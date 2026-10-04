@@ -57,9 +57,11 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
                   const movement=visitorMovements?.[value] || 0;
                   const queueWait=isWater ? Math.min(45, Math.round(Math.max(0, movement/(capacity*1.4)-0.35)*18)) : 0;
                   const row=Math.floor(index/8), col=index%8;
+                  const expansionThemes=["starter","family","thrill","resort","extreme","vip","grand"];
+                  const expansionTheme=expansionThemes[Math.max(0, Math.min(expansionThemes.length-1, row-5))];
                   const neighbors=[row>0?index-8:-1,row<Math.ceil(grid.length/8)-1?index+8:-1,col>0?index-1:-1,col<7?index+1:-1].filter((n)=>n>=0);
                   const queueConnected=!isWater || neighbors.some((n)=>grid[n]==="queue_path"||grid[n]==="main_path");
-                  return <Tile key={index} index={index} grid={grid} zone={parkZones?.[index]} upgradeLevel={upgrades?.[index]||0} value={value} selectedBuild={selectedBuild} isSelected={selectedTile===index} incident={incidentMap.get(index)} queueWait={queueWait} queueConnected={queueConnected} movement={movement} onClick={()=>onTileClick(index)} />;
+                  return <Tile key={index} index={index} grid={grid} zone={parkZones?.[index]} upgradeLevel={upgrades?.[index]||0} value={value} selectedBuild={selectedBuild} expansionTheme={expansionTheme} isSelected={selectedTile===index} incident={incidentMap.get(index)} queueWait={queueWait} queueConnected={queueConnected} movement={movement} onClick={()=>onTileClick(index)} />;
                 })}
               </div>
               <GuestLayer grid={grid} guests={guests} movements={visitorMovements} staffTotal={staffTotal} />
