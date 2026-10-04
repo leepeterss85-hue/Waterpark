@@ -34,6 +34,18 @@ export default function ParkManagementPanel({ admissionFee, marketingSpend, expr
         <div className="rounded-lg bg-white/10 p-2"><div className="flex items-center gap-1 text-[8px] font-black uppercase text-white/45"><Wrench className="h-3 w-3" /> Issues</div><div className="mt-0.5 text-sm font-black">{broken + maintenance}</div><div className="text-[8px] text-white/45">{broken ? `${broken} breakdown${broken > 1 ? "s" : ""}` : maintenance ? `${maintenance} maintenance` : "All rides operational"}</div></div>
         <div className="rounded-lg bg-white/10 p-2"><div className="flex items-center gap-1 text-[8px] font-black uppercase text-white/45"><TrendingUp className="h-3 w-3" /> Latest</div><div className="mt-0.5 text-sm font-black">{latest ? (latest.net >= 0 ? "+" : "") + "$" + latest.net.toLocaleString() : "—"}</div><div className="text-[8px] text-white/45">{latest ? `${latest.guests} guests · ${latestExpenses.toLocaleString()} costs` : "Advance a day to measure"}</div></div>
       </div>
+      {latest && <div className="mt-3 rounded-xl bg-white/5 p-2.5 ring-1 ring-white/10">
+        <div className="mb-2 text-[8px] font-black uppercase tracking-[0.14em] text-white/45">Latest day breakdown</div>
+        <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[9px]">
+          <div className="flex justify-between gap-2"><span className="text-white/45">Tickets</span><b>${(latest.ticketRevenue || 0).toLocaleString()}</b></div>
+          <div className="flex justify-between gap-2"><span className="text-white/45">Rides</span><b>${(latest.rideIncome || 0).toLocaleString()}</b></div>
+          <div className="flex justify-between gap-2"><span className="text-white/45">Upkeep</span><b>-${(latest.upkeep || 0).toLocaleString()}</b></div>
+          <div className="flex justify-between gap-2"><span className="text-white/45">Wages</span><b>-${(latest.wages || 0).toLocaleString()}</b></div>
+          <div className="flex justify-between gap-2"><span className="text-white/45">Utilities</span><b>-${(latest.utilities || 0).toLocaleString()}</b></div>
+          <div className="flex justify-between gap-2"><span className="text-white/45">Marketing</span><b>-${(latest.marketing || 0).toLocaleString()}</b></div>
+        </div>
+        {(latest.weather || latest.event) && <div className="mt-2 text-[8px] font-bold text-cyan-200">{latest.weather}{latest.event ? " · " + latest.event : ""}</div>}
+      </div>}
       {topRide && <div className="mt-2 rounded-lg bg-cyan-400/10 px-2.5 py-2 text-[9px] font-bold text-cyan-200">⭐ Top attraction: {topRide}</div>}
     </div>
   </section>;
