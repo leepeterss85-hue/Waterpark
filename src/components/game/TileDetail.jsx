@@ -1,5 +1,5 @@
 import React from "react";
-import { X, ArrowUpCircle, Wrench, CheckCircle2, AlertTriangle, Users } from "lucide-react";
+import { X, ArrowUpCircle, Wrench, CheckCircle2, AlertTriangle, Users, Clock } from "lucide-react";
 import { getAttraction, MAX_UPGRADE, upgradeCost } from "@/data/gameData";
 import { getIcon } from "./icons";
 
@@ -12,7 +12,7 @@ function Row({ label, value }) {
   );
 }
 
-export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0, incident = null, guests = 0, onUpgrade, onSell, onClose }) {
+export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0, incident = null, guests = 0, queueWait = 0, onUpgrade, onSell, onClose }) {
   if (gridIndex == null || !attractionId) return null;
   const attr = getAttraction(attractionId);
   const Icon = attr ? getIcon(attr.icon) : null;
@@ -41,7 +41,7 @@ export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0,
         <Row label="Build cost" value={`$${attr.cost.toLocaleString()}`} />
         <Row label="Daily income" value={`$${attr.income.toLocaleString()}`} />
         <Row label="Upkeep" value={`$${attr.maintenance.toLocaleString()}`} />
-        {attr.capacity > 0 && <Row label="Capacity" value={`${effectiveCapacity} riders/day`} />}\n        {attr.capacity > 0 && <Row label="Current park load" value={<span className="inline-flex items-center gap-1"><Users className="h-3 w-3" />{estimatedLoad}%</span>} />}
+        {attr.capacity > 0 && <Row label="Capacity" value={`${effectiveCapacity} riders/day`} />}\n        {attr.capacity > 0 && <Row label="Current park load" value={<span className="inline-flex items-center gap-1"><Users className="h-3 w-3" />{estimatedLoad}%</span>} />}\n        {attr.capacity > 0 && <Row label="Estimated queue" value={<span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" />{queueWait ? `${queueWait} min` : "Low / none"}</span>} />}
         {attr.fun > 0 && <Row label="Fun rating" value={`${attr.fun}/10`} />}
         <Row label="Upgrade level" value={maxed ? `Lv ${level} (max)` : `Lv ${level} / ${MAX_UPGRADE}`} />
       </div>
