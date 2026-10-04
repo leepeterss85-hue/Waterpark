@@ -480,7 +480,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         return nu;
       });
       setMoney((m) => m - cost);
-      setTotalUpgrades((t) => t + 1);
+      setTotalUpgrades((t) => t + 1);\n      setXp((x) => x + 15);
     },
     [grid, upgrades, money]
   );
@@ -514,6 +514,17 @@ const [selectedZone, setSelectedZone] = useState(null);
     setSelectedZone((current) => (current === zoneId ? null : zoneId));
     setSelectedBuild(null);
     setSelectedTile(null);
+  }, []);
+
+  const applyCheat = useCallback((kind) => {
+    if (kind === "cash") setMoney((m) => m + 50000);
+    if (kind === "xp") setXp((x) => x + 500);
+    if (kind === "reputation") setReputation(100);
+    if (kind === "boost") {
+      setMoney((m) => m + 250000);
+      setXp((x) => x + 2500);
+      setReputation(100);
+    }
   }, []);
 
   const claimMission = useCallback(
@@ -686,7 +697,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     upgradeAttraction,
     level,
     xp,
-    xpForNext: xpForLevel(level),
+    xpForNext: xpForLevel(level),\n    applyCheat,
     expansionsDone,
     gridSize,
     maxGridSize: MAX_GRID_SIZE,
