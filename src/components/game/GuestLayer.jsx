@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { getParkItem } from "@/data/gameData";
+import PersonSprite from "@/components/game/PersonSprite";
 
 const STAFF_ROLES = [
   { id: "lifeguard", color: "bg-red-500", label: "Lifeguard" },
@@ -10,42 +12,36 @@ const STAFF_ROLES = [
   { id: "gardener", color: "bg-lime-600", label: "Groundskeeper" },
 ];
 
-export default function GuestLayer({ grid, parkZones = [], guests = 0, movements = {}, queueStats = {}, staff = {}, staffAssignments = {} }) {
+export default function GuestLayer({ grid, parkZones = [], guests = 0, movements = {}, queueStats = {}, staff = {}, staffAssignments = {}, incidents = [] }) {
   const [tick, setTick] = useState(0);
-  useEffect(() => {
-    const id = setInterval(() => setTick((value) => value + 1), 2200);
-    return () => clearInterval(id);
-  }, []);
+  useEffect(() => { const timer = setInterval(() => setTick(value => value + 1), 1600); return () => clearInterval(timer); }, []);
   const rows = Math.max(1, Math.ceil(grid.length / 8));
-  const targets = useMemo(() => grid.map((id, index) => id ? { index, id, weight: movements[id] || 1 } : null).filter(Boolean), [grid, movements]);
-  const visibleGuests = Math.min(18, guests > 0 ? Math.max(4, Math.ceil(Math.sqrt(guests) * 1.7)) : 0);
-  const guestDots = Array.from({ length: visibleGuests }, (_, index) => {
-    const target = targets.length ? targets[(index * 3 + tick + Math.floor(index / 4)) % targets.length] : { index: 0 };
-    const col = target.index % 8, row = Math.floor(target.index / 8);
-    return { id: index, left: ((col + 0.5) / 8) * 100, top: ((row + 0.5) / rows) * 100 };
+  const targets = useMemo(() => grid.map((id, index) => id ? { index, id, attr: getParkItem(id) } : null).filter(Boolean), [grid]);
+  const closed = new Set(incidents.filter(incident => incident.type === "breakdown").map(incident => incident.tileIndex));
+  const destinations = targets.filter(target => target.attr?.category !== "environment" && !closed.has(target.index) && (movements[target.id] || 0) > 0);
+  const entrance = targets.find(target => target.id === "park_entrance")?.index ?? Math.max(0, grid.length - 8);
+  const entry = { x: entrance % 8 + .5, y: Math.floor(entrance / 8) + .65 };
+  const position = (x, y) => ({ left: x / 8 * 100 + "%", top: y / rows * 100 + "%" });
+  const walkers = Array.from({ length: Math.min(24, guests > 0 ? Math.max(4, Math.ceil(Math.sqrt(guests) * 1.7)) : 0) }, (_, i) => {
+    const target = destinations[(i + Math.floor(tick / 10)) % Math.max(1, destinations.length)];
+    if (!target) return null;
+    const phase = (tick + i * 3) % 10, x = target.index % 8 + .12, y = Math.floor(target.index / 8) + .73;
+    const inWater = target.attr.category === "attraction" && !["soft_play", "gem_mining"].includes(target.id);
+    if (inWater && phase >= 4 && phase <= 7) return null;
+    const spot = phase === 0 || phase === 9 ? entry : phase === 1 ? { x, y: entry.y } : phase === 2 ? { x, y: (entry.y + y) / 2 } : { x, y };
+    const activity = phase >= 4 && phase <= 7 ? "waiting" : "walking";
+    return <span key={"g" + i} className="park-pedestrian park-guest" data-activity={activity} data-destination={target.id} style={position(spot.x, spot.y)} title={`Guest ${activity === "waiting" ? "visiting" : "heading to"} ${target.attr.name}`}><PersonSprite activity={activity} variant={i} /></span>;
   });
-  const staffDots = STAFF_ROLES.flatMap((role, roleIndex) => {
-    const count = Math.max(0, staff?.[role.id] || 0);
-    const assignment = staffAssignments?.[role.id] || "";
-    const roleTargets = targets.filter((target) => !assignment || (parkZones?.[target.index] || "") === assignment);
-    const positions = roleTargets.length ? roleTargets : (assignment ? [] : targets);
-    return Array.from({ length: Math.min(3, count) }, (_, index) => {
-      const target = positions[(index + tick + roleIndex) % Math.max(1, positions.length)];
-      if (!target) return null;
-      const col = target.index % 8, row = Math.floor(target.index / 8);
-      return { id: role.id + "-" + index, role: role.label, color: role.color, left: ((col + 0.28 + index * 0.08) / 8) * 100, top: ((row + 0.28 + roleIndex * 0.06) / rows) * 100 };
-    }).filter(Boolean);
+  const personnel = STAFF_ROLES.flatMap((role, roleIndex) => {
+    const assignment = staffAssignments[role.id] || "";
+    const positions = targets.filter(target => !assignment || (parkZones[target.index] || "") === assignment);
+    return Array.from({ length: Math.min(3, Math.max(0, staff[role.id] || 0)) }, (_, i) => {
+      const target = positions[(i + tick + roleIndex) % Math.max(1, positions.length)];
+      return target ? <span key={role.id + i} className="park-pedestrian park-staff" data-role={role.id} data-activity="walking" style={position(target.index % 8 + .88, Math.floor(target.index / 8) + .7)} title={role.label}><PersonSprite variant={roleIndex + 1} role={role.id} /></span> : null;
+    });
   });
-  const queues = Object.entries(queueStats || {}).filter(([, queue]) => queue?.guests > 0);
-  return (
-    <div className="pointer-events-none absolute inset-0 z-30 overflow-hidden">
-      {guestDots.map((guest) => <span key={"g" + guest.id} className="guest-marker absolute h-3.5 w-3.5 rounded-full border-2 border-white bg-fuchsia-400 shadow-md transition-[left,top] ease-in-out" style={{ left: guest.left + "%", top: guest.top + "%", transform: "translate(-50%,-50%)", transitionDuration: "1800ms" }}><span className="absolute left-1/2 top-0.5 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-white/90" /></span>)}
-      {queues.map(([tileIndex, queue]) => {
-        const col = Number(tileIndex) % 8, row = Math.floor(Number(tileIndex) / 8);
-        const count = Math.min(5, Math.max(1, Math.ceil(queue.guests / 5)));
-        return Array.from({ length: count }, (_, index) => <span key={"q" + tileIndex + "-" + index} title={"Queue: " + queue.guests + " guests · estimated wait " + queue.wait + " min · rail capacity " + (queue.queueCapacity ?? 8) + (queue.overflow > 0 ? " · overflow " + queue.overflow : "")} className={`absolute h-2.5 w-2.5 rounded-full border border-white shadow ${queue.overflow > 0 ? "bg-rose-500" : "bg-amber-300"}`} style={{ left: (((col + 0.5 + (index % 2) * 0.13) / 8) * 100) + "%", top: (((row + 0.5 + Math.floor(index / 2) * 0.13) / rows) * 100) + "%", transform: "translate(-50%,-50%)" }} />);
-      })}
-      {staffDots.map((person) => <span key={"s" + person.id} title={person.role} className={`staff-marker absolute h-3 w-3 rounded-full border-2 border-white shadow-md transition-[left,top] ease-in-out ${person.color}`} style={{ left: person.left + "%", top: person.top + "%", transform: "translate(-50%,-50%)", transitionDuration: "1800ms" }} />)}
-    </div>
-  );
+  return <div className="pointer-events-none absolute inset-0 z-30 overflow-hidden" data-people-layer>
+    {walkers}{personnel}
+    {guests > 0 && Object.entries(queueStats).filter(([, queue]) => queue.guests > 0).flatMap(([tileIndex, queue]) => Array.from({ length: Math.min(5, Math.max(1, Math.ceil(queue.guests / 5))) }, (_, i) => <span key={`q${tileIndex}-${i}`} className="park-pedestrian park-queue-guest" data-activity="waiting" title={`Queue: ${queue.guests} guests · ${queue.wait}m wait · rail capacity ${queue.queueCapacity ?? 8}${queue.overflow > 0 ? " · overflow " + queue.overflow : ""}`} style={position(Number(tileIndex) % 8 + .09 + i % 2 * .15, Math.floor(Number(tileIndex) / 8) + .28 + Math.floor(i / 2) * .16)}><PersonSprite activity="waiting" variant={i + 1} /></span>))}
+  </div>;
 }

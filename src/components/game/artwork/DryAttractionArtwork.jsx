@@ -1,0 +1,6 @@
+import React from "react";
+
+export default function DryAttractionArtwork({ id }) {
+  if (id === "gem_mining") return <g data-ride-detail="gem-sluice"><rect x="12" y="23" width="74" height="55" rx="6" className="scene-wood" /><path d="M15 35H82V56H15Z" className="pool-rim" /><path d="M18 39H80V51H18Z" className="scene-water" />{[28, 49, 70].map((x) => <g key={x}><ellipse cx={x} cy="58" rx="9" ry="5" className="scene-gem-pan" /><path d={`M${x - 3} 58L${x} 53L${x + 4} 58L${x} 61Z`} className="scene-gem" /></g>)}<path d="M18 78V88M77 78V88M9 21L45 8L89 21Z" className="scene-wood" /></g>;
+  return <g data-ride-detail="soft-play"><rect x="8" y="18" width="84" height="67" rx="10" className="scene-play-mat" /><rect x="20" y="29" width="25" height="29" rx="4" className="scene-play-tower" /><path d="M17 31L32 17L49 31Z" className="scene-roof-coral" /><path d="M43 47Q80 41 76 73" className="ride-water-slide pool-slide-gold" /><path d="M24 60V77M34 59V77M22 65H37M22 71H37" className="scene-play-ladder" />{[53, 64, 37].map((x, i) => <circle key={x} cx={x} cy={72 - i * 7} r="5" className="scene-play-ball" />)}</g>;
+}

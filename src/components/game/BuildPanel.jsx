@@ -1,53 +1,7 @@
 import React, { useMemo, useState } from "react";
-import { Search, Waves, Utensils, Check, LockKeyhole } from "lucide-react";
+import { Search, Waves, Utensils } from "lucide-react";
 import { ATTRACTIONS, PARK_OBJECTS, CATEGORIES, unlockLevelFor } from "@/data/gameData";
-import { getIcon } from "./icons";
-
-function BuildCard({ item, selected, affordable, unlocked, onSelect }) {
-  const Icon = getIcon(item.icon);
-  const isWater = item.category === "attraction";
-  const isEnvironment = item.category === "environment";
-  return (
-    <button
-      onClick={() => onSelect(selected ? null : item.id)}
-      disabled={(!affordable || !unlocked) && !selected}
-      className={
-        "build-catalog-card group w-full rounded-xl border p-2 text-left transition-all duration-200 " +
-        (selected
-          ? "border-cyan-500 bg-slate-950 text-white shadow-lg ring-2 ring-cyan-300/60"
-          : affordable
-          ? "border-slate-200 bg-white text-slate-700 shadow-sm hover:-translate-y-0.5 hover:border-cyan-200 hover:shadow-md"
-          : "cursor-not-allowed border-slate-100 bg-slate-50 text-slate-300")
-      }
-      title={!unlocked ? "Unlocks at a higher park level" : !affordable && !selected ? "You need more cash" : item.description}
-    >
-      <div className="flex items-start gap-3">
-        <div className={"relative grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-lg bg-gradient-to-br " + item.color}>
-          <div className="absolute inset-0 bg-white/15" />
-          {Icon && <Icon className="relative z-10 h-4 w-4 text-white drop-shadow" />}
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-start gap-2">
-            <div className="min-w-0 flex-1">
-              <div className="line-clamp-2 text-[11px] font-extrabold leading-4">{item.name}</div>
-              <div className={"mt-0.5 text-[9px] font-bold uppercase tracking-wider " + (selected ? "text-cyan-200" : isWater ? "text-cyan-600" : "text-amber-600")}>
-                {isWater ? "Water attraction" : isEnvironment ? "Park essential" : "Park facility"}
-              </div>
-            </div>
-            {selected ? <Check className="h-4 w-4 shrink-0 text-cyan-300" /> : !unlocked ? <LockKeyhole className="h-4 w-4 shrink-0 text-amber-400" /> : !affordable ? <LockKeyhole className="h-4 w-4 shrink-0 text-slate-300" /> : null}
-          </div>
-          <div className={"mt-1 text-[11px] font-extrabold " + (selected ? "text-white" : "text-slate-800")}>
-            {!unlocked && <div className="mb-1 text-[8px] font-black uppercase tracking-wider text-amber-600">Unlocks at Level {unlockLevelFor(item)}</div>}
-            ${item.cost.toLocaleString()}
-          </div>
-          <div className={"mt-1 line-clamp-2 text-[9px] leading-3.5 " + (selected ? "text-slate-300" : "text-slate-500")}>
-            {item.description}
-          </div>
-        </div>
-      </div>
-    </button>
-  );
-}
+import BuildCard from "@/components/game/BuildCard";
 
 export default function BuildPanel({ money, level = 1, selectedBuild, onSelect }) {
   const [query, setQuery] = useState("");

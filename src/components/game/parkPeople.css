@@ -1,0 +1,19 @@
+.game-control-bar .game-action-button { color:hsl(var(--park-ink)); background:hsl(var(--park-rim)); }
+.park-person { display:block; overflow:visible; --person-color:hsl(var(--park-slide)); --skin:hsl(var(--park-skin-light)); }
+.person-color-1 { --person-color:hsl(var(--park-sun)); }.person-color-2 { --person-color:hsl(var(--park-deep)); }.person-color-3 { --person-color:hsl(var(--park-green)); }.person-color-4 { --person-color:hsl(var(--park-water)); }
+.person-skin-1 { --skin:hsl(var(--park-skin-medium)); }.person-skin-2 { --skin:hsl(var(--park-skin-dark)); }
+.person-uniform-lifeguard,.person-uniform-entertainer { --person-color:hsl(var(--park-slide)); }.person-uniform-mechanic { --person-color:hsl(var(--park-sun)); }.person-uniform-cleaner,.person-uniform-gardener { --person-color:hsl(var(--park-green)); }.person-uniform-security { --person-color:hsl(var(--park-ink)); }.person-uniform-fitness_coach { --person-color:hsl(var(--park-deep)); }
+.person-skin { fill:var(--skin); }.person-shirt,.person-cap { fill:var(--person-color); }.person-shorts { fill:hsl(var(--park-deep)); }
+.person-limb { fill:none; stroke:var(--skin); stroke-width:3; stroke-linecap:round; }.person-leg { fill:none; stroke:var(--skin); stroke-width:3.5; stroke-linecap:round; }
+.person-hair { fill:none; stroke:hsl(var(--park-ink)); stroke-width:2.5; stroke-linecap:round; }.person-shoes { stroke:hsl(var(--park-ink)); stroke-width:3; stroke-linecap:round; }.person-badge { fill:hsl(var(--park-rim)); }
+.person-shadow { fill:hsl(var(--park-ink)/.2); }.person-ripple { fill:none; stroke:hsl(var(--park-rim)/.85); stroke-width:1.2; stroke-linecap:round; }
+.park-pedestrian { position:absolute; width:17px; height:26px; transform:translate(-50%,-80%); transition:left 1.3s linear,top 1.3s linear; }
+.park-pedestrian > .park-person { width:100%; height:100%; filter:drop-shadow(0 1px 1px hsl(var(--park-ink)/.25)); }
+.park-pedestrian[data-activity="walking"] .person-leg-left,.park-pedestrian[data-activity="walking"] .person-arm-right { transform-origin:12px 20px; animation:person-stride .65s ease-in-out infinite alternate; }
+.park-pedestrian[data-activity="walking"] .person-leg-right,.park-pedestrian[data-activity="walking"] .person-arm-left { transform-origin:12px 20px; animation:person-stride .65s ease-in-out infinite alternate-reverse; }
+.ride-visitors { position:absolute; inset:0; width:100%; height:100%; z-index:12; overflow:visible; pointer-events:none; }
+.ride-swimmer { animation:person-swim 3.5s ease-in-out infinite alternate; }.person-swim-stroke { transform-origin:center; animation:person-stroke 1.2s ease-in-out infinite alternate; }.ride-swimmer:nth-child(2n) { animation-delay:-1.7s; }
+@keyframes person-stride { from{transform:rotate(-12deg)}to{transform:rotate(12deg)} }
+@keyframes person-swim { from{transform:translateX(-3px)}to{transform:translateX(4px)} }
+@keyframes person-stroke { from{transform:rotate(-4deg)}to{transform:rotate(4deg)} }
+@media (prefers-reduced-motion:reduce) { .park-pedestrian{transition:none}.park-person *,.ride-swimmer { animation:none!important; } }

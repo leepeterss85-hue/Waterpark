@@ -42,6 +42,9 @@
     --park-green: 150 45% 37%;
     --park-sun: 41 97% 60%;
     --park-slide: 12 89% 63%;
+    --park-skin-light: 27 79% 78%;
+    --park-skin-medium: 25 52% 57%;
+    --park-skin-dark: 23 38% 35%;
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -86,6 +89,9 @@
     --park-green: 150 45% 37%;
     --park-sun: 41 97% 60%;
     --park-slide: 12 89% 63%;
+    --park-skin-light: 27 79% 78%;
+    --park-skin-medium: 25 52% 57%;
+    --park-skin-dark: 23 38% 35%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
