@@ -98,6 +98,7 @@ const [selectedZone, setSelectedZone] = useState(null);
   const level = levelFromXp(xp);
   const gridSize = grid.length;
 
+  /** @type {import("react").MutableRefObject<Record<string, any>>} */
   const stateRef = useRef({});
   stateRef.current = { money, day, reputation, grid, staff, incidents, upgrades, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass };
 
@@ -205,7 +206,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     let newGuests = 0;
     let income = 0;
     let newReputation = rep;
-    let visitorStats = { avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null };
+    let visitorStats = { avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {}, guestTypes: {} };
 
     if (attractions.length > 0) {
       const demand = Math.floor(
@@ -418,6 +419,15 @@ const [selectedZone, setSelectedZone] = useState(null);
     [selectedBuild, money]
   );
 
+  const paintZone = useCallback((index) => {
+    if (!selectedZone) return;
+    setParkZones((z) => {
+      const nz = [...z];
+      nz[index] = selectedZone;
+      return nz;
+    });
+  }, [selectedZone]);
+
   const handleTileClick = useCallback(
     (index) => {
       if (selectedZone) {
@@ -494,15 +504,6 @@ const [selectedZone, setSelectedZone] = useState(null);
     setMoney((m) => m - cost);
     setExpansionsDone((e) => e + 1);
   }, [expansionsDone, level, money]);
-
-  const paintZone = useCallback((index) => {
-    if (!selectedZone) return;
-    setParkZones((z) => {
-      const nz = [...z];
-      nz[index] = selectedZone;
-      return nz;
-    });
-  }, [selectedZone]);
 
   const chooseBuild = useCallback((id) => {
     setSelectedBuild(id);
