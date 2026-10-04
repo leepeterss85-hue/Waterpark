@@ -1,0 +1,21 @@
+/* All texture and reflection layers are clipped to the actual water footprint. */
+.pool-water-surface { pointer-events:none; }
+.water-stop-shallow { stop-color:hsl(var(--park-water)); }
+.water-stop-aqua { stop-color:hsl(var(--park-water)); }
+.water-stop-blue,.water-stop-depth { stop-color:hsl(var(--park-deep)); }
+.water-stop-sky { stop-color:hsl(var(--park-rim)); }
+.water-floor-grout { fill:none; stroke:hsl(var(--park-deep)/.28); stroke-width:.55; }
+.water-floor-light { fill:none; stroke:hsl(var(--park-rim)/.12); stroke-width:.4; }
+.water-caustic-soft { fill:none; stroke:hsl(var(--park-rim)/.12); stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
+.water-caustic-fine { fill:none; stroke:hsl(var(--park-rim)/.38); stroke-width:.6; stroke-linecap:round; }
+.water-pool-wall { fill:none; stroke:hsl(var(--park-deep)/.52); stroke-width:3.5; stroke-linejoin:round; }
+.water-reflection-soft { fill:none; stroke:hsl(var(--park-rim)/.16); stroke-width:4; stroke-linecap:round; }
+.water-reflection-bright { fill:none; stroke:hsl(var(--park-rim)/.85); stroke-width:.8; stroke-linecap:round; }
+.water-surface-ripples { fill:none; stroke:hsl(var(--park-rim)/.4); stroke-width:.6; stroke-linecap:round; }
+.water-caustic-drift { animation:water-caustic-drift 14s linear infinite; }
+.water-reflections { animation:water-reflection-shimmer 6s ease-in-out infinite; }
+.aquatic-ride-art .ride-wave-line { stroke:hsl(var(--park-rim)/.58); stroke-width:1.1; }
+.aquatic-ride-art .ride-river-glint { stroke:hsl(var(--park-rim)/.65); stroke-width:.65; stroke-dasharray:3 8; }
+@keyframes water-caustic-drift { to { transform:translate(22px,18px); } }
+@keyframes water-reflection-shimmer { 0%,100% { opacity:.65; } 50% { opacity:1; } }
+@media (prefers-reduced-motion:reduce) { .water-caustic-drift,.water-reflections { animation:none; } }
