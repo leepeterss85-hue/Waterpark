@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Waves, BarChart3, Save } from "lucide-react";
+import { Waves, BarChart3, Save, Trees } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useGameState } from "@/hooks/useGameState";
 import { ACHIEVEMENTS } from "@/data/achievements";
@@ -16,15 +16,13 @@ import MissionsPanel from "@/components/game/MissionsPanel";
 import ChallengeBanner from "@/components/game/ChallengeBanner";
 import VisitorInsights from "@/components/game/VisitorInsights";
 import { TileDetailPanel } from "@/components/game/TileDetail";
-import { getAttraction } from "@/data/gameData";
 
 export default function Home() {
   const game = useGameState();
   const { toast } = useToast();
-  const selectedAttrId =
-    game.selectedTile != null ? game.grid[game.selectedTile] : null;
-
+  const selectedAttrId = game.selectedTile != null ? game.grid[game.selectedTile] : null;
   const prevUnlocked = useRef(null);
+
   useEffect(() => {
     const unlocked = ACHIEVEMENTS.filter((a) => a.check(game.achievementState)).map((a) => a.id);
     if (prevUnlocked.current == null) {
@@ -34,146 +32,86 @@ export default function Home() {
     for (const id of unlocked) {
       if (!prevUnlocked.current.includes(id)) {
         const a = ACHIEVEMENTS.find((x) => x.id === id);
-        toast({ title: "🏆 Achievement Unlocked!", description: `${a.title} — ${a.desc}` });
+        toast({ title: "🏆 Achievement Unlocked!", description: a.title + " — " + a.desc });
       }
     }
     prevUnlocked.current = unlocked;
   }, [game.achievementState, toast]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-50 via-cyan-50 to-blue-100">
-      {/* Header */}
-      <header className="border-b border-white/60 bg-white/70 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-4">
-          <div className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 shadow-md">
-            <Waves className="h-6 w-6 text-white" />
+    <div className="min-h-screen bg-[radial-gradient(circle_at_12%_0%,rgba(34,211,238,.22),transparent_30%),radial-gradient(circle_at_90%_8%,rgba(45,212,191,.16),transparent_28%),linear-gradient(180deg,#dff6ff_0%,#eef9ee_42%,#d7ead2_100%)]">
+      <header className="sticky top-0 z-40 border-b border-white/70 bg-white/85 shadow-sm backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:py-4">
+          <div className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-2xl bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-700 shadow-lg">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,.55),transparent_24%)]" />
+            <Waves className="relative z-10 h-6 w-6 text-white" />
           </div>
-          <div>
-            <h1 className="font-display text-2xl font-extrabold tracking-tight text-slate-800">
-              Splash Tycoon
-            </h1>
-            <p className="text-sm text-slate-400">Build your dream water park</p>
+          <div className="min-w-0">
+            <h1 className="font-display text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">Splash Tycoon</h1>
+            <p className="hidden text-xs font-semibold text-slate-500 sm:block">Design, operate and grow your ultimate water park.</p>
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <Link
-              to="/load"
-              className="flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50 sm:px-4"
-            >
-              <Save className="h-4 w-4" />
-              <span className="hidden sm:inline">Load Manager</span>
+            <Link to="/load" className="flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-bold text-slate-700 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:bg-sky-50 sm:px-4">
+              <Save className="h-4 w-4 text-cyan-600" /><span className="hidden sm:inline">Load Manager</span>
             </Link>
-            <Link
-              to="/dashboard"
-              className="flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50 sm:px-4"
-            >
-              <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Dashboard</span>
+            <Link to="/dashboard" className="flex items-center gap-2 rounded-xl bg-slate-900 px-3 py-2 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-800 sm:px-4">
+              <BarChart3 className="h-4 w-4" /><span className="hidden sm:inline">Dashboard</span>
             </Link>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-5">
-        {/* Stats */}
-        <StatsBar
-          money={game.money}
-          day={game.day}
-          guests={game.guests}
-          reputation={game.reputation}
-          lastNet={game.lastNet}
-          level={game.level}
-        />
-
-        {/* Controls */}
-        <div className="mt-4">
-          <GameControls
-            playing={game.playing}
-            speed={game.speed}
-            onTogglePlay={() => game.setPlaying(!game.playing)}
-            onSpeed={game.setSpeed}
-            onAdvance={game.advanceDay}
-            onReset={game.resetGame}
-          />
+      <main className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-6">
+        <div className="mb-4 overflow-hidden rounded-[28px] border border-white/80 bg-white/75 px-4 py-4 shadow-sm backdrop-blur sm:px-5">
+          <div className="flex items-center gap-3">
+            <div className="hidden h-10 w-10 place-items-center rounded-2xl bg-emerald-100 sm:grid"><Trees className="h-5 w-5 text-emerald-700" /></div>
+            <div>
+              <div className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-emerald-700">Park Manager</div>
+              <h2 className="font-display text-lg font-extrabold text-slate-900 sm:text-xl">Shape a believable resort-style water park</h2>
+              <p className="mt-1 text-xs leading-5 text-slate-500">Build major water attractions first, then add food, shade, changing rooms and guest services around them.</p>
+            </div>
+          </div>
         </div>
 
-        {/* Main layout */}
-        <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
-          <div className="flex flex-col gap-4">
+        <StatsBar money={game.money} day={game.day} guests={game.guests} reputation={game.reputation} lastNet={game.lastNet} level={game.level} />
+
+        <div className="mt-4"><GameControls playing={game.playing} speed={game.speed} onTogglePlay={() => game.setPlaying(!game.playing)} onSpeed={game.setSpeed} onAdvance={game.advanceDay} onReset={game.resetGame} /></div>
+
+        <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+          <div className="flex min-w-0 flex-col gap-4">
             <ChallengeBanner challenge={game.challenge} />
-            <ExpansionPanel
-              gridSize={game.gridSize}
-              expansionsDone={game.expansionsDone}
-              level={game.level}
-              money={game.money}
-              onExpand={game.expandPark}
-            />
-            <ParkGrid
-              grid={game.grid}
-              selectedBuild={game.selectedBuild}
-              selectedTile={game.selectedTile}
-              incidents={game.incidents}
-              onTileClick={game.handleTileClick}
-            />
+            <ExpansionPanel gridSize={game.gridSize} expansionsDone={game.expansionsDone} level={game.level} money={game.money} onExpand={game.expandPark} />
+            <ParkGrid grid={game.grid} selectedBuild={game.selectedBuild} selectedTile={game.selectedTile} incidents={game.incidents} onTileClick={game.handleTileClick} />
             <EventLog log={game.log} issueCount={game.incidents.length} />
             <VisitorInsights visitorStats={game.visitorStats} />
-            <MissionsPanel
-              level={game.level}
-              xp={game.xp}
-              xpForNext={game.xpForNext}
-              missionState={game.missionState}
-              claimedMissions={game.claimedMissions}
-              onClaim={game.claimMission}
-            />
+            <MissionsPanel level={game.level} xp={game.xp} xpForNext={game.xpForNext} missionState={game.missionState} claimedMissions={game.claimedMissions} onClaim={game.claimMission} />
           </div>
 
-          <aside className="flex flex-col gap-4">
+          <aside className="flex min-w-0 flex-col gap-4">
             {selectedAttrId ? (
-              <TileDetailPanel
-                gridIndex={game.selectedTile}
-                attractionId={selectedAttrId}
-                level={game.upgrades[game.selectedTile] || 0}
-                money={game.money}
-                onUpgrade={() => game.upgradeAttraction(game.selectedTile)}
-                onSell={() => game.sellAttraction(game.selectedTile)}
-                onClose={() => game.setSelectedTile(null)}
-              />
+              <TileDetailPanel gridIndex={game.selectedTile} attractionId={selectedAttrId} level={game.upgrades[game.selectedTile] || 0} money={game.money} onUpgrade={() => game.upgradeAttraction(game.selectedTile)} onSell={() => game.sellAttraction(game.selectedTile)} onClose={() => game.setSelectedTile(null)} />
             ) : (
-              <div className="rounded-2xl bg-white/70 p-4 text-sm text-slate-500 shadow-sm ring-1 ring-slate-100">
-                <span className="font-semibold text-slate-700">Tip:</span> Pick a
-                build item, then tap an empty lot to place it. Tap a placed
-                attraction to inspect or sell it.
+              <div className="waterpark-panel border-dashed bg-white/80 p-4">
+                <div className="text-[10px] font-extrabold uppercase tracking-wider text-cyan-700">How to build</div>
+                <p className="mt-1 text-xs leading-5 text-slate-500">Choose an attraction or service on the right, then tap an open green lot. Tap a built tile to inspect, upgrade or sell it.</p>
               </div>
             )}
-            <div className="rounded-2xl bg-white/70 p-4 shadow-sm ring-1 ring-slate-100">
-              <h3 className="mb-3 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                Build Menu
-              </h3>
-              <BuildPanel
-                money={game.money}
-                selectedBuild={game.selectedBuild}
-                onSelect={game.setSelectedBuild}
-              />
+
+            <div className="waterpark-panel overflow-hidden bg-white/85 p-4">
+              <div className="mb-3 border-b border-slate-100 pb-3">
+                <div className="text-[10px] font-extrabold uppercase tracking-wider text-cyan-700">Construction</div>
+                <h3 className="mt-0.5 font-display text-lg font-extrabold text-slate-900">Build your park</h3>
+                <p className="mt-1 text-[11px] leading-4 text-slate-500">Pools, slides, family attractions and essential guest facilities.</p>
+              </div>
+              <BuildPanel money={game.money} selectedBuild={game.selectedBuild} onSelect={game.setSelectedBuild} />
             </div>
-            <div className="rounded-2xl bg-white/70 p-4 shadow-sm ring-1 ring-slate-100">
-              <StaffPanel
-                money={game.money}
-                staff={game.staff}
-                staffWages={game.staffWages}
-                uptime={game.uptime}
-                safety={game.safety}
-                cleanliness={game.cleanliness}
-                entertainment={game.entertainment}
-                onHire={game.hireStaff}
-                onFire={game.fireStaff}
-              />
+
+            <div className="waterpark-panel bg-white/85 p-4">
+              <StaffPanel money={game.money} staff={game.staff} staffWages={game.staffWages} uptime={game.uptime} safety={game.safety} cleanliness={game.cleanliness} entertainment={game.entertainment} onHire={game.hireStaff} onFire={game.fireStaff} />
             </div>
-            <div className="rounded-2xl bg-white/70 p-4 shadow-sm ring-1 ring-slate-100">
-              <SaveLoadPanel
-                saves={game.saves}
-                onSave={game.savePark}
-                onLoad={game.loadPark}
-                onDelete={game.deleteSave}
-              />
+
+            <div className="waterpark-panel bg-white/85 p-4">
+              <SaveLoadPanel saves={game.saves} onSave={game.savePark} onLoad={game.loadPark} onDelete={game.deleteSave} />
             </div>
           </aside>
         </div>
