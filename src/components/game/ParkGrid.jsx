@@ -32,8 +32,8 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
           <div className="pointer-events-none absolute left-0 right-0 top-1/2 h-6 -translate-y-1/2 bg-[#d8bb7b]/25" />
           <div className="pointer-events-none absolute bottom-0 left-1/2 top-0 w-6 -translate-x-1/2 bg-[#d8bb7b]/20" />
           <div className="pointer-events-none absolute left-0 right-0 top-[25%] h-3 bg-[#d8bb7b]/10" />
-          <div className="relative overflow-visible"><div className="relative" style={{ transform: "scale(" + zoom + ")", transformOrigin: "top left", width: (100 / zoom) + "%", marginBottom: ((zoom - 1) * 100 / zoom * 0.8) + "%" }}>
-            <div className="relative grid grid-cols-8 gap-1.5 sm:gap-2">
+          <div className="relative overflow-visible game-map-stage"><div className="relative" style={{ transform: "scale(" + zoom + ")", transformOrigin: "top left", width: (100 / zoom) + "%", marginBottom: ((zoom - 1) * 100 / zoom * 0.8) + "%" }}>
+            <div className="relative grid grid-cols-8 gap-1.5 sm:gap-2 game-map-grid">
               {grid.map((value, index) => {
                 const item = value ? getParkItem(value) : null;
                 const isWater = item?.category === "attraction";
