@@ -1,0 +1,98 @@
+import React from "react";
+import { Waves } from "lucide-react";
+import { useGameState } from "@/hooks/useGameState";
+import StatsBar from "@/components/game/StatsBar";
+import ParkGrid from "@/components/game/ParkGrid";
+import BuildPanel from "@/components/game/BuildPanel";
+import GameControls from "@/components/game/GameControls";
+import EventLog from "@/components/game/EventLog";
+import { TileDetailPanel } from "@/components/game/TileDetail";
+import { getAttraction } from "@/data/gameData";
+
+export default function Home() {
+  const game = useGameState();
+  const selectedAttrId =
+    game.selectedTile != null ? game.grid[game.selectedTile] : null;
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-sky-50 via-cyan-50 to-blue-100">
+      {/* Header */}
+      <header className="border-b border-white/60 bg-white/70 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-4">
+          <div className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 shadow-md">
+            <Waves className="h-6 w-6 text-white" />
+          </div>
+          <div>
+            <h1 className="font-display text-2xl font-extrabold tracking-tight text-slate-800">
+              Splash Tycoon
+            </h1>
+            <p className="text-sm text-slate-400">Build your dream water park</p>
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-7xl px-4 py-5">
+        {/* Stats */}
+        <StatsBar
+          money={game.money}
+          day={game.day}
+          guests={game.guests}
+          reputation={game.reputation}
+          lastNet={game.lastNet}
+        />
+
+        {/* Controls */}
+        <div className="mt-4">
+          <GameControls
+            playing={game.playing}
+            speed={game.speed}
+            onTogglePlay={() => game.setPlaying(!game.playing)}
+            onSpeed={game.setSpeed}
+            onAdvance={game.advanceDay}
+            onReset={game.resetGame}
+          />
+        </div>
+
+        {/* Main layout */}
+        <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
+          <div className="flex flex-col gap-5">
+            <ParkGrid
+              grid={game.grid}
+              selectedBuild={game.selectedBuild}
+              selectedTile={game.selectedTile}
+              onTileClick={game.handleTileClick}
+            />
+            <EventLog log={game.log} />
+          </div>
+
+          <aside className="flex flex-col gap-4">
+            {selectedAttrId ? (
+              <TileDetailPanel
+                gridIndex={game.selectedTile}
+                attractionId={selectedAttrId}
+                onSell={() => game.sellAttraction(game.selectedTile)}
+                onClose={() => game.setSelectedTile(null)}
+              />
+            ) : (
+              <div className="rounded-2xl bg-white/70 p-4 text-sm text-slate-500 shadow-sm ring-1 ring-slate-100">
+                <span className="font-semibold text-slate-700">Tip:</span> Pick a
+                build item, then tap an empty lot to place it. Tap a placed
+                attraction to inspect or sell it.
+              </div>
+            )}
+            <div className="rounded-2xl bg-white/70 p-4 shadow-sm ring-1 ring-slate-100">
+              <h3 className="mb-3 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                Build Menu
+              </h3>
+              <BuildPanel
+                money={game.money}
+                selectedBuild={game.selectedBuild}
+                onSelect={game.setSelectedBuild}
+              />
+            </div>
+          </aside>
+        </div>
+      </main>
+    </div>
+  );
+}
