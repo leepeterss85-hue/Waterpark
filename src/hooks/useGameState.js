@@ -86,6 +86,7 @@ const [selectedZone, setSelectedZone] = useState(null);
   const [staffAssignments, setStaffAssignments] = useState({});
   const [saves, setSaves] = useState([]);
   const [incidents, setIncidents] = useState([]);
+  const [attractionCondition, setAttractionCondition] = useState(() => Array(GRID_SIZE).fill(100));
   const [upgrades, setUpgrades] = useState(() => Array(GRID_SIZE).fill(0));
   const [xp, setXp] = useState(0);
   const [expansionsDone, setExpansionsDone] = useState(0);
@@ -102,7 +103,7 @@ const [selectedZone, setSelectedZone] = useState(null);
 
   /** @type {import("react").MutableRefObject<Record<string, any>>} */
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass };
+  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass };
 
   // Load saved game
   useEffect(() => {
@@ -124,6 +125,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (data.history) setHistory(data.history);
         if (data.staff) setStaff({ ...DEFAULT_STAFF, ...data.staff });
         if (data.staffAssignments) setStaffAssignments(data.staffAssignments);
+        if (data.attractionCondition) setAttractionCondition(data.attractionCondition);
         if (data.xp != null) setXp(data.xp);
         if (data.expansionsDone != null) setExpansionsDone(data.expansionsDone);
         if (data.peakGuests != null) setPeakGuests(data.peakGuests);
@@ -145,14 +147,14 @@ const [selectedZone, setSelectedZone] = useState(null);
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, grid, parkZones, history, staff, staffAssignments, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass })
+          JSON.stringify({ money, day, reputation, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass })
         );
       } catch {
         /* ignore */
       }
     }, 300);
     return () => clearTimeout(t);
-  }, [money, day, reputation, grid, parkZones, history, staff, staffAssignments, incidents, upgrades, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass]);
+  }, [money, day, reputation, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass]);
 
   // Load save slots list on mount
   useEffect(() => {
@@ -161,7 +163,7 @@ const [selectedZone, setSelectedZone] = useState(null);
   }, []);
 
   const advanceDay = useCallback(() => {
-    const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, staffAssignments: currentAssignments, incidents: currentIncidents, upgrades: currentUpgrades, challenge: currentChallenge, parkZones: currentZones, forecast: currentForecast, seasonEvent: currentSeasonEvent, ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass } = stateRef.current;
+    const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, staffAssignments: currentAssignments, incidents: currentIncidents, upgrades: currentUpgrades, attractionCondition: currentCondition, challenge: currentChallenge, parkZones: currentZones, forecast: currentForecast, seasonEvent: currentSeasonEvent, ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass } = stateRef.current;
     const dayWeather = currentForecast || rollWeather(d + 1);
     const dayForecast = rollWeather(d + 2);
     const eff = currentChallenge?.effects || {};
@@ -234,6 +236,25 @@ const [selectedZone, setSelectedZone] = useState(null);
       else remaining.push(inc);
     }
     const incidentByTile = new Map(remaining.map((i) => [i.tileIndex, i]));
+    // Attraction condition wears down with use and recovers through staff repairs.
+    const nextCondition = Array(prevGrid.length).fill(100);
+    for (const p of attractions) {
+      let condition = Number.isFinite(currentCondition?.[p.idx]) ? currentCondition[p.idx] : 100;
+      const activeIncident = incidentByTile.get(p.idx);
+      const resolvedIncident = resolved.find((inc) => inc.tileIndex === p.idx);
+      const loadPressure = Math.min(1.5, newGuests / Math.max(1, totalCapacity || capOf(p)));
+      const wear = 1.2 + loadPressure * 2.4 + p.level * 0.25 + (dayWeather.id === "storm" ? 1.2 : 0);
+      if (resolvedIncident?.type === "breakdown") condition += 32;
+      else if (resolvedIncident?.type === "maintenance") condition += 18;
+      const zone = currentZones?.[p.idx] || "";
+      const mechanicAssigned = currentAssignments?.mechanic && currentAssignments.mechanic !== zone ? 0 : (counts.mechanic || 0);
+      condition += Math.min(10, mechanicAssigned * 3.5);
+      condition -= wear;
+      if (activeIncident?.type === "breakdown") condition = Math.min(condition, 8);
+      if (activeIncident?.type === "maintenance") condition = Math.min(condition, 28);
+      nextCondition[p.idx] = Math.max(0, Math.min(100, Math.round(condition)));
+    }
+
 
     // --- Guests & income: agent-based visitor simulation ---
     const workingAttractions = attractions.filter(
@@ -310,19 +331,22 @@ const [selectedZone, setSelectedZone] = useState(null);
     const newIncidents = [];
     if (eligible.length > 0) {
       const pick = eligible[Math.floor(Math.random() * eligible.length)];
-      const breakChance = Math.max(0, 0.15 - 0.02 * (counts.mechanic || 0) - 0.02 * (counts.security || 0));
-      const maintChance = Math.max(0, 0.12 - 0.02 * (counts.cleaner || 0) - 0.02 * (counts.gardener || 0));
+      const condition = nextCondition[pick.idx] ?? 100;
+      const breakChance = Math.max(0, 0.11 - 0.018 * (counts.mechanic || 0) - 0.015 * (counts.security || 0) + (condition < 35 ? 0.16 : condition < 55 ? 0.06 : 0));
+      const maintChance = Math.max(0, 0.09 - 0.015 * (counts.cleaner || 0) - 0.015 * (counts.gardener || 0) + (condition < 60 ? 0.08 : 0));
       const r = Math.random();
-      if (r < breakChance) {
+      if (condition <= 10 || r < breakChance) {
         newIncidents.push({ tileIndex: pick.idx, type: "breakdown", attractionId: pick.id, since: d + 1 });
-      } else if (r < breakChance + maintChance) {
+      } else if (condition <= 32 || r < breakChance + maintChance) {
         newIncidents.push({ tileIndex: pick.idx, type: "maintenance", attractionId: pick.id, since: d + 1 });
       }
     }
     setIncidents([...remaining, ...newIncidents]);
+    setAttractionCondition(nextCondition);
 
     const ticketRevenue = newGuests * currentTicketPrice;
-    const rideIncome = income *
+    const conditionIncomeMult = workingAttractions.length ? workingAttractions.reduce((sum, p) => sum + (0.72 + (nextCondition[p.idx] || 0) * 0.0028), 0) / workingAttractions.length : 0;
+    const rideIncome = income * conditionIncomeMult *
       (dayWeather.incomeMult ?? 1) *
       (currentSeasonEvent?.incomeMult ?? 1) *
       (currentPriorityPass ? 1.08 : 1);
@@ -516,6 +540,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         return nu;
       });
       setIncidents((items) => items.filter((item) => item.tileIndex !== index));
+      setAttractionCondition((conditions) => { const next = [...conditions]; next[index] = 100; return next; });
       setParkZones((zones) => {
         const next = [...zones];
         next[index] = null;
@@ -575,6 +600,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setGrid((g) => [...g, ...Array(EXPAND_ROW).fill(null)]);
     setParkZones((z) => [...z, ...Array(EXPAND_ROW).fill(null)]);
     setUpgrades((u) => [...u, ...Array(EXPAND_ROW).fill(0)]);
+    setAttractionCondition((conditions) => [...conditions, ...Array(EXPAND_ROW).fill(100)]);
     setMoney((m) => m - cost);
     setExpansionsDone((e) => e + 1);
     trackEvent("park_expanded", { expansions: expansionsDone + 1, cost });
@@ -641,6 +667,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         history,
         staff,
         staffAssignments,
+        attractionCondition,
         log,
         lastNet,
         incidents,
@@ -690,6 +717,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setStaff({ ...DEFAULT_STAFF, ...(data.staff || {}) });
     setStaffAssignments(data.staffAssignments || {});
     setIncidents(data.incidents ?? []);
+    setAttractionCondition(data.attractionCondition ?? Array((data.grid ?? makeStartingGrid()).length).fill(100));
     setUpgrades(data.upgrades ?? Array(GRID_SIZE).fill(0));
     setXp(data.xp ?? 0);
     setExpansionsDone(data.expansionsDone ?? 0);
@@ -738,6 +766,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setStaff(DEFAULT_STAFF);
     setStaffAssignments({});
     setIncidents([]);
+    setAttractionCondition(Array(GRID_SIZE).fill(100));
     setUpgrades(Array(GRID_SIZE).fill(0));
     setXp(0);
     setExpansionsDone(0);
@@ -777,6 +806,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     staffAssignments,
     assignStaff,
     incidents,
+    attractionCondition,
     upgrades,
     upgradeAttraction,
     level,
