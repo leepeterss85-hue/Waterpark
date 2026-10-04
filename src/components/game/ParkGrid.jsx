@@ -26,7 +26,8 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
           <span className="hidden h-4 w-px bg-white/20 sm:block" /><span className="hidden items-center gap-1.5 sm:flex"><Footprints className="h-3.5 w-3.5 text-amber-200" />GUESTS MOVING</span>
         </div>
       </div>
-      {(seasonEvent || weatherId === "storm") && <div className={"park-event-ribbon " + (weatherId === "storm" ? "storm" : "")}><Sparkles className="h-3.5 w-3.5" /><span>{weatherId === "storm" ? "THUNDERSTORM — SAFETY MODE" : seasonEvent?.name}</span><b>{weatherId === "storm" ? "Outdoor demand reduced" : seasonEvent?.description}</b></div>}\n      <div className="game-board-frame">
+      {(seasonEvent || weatherId === "storm") && <div className={"park-event-ribbon " + (weatherId === "storm" ? "storm" : "")}><Sparkles className="h-3.5 w-3.5" /><span>{weatherId === "storm" ? "THUNDERSTORM — SAFETY MODE" : seasonEvent?.name}</span><b>{weatherId === "storm" ? "Outdoor demand reduced" : seasonEvent?.description}</b></div>}
+      <div className="game-board-frame">
         <div className="game-map-toolbar">
           <div className="flex items-center gap-2"><span className="game-map-status"><span /> PARK MAP</span><span className="hidden text-[9px] font-extrabold uppercase tracking-wider text-slate-400 sm:inline">Tap a tile to build or inspect</span></div>
           <div className="flex items-center gap-1 rounded-xl bg-white/95 p-1 shadow-md ring-1 ring-slate-200">
