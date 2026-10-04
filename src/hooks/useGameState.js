@@ -509,6 +509,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setSelectedBuild(null);
     setSelectedZone(null);
     setSelectedTile(null);
+    setSelectedZone(zoneId);
   }, []);
 
   const claimMission = useCallback(
