@@ -131,7 +131,21 @@ export default function Home() {
               <BuildPanel money={game.money} selectedBuild={game.selectedBuild} onSelect={game.setSelectedBuild} />
             </div>
 
-            <ParkManagementPanel admissionFee={game.ticketPrice} marketingSpend={game.adBudget} expressLane={game.priorityPass} utilities={game.estimatedUtilities} wages={game.staffWages} onAdmission={game.setTicketPrice} onMarketing={game.setAdBudget} onExpressLane={game.setPriorityPass} />
+            <ParkManagementPanel
+              admissionFee={game.ticketPrice}
+              marketingSpend={game.adBudget}
+              expressLane={game.priorityPass}
+              utilities={game.estimatedUtilities}
+              wages={game.staffWages}
+              history={game.history}
+              visitorStats={game.visitorStats}
+              grid={game.grid}
+              upgrades={game.upgrades}
+              incidents={game.incidents}
+              onAdmission={game.setTicketPrice}
+              onMarketing={game.setAdBudget}
+              onExpressLane={game.setPriorityPass}
+            />
             <div className="waterpark-panel bg-white/85 p-4">
               <StaffPanel money={game.money} staff={game.staff} staffWages={game.staffWages} uptime={game.uptime} safety={game.safety} cleanliness={game.cleanliness} entertainment={game.entertainment} onHire={game.hireStaff} onFire={game.fireStaff} />
             </div>
