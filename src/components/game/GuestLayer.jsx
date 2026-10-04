@@ -19,8 +19,10 @@ export default function GuestLayer({ grid, guests = 0, movements = {}, staffTota
     const row = Math.floor(target.index / 8);
     return { i, left: ((col + 0.35) / 8) * 100, top: ((row + 0.35) / rows) * 100 };
   });
+  const activityDots = guestDots.filter((_, i) => i % 3 === 0).map((g) => ({ ...g, key: "a" + g.i }));
   return <div className="pointer-events-none absolute inset-0 z-30 overflow-hidden">
     {guestDots.map((g) => <span key={"g"+g.i} className="absolute h-3.5 w-3.5 rounded-full border-2 border-white bg-fuchsia-400 shadow-md transition-[left,top] ease-in-out guest-marker" style={{ left: g.left + "%", top: g.top + "%", transform: "translate(-50%,-50%)", transitionDuration: "1800ms" }}><span className="absolute left-1/2 top-0.5 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-white/90" /></span>)}
+    {activityDots.map((g) => <span key={g.key} className="absolute h-5 w-5 rounded-full border border-white/70 bg-cyan-100/35 opacity-0 animate-ping" style={{ left: g.left + "%", top: g.top + "%", animationDuration: "2.4s", animationDelay: ((g.i % 4) * 0.35) + "s" }} />)}
     {staffDots.map((g) => <span key={"s"+g.i} className="absolute h-3 w-3 rounded-full border-2 border-white bg-sky-700 shadow-md transition-[left,top] ease-in-out staff-marker" style={{ left: g.left + "%", top: g.top + "%", transform: "translate(-50%,-50%)", transitionDuration: "1800ms" }} />)}
   </div>;
 }
