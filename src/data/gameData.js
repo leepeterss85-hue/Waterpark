@@ -471,6 +471,21 @@ export const ATTRACTIONS = [
   },
 ];
 
+
+
+export const PARK_OBJECTS = [
+  { id:"park_entrance", name:"Park Entrance", category:"environment", cost:0, income:0, capacity:0, fun:0, maintenance:20, icon:"MapPin", color:"from-slate-500 to-slate-700", description:"Main guest gateway with ticket gates and welcome signage." },
+  { id:"main_path", name:"Main Path", category:"environment", cost:150, income:0, capacity:0, fun:0, maintenance:5, icon:"Footprints", color:"from-amber-100 to-stone-200", description:"Paved guest walkway connecting attractions and services." },
+  { id:"queue_path", name:"Queue Rail", category:"environment", cost:200, income:0, capacity:0, fun:0, maintenance:5, icon:"Flag", color:"from-yellow-300 to-amber-500", description:"Rope-and-post queue lane for busy attractions." },
+  { id:"fence", name:"Pool Fencing", category:"environment", cost:100, income:0, capacity:0, fun:0, maintenance:3, icon:"CircleDot", color:"from-stone-300 to-stone-500", description:"Safety barrier around pools, slides and restricted areas." },
+  { id:"palm_tree", name:"Palm Tree", category:"environment", cost:350, income:0, capacity:0, fun:0, maintenance:8, icon:"Sprout", color:"from-emerald-400 to-green-600", description:"Tropical landscaping that makes the park feel like a resort." },
+  { id:"bench", name:"Park Bench", category:"environment", cost:250, income:0, capacity:0, fun:0, maintenance:5, icon:"Users", color:"from-amber-500 to-orange-700", description:"Seating for tired guests beside walkways and pools." },
+  { id:"shade_umbrella", name:"Shade Umbrella", category:"environment", cost:300, income:0, capacity:0, fun:0, maintenance:6, icon:"Umbrella", color:"from-yellow-300 to-amber-500", description:"Extra shade beside pool decks and family areas." },
+  { id:"fountain", name:"Feature Fountain", category:"environment", cost:1200, income:0, capacity:0, fun:0, maintenance:35, icon:"Droplets", color:"from-cyan-300 to-sky-600", description:"Decorative water feature for entrances and resort areas." },
+  { id:"wayfinding_sign", name:"Wayfinding Sign", category:"environment", cost:180, income:0, capacity:0, fun:0, maintenance:3, icon:"Flag", color:"from-orange-300 to-orange-600", description:"Helps guests find slides, pools, food and facilities." },
+  { id:"service_road", name:"Service Road", category:"environment", cost:350, income:0, capacity:0, fun:0, maintenance:10, icon:"Footprints", color:"from-slate-300 to-slate-500", description:"Back-of-house route for maintenance and service vehicles." }
+];
+
 export const getAttraction = (id) => ATTRACTIONS.find((a) => a.id === id);
 
 export const STAFF = {
@@ -550,6 +565,7 @@ export function staffEffects(staff) {
 export const CATEGORIES = [
   { id: "attraction", label: "Core Water Attractions" },
   { id: "facility", label: "Facilities & Services" },
+  { id: "environment", label: "Paths, Landscaping & Essentials" },
 ];
 
 export const MAX_UPGRADE = 5;
