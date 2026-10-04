@@ -26,6 +26,9 @@ import {
   Umbrella,
   IceCream,
   Coffee,
+  Crown,
+  CloudRain,
+  Megaphone,
 } from "lucide-react";
 
 export const ICONS = {
@@ -56,6 +59,9 @@ export const ICONS = {
   Umbrella,
   IceCream,
   Coffee,
+  Crown,
+  CloudRain,
+  Megaphone,
 };
 
 export function getIcon(name) {

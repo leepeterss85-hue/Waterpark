@@ -11,6 +11,7 @@ import StaffPanel from "@/components/game/StaffPanel";
 import SaveLoadPanel from "@/components/game/SaveLoadPanel";
 import ExpansionPanel from "@/components/game/ExpansionPanel";
 import MissionsPanel from "@/components/game/MissionsPanel";
+import ChallengeBanner from "@/components/game/ChallengeBanner";
 import { TileDetailPanel } from "@/components/game/TileDetail";
 import { getAttraction } from "@/data/gameData";
 
@@ -78,6 +79,7 @@ export default function Home() {
         {/* Main layout */}
         <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
           <div className="flex flex-col gap-5">
+            <ChallengeBanner challenge={game.challenge} />
             <ExpansionPanel
               gridSize={game.gridSize}
               expansionsDone={game.expansionsDone}

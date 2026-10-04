@@ -5,6 +5,7 @@ import {
   expandCost, expandLevelReq, levelFromXp, xpForLevel,
 } from "@/data/gameData";
 import { MISSIONS, missionProgress } from "@/data/missions";
+import { rollChallenge } from "@/data/challenges";
 
 const STORAGE_KEY = "waterpark-tycoon-save-v1";
 const SLOTS_KEY = "waterpark-tycoon-slots";
@@ -62,12 +63,13 @@ export function useGameState() {
   const [peakGuests, setPeakGuests] = useState(0);
   const [totalUpgrades, setTotalUpgrades] = useState(0);
   const [claimedMissions, setClaimedMissions] = useState([]);
+  const [challenge, setChallenge] = useState(null);
 
   const level = levelFromXp(xp);
   const gridSize = grid.length;
 
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, grid, staff, incidents, upgrades };
+  stateRef.current = { money, day, reputation, grid, staff, incidents, upgrades, challenge };
 
   // Load saved game
   useEffect(() => {
@@ -86,6 +88,7 @@ export function useGameState() {
         if (data.peakGuests != null) setPeakGuests(data.peakGuests);
         if (data.totalUpgrades != null) setTotalUpgrades(data.totalUpgrades);
         if (data.claimedMissions) setClaimedMissions(data.claimedMissions);
+        if (data.challenge) setChallenge(data.challenge);
       }
     } catch {
       /* ignore */
@@ -98,14 +101,14 @@ export function useGameState() {
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, grid, history, staff, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions })
+          JSON.stringify({ money, day, reputation, grid, history, staff, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge })
         );
       } catch {
         /* ignore */
       }
     }, 300);
     return () => clearTimeout(t);
-  }, [money, day, reputation, grid, history, staff, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions]);
+  }, [money, day, reputation, grid, history, staff, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge]);
 
   // Load save slots list on mount
   useEffect(() => {
@@ -114,7 +117,8 @@ export function useGameState() {
   }, []);
 
   const advanceDay = useCallback(() => {
-    const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, incidents: currentIncidents, upgrades: currentUpgrades } = stateRef.current;
+    const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, incidents: currentIncidents, upgrades: currentUpgrades, challenge: currentChallenge } = stateRef.current;
+    const eff = currentChallenge?.effects || {};
     const placedItems = prevGrid
       .map((id, idx) => (id ? { id, idx, attr: getAttraction(id), level: (currentUpgrades || [])[idx] || 0 } : null))
       .filter(Boolean);
@@ -158,7 +162,7 @@ export function useGameState() {
 
     if (attractions.length > 0) {
       const demand = Math.floor(
-        (rep / 100) * totalCapacity * 1.15 * (1 + d / 80)
+        (rep / 100) * totalCapacity * 1.15 * (1 + d / 80) * (eff.guestMult ?? 1)
       );
       newGuests = Math.min(demand, totalCapacity);
       const fillRatio = totalCapacity > 0 ? newGuests / totalCapacity : 0;
@@ -174,7 +178,7 @@ export function useGameState() {
         (s, f) => s + incOf(f) * Math.min(1, newGuests / 60),
         0
       );
-      income = attractionIncome + facilityIncome;
+      income = (attractionIncome + facilityIncome) * (eff.incomeMult ?? 1);
 
       const avgFun =
         totalCapacity > 0
@@ -196,6 +200,7 @@ export function useGameState() {
         (s, inc) => s + (inc.type === "breakdown" ? 1.2 : 0.6),
         0
       );
+      repDelta += eff.repDelta ?? 0;
       newReputation = Math.max(0, Math.min(100, rep + repDelta));
     } else {
       newReputation = Math.max(0, rep - 1);
@@ -218,7 +223,9 @@ export function useGameState() {
     }
     setIncidents([...remaining, ...newIncidents]);
 
-    const expenses = placedItems.reduce((s, p) => s + upkeepOf(p), 0) + staffWages;
+    const expenses =
+      placedItems.reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) +
+      staffWages * (eff.wageMult ?? 1);
     const net = Math.round(income - expenses);
 
     // --- Build log entries (newest first) ---
@@ -263,6 +270,37 @@ export function useGameState() {
       [...h, { day: d + 1, income: Math.round(income), guests: newGuests, reputation: Math.round(newReputation), net }].slice(-60)
     );
     setLog((l) => [...entries, ...l].slice(0, 12));
+
+    // --- Resolve / advance / roll a random challenge ---
+    const challengeEntries = [];
+    if (currentChallenge) {
+      const nextLeft = currentChallenge.daysLeft - 1;
+      if (nextLeft <= 0) {
+        if (currentChallenge.resolve?.type === "vip") {
+          const r = currentChallenge.resolve;
+          if (Math.round(newReputation) >= r.repRequired) {
+            setMoney((m) => m + r.success.money);
+            setReputation((rv) => Math.max(0, Math.min(100, rv + r.success.rep)));
+            challengeEntries.push({ day: d + 1, text: `Day ${d + 1}: 👑 VIP impressed! +$${r.success.money.toLocaleString()} and +${r.success.rep} reputation.` });
+          } else {
+            setReputation((rv) => Math.max(0, Math.min(100, rv + r.fail.rep)));
+            challengeEntries.push({ day: d + 1, text: `Day ${d + 1}: 👑 VIP left unimpressed. ${r.fail.rep} reputation.` });
+          }
+        } else {
+          challengeEntries.push({ day: d + 1, text: `Day ${d + 1}: ${currentChallenge.name} has passed.` });
+        }
+        setChallenge(null);
+      } else {
+        setChallenge({ ...currentChallenge, daysLeft: nextLeft });
+      }
+    } else if (d + 1 >= 3 && Math.random() < 0.18) {
+      const picked = rollChallenge();
+      setChallenge({ ...picked, daysLeft: picked.duration });
+      challengeEntries.push({ day: d + 1, text: `Day ${d + 1}: ⚡ ${picked.name}! ${picked.desc}` });
+    }
+    if (challengeEntries.length) {
+      setLog((l) => [...challengeEntries, ...l].slice(0, 12));
+    }
   }, []);
 
   // Game loop
@@ -401,13 +439,14 @@ export function useGameState() {
         peakGuests,
         totalUpgrades,
         claimedMissions,
+        challenge,
         savedAt: new Date().toISOString(),
       };
       writeSlots(slots);
       setSaves(Object.entries(slots).map(([n, s]) => slotMeta(n, s)));
       return true;
     },
-    [money, day, reputation, guests, grid, history, staff, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions]
+    [money, day, reputation, guests, grid, history, staff, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge]
   );
 
   const loadPark = useCallback((name) => {
@@ -428,6 +467,7 @@ export function useGameState() {
     setPeakGuests(data.peakGuests ?? 0);
     setTotalUpgrades(data.totalUpgrades ?? 0);
     setClaimedMissions(data.claimedMissions ?? []);
+    setChallenge(data.challenge ?? null);
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
     setLastNet(data.lastNet ?? 0);
     setPlaying(false);
@@ -462,6 +502,7 @@ export function useGameState() {
     setPeakGuests(0);
     setTotalUpgrades(0);
     setClaimedMissions([]);
+    setChallenge(null);
   }, []);
 
   return {
@@ -492,6 +533,7 @@ export function useGameState() {
     totalUpgrades,
     claimedMissions,
     claimMission,
+    challenge,
     missionState: {
       attractionCount: grid.filter((id) => id && getAttraction(id)?.category === "attraction").length,
       peakGuests,
