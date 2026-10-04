@@ -7,13 +7,22 @@ function rand(min, max) {
   return Math.random() * (max - min) + min;
 }
 
+const GUEST_PROFILES = [
+  { type: "Family", mood: [50, 78], hunger: [20, 50], budget: [70, 150] },
+  { type: "Thrill seeker", mood: [58, 88], hunger: [10, 40], budget: [60, 130] },
+  { type: "Relaxed guest", mood: [45, 75], hunger: [15, 45], budget: [80, 170] },
+  { type: "Premium guest", mood: [55, 82], hunger: [15, 40], budget: [120, 220] },
+];
+
 function createGuest() {
+  const profile = GUEST_PROFILES[Math.floor(Math.random() * GUEST_PROFILES.length)];
   return {
-    mood: rand(45, 75),
-    hunger: rand(10, 35),
+    type: profile.type,
+    mood: rand(profile.mood[0], profile.mood[1]),
+    hunger: rand(profile.hunger[0], profile.hunger[1]),
     spend: 0,
     visited: new Set(),
-    budget: rand(60, 160),
+    budget: rand(profile.budget[0], profile.budget[1]),
   };
 }
 
@@ -34,9 +43,13 @@ function scoreAttraction(guest, p) {
     if (attr.id === "dining" || attr.id === "ice_cream" || attr.id === "coffee_bar") {
       score += guest.hunger * 0.08;
     }
+    if (guest.type === "Premium guest" && ["cabanas", "vip_lounge", "spa", "retail"].includes(attr.id)) score += 3;
     score *= 0.85;
   } else {
     if (attr.fun >= 8 && guest.mood > 60) score += 2.5;
+    if (guest.type === "Thrill seeker" && attr.fun >= 8) score += 4;
+    if (guest.type === "Family" && ["kiddie_pool", "play_structure", "family_raft", "splash_pad", "soft_play", "lazy_river"].includes(attr.id)) score += 4;
+    if (guest.type === "Relaxed guest" && ["lazy_river", "flowrider", "sun_lounge", "lap_sports_pool"].includes(attr.id)) score += 3;
     if (attr.fun <= 5 && (guest.mood < 45 || guest.hunger > 55)) score += 2;
   }
   if (p.overcrowded) score *= 0.6;
@@ -60,7 +73,7 @@ function pickAttraction(guest, options) {
 }
 
 export function simulateVisits({ demand, placedItems, incidents, uptime, safety, cleanliness, incomeMult, entertainment = 0, facilityBonus = 1 }) {
-  const empty = { income: 0, avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {} };
+  const empty = { income: 0, avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {}, guestTypes: {} };
   if (demand <= 0 || !placedItems || placedItems.length === 0) return empty;
 
   const options = placedItems
@@ -81,9 +94,11 @@ export function simulateVisits({ demand, placedItems, incidents, uptime, safety,
   let totalMood = 0;
   let totalVisits = 0;
   const movements = {};
+  const guestTypes = {};
 
   for (let a = 0; a < agentCount; a++) {
     const guest = createGuest();
+    guestTypes[guest.type] = (guestTypes[guest.type] || 0) + crowdScale;
     const maxSteps = Math.floor(rand(3, 6));
     for (let step = 0; step < maxSteps; step++) {
       for (const o of options) o.overcrowded = o.load > o.cap * 0.85;
@@ -142,5 +157,6 @@ export function simulateVisits({ demand, placedItems, incidents, uptime, safety,
     totalVisits: Math.round(totalVisits),
     topAttraction,
     movements,
+    guestTypes,
   };
 }
