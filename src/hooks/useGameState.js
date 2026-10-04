@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import {
-  ATTRACTIONS, getAttraction, STAFF, MAX_UPGRADE, upgradeCost,
+  ATTRACTIONS, getParkItem, STAFF, MAX_UPGRADE, upgradeCost,
   INITIAL_GRID_SIZE, EXPAND_ROW, MAX_EXPANSIONS, MAX_GRID_SIZE,
   expandCost, expandLevelReq, levelFromXp, xpForLevel, staffWages, staffEffects,
 } from "@/data/gameData";
@@ -163,7 +163,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     const daySeason = getSeason(d + 1);
     const eff = currentChallenge?.effects || {};
     const placedItems = prevGrid
-      .map((id, idx) => (id ? { id, idx, attr: getAttraction(id), level: (currentUpgrades || [])[idx] || 0 } : null))
+      .map((id, idx) => (id ? { id, idx, attr: getParkItem(id), level: (currentUpgrades || [])[idx] || 0 } : null))
       .filter(Boolean);
     const attractions = placedItems.filter((p) => p.attr.category === "attraction");
     const facilities = placedItems.filter((p) => p.attr.category === "facility");
@@ -299,7 +299,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     // --- Build log entries (newest first) ---
     const entries = [];
     for (const inc of newIncidents) {
-      const a = getAttraction(inc.attractionId);
+      const a = getParkItem(inc.attractionId);
       entries.push({
         day: d + 1,
         text:
@@ -309,7 +309,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       });
     }
     for (const inc of resolved) {
-      const a = getAttraction(inc.attractionId);
+      const a = getParkItem(inc.attractionId);
       entries.push({
         day: d + 1,
         text:
@@ -402,7 +402,7 @@ const [selectedZone, setSelectedZone] = useState(null);
   const placeAttraction = useCallback(
     (index) => {
       if (!selectedBuild) return;
-      const attr = getAttraction(selectedBuild);
+      const attr = getParkItem(selectedBuild);
       if (!attr) return;
       if (money < attr.cost) return;
       setGrid((g) => {
@@ -435,7 +435,7 @@ const [selectedZone, setSelectedZone] = useState(null);
   const sellAttraction = useCallback((index) => {
     setGrid((g) => {
       if (!g[index]) return g;
-      const attr = getAttraction(g[index]);
+      const attr = getParkItem(g[index]);
       setMoney((m) => m + Math.floor(attr.cost * 0.5));
       setUpgrades((u) => {
         const nu = [...u];
@@ -453,7 +453,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     (index) => {
       const id = grid[index];
       if (!id) return;
-      const attr = getAttraction(id);
+      const attr = getParkItem(id);
       if (!attr || attr.category === "environment") return;
       const level = upgrades[index] || 0;
       if (level >= MAX_UPGRADE) return;
@@ -516,7 +516,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       const mission = MISSIONS.find((m) => m.id === id);
       if (!mission || claimedMissions.includes(id) || level < mission.level) return;
       const ms = {
-        attractionCount: grid.filter((x) => x && getAttraction(x)?.category === "attraction").length,
+        attractionCount: grid.filter((x) => x && getParkItem(x)?.category === "attraction").length,
         peakGuests,
         money,
         reputation,
@@ -691,12 +691,12 @@ const [selectedZone, setSelectedZone] = useState(null);
       money,
       reputation,
       staffTotal: Object.values(staff).reduce((s, n) => s + (n || 0), 0),
-      facilityCount: grid.filter((id) => id && getAttraction(id)?.category === "facility").length,
+      facilityCount: grid.filter((id) => id && getParkItem(id)?.category === "facility").length,
       avgMood: visitorStats?.avgMood || 0,
       avgSpendPerVisit: visitorStats?.avgSpendPerVisit || 0,
     },
     missionState: {
-      attractionCount: grid.filter((id) => id && getAttraction(id)?.category === "attraction").length,
+      attractionCount: grid.filter((id) => id && getParkItem(id)?.category === "attraction").length,
       peakGuests,
       money,
       reputation,
@@ -708,7 +708,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     },
     ...staffEffects(staff),
     staffWages: staffWages(staff),
-    estimatedUtilities: Math.round((150 + grid.filter((id) => id && getAttraction(id)?.category === "attraction").length * 45 + grid.filter((id) => id && getAttraction(id)?.category === "facility").length * 18 + guests * 2.2) * (weather?.utilityMult ?? 1)),
+    estimatedUtilities: Math.round((150 + grid.filter((id) => id && getParkItem(id)?.category === "attraction").length * 45 + grid.filter((id) => id && getParkItem(id)?.category === "facility").length * 18 + guests * 2.2) * (weather?.utilityMult ?? 1)),
     GRID_SIZE,
     setPlaying,
     setSpeed,
