@@ -64,6 +64,8 @@ export function useGameState() {
   const [totalUpgrades, setTotalUpgrades] = useState(0);
   const [claimedMissions, setClaimedMissions] = useState([]);
   const [challenge, setChallenge] = useState(null);
+  const [lifetimeEarnings, setLifetimeEarnings] = useState(0);
+  const [builtAttractionIds, setBuiltAttractionIds] = useState([]);
 
   const level = levelFromXp(xp);
   const gridSize = grid.length;
@@ -89,6 +91,8 @@ export function useGameState() {
         if (data.totalUpgrades != null) setTotalUpgrades(data.totalUpgrades);
         if (data.claimedMissions) setClaimedMissions(data.claimedMissions);
         if (data.challenge) setChallenge(data.challenge);
+        if (data.lifetimeEarnings != null) setLifetimeEarnings(data.lifetimeEarnings);
+        if (data.builtAttractionIds) setBuiltAttractionIds(data.builtAttractionIds);
       }
     } catch {
       /* ignore */
@@ -101,14 +105,14 @@ export function useGameState() {
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, grid, history, staff, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge })
+          JSON.stringify({ money, day, reputation, grid, history, staff, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds })
         );
       } catch {
         /* ignore */
       }
     }, 300);
     return () => clearTimeout(t);
-  }, [money, day, reputation, grid, history, staff, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge]);
+  }, [money, day, reputation, grid, history, staff, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds]);
 
   // Load save slots list on mount
   useEffect(() => {
@@ -264,6 +268,7 @@ export function useGameState() {
     setDay((x) => x + 1);
     setGuests(newGuests);
     setPeakGuests((p) => Math.max(p, newGuests));
+    setLifetimeEarnings((e) => e + Math.round(income));
     setReputation(Math.round(newReputation));
     setLastNet(net);
     setHistory((h) =>
@@ -323,6 +328,9 @@ export function useGameState() {
         return ng;
       });
       setMoney((m) => m - attr.cost);
+      if (attr.category === "attraction") {
+        setBuiltAttractionIds((ids) => (ids.includes(selectedBuild) ? ids : [...ids, selectedBuild]));
+      }
     },
     [selectedBuild, money]
   );
@@ -440,13 +448,15 @@ export function useGameState() {
         totalUpgrades,
         claimedMissions,
         challenge,
+        lifetimeEarnings,
+        builtAttractionIds,
         savedAt: new Date().toISOString(),
       };
       writeSlots(slots);
       setSaves(Object.entries(slots).map(([n, s]) => slotMeta(n, s)));
       return true;
     },
-    [money, day, reputation, guests, grid, history, staff, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge]
+    [money, day, reputation, guests, grid, history, staff, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds]
   );
 
   const loadPark = useCallback((name) => {
@@ -468,6 +478,8 @@ export function useGameState() {
     setTotalUpgrades(data.totalUpgrades ?? 0);
     setClaimedMissions(data.claimedMissions ?? []);
     setChallenge(data.challenge ?? null);
+    setLifetimeEarnings(data.lifetimeEarnings ?? 0);
+    setBuiltAttractionIds(data.builtAttractionIds ?? []);
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
     setLastNet(data.lastNet ?? 0);
     setPlaying(false);
@@ -503,6 +515,8 @@ export function useGameState() {
     setTotalUpgrades(0);
     setClaimedMissions([]);
     setChallenge(null);
+    setLifetimeEarnings(0);
+    setBuiltAttractionIds([]);
   }, []);
 
   return {
@@ -534,6 +548,18 @@ export function useGameState() {
     claimedMissions,
     claimMission,
     challenge,
+    lifetimeEarnings,
+    builtCount: builtAttractionIds.length,
+    achievementState: {
+      peakGuests,
+      lifetimeEarnings,
+      builtCount: builtAttractionIds.length,
+      maxedUpgrades: upgrades.filter((lv) => lv >= MAX_UPGRADE).length,
+      expansionsDone,
+      day,
+      money,
+      reputation,
+    },
     missionState: {
       attractionCount: grid.filter((id) => id && getAttraction(id)?.category === "attraction").length,
       peakGuests,

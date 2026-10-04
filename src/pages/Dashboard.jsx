@@ -8,6 +8,7 @@ import VisitorsChart from "@/components/dashboard/VisitorsChart";
 import SatisfactionChart from "@/components/dashboard/SatisfactionChart";
 import AttractionBreakdown from "@/components/dashboard/AttractionBreakdown";
 import VisitorGrowthChart from "@/components/dashboard/VisitorGrowthChart";
+import AchievementsGallery from "@/components/dashboard/AchievementsGallery";
 
 export default function Dashboard() {
   const game = useGameState();
@@ -49,6 +50,9 @@ export default function Dashboard() {
           <VisitorsChart history={game.history} />
           <SatisfactionChart history={game.history} />
           <AttractionBreakdown grid={game.grid} />
+        </div>
+        <div className="mt-5">
+          <AchievementsGallery achievementState={game.achievementState} />
         </div>
       </main>
     </div>

@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Waves, BarChart3, Save } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useGameState } from "@/hooks/useGameState";
+import { ACHIEVEMENTS } from "@/data/achievements";
+import { useToast } from "@/components/ui/use-toast";
 import StatsBar from "@/components/game/StatsBar";
 import ParkGrid from "@/components/game/ParkGrid";
 import BuildPanel from "@/components/game/BuildPanel";
@@ -17,8 +19,25 @@ import { getAttraction } from "@/data/gameData";
 
 export default function Home() {
   const game = useGameState();
+  const { toast } = useToast();
   const selectedAttrId =
     game.selectedTile != null ? game.grid[game.selectedTile] : null;
+
+  const prevUnlocked = useRef(null);
+  useEffect(() => {
+    const unlocked = ACHIEVEMENTS.filter((a) => a.check(game.achievementState)).map((a) => a.id);
+    if (prevUnlocked.current == null) {
+      prevUnlocked.current = unlocked;
+      return;
+    }
+    for (const id of unlocked) {
+      if (!prevUnlocked.current.includes(id)) {
+        const a = ACHIEVEMENTS.find((x) => x.id === id);
+        toast({ title: "🏆 Achievement Unlocked!", description: `${a.title} — ${a.desc}` });
+      }
+    }
+    prevUnlocked.current = unlocked;
+  }, [game.achievementState, toast]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 via-cyan-50 to-blue-100">
