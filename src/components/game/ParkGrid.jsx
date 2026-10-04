@@ -4,7 +4,7 @@ import { getParkItem } from "@/data/gameData";
 import Tile from "./Tile";
 import GuestLayer from "./GuestLayer";
 
-export default function ParkGrid({ grid, parkZones, selectedBuild, selectedTile, selectedZone, incidents, guests, visitorMovements, staffTotal, onTileClick }) {
+export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, visitorMovements, staffTotal, onTileClick }) {
   const [zoom, setZoom] = useState(1);
   const incidentMap = new Map((incidents || []).map((i) => [i.tileIndex, i]));
   return <section className="overflow-hidden rounded-[28px] border border-white/80 bg-[#719f5f] p-2.5 shadow-[0_18px_50px_rgba(30,64,50,.18)] sm:p-4">
@@ -31,7 +31,10 @@ export default function ParkGrid({ grid, parkZones, selectedBuild, selectedTile,
             const capacity=item?.capacity || 1;
             const movement=visitorMovements?.[value] || 0;
             const queueWait=isWater ? Math.min(45, Math.round(Math.max(0, movement/(capacity*1.4)-0.35)*18)) : 0;
-            return <Tile key={index} index={index} grid={grid} zone={parkZones?.[index]} value={value} selectedBuild={selectedBuild} isSelected={selectedTile===index} incident={incidentMap.get(index)} queueWait={queueWait} onClick={()=>onTileClick(index)} />;
+            const row=Math.floor(index/8), col=index%8;
+            const neighbors=[row>0?index-8:-1,row<Math.ceil(grid.length/8)-1?index+8:-1,col>0?index-1:-1,col<7?index+1:-1].filter((n)=>n>=0);
+            const queueConnected=!isWater || neighbors.some((n)=>grid[n]==="queue_path"||grid[n]==="main_path");
+            return <Tile key={index} index={index} grid={grid} zone={parkZones?.[index]} upgradeLevel={upgrades?.[index]||0} value={value} selectedBuild={selectedBuild} isSelected={selectedTile===index} incident={incidentMap.get(index)} queueWait={queueWait} queueConnected={queueConnected} onClick={()=>onTileClick(index)} />;
           })}
           </div>
           <GuestLayer grid={grid} guests={guests} movements={visitorMovements} staffTotal={staffTotal} />
