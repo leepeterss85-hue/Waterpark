@@ -26,14 +26,19 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
       {(seasonEvent || weatherId === "storm") && <div className={"park-event-ribbon " + (weatherId === "storm" ? "storm" : "")}><Sparkles className="h-3.5 w-3.5" /><span>{weatherId === "storm" ? "THUNDERSTORM — SAFETY MODE" : seasonEvent?.name}</span><b>{weatherId === "storm" ? "Outdoor demand reduced" : seasonEvent?.description}</b></div>}
       <div className="game-board-frame">
         <div className="game-map-toolbar"><div className="flex items-center gap-2"><span className="game-map-status"><span /> PARK MAP</span><span className="hidden text-[9px] font-extrabold uppercase tracking-wider text-slate-400 sm:inline">Tap a tile to build or inspect</span></div><div className="flex items-center gap-1 rounded-xl bg-white/95 p-1 shadow-md ring-1 ring-slate-200"><button aria-label="Zoom out" onClick={() => setZoom((z) => Math.max(0.8, Number((z - 0.1).toFixed(1))))} className="grid h-7 w-7 place-items-center rounded-lg text-sm font-black text-slate-600 hover:bg-slate-100">−</button><button aria-label="Reset zoom" onClick={() => setZoom(1)} className="min-w-10 rounded-lg px-1.5 py-1 text-[9px] font-extrabold text-slate-500 hover:bg-slate-100">{Math.round(zoom * 100)}%</button><button aria-label="Zoom in" onClick={() => setZoom((z) => Math.min(1.5, Number((z + 0.1).toFixed(1))))} className="grid h-7 w-7 place-items-center rounded-lg text-sm font-black text-slate-600 hover:bg-slate-100">+</button></div></div>
-        <div className="relative overflow-auto rounded-[20px] border-[5px] border-[#315f47] bg-[#7aa966] p-2 shadow-[inset_0_0_0_2px_rgba(255,255,255,.15),inset_0_12px_35px_rgba(19,70,44,.18)] sm:p-3">
+        <div className="relative overflow-auto rounded-[20px] border-[5px] border-[#315f47] bg-[#7aa966] p-2 shadow-[inset_0_0_0_2px_rgba(255,255,255,.15),inset_0_12px_35px_rgba(19,70,44,.18)] sm:p-3 game-map-surface">
+          <div className="map-scenery map-scenery-water-a" aria-hidden="true"><span /><span /><span /></div>
+          <div className="map-scenery map-scenery-water-b" aria-hidden="true"><span /><span /><span /></div>
+          <div className="map-scenery-maple" aria-hidden="true"><span /><span /><span /></div>
+          <div className="map-scenery-palm map-scenery-palm-a" aria-hidden="true">🌴</div>
+          <div className="map-scenery-palm map-scenery-palm-b" aria-hidden="true">🌴</div>
+          <div className="map-scenery-deck" aria-hidden="true" />
+          <div className="map-map-label" aria-hidden="true"><span>☀</span><b>SPLASH ISLAND</b></div>
           <div className="park-atmosphere" aria-hidden="true"><span className="park-sun" /><span className="park-cloud park-cloud-a" /><span className="park-cloud park-cloud-b" /><span className="park-rain" /></div>
           <div className="pointer-events-none absolute inset-2 rounded-[16px] border-2 border-dashed border-white/20" />
-          <div className="pointer-events-none absolute left-0 right-0 top-1/2 h-6 -translate-y-1/2 bg-[#d8bb7b]/25" />
-          <div className="pointer-events-none absolute bottom-0 left-1/2 top-0 w-6 -translate-x-1/2 bg-[#d8bb7b]/20" />
-          <div className="pointer-events-none absolute left-0 right-0 top-[25%] h-3 bg-[#d8bb7b]/10" />
+          
           <div className="relative overflow-visible game-map-stage"><div className="relative" style={{ transform: "scale(" + zoom + ")", transformOrigin: "top left", width: (100 / zoom) + "%", marginBottom: ((zoom - 1) * 100 / zoom * 0.8) + "%" }}>
-            <div className="relative grid grid-cols-8 gap-1.5 sm:gap-2 game-map-grid">
+            <div className="relative grid grid-cols-8 gap-1 sm:gap-1.5 game-map-grid">
               {grid.map((value, index) => {
                 const item = value ? getParkItem(value) : null;
                 const isWater = item?.category === "attraction";
