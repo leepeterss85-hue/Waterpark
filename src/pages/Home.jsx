@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Waves, BarChart3, Save, Trees } from "lucide-react";
+import { getParkItem } from "@/data/gameData";
 import { Link } from "react-router-dom";
 import { useGameState } from "@/hooks/useGameState";
 import { ACHIEVEMENTS } from "@/data/achievements";
@@ -24,6 +25,7 @@ export default function Home() {
   const game = useGameState();
   const { toast } = useToast();
   const selectedAttrId = game.selectedTile != null ? game.grid[game.selectedTile] : null;
+  const selectedItem = selectedAttrId ? getParkItem(selectedAttrId) : null;
   const prevUnlocked = useRef(null);
 
   useEffect(() => {
@@ -92,11 +94,24 @@ export default function Home() {
           </div>
 
           <aside className="flex min-w-0 flex-col gap-4">
-            {selectedAttrId ? (
-              <>
-                <TileDetailPanel gridIndex={game.selectedTile} attractionId={selectedAttrId} level={game.upgrades[game.selectedTile] || 0} money={game.money} onUpgrade={() => game.upgradeAttraction(game.selectedTile)} onSell={() => game.sellAttraction(game.selectedTile)} onClose={() => game.setSelectedTile(null)} />
-                <ParkObjectDetail itemId={selectedAttrId} onSell={() => game.sellAttraction(game.selectedTile)} onClose={() => game.setSelectedTile(null)} />
-              </>
+            {selectedItem ? (
+              selectedItem.category === "environment" ? (
+                <ParkObjectDetail
+                  itemId={selectedAttrId}
+                  onSell={() => game.sellAttraction(game.selectedTile)}
+                  onClose={() => game.setSelectedTile(null)}
+                />
+              ) : (
+                <TileDetailPanel
+                  gridIndex={game.selectedTile}
+                  attractionId={selectedAttrId}
+                  level={game.upgrades[game.selectedTile] || 0}
+                  money={game.money}
+                  onUpgrade={() => game.upgradeAttraction(game.selectedTile)}
+                  onSell={() => game.sellAttraction(game.selectedTile)}
+                  onClose={() => game.setSelectedTile(null)}
+                />
+              )
             ) : (
               <div className="waterpark-panel border-dashed bg-white/80 p-4">
                 <div className="text-[10px] font-extrabold uppercase tracking-wider text-cyan-700">How to build</div>
