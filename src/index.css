@@ -761,3 +761,79 @@
   .map-scenery-palm{font-size:24px}.map-map-label{font-size:6px;padding:4px 6px}
 }
 @media (prefers-reduced-motion:reduce){.map-scenery span{animation:none}}
+
+/* === 3D attraction finish + connected resort paths === */
+@layer components {
+  .game-map-grid > button:has(.ride-art),
+  .game-map-grid > button:has(.facility-art),
+  .game-map-grid > button:has(.park-entrance-art) {
+    overflow:visible!important;
+    isolation:isolate;
+    background:linear-gradient(145deg,rgba(255,255,255,.18),rgba(52,94,58,.14))!important;
+    border-color:rgba(255,255,255,.42)!important;
+    box-shadow:0 8px 0 rgba(48,91,52,.12),0 12px 16px rgba(15,52,30,.18),inset 0 1px 0 rgba(255,255,255,.65)!important;
+  }
+  .game-map-grid > button:has(.ride-art):before,
+  .game-map-grid > button:has(.facility-art):before {
+    content:"";position:absolute;left:7%;right:7%;bottom:4%;height:24%;
+    border-radius:50%;background:rgba(19,65,38,.18);filter:blur(4px);transform:translateY(6px);z-index:-1;
+  }
+  .ride-art {
+    inset:8%!important;transform:translateY(-3px);transform-style:preserve-3d;border-radius:22%!important;
+    filter:saturate(1.08) drop-shadow(0 5px 4px rgba(15,23,42,.18));
+  }
+  .ride-art-slide,.ride-art-pool,.ride-art-water,.ride-art-family {
+    box-shadow:inset 0 2px 5px rgba(255,255,255,.35),0 7px 8px rgba(15,23,42,.2);
+  }
+  .ride-tower {
+    left:12%;top:13%;width:24%;height:62%;border-radius:5px 5px 3px 3px;
+    transform:skewY(-7deg);box-shadow:4px 5px 5px rgba(15,23,42,.18),inset 2px 0 rgba(255,255,255,.28);
+  }
+  .ride-tower span {position:absolute;left:8%;right:8%;height:7px;border-radius:4px;background:rgba(255,255,255,.3);box-shadow:0 2px 1px rgba(15,23,42,.12)}
+  .ride-tower span:nth-child(1){top:20%}.ride-tower span:nth-child(2){top:48%}.ride-tower span:nth-child(3){top:76%}
+  .ride-slide {left:28%;right:3%;top:20%;height:61%;transform:rotate(-7deg) skewY(-4deg)}
+  .ride-slide i {border-radius:999px;box-shadow:0 2px 2px rgba(15,23,42,.18)}
+  .ride-slide i:nth-child(1){top:12%;transform:rotate(7deg)}
+  .ride-slide i:nth-child(2){top:38%;left:14%;width:66%;transform:rotate(5deg)}
+  .ride-slide i:nth-child(3){top:64%;left:27%;width:58%;transform:rotate(2deg)}
+  .ride-loop {right:3%;top:6%;width:43%;height:70%;border-width:7px;border-radius:50%;transform:rotate(-18deg);box-shadow:3px 4px 5px rgba(15,23,42,.2)}
+  .ride-halfpipe {right:2%;bottom:9%;width:65%;height:48%;border-width:6px;border-top:0;border-radius:0 0 50% 50%;transform:skewX(-9deg);box-shadow:0 4px 5px rgba(15,23,42,.2)}
+  .ride-art-pool {inset:8%!important;border-radius:28%!important;transform:translateY(-2px) rotateX(4deg)}
+  .pool-water {inset:8%;border-radius:25%;border-width:3px}
+  .pool-deck {inset:3%;border-width:5px;border-radius:27%}
+  .pool-water i {width:24%;height:5px;border-radius:99px;box-shadow:0 0 5px rgba(255,255,255,.65)}
+  .ride-art-water {inset:7%!important;border-radius:30%!important;transform:translateY(-2px)}
+  .water-track {left:8%;right:8%;top:21%;bottom:21%;border-width:5px;border-radius:48% 28% 48% 28%;transform:rotate(-8deg)}
+  .ride-tube {right:8%;top:10%;width:24%;height:24%;border-width:5px;box-shadow:inset 0 2px 3px rgba(255,255,255,.7),0 3px 6px rgba(15,23,42,.25)}
+  .ride-bowl {right:4%;top:8%;width:44%;height:44%;border-width:5px;box-shadow:inset 0 4px 8px rgba(255,255,255,.24),0 4px 8px rgba(15,23,42,.2)}
+  .ride-art-family {inset:8%!important;border-radius:25%!important}
+  .play-tower {left:14%;top:17%;width:32%;height:55%;border-radius:6px;background:linear-gradient(90deg,#f59e0b,#fde68a);box-shadow:0 4px 6px rgba(15,23,42,.2)}
+  .play-roof {left:7%;top:8%;width:46%;height:18%;background:#ef4444;clip-path:polygon(50% 0,100% 100%,0 100%);filter:drop-shadow(2px 3px 2px rgba(15,23,42,.22))}
+  .play-splash {right:7%;bottom:12%;width:50%;height:45%}
+  .play-splash i {animation:ride-splash 1.6s ease-in-out infinite}
+  .facility-art {inset:7%!important;transform:translateY(-3px);border-radius:18%!important;box-shadow:0 8px 8px rgba(15,23,42,.18)}
+  .facility-building {left:15%;right:15%;bottom:17%;height:48%;top:auto;border-radius:8px 8px 5px 5px;background:linear-gradient(145deg,#f8fafc,#94a3b8);border:2px solid rgba(255,255,255,.65);box-shadow:3px 5px 5px rgba(15,23,42,.2)}
+  .facility-roof {left:9%;right:9%;top:12%;height:24%;border-radius:50% 50% 10% 10%;background:linear-gradient(180deg,#fff7ed,#fb923c);box-shadow:0 4px 4px rgba(15,23,42,.2)}
+  .facility-window span {background:linear-gradient(135deg,#bae6fd,#0ea5e9);border:1px solid rgba(255,255,255,.7)}
+  .facility-door {background:#334155;box-shadow:inset 2px 0 rgba(255,255,255,.18)}
+  .facility-awning {background:repeating-linear-gradient(90deg,#ef4444 0 12px,#fff 12px 24px)}
+  .facility-sign {background:rgba(15,23,42,.68);color:#fff;box-shadow:0 2px 3px rgba(15,23,42,.2)}
+  .game-map-grid > button:has(.service-road),
+  .game-map-grid > button:has(.queue-rail) {border-color:transparent!important;box-shadow:none!important;background:transparent!important}
+  .game-map-grid > button:has(.service-road) .service-road {
+    inset:-2px!important;border-radius:8px!important;background:linear-gradient(180deg,#66717a,#4b5563)!important;
+    box-shadow:inset 0 2px 0 rgba(255,255,255,.18),inset 0 -3px 6px rgba(15,23,42,.22),0 3px 5px rgba(15,23,42,.12);
+  }
+  .game-map-grid > button:has(.service-road) .service-road:before {border-left-width:3px!important;border-left-color:rgba(250,204,21,.8)!important}
+  .game-map-grid > button:has(.queue-rail) .queue-rail-a,
+  .game-map-grid > button:has(.queue-rail) .queue-rail-b {height:5px!important;background:linear-gradient(180deg,#fcd34d,#b45309)!important;box-shadow:0 2px 2px rgba(120,53,15,.25)}
+  .game-map-grid > button:has(.queue-rail) .queue-post {width:3px!important;height:15px!important;background:linear-gradient(#94a3b8,#475569)!important}
+  .game-map-grid > button:has(.ride-art):focus-visible,
+  .game-map-grid > button:has(.facility-art):focus-visible {outline:3px solid rgba(34,211,238,.9)!important;outline-offset:2px}
+  .game-map-grid > button:has(.ride-art):has(.ride-crowd-heavy) .ride-art {animation:ride-busy-bob 1.8s ease-in-out infinite}
+  @keyframes ride-busy-bob {0%,100%{transform:translateY(-3px)}50%{transform:translateY(-5px)}}
+  .game-map-surface {scroll-behavior:smooth;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(22,79,57,.55) rgba(255,255,255,.18)}
+  .game-map-surface::-webkit-scrollbar{width:8px;height:8px}.game-map-surface::-webkit-scrollbar-track{background:rgba(255,255,255,.16);border-radius:999px}.game-map-surface::-webkit-scrollbar-thumb{background:rgba(22,79,57,.55);border-radius:999px;border:2px solid rgba(255,255,255,.18)}
+}
+@media (max-width:640px){.ride-art,.facility-art{inset:10%!important}.game-map-grid>button:has(.ride-art),.game-map-grid>button:has(.facility-art){box-shadow:0 5px 0 rgba(48,91,52,.1),0 8px 11px rgba(15,52,30,.15),inset 0 1px 0 rgba(255,255,255,.65)!important}}
+@media (prefers-reduced-motion:reduce){.play-splash i,.game-map-grid > button:has(.ride-art):has(.ride-crowd-heavy) .ride-art{animation:none!important}}
