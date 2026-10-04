@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import {
-  ATTRACTIONS, getParkItem, STAFF, MAX_UPGRADE, upgradeCost,
+  getParkItem, STAFF, MAX_UPGRADE, upgradeCost,
   INITIAL_GRID_SIZE, EXPAND_ROW, MAX_EXPANSIONS, MAX_GRID_SIZE,
   expandCost, expandLevelReq, levelFromXp, xpForLevel, staffWages, staffEffects,
 } from "@/data/gameData";
@@ -141,7 +141,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, grid, parkZones, history, staff, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, priorityPass, adBudget, ticketPrice, seasonEvent, forecast, seasonEvent, ticketPrice, adBudget, priorityPass })
+          JSON.stringify({ money, day, reputation, grid, parkZones, history, staff, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass })
         );
       } catch {
         /* ignore */
@@ -157,10 +157,9 @@ const [selectedZone, setSelectedZone] = useState(null);
   }, []);
 
   const advanceDay = useCallback(() => {
-    const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, incidents: currentIncidents, upgrades: currentUpgrades, challenge: currentChallenge, parkZones: currentZones, weather: currentWeather, forecast: currentForecast, seasonEvent: currentSeasonEvent, ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass } = stateRef.current;
+    const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, incidents: currentIncidents, upgrades: currentUpgrades, challenge: currentChallenge, parkZones: currentZones, forecast: currentForecast, seasonEvent: currentSeasonEvent, ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass } = stateRef.current;
     const dayWeather = currentForecast || rollWeather(d + 1);
     const dayForecast = rollWeather(d + 2);
-    const daySeason = getSeason(d + 1);
     const eff = currentChallenge?.effects || {};
     const placedItems = prevGrid
       .map((id, idx) => (id ? { id, idx, attr: getParkItem(id), level: (currentUpgrades || [])[idx] || 0 } : null))
@@ -574,7 +573,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       setSaves(Object.entries(slots).map(([n, s]) => slotMeta(n, s)));
       return true;
     },
-    [money, day, reputation, guests, grid, parkZones, history, staff, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast]
+    [money, day, reputation, guests, grid, parkZones, history, staff, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass]
   );
 
   const loadPark = useCallback((name) => {
