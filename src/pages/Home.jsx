@@ -18,6 +18,7 @@ import VisitorInsights from "@/components/game/VisitorInsights";
 import { TileDetailPanel } from "@/components/game/TileDetail";
 import ParkToolbar from "@/components/game/ParkToolbar";
 import ParkManagementPanel from "@/components/game/ParkManagementPanel";
+import ParkObjectDetail from "@/components/game/ParkObjectDetail";
 
 export default function Home() {
   const game = useGameState();
@@ -92,11 +93,14 @@ export default function Home() {
 
           <aside className="flex min-w-0 flex-col gap-4">
             {selectedAttrId ? (
-              <TileDetailPanel gridIndex={game.selectedTile} attractionId={selectedAttrId} level={game.upgrades[game.selectedTile] || 0} money={game.money} onUpgrade={() => game.upgradeAttraction(game.selectedTile)} onSell={() => game.sellAttraction(game.selectedTile)} onClose={() => game.setSelectedTile(null)} />
+              <>
+                <TileDetailPanel gridIndex={game.selectedTile} attractionId={selectedAttrId} level={game.upgrades[game.selectedTile] || 0} money={game.money} onUpgrade={() => game.upgradeAttraction(game.selectedTile)} onSell={() => game.sellAttraction(game.selectedTile)} onClose={() => game.setSelectedTile(null)} />
+                <ParkObjectDetail itemId={selectedAttrId} onSell={() => game.sellAttraction(game.selectedTile)} onClose={() => game.setSelectedTile(null)} />
+              </>
             ) : (
               <div className="waterpark-panel border-dashed bg-white/80 p-4">
                 <div className="text-[10px] font-extrabold uppercase tracking-wider text-cyan-700">How to build</div>
-                <p className="mt-1 text-xs leading-5 text-slate-500">Choose an attraction or service on the right, then tap an open green lot. Tap a built tile to inspect, upgrade or sell it.</p>
+                <p className="mt-1 text-xs leading-5 text-slate-500">Choose a ride, facility or park object on the right, then tap an open lot. Use zoning mode to colour-code areas and click built tiles to inspect them.</p>
               </div>
             )}
 
