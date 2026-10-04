@@ -480,7 +480,8 @@ const [selectedZone, setSelectedZone] = useState(null);
         return nu;
       });
       setMoney((m) => m - cost);
-      setTotalUpgrades((t) => t + 1);\n      setXp((x) => x + 15);
+      setTotalUpgrades((t) => t + 1);
+      setXp((x) => x + 15);
     },
     [grid, upgrades, money]
   );
@@ -697,7 +698,8 @@ const [selectedZone, setSelectedZone] = useState(null);
     upgradeAttraction,
     level,
     xp,
-    xpForNext: xpForLevel(level),\n    applyCheat,
+    xpForNext: xpForLevel(level),
+    applyCheat,
     expansionsDone,
     gridSize,
     maxGridSize: MAX_GRID_SIZE,
