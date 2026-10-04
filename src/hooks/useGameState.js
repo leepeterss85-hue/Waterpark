@@ -334,11 +334,11 @@ const [selectedZone, setSelectedZone] = useState(null);
     setGuests(newGuests);
     setPeakGuests((p) => Math.max(p, newGuests));
     setVisitorStats(visitorStats);
-    setLifetimeEarnings((e) => e + Math.round(income));
+    setLifetimeEarnings((e) => e + grossIncome);
     setReputation(Math.round(newReputation));
     setLastNet(net);
     setHistory((h) =>
-      [...h, { day: d + 1, income: Math.round(income), guests: newGuests, reputation: Math.round(newReputation), net }].slice(-60)
+      [...h, { day: d + 1, income: grossIncome, guests: newGuests, reputation: Math.round(newReputation), net }].slice(-60)
     );
     setLog((l) => [...entries, ...l].slice(0, 12));
 
