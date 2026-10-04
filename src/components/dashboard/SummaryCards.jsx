@@ -8,7 +8,7 @@ function satisfactionLabel(r) {
   return "Poor";
 }
 
-function Card({ icon: Icon, label, value, sub, tone }) {
+function Card({ icon: Icon, label, value, sub = "", tone }) {
   return (
     <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
       <div className="flex items-center gap-3">
