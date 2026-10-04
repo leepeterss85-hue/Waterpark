@@ -113,6 +113,9 @@ export default function Home() {
                   incident={game.incidents.find((x) => x.tileIndex === game.selectedTile) || null}
                   guests={game.guests}
                   queueWait={selectedItem?.capacity ? Math.min(45, Math.round(Math.max(0, ((game.visitorStats?.movements?.[selectedAttrId] || 0) / (selectedItem.capacity * 1.4) - 0.35) * 18))) : 0}
+                  lifeguards={game.staff?.lifeguard || 0}
+                  movementCount={game.visitorStats?.movements?.[selectedAttrId] || 0}
+                  totalVisits={game.visitorStats?.totalVisits || 0}
                   onUpgrade={() => game.upgradeAttraction(game.selectedTile)}
                   onSell={() => game.sellAttraction(game.selectedTile)}
                   onClose={() => game.setSelectedTile(null)}
@@ -131,7 +134,7 @@ export default function Home() {
                 <h3 className="mt-0.5 font-display text-lg font-extrabold text-slate-900">Build your park</h3>
                 <p className="mt-1 text-[11px] leading-4 text-slate-500">Pools, slides, family attractions and essential guest facilities.</p>
               </div>
-              <BuildPanel money={game.money} selectedBuild={game.selectedBuild} onSelect={game.setSelectedBuild} />
+              <BuildPanel money={game.money} level={game.level} selectedBuild={game.selectedBuild} onSelect={game.setSelectedBuild} />
             </div>
 
             <ParkManagementPanel
