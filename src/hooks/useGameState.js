@@ -564,6 +564,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         visitorStats,
         weather,
         forecast,
+        seasonEvent,
         savedAt: new Date().toISOString(),
       };
       writeSlots(slots);
