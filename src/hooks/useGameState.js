@@ -19,6 +19,7 @@ export function useGameState() {
   const [log, setLog] = useState([
     { day: 0, text: "Welcome to your new water park! Place an attraction to get started." },
   ]);
+  const [history, setHistory] = useState([]);
 
   const stateRef = useRef({});
   stateRef.current = { money, day, reputation, grid };
@@ -33,6 +34,7 @@ export function useGameState() {
         if (data.day != null) setDay(data.day);
         if (data.reputation != null) setReputation(data.reputation);
         if (data.grid) setGrid(data.grid);
+        if (data.history) setHistory(data.history);
       }
     } catch {
       /* ignore */
@@ -45,14 +47,14 @@ export function useGameState() {
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, grid })
+          JSON.stringify({ money, day, reputation, grid, history })
         );
       } catch {
         /* ignore */
       }
     }, 300);
     return () => clearTimeout(t);
-  }, [money, day, reputation, grid]);
+  }, [money, day, reputation, grid, history]);
 
   const advanceDay = useCallback(() => {
     const { grid: prevGrid, reputation: rep, day: d } = stateRef.current;
@@ -104,6 +106,9 @@ export function useGameState() {
     setGuests(newGuests);
     setReputation(Math.round(newReputation));
     setLastNet(net);
+    setHistory((h) =>
+      [...h, { day: d + 1, income: Math.round(income), guests: newGuests, reputation: Math.round(newReputation), net }].slice(-60)
+    );
     setLog((l) =>
       [
         {
@@ -178,6 +183,7 @@ export function useGameState() {
     setSelectedTile(null);
     setLastNet(0);
     setLog([{ day: 0, text: "New park started! Place an attraction to begin." }]);
+    setHistory([]);
   }, []);
 
   return {
@@ -192,6 +198,7 @@ export function useGameState() {
     selectedTile,
     lastNet,
     log,
+    history,
     GRID_SIZE,
     setPlaying,
     setSpeed,

@@ -1,5 +1,6 @@
 import React from "react";
-import { Waves } from "lucide-react";
+import { Waves, BarChart3 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useGameState } from "@/hooks/useGameState";
 import StatsBar from "@/components/game/StatsBar";
 import ParkGrid from "@/components/game/ParkGrid";
@@ -28,6 +29,13 @@ export default function Home() {
             </h1>
             <p className="text-sm text-slate-400">Build your dream water park</p>
           </div>
+          <Link
+            to="/dashboard"
+            className="ml-auto flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50"
+          >
+            <BarChart3 className="h-4 w-4" />
+            Dashboard
+          </Link>
         </div>
       </header>
 
