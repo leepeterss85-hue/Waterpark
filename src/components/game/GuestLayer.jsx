@@ -29,7 +29,7 @@ export default function GuestLayer({ grid, guests = 0, movements = {}, queueStat
         const col = Number(tileIndex) % 8;
         const row = Math.floor(Number(tileIndex) / 8);
         const count = Math.min(5, Math.max(1, Math.ceil(queue.guests / 5)));
-        return Array.from({ length: count }, (_, index) => <span key={"q" + tileIndex + "-" + index} title={"Queue: " + queue.guests + " guests"} className="absolute h-2.5 w-2.5 rounded-full border border-white bg-amber-300 shadow" style={{ left: (((col + 0.5 + (index % 2) * 0.13) / 8) * 100) + "%", top: (((row + 0.5 + Math.floor(index / 2) * 0.13) / rows) * 100) + "%", transform: "translate(-50%,-50%)" }} />);
+        return Array.from({ length: count }, (_, index) => <span key={"q" + tileIndex + "-" + index} title={"Queue: " + queue.guests + " guests · estimated wait " + queue.wait + " min · rail capacity " + (queue.queueCapacity ?? 8) + (queue.overflow > 0 ? " · overflow " + queue.overflow : "")} className={`absolute h-2.5 w-2.5 rounded-full border border-white shadow ${queue.overflow > 0 ? "bg-rose-500" : "bg-amber-300"}`} style={{ left: (((col + 0.5 + (index % 2) * 0.13) / 8) * 100) + "%", top: (((row + 0.5 + Math.floor(index / 2) * 0.13) / rows) * 100) + "%", transform: "translate(-50%,-50%)" }} />);
       })}
       {staffDots.map((staff) => <span key={"s" + staff.id} className="staff-marker absolute h-3 w-3 rounded-full border-2 border-white bg-sky-700 shadow-md transition-[left,top] ease-in-out" style={{ left: staff.left + "%", top: staff.top + "%", transform: "translate(-50%,-50%)", transitionDuration: "1800ms" }} />)}
     </div>
