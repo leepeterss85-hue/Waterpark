@@ -76,6 +76,7 @@ export function simulateVisits({
   incomeMult,
   entertainment = 0,
   facilityBonus = 1,
+  queuePaths = [],
 }) {
   const empty = {
     income: 0, avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0,
@@ -86,6 +87,16 @@ export function simulateVisits({
     groupTypes: {},
   };
   if (demand <= 0 || !placedItems?.length) return empty;
+
+  const queueSupportByTile = new Map();
+  for (const attraction of placedItems.filter((item) => item.attr.category === "attraction")) {
+    const nearbyRails = queuePaths.filter((path) => {
+      const dx = Math.abs((path.idx % 8) - (attraction.idx % 8));
+      const dy = Math.abs(Math.floor(path.idx / 8) - Math.floor(attraction.idx / 8));
+      return dx + dy <= 2;
+    }).length;
+    queueSupportByTile.set(attraction.idx, nearbyRails);
+  }
 
   const options = placedItems
     .filter((item) => incidents.get(item.idx)?.type !== "breakdown")
@@ -100,6 +111,7 @@ export function simulateVisits({
         load: 0,
         overcrowded: false,
         queueWait: 0,
+        queueSupport: queueSupportByTile.get(item.idx) || 0,
       };
     });
   if (!options.length) return { ...empty, avgMood: 30, guestExperience: { happy: 0, content: 0, unhappy: demand } };
@@ -128,7 +140,7 @@ export function simulateVisits({
       for (const item of options) {
         item.overcrowded = item.load >= item.cap * 0.85;
         item.queueWait = item.attr.category === "attraction"
-          ? Math.round((item.load / Math.max(1, item.cap)) * (item.attr.duration || 4) * 3)
+          ? Math.max(0, Math.round((item.load / Math.max(1, item.cap)) * (item.attr.duration || 4) * 3 - item.queueSupport * 1.5))
           : 0;
       }
       const available = options.filter((item) => !guest.visited.has(item.idx) && item.load < item.cap);
@@ -198,8 +210,9 @@ export function simulateVisits({
   for (const item of options) {
     if (item.attr.category !== "attraction") continue;
     const guestsInQueue = Math.max(0, Math.round(item.load - item.cap * 0.55));
-    const wait = Math.min(90, Math.round((item.load / Math.max(1, item.cap)) * (item.attr.duration || 4) * 3));
-    queueStats[item.idx] = { id: item.attr.id, guests: guestsInQueue, wait, load: Math.round(item.load), capacity: Math.round(item.cap) };
+    const wait = Math.min(90, Math.max(0, Math.round((item.load / Math.max(1, item.cap)) * (item.attr.duration || 4) * 3 - item.queueSupport * 1.5)));
+    const queueCapacity = item.queueSupport > 0 ? item.queueSupport * 12 : 8;
+    queueStats[item.idx] = { id: item.attr.id, guests: guestsInQueue, wait, load: Math.round(item.load), capacity: Math.round(item.cap), queueCapacity, queueRails: item.queueSupport, overflow: Math.max(0, guestsInQueue - queueCapacity) };
     if (wait > longestQueue.wait) longestQueue = { id: item.attr.id, wait, guests: guestsInQueue };
   }
 
