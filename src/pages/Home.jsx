@@ -189,7 +189,7 @@ export default function Home() {
               onExpressLane={game.setPriorityPass}
             />
             <div className="waterpark-panel bg-white/85 p-4">
-              <StaffPanel money={game.money} staff={game.staff} staffWages={game.staffWages} uptime={game.uptime} safety={game.safety} cleanliness={game.cleanliness} entertainment={game.entertainment} onHire={game.hireStaff} onFire={game.fireStaff} />
+              <StaffPanel money={game.money} staff={game.staff} staffWages={game.staffWages} uptime={game.uptime} safety={game.safety} cleanliness={game.cleanliness} entertainment={game.entertainment} onHire={game.hireStaff} onFire={game.fireStaff} assignments={game.staffAssignments} zones={[...new Set((game.parkZones || []).filter(Boolean))].map((id) => ({ id, label: String(id).replace(/[-_]/g, " ").replace(/\\b\\w/g, (letter) => letter.toUpperCase()) }))} onAssign={game.assignStaff} />
             </div>
 
             <div className="waterpark-panel bg-white/85 p-4">
