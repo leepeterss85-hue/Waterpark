@@ -45,7 +45,7 @@ export default function Home() {
   }, [game.achievementState, toast]);
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_12%_0%,rgba(34,211,238,.22),transparent_30%),radial-gradient(circle_at_90%_8%,rgba(45,212,191,.16),transparent_28%),linear-gradient(180deg,#dff6ff_0%,#eef9ee_42%,#d7ead2_100%)]">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_10%_0%,rgba(34,211,238,.35),transparent_28%),radial-gradient(circle_at_90%_12%,rgba(250,204,21,.16),transparent_24%),linear-gradient(180deg,#bdefff_0%,#e8f8ed_42%,#c8e1c0_100%)]">
       <header className="sticky top-0 z-40 border-b border-white/70 bg-white/85 shadow-sm backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:py-4">
           <div className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-2xl bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-700 shadow-lg">
@@ -68,13 +68,13 @@ export default function Home() {
       </header>
 
       <main className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-6">
-        <div className="mb-4 overflow-hidden rounded-[28px] border border-white/80 bg-white/75 px-4 py-4 shadow-sm backdrop-blur sm:px-5">
+        <div className="game-welcome-banner mb-4 overflow-hidden rounded-[24px] border border-white/70 px-4 py-3 shadow-[0_12px_35px_rgba(21,80,60,.12)] sm:px-5">
           <div className="flex items-center gap-3">
-            <div className="hidden h-10 w-10 place-items-center rounded-2xl bg-emerald-100 sm:grid"><Trees className="h-5 w-5 text-emerald-700" /></div>
+            <div className="hidden h-11 w-11 place-items-center rounded-2xl bg-white/20 shadow-inner ring-1 ring-white/30 sm:grid"><Trees className="h-6 w-6 text-white" /></div>
             <div>
-              <div className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-emerald-700">Park Manager</div>
-              <h2 className="font-display text-lg font-extrabold text-slate-900 sm:text-xl">Shape a believable resort-style water park</h2>
-              <p className="mt-1 text-xs leading-5 text-slate-500">Build major water attractions first, then add food, shade, changing rooms and guest services around them.</p>
+              <div className="text-[9px] font-black uppercase tracking-[0.2em] text-white/70">WATER PARK TYCOON</div>
+              <h2 className="font-display text-lg font-black text-white sm:text-xl">Build the biggest water park in town!</h2>
+              <p className="mt-0.5 text-[11px] font-semibold leading-5 text-white/70">Build rides, attract guests, earn cash and level up your park.</p>
             </div>
           </div>
         </div>
