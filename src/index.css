@@ -260,3 +260,10 @@
   .ride-art-slide, .ride-art-pool, .ride-art-water, .ride-art-family { transform: translateY(-1px); }
   @keyframes fountain-spray { 0%,100% { transform: translateY(3px) scale(.8); opacity:.35; } 50% { transform: translateY(-4px) scale(1); opacity:1; } }
 }
+
+@layer components {
+  .guest-marker { box-shadow: 0 3px 5px rgba(15,23,42,.3), 0 0 0 2px rgba(236,72,153,.12); }
+  .guest-marker:after { content:""; position:absolute; left:50%; bottom:-4px; width:4px; height:4px; transform:translateX(-50%) rotate(45deg); background:inherit; border-right:1px solid white; border-bottom:1px solid white; }
+  .staff-marker { box-shadow: 0 3px 5px rgba(15,23,42,.3), 0 0 0 2px rgba(14,116,144,.12); }
+  .staff-marker:after { content:""; position:absolute; left:50%; bottom:-3px; width:4px; height:4px; transform:translateX(-50%) rotate(45deg); background:inherit; border-right:1px solid white; border-bottom:1px solid white; }
+}
