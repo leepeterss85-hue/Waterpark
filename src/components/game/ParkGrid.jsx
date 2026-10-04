@@ -4,7 +4,7 @@ import { getParkItem } from "@/data/gameData";
 import Tile from "./Tile";
 import GuestLayer from "./GuestLayer";
 
-export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, visitorMovements, staffTotal, day = 1, weather, onTileClick }) {
+export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, visitorMovements, staffTotal, day = 1, weather, seasonEvent, onTileClick }) {
   const [zoom, setZoom] = useState(1);
   const incidentMap = new Map((incidents || []).map((i) => [i.tileIndex, i]));
   const phase = ((day - 1) % 8);
@@ -26,7 +26,7 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
           <span className="hidden h-4 w-px bg-white/20 sm:block" /><span className="hidden items-center gap-1.5 sm:flex"><Footprints className="h-3.5 w-3.5 text-amber-200" />GUESTS MOVING</span>
         </div>
       </div>
-      <div className="game-board-frame">
+      {(seasonEvent || weatherId === "storm") && <div className={"park-event-ribbon " + (weatherId === "storm" ? "storm" : "")}><Sparkles className="h-3.5 w-3.5" /><span>{weatherId === "storm" ? "THUNDERSTORM — SAFETY MODE" : seasonEvent?.name}</span><b>{weatherId === "storm" ? "Outdoor demand reduced" : seasonEvent?.description}</b></div>}\n      <div className="game-board-frame">
         <div className="game-map-toolbar">
           <div className="flex items-center gap-2"><span className="game-map-status"><span /> PARK MAP</span><span className="hidden text-[9px] font-extrabold uppercase tracking-wider text-slate-400 sm:inline">Tap a tile to build or inspect</span></div>
           <div className="flex items-center gap-1 rounded-xl bg-white/95 p-1 shadow-md ring-1 ring-slate-200">
@@ -58,7 +58,7 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
                   const row=Math.floor(index/8), col=index%8;
                   const neighbors=[row>0?index-8:-1,row<Math.ceil(grid.length/8)-1?index+8:-1,col>0?index-1:-1,col<7?index+1:-1].filter((n)=>n>=0);
                   const queueConnected=!isWater || neighbors.some((n)=>grid[n]==="queue_path"||grid[n]==="main_path");
-                  return <Tile key={index} index={index} grid={grid} zone={parkZones?.[index]} upgradeLevel={upgrades?.[index]||0} value={value} selectedBuild={selectedBuild} isSelected={selectedTile===index} incident={incidentMap.get(index)} queueWait={queueWait} queueConnected={queueConnected} onClick={()=>onTileClick(index)} />;
+                  return <Tile key={index} index={index} grid={grid} zone={parkZones?.[index]} upgradeLevel={upgrades?.[index]||0} value={value} selectedBuild={selectedBuild} isSelected={selectedTile===index} incident={incidentMap.get(index)} queueWait={queueWait} queueConnected={queueConnected} movement={movement} onClick={()=>onTileClick(index)} />;
                 })}
               </div>
               <GuestLayer grid={grid} guests={guests} movements={visitorMovements} staffTotal={staffTotal} />
