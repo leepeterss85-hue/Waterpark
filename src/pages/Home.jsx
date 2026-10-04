@@ -110,6 +110,8 @@ export default function Home() {
                   attractionId={selectedAttrId}
                   level={game.upgrades[game.selectedTile] || 0}
                   money={game.money}
+                  incident={game.incidents.find((x) => x.tileIndex === game.selectedTile) || null}
+                  guests={game.guests}
                   onUpgrade={() => game.upgradeAttraction(game.selectedTile)}
                   onSell={() => game.sellAttraction(game.selectedTile)}
                   onClose={() => game.setSelectedTile(null)}
