@@ -117,6 +117,18 @@ export default function StaffPanel({
                   </button>
                 </div>
               </div>
+              <div className="mt-2 flex items-center gap-2">
+                <label htmlFor={`staff-zone-${s.id}`} className="shrink-0 text-[10px] font-semibold uppercase tracking-wide text-slate-400">Assignment</label>
+                <select
+                  id={`staff-zone-${s.id}`}
+                  value={assignments[s.id] || ""}
+                  onChange={(event) => onAssign(s.id, event.target.value)}
+                  className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs font-medium text-slate-600 outline-none focus:border-cyan-400"
+                >
+                  <option value="">Park-wide</option>
+                  {zones.map((zone) => <option key={zone.id} value={zone.id}>{zone.label}</option>)}
+                </select>
+              </div>
             </div>
           );
         })}
