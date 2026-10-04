@@ -2,7 +2,7 @@ import React from "react";
 
 export default function EventLog({ log, issueCount = 0 }) {
   return (
-    <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
+    <div className="rounded-2xl bg-white/70 p-4 shadow-sm ring-1 ring-slate-100">
       <h3 className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
         Park Log
         {issueCount > 0 && (

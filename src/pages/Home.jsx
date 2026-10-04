@@ -98,7 +98,7 @@ export default function Home() {
 
         {/* Main layout */}
         <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-4">
             <ChallengeBanner challenge={game.challenge} />
             <ExpansionPanel
               gridSize={game.gridSize}

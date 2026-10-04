@@ -13,7 +13,7 @@ export default function MissionsPanel({
   const pct = xpForNext > 0 ? Math.min(100, Math.round((xp / xpForNext) * 100)) : 100;
 
   return (
-    <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
+    <div className="rounded-2xl bg-white/70 p-4 shadow-sm ring-1 ring-slate-100">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
           <Target className="h-3.5 w-3.5" /> Missions

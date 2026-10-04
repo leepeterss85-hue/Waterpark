@@ -3,6 +3,7 @@ import { Play, Pause, SkipForward, RotateCcw } from "lucide-react";
 
 export default function GameControls({ playing, speed, onTogglePlay, onSpeed, onAdvance, onReset }) {
   return (
+    <div className="rounded-2xl bg-white/70 p-3 shadow-sm ring-1 ring-slate-100">
     <div className="flex flex-wrap items-center gap-2">
       <button
         onClick={onTogglePlay}
@@ -40,6 +41,7 @@ export default function GameControls({ playing, speed, onTogglePlay, onSpeed, on
         <RotateCcw className="h-4 w-4" />
         Reset
       </button>
+    </div>
     </div>
   );
 }

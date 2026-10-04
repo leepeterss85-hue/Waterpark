@@ -21,7 +21,7 @@ export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0,
   const cost = upgradeCost(attr.cost, level);
   const canAfford = money >= cost;
   return (
-    <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
+    <div className="rounded-2xl bg-white/70 p-4 shadow-sm ring-1 ring-slate-100">
       <div className="mb-3 flex items-start justify-between">
         <div className="flex items-center gap-3">
           <div className={`grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br ${attr.color}`}>
