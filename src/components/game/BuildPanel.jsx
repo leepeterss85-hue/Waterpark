@@ -12,7 +12,7 @@ function BuildCard({ item, selected, affordable, unlocked, onSelect }) {
       onClick={() => onSelect(selected ? null : item.id)}
       disabled={(!affordable || !unlocked) && !selected}
       className={
-        "group w-full rounded-xl border p-2 text-left transition-all duration-200 " +
+        "build-catalog-card group w-full rounded-xl border p-2 text-left transition-all duration-200 " +
         (selected
           ? "border-cyan-500 bg-slate-950 text-white shadow-lg ring-2 ring-cyan-300/60"
           : affordable
@@ -79,7 +79,7 @@ export default function BuildPanel({ money, level = 1, selectedBuild, onSelect }
         if (!items.length) return null;
         return (
           <div key={cat.id}>
-            <button onClick={() => setExpanded((state) => ({ ...state, [cat.id]: !state[cat.id] }))} className="mb-2 flex w-full items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-left ring-1 ring-slate-100 hover:bg-slate-100">
+            <button onClick={() => setExpanded((state) => ({ ...state, [cat.id]: !state[cat.id] }))} className="build-category-toggle mb-2 flex w-full items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-left ring-1 ring-slate-100 hover:bg-slate-100">
               <span className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-slate-600">{cat.label}</span>
               <span className="flex items-center gap-2 text-[9px] font-semibold text-slate-400">{items.length} <span className="text-sm">{expanded[cat.id] ? "−" : "+"}</span></span>
             </button>
