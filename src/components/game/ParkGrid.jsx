@@ -4,12 +4,12 @@ import { getParkItem } from "@/data/gameData";
 import Tile from "./Tile";
 import GuestLayer from "./GuestLayer";
 
-export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, visitorMovements, staffTotal, day = 1, weather, seasonEvent, onTileClick }) {
+export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, visitorMovements, staffTotal, lifeguardTotal = 0, day = 1, weather, seasonEvent, onTileClick }) {
   const [zoom, setZoom] = useState(1);
   const incidentMap = new Map((incidents || []).map((i) => [i.tileIndex, i]));
   const phase = ((day - 1) % 8);
   const timeOfDay = phase <= 1 ? "morning" : phase <= 5 ? "day" : phase === 6 ? "sunset" : "night";
-  const weatherId = weather?.id || "clear";
+  const weatherId = weather?.id || "clear";\n  const attractionCount = grid.filter((id) => getParkItem(id)?.category === "attraction").length;\n  const lifeguardStations = grid.filter((id) => id === "lifeguard_station").length;\n  const toilets = grid.filter((id) => id === "toilets" || id === "lockers").length;\n  const requiredGuards = Math.max(1, Math.ceil(attractionCount / 3));\n  const guardCoverage = Math.min(1, lifeguardTotal / requiredGuards + lifeguardStations * 0.12);\n  const facilityStatus = { toilets: guests <= Math.max(1, toilets) * 80 ? "COVERED" : "OVERLOADED", lifeguard_station: guardCoverage >= 0.7 ? "COVERED" : "OVERLOADED" };
 
   return (
     <section className={"game-board-shell park-time-" + timeOfDay + " park-weather-" + weatherId}>
@@ -61,7 +61,7 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
                   const expansionTheme=expansionThemes[Math.max(0, Math.min(expansionThemes.length-1, row-5))];
                   const neighbors=[row>0?index-8:-1,row<Math.ceil(grid.length/8)-1?index+8:-1,col>0?index-1:-1,col<7?index+1:-1].filter((n)=>n>=0);
                   const queueConnected=!isWater || neighbors.some((n)=>grid[n]==="queue_path"||grid[n]==="main_path");
-                  return <Tile key={index} index={index} grid={grid} zone={parkZones?.[index]} upgradeLevel={upgrades?.[index]||0} value={value} selectedBuild={selectedBuild} expansionTheme={expansionTheme} isSelected={selectedTile===index} incident={incidentMap.get(index)} queueWait={queueWait} queueConnected={queueConnected} movement={movement} onClick={()=>onTileClick(index)} />;
+                  return <Tile key={index} index={index} grid={grid} zone={parkZones?.[index]} upgradeLevel={upgrades?.[index]||0} value={value} selectedBuild={selectedBuild} expansionTheme={expansionTheme} isSelected={selectedTile===index} incident={incidentMap.get(index)} queueWait={queueWait} queueConnected={queueConnected} movement={movement} facilityStatus={facilityStatus} timeOfDay={timeOfDay} nightSwim={seasonEvent?.id === "night_swim"} onClick={()=>onTileClick(index)} />;
                 })}
               </div>
               <GuestLayer grid={grid} guests={guests} movements={visitorMovements} staffTotal={staffTotal} />
