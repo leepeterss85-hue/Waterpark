@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { ATTRACTIONS, getAttraction, STAFF } from "@/data/gameData";
+import { ATTRACTIONS, getAttraction, STAFF, MAX_UPGRADE, upgradeCost } from "@/data/gameData";
 
 const STORAGE_KEY = "waterpark-tycoon-save-v1";
 const SLOTS_KEY = "waterpark-tycoon-slots";
@@ -51,9 +51,10 @@ export function useGameState() {
   const [staff, setStaff] = useState({ lifeguard: 0, mechanic: 0, cleaner: 0 });
   const [saves, setSaves] = useState([]);
   const [incidents, setIncidents] = useState([]);
+  const [upgrades, setUpgrades] = useState(() => Array(GRID_SIZE).fill(0));
 
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, grid, staff, incidents };
+  stateRef.current = { money, day, reputation, grid, staff, incidents, upgrades };
 
   // Load saved game
   useEffect(() => {
@@ -79,14 +80,14 @@ export function useGameState() {
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, grid, history, staff, incidents })
+          JSON.stringify({ money, day, reputation, grid, history, staff, incidents, upgrades })
         );
       } catch {
         /* ignore */
       }
     }, 300);
     return () => clearTimeout(t);
-  }, [money, day, reputation, grid, history, staff, incidents]);
+  }, [money, day, reputation, grid, history, staff, incidents, upgrades]);
 
   // Load save slots list on mount
   useEffect(() => {
@@ -95,12 +96,16 @@ export function useGameState() {
   }, []);
 
   const advanceDay = useCallback(() => {
-    const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, incidents: currentIncidents } = stateRef.current;
+    const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, incidents: currentIncidents, upgrades: currentUpgrades } = stateRef.current;
     const placedItems = prevGrid
-      .map((id, idx) => (id ? { id, idx, attr: getAttraction(id) } : null))
+      .map((id, idx) => (id ? { id, idx, attr: getAttraction(id), level: (currentUpgrades || [])[idx] || 0 } : null))
       .filter(Boolean);
     const attractions = placedItems.filter((p) => p.attr.category === "attraction");
     const facilities = placedItems.filter((p) => p.attr.category === "facility");
+    const capOf = (p) => p.attr.capacity * (1 + 0.2 * p.level);
+    const incOf = (p) => p.attr.income * (1 + 0.15 * p.level);
+    const funOf = (p) => Math.min(10, p.attr.fun + p.level * 0.5);
+    const upkeepOf = (p) => p.attr.maintenance * (1 + 0.1 * p.level);
 
     const counts = currentStaff || { lifeguard: 0, mechanic: 0, cleaner: 0 };
     const uptime = Math.min(1, 0.65 + (counts.mechanic || 0) * 0.07);
@@ -127,7 +132,7 @@ export function useGameState() {
     const workingAttractions = attractions.filter(
       (p) => incidentByTile.get(p.idx)?.type !== "breakdown"
     );
-    const totalCapacity = workingAttractions.reduce((s, p) => s + p.attr.capacity, 0);
+    const totalCapacity = workingAttractions.reduce((s, p) => s + capOf(p), 0);
 
     let newGuests = 0;
     let income = 0;
@@ -145,17 +150,17 @@ export function useGameState() {
           let mult = 1;
           if (inc?.type === "breakdown") mult = 0;
           else if (inc?.type === "maintenance") mult = 0.5;
-          return s + p.attr.income * fillRatio * mult;
+          return s + incOf(p) * fillRatio * mult;
         }, 0) * uptime;
       const facilityIncome = facilities.reduce(
-        (s, f) => s + f.attr.income * Math.min(1, newGuests / 60),
+        (s, f) => s + incOf(f) * Math.min(1, newGuests / 60),
         0
       );
       income = attractionIncome + facilityIncome;
 
       const avgFun =
         totalCapacity > 0
-          ? workingAttractions.reduce((s, p) => s + p.attr.fun * p.attr.capacity, 0) /
+          ? workingAttractions.reduce((s, p) => s + funOf(p) * capOf(p), 0) /
             totalCapacity
           : 0;
       const overcrowded = newGuests > totalCapacity * 0.85;
@@ -195,7 +200,7 @@ export function useGameState() {
     }
     setIncidents([...remaining, ...newIncidents]);
 
-    const expenses = placedItems.reduce((s, p) => s + p.attr.maintenance, 0) + staffWages;
+    const expenses = placedItems.reduce((s, p) => s + upkeepOf(p), 0) + staffWages;
     const net = Math.round(income - expenses);
 
     // --- Build log entries (newest first) ---
@@ -281,12 +286,36 @@ export function useGameState() {
       if (!g[index]) return g;
       const attr = getAttraction(g[index]);
       setMoney((m) => m + Math.floor(attr.cost * 0.5));
+      setUpgrades((u) => {
+        const nu = [...u];
+        nu[index] = 0;
+        return nu;
+      });
       const ng = [...g];
       ng[index] = null;
       return ng;
     });
     setSelectedTile(null);
   }, []);
+
+  const upgradeAttraction = useCallback(
+    (index) => {
+      const id = grid[index];
+      if (!id) return;
+      const attr = getAttraction(id);
+      const level = upgrades[index] || 0;
+      if (level >= MAX_UPGRADE) return;
+      const cost = upgradeCost(attr.cost, level);
+      if (money < cost) return;
+      setUpgrades((u) => {
+        const nu = [...u];
+        nu[index] = level + 1;
+        return nu;
+      });
+      setMoney((m) => m - cost);
+    },
+    [grid, upgrades, money]
+  );
 
   const hireStaff = useCallback((type) => {
     setStaff((s) => ({ ...s, [type]: (s[type] || 0) + 1 }));
@@ -312,6 +341,7 @@ export function useGameState() {
         log,
         lastNet,
         incidents,
+        upgrades,
         savedAt: new Date().toISOString(),
       };
       writeSlots(slots);
@@ -333,6 +363,7 @@ export function useGameState() {
     setHistory(data.history ?? []);
     setStaff(data.staff ?? { lifeguard: 0, mechanic: 0, cleaner: 0 });
     setIncidents(data.incidents ?? []);
+    setUpgrades(data.upgrades ?? Array(GRID_SIZE).fill(0));
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
     setLastNet(data.lastNet ?? 0);
     setPlaying(false);
@@ -361,6 +392,7 @@ export function useGameState() {
     setHistory([]);
     setStaff({ lifeguard: 0, mechanic: 0, cleaner: 0 });
     setIncidents([]);
+    setUpgrades(Array(GRID_SIZE).fill(0));
   }, []);
 
   return {
@@ -378,6 +410,8 @@ export function useGameState() {
     history,
     staff,
     incidents,
+    upgrades,
+    upgradeAttraction,
     uptime: Math.min(1, 0.65 + (staff.mechanic || 0) * 0.07),
     safety: Math.min(1, 0.7 + (staff.lifeguard || 0) * 0.06),
     cleanliness: Math.min(1, 0.6 + (staff.cleaner || 0) * 0.1),

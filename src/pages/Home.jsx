@@ -81,6 +81,9 @@ export default function Home() {
               <TileDetailPanel
                 gridIndex={game.selectedTile}
                 attractionId={selectedAttrId}
+                level={game.upgrades[game.selectedTile] || 0}
+                money={game.money}
+                onUpgrade={() => game.upgradeAttraction(game.selectedTile)}
                 onSell={() => game.sellAttraction(game.selectedTile)}
                 onClose={() => game.setSelectedTile(null)}
               />

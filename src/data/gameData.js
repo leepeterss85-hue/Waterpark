@@ -348,3 +348,9 @@ export const CATEGORIES = [
   { id: "attraction", label: "Core Water Attractions" },
   { id: "facility", label: "Facilities & Services" },
 ];
+
+export const MAX_UPGRADE = 5;
+
+export function upgradeCost(baseCost, level) {
+  return Math.round(baseCost * 0.5 * (level + 1));
+}
