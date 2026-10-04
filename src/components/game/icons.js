@@ -13,6 +13,19 @@ import {
   ShieldCheck,
   Wrench,
   Sparkles,
+  Zap,
+  Tornado,
+  Users,
+  Cloud,
+  Sun,
+  Flame,
+  RotateCw,
+  Mountain,
+  Anchor,
+  Dumbbell,
+  Umbrella,
+  IceCream,
+  Coffee,
 } from "lucide-react";
 
 export const ICONS = {
@@ -30,6 +43,19 @@ export const ICONS = {
   ShieldCheck,
   Wrench,
   Sparkles,
+  Zap,
+  Tornado,
+  Users,
+  Cloud,
+  Sun,
+  Flame,
+  RotateCw,
+  Mountain,
+  Anchor,
+  Dumbbell,
+  Umbrella,
+  IceCream,
+  Coffee,
 };
 
 export function getIcon(name) {
