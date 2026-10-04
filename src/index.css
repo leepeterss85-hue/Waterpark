@@ -441,3 +441,16 @@
 .park-expansion-theme-extreme{box-shadow:inset 0 0 0 2px rgba(249,115,22,.14)}
 .park-expansion-theme-vip{box-shadow:inset 0 0 0 2px rgba(168,85,247,.16)}
 .park-expansion-theme-grand{box-shadow:inset 0 0 0 2px rgba(14,116,144,.16)}
+
+/* Expansion identity, crowd pressure and Night Swim effects. */
+.expansion-decor{position:absolute;inset:0;z-index:12;pointer-events:none;overflow:hidden;opacity:.78}
+.expansion-decor>span{position:absolute;font-size:11px;font-weight:900;text-shadow:0 2px 5px rgba(15,23,42,.22);filter:drop-shadow(0 1px 2px rgba(255,255,255,.5))}
+.expansion-decor>span:nth-child(1){left:7%;top:8%}.expansion-decor>span:nth-child(2){right:8%;top:13%}.expansion-decor>span:nth-child(3){right:10%;bottom:8%}
+.expansion-decor-family>span{color:#b45309}.expansion-decor-thrill>span{color:#dc2626}.expansion-decor-resort>span{color:#059669}.expansion-decor-extreme>span{color:#ea580c}.expansion-decor-vip>span{color:#7e22ce}.expansion-decor-grand>span{color:#0369a1}
+.expansion-decor-night{opacity:.95}.expansion-decor-night>span{filter:drop-shadow(0 0 7px rgba(125,211,252,.9))}
+.park-expansion-theme-thrill:has(.ride-art) .expansion-decor{animation:theme-pulse 2.2s ease-in-out infinite}
+.night-swim-lights{position:absolute;inset:0}.night-swim-lights i{position:absolute;width:5px;height:5px;border-radius:999px;background:#a5f3fc;box-shadow:0 0 9px 3px rgba(103,232,249,.8);animation:night-light 1.4s ease-in-out infinite}
+.night-swim-lights i:nth-child(1){left:16%;bottom:17%}.night-swim-lights i:nth-child(2){left:38%;top:18%;animation-delay:.25s}.night-swim-lights i:nth-child(3){right:25%;bottom:25%;animation-delay:.5s}.night-swim-lights i:nth-child(4){right:9%;top:34%;animation-delay:.75s}
+.ride-crowd-heavy{box-shadow:0 0 0 2px rgba(251,146,60,.55),0 0 12px rgba(251,146,60,.35)}
+.facility-covered{background:#047857!important}.facility-overloaded{background:#dc2626!important;animation:facility-alert 1.1s ease-in-out infinite}
+@keyframes theme-pulse{50%{filter:saturate(1.3) brightness(1.08)}}@keyframes night-light{50%{transform:scale(1.7);opacity:.55}}@keyframes facility-alert{50%{transform:scale(1.04);opacity:.78}}
