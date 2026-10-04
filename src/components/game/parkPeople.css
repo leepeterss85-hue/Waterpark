@@ -10,14 +10,16 @@
 .person-shirt-detail { fill:none; stroke:hsl(var(--park-rim)/.85); stroke-width:1.5; stroke-linecap:round; }
 .person-float { fill:none; stroke:var(--person-color); stroke-width:7; }.person-float-highlight { fill:none; stroke:hsl(var(--park-rim)); stroke-width:1; }
 .person-shadow { fill:hsl(var(--park-ink)/.2); }.person-ripple { fill:none; stroke:hsl(var(--park-rim)/.9); stroke-width:1.3; stroke-linecap:round; }
-.park-pedestrian { position:absolute; width:29px; height:42px; transform:translate(-50%,-90%); transition:left 1.3s linear,top 1.3s linear; }
+.park-pedestrian { position:absolute; width:34px; height:48px; transform:translate(-50%,-90%); transition:left 1.3s linear,top 1.3s linear; }
 .park-pedestrian > .park-person { width:100%; height:100%; filter:drop-shadow(0 1px 1px hsl(var(--park-ink)/.25)); }
 .park-pedestrian[data-activity="walking"] .person-leg-left,.park-pedestrian[data-activity="walking"] .person-arm-right { transform-origin:16px 26px; animation:person-stride .65s ease-in-out infinite alternate; }
 .park-pedestrian[data-activity="walking"] .person-leg-right,.park-pedestrian[data-activity="walking"] .person-arm-left { transform-origin:16px 26px; animation:person-stride .65s ease-in-out infinite alternate-reverse; }
 .ride-visitors { position:absolute; inset:0; width:100%; height:100%; z-index:12; overflow:visible; pointer-events:none; }
+.ride-visitor-splash { fill:none; stroke:hsl(var(--park-rim)/.6); stroke-width:1.5; animation:ride-splash-ring 2s ease-in-out infinite; }
 .ride-swimmer { animation:person-swim 3.5s ease-in-out infinite alternate; }.person-swim-stroke { transform-origin:16px 20px; animation:person-stroke 1.2s ease-in-out infinite alternate; }.ride-swimmer:nth-child(2n) { animation-delay:-1.7s; }
 .ride-visitors .park-person { filter:drop-shadow(0 1px 1px hsl(var(--park-ink)/.35)); }
 @keyframes person-stride { from{transform:rotate(-12deg)}to{transform:rotate(12deg)} }
 @keyframes person-swim { from{transform:translateX(-3px)}to{transform:translateX(4px)} }
 @keyframes person-stroke { from{transform:rotate(-4deg)}to{transform:rotate(4deg)} }
-@media (prefers-reduced-motion:reduce) { .park-pedestrian{transition:none}.park-person *,.ride-swimmer { animation:none!important; } }
+@keyframes ride-splash-ring { 0%,100%{opacity:.3;transform:scale(.85)} 50%{opacity:.8;transform:scale(1.1)} }
+@media (prefers-reduced-motion:reduce) { .park-pedestrian{transition:none}.park-person *,.ride-swimmer,.ride-visitor-splash { animation:none!important; } }
