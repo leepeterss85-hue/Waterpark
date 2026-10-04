@@ -45,7 +45,29 @@ function ParkObject({ attr, grid, index }) {
   if (attr.id === "shade_umbrella") return <div className="absolute inset-0 flex items-center justify-center"><Umbrella className="h-8 w-8 text-amber-500 drop-shadow" /><div className="absolute bottom-3 h-2 w-5 rounded-full bg-slate-700/25" /></div>;
   if (attr.id === "fountain") return <div className="absolute inset-0 flex items-center justify-center"><div className="h-10 w-10 rounded-full bg-cyan-400/60 ring-2 ring-white/50" /><Droplets className="absolute h-7 w-7 text-white animate-pulse" /></div>;
   if (attr.id === "wayfinding_sign") return <div className="absolute inset-0 flex items-center justify-center"><Flag className="h-8 w-8 text-orange-600 drop-shadow" /></div>;
+  if (attr.id === "service_road") return <div className="absolute inset-0 service-road"><span /><span /><span /></div>;
   return <div className={"absolute inset-1 flex items-center justify-center rounded-[15px] bg-gradient-to-br " + attr.color}><Icon className="h-7 w-7 text-white drop-shadow-md" /></div>;
+}
+
+function FacilityArtwork({ attr }) {
+  const id = attr.id;
+  const labels = {
+    dining:"FOOD", cabanas:"CABANAS", lockers:"LOCKERS", retail:"SHOP", first_aid:"FIRST AID",
+    sun_lounge:"LOUNGE", ice_cream:"ICE CREAM", coffee_bar:"CAFÉ", gym:"GYM", spa:"SPA",
+    arcade:"ARCADE", vip_lounge:"VIP", party_room:"PARTY", photo_kiosk:"PHOTO"
+  };
+  return <div className={"facility-art facility-" + id}>
+    <div className="facility-roof" />
+    <div className="facility-building">
+      <div className="facility-awning" />
+      <div className="facility-window"><span /><span /></div>
+      <div className="facility-door" />
+    </div>
+    <div className="facility-sign">{labels[id] || "PARK"}</div>
+    {id === "dining" || id === "ice_cream" || id === "coffee_bar" ? <div className="facility-table"><i /><i /><i /></div> : null}
+    {id === "cabanas" || id === "sun_lounge" ? <div className="facility-umbrella">☂</div> : null}
+    {id === "arcade" ? <div className="facility-lights"><i /><i /><i /></div> : null}
+  </div>;
 }
 
 function RideArtwork({ attr }) {
@@ -108,7 +130,7 @@ export default function Tile({ value, index, grid, zone, upgradeLevel = 0, selec
   const zoneTint = zone ? ZONE_TINT[zone] : "";
   return <button onClick={onClick} title={attr ? attr.name : canPlace ? "Build here" : zone ? "Park zone" : "Open land"} className={"group relative aspect-square overflow-hidden rounded-[17px] border-2 transition-all duration-200 " + (attr ? (isSelected ? "scale-[.97] border-white ring-4 ring-cyan-300/80 shadow-[0_10px_24px_rgba(15,23,42,.24)]" : "border-white/75 shadow-[0_6px_15px_rgba(15,23,42,.13)] hover:-translate-y-0.5 hover:shadow-[0_10px_20px_rgba(15,23,42,.18)]") : canPlace ? "border-dashed border-cyan-300 bg-cyan-50 hover:bg-white" : "border-white/70 bg-[#b9d6ae] hover:bg-[#c7dfbd]")}>
     {!attr && <><div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,.5),transparent_18%)]" /><div className="absolute left-[14%] top-[17%]"><Trees className="h-3.5 w-3.5 text-emerald-700/45" /></div><div className="absolute bottom-[18%] right-[16%]"><Trees className="h-3 w-3 text-emerald-800/35" /></div></>}
-    {attr?.category === "environment" ? <ParkObject attr={attr} grid={grid} index={index} /> : attr ? <AttractionMark attr={attr} /> : null}
+    {attr?.category === "environment" ? <ParkObject attr={attr} grid={grid} index={index} /> : attr?.category === "facility" ? <div className={"absolute inset-0 overflow-hidden rounded-[16px] bg-gradient-to-br " + attr.color}><FacilityArtwork attr={attr} /><div className="relative z-20 flex h-full items-end justify-center pb-1"><span className="rounded-md bg-slate-950/50 px-1.5 py-0.5 text-[7px] font-extrabold uppercase tracking-wide text-white shadow">{attr.name}</span></div></div> : attr ? <AttractionMark attr={attr} /> : null}
     {canPlace && <div className="relative z-10 flex h-full flex-col items-center justify-center gap-1"><div className="grid h-8 w-8 place-items-center rounded-full bg-white shadow-sm ring-1 ring-cyan-200"><span className="text-xl font-light text-cyan-500">+</span></div><span className="text-[8px] font-extrabold uppercase tracking-wider text-cyan-700">Build</span></div>}
     {zoneTint && <div className={"pointer-events-none absolute inset-0 z-10 rounded-[15px] ring-2 " + zoneTint} />}
     {isWater && <><div className="absolute left-1 top-1 z-20 rounded bg-white/80 px-1 py-0.5 text-[6px] font-black text-slate-700">IN</div><div className="absolute right-1 bottom-1 z-20 rounded bg-black/45 px-1 py-0.5 text-[6px] font-black text-white">OUT</div>{queueWait > 0 && <div className="absolute bottom-1 left-1 z-20 rounded-md bg-black/60 px-1.5 py-0.5 text-[7px] font-black text-white">{queueWait}m wait</div>}{queueConnected === false && <div className="absolute left-1/2 top-1 z-20 -translate-x-1/2 rounded bg-amber-100 px-1 py-0.5 text-[6px] font-black text-amber-800">ADD QUEUE</div>}</>}
