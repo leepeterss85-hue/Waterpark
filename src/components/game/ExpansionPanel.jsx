@@ -1,7 +1,6 @@
 import React from "react";
 import { Expand, Maximize2 } from "lucide-react";
 import {
-  INITIAL_GRID_SIZE,
   EXPAND_ROW,
   MAX_EXPANSIONS,
   MAX_GRID_SIZE,
