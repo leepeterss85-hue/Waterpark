@@ -4,7 +4,7 @@ import { getParkItem } from "@/data/gameData";
 import Tile from "./Tile";
 import GuestLayer from "./GuestLayer";
 
-export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, visitorMovements, queueStats = {}, staffTotal, lifeguardTotal = 0, day = 1, weather, seasonEvent, onTileClick }) {
+export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, visitorMovements, queueStats = {}, staff = {}, staffAssignments = {}, lifeguardTotal = 0, day = 1, weather, seasonEvent, onTileClick }) {
   const [zoom, setZoom] = useState(1);
   const incidentMap = new Map((incidents || []).map((incident) => [incident.tileIndex, incident]));
   const phase = ((day - 1) % 8);
@@ -49,7 +49,7 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
                 return <Tile key={index} index={index} grid={grid} zone={parkZones?.[index]} upgradeLevel={upgrades?.[index] || 0} value={value} selectedBuild={selectedBuild} expansionTheme={expansionTheme} isSelected={selectedTile === index} incident={incidentMap.get(index)} queueWait={queueWait} queueConnected={queueConnected} movement={movement} facilityStatus={facilityStatus} timeOfDay={timeOfDay} nightSwim={seasonEvent?.id === "night_swim"} onClick={() => onTileClick(index)} />;
               })}
             </div>
-            <GuestLayer grid={grid} guests={guests} movements={visitorMovements} queueStats={queueStats} staffTotal={staffTotal} />
+            <GuestLayer grid={grid} parkZones={parkZones} guests={guests} movements={visitorMovements} queueStats={queueStats} staff={staff} staffAssignments={staffAssignments} />
           </div></div>
         </div>
       </div>
