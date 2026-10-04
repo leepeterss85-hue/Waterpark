@@ -4,12 +4,15 @@ import { getParkItem } from "@/data/gameData";
 import Tile from "./Tile";
 import GuestLayer from "./GuestLayer";
 
-export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, visitorMovements, staffTotal, onTileClick }) {
+export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, visitorMovements, staffTotal, day = 1, weather, onTileClick }) {
   const [zoom, setZoom] = useState(1);
   const incidentMap = new Map((incidents || []).map((i) => [i.tileIndex, i]));
+  const phase = ((day - 1) % 8);
+  const timeOfDay = phase <= 1 ? "morning" : phase <= 5 ? "day" : phase === 6 ? "sunset" : "night";
+  const weatherId = weather?.id || "clear";
 
   return (
-    <section className="game-board-shell">
+    <section className={"game-board-shell park-time-" + timeOfDay + " park-weather-" + weatherId}>
       <div className="game-board-titlebar">
         <div className="flex min-w-0 items-center gap-3">
           <div className="game-board-icon"><MapIcon className="h-5 w-5" /></div>
@@ -33,6 +36,12 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
           </div>
         </div>
         <div className="relative overflow-auto rounded-[20px] border-[5px] border-[#315f47] bg-[#7aa966] p-2 shadow-[inset_0_0_0_2px_rgba(255,255,255,.15),inset_0_12px_35px_rgba(19,70,44,.18)] sm:p-3">
+          <div className="park-atmosphere" aria-hidden="true">
+            <span className="park-sun" />
+            <span className="park-cloud park-cloud-a" />
+            <span className="park-cloud park-cloud-b" />
+            <span className="park-rain" />
+          </div>
           <div className="pointer-events-none absolute inset-2 rounded-[16px] border-2 border-dashed border-white/20" />
           <div className="pointer-events-none absolute left-0 right-0 top-1/2 h-6 -translate-y-1/2 bg-[#d8bb7b]/25" />
           <div className="pointer-events-none absolute bottom-0 left-1/2 top-0 w-6 -translate-x-1/2 bg-[#d8bb7b]/20" />
