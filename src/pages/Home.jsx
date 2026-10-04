@@ -16,6 +16,8 @@ import MissionsPanel from "@/components/game/MissionsPanel";
 import ChallengeBanner from "@/components/game/ChallengeBanner";
 import VisitorInsights from "@/components/game/VisitorInsights";
 import { TileDetailPanel } from "@/components/game/TileDetail";
+import ParkToolbar from "@/components/game/ParkToolbar";
+import ParkManagementPanel from "@/components/game/ParkManagementPanel";
 
 export default function Home() {
   const game = useGameState();
@@ -76,12 +78,13 @@ export default function Home() {
         <StatsBar money={game.money} day={game.day} guests={game.guests} reputation={game.reputation} lastNet={game.lastNet} level={game.level} />
 
         <div className="mt-4"><GameControls playing={game.playing} speed={game.speed} onTogglePlay={() => game.setPlaying(!game.playing)} onSpeed={game.setSpeed} onAdvance={game.advanceDay} onReset={game.resetGame} /></div>
+        <div className="mt-4"><ParkToolbar weather={game.weather} forecast={game.forecast} season={game.season} seasonEvent={game.seasonEvent} guests={game.guests} selectedZone={game.selectedZone} onZoneSelect={game.setSelectedZone} /></div>
 
         <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
           <div className="flex min-w-0 flex-col gap-4">
             <ChallengeBanner challenge={game.challenge} />
             <ExpansionPanel gridSize={game.gridSize} expansionsDone={game.expansionsDone} level={game.level} money={game.money} onExpand={game.expandPark} />
-            <ParkGrid grid={game.grid} selectedBuild={game.selectedBuild} selectedTile={game.selectedTile} incidents={game.incidents} onTileClick={game.handleTileClick} />
+            <ParkGrid grid={game.grid} parkZones={game.parkZones} selectedBuild={game.selectedBuild} selectedTile={game.selectedTile} selectedZone={game.selectedZone} incidents={game.incidents} guests={game.guests} visitorMovements={game.visitorStats?.movements} staffTotal={Object.values(game.staff || {}).reduce((sum, n) => sum + (n || 0), 0)} onTileClick={game.handleTileClick} />
             <EventLog log={game.log} issueCount={game.incidents.length} />
             <VisitorInsights visitorStats={game.visitorStats} />
             <MissionsPanel level={game.level} xp={game.xp} xpForNext={game.xpForNext} missionState={game.missionState} claimedMissions={game.claimedMissions} onClaim={game.claimMission} />
@@ -106,6 +109,7 @@ export default function Home() {
               <BuildPanel money={game.money} selectedBuild={game.selectedBuild} onSelect={game.setSelectedBuild} />
             </div>
 
+            <ParkManagementPanel admissionFee={game.ticketPrice} marketingSpend={game.adBudget} expressLane={game.priorityPass} utilities={game.estimatedUtilities} wages={game.staffWages} onAdmission={game.setTicketPrice} onMarketing={game.setAdBudget} onExpressLane={game.setPriorityPass} />
             <div className="waterpark-panel bg-white/85 p-4">
               <StaffPanel money={game.money} staff={game.staff} staffWages={game.staffWages} uptime={game.uptime} safety={game.safety} cleanliness={game.cleanliness} entertainment={game.entertainment} onHire={game.hireStaff} onFire={game.fireStaff} />
             </div>
