@@ -365,3 +365,15 @@
   }
   .game-board-shell .relative.grid { position: relative; z-index: 4; }
 }
+
+
+@layer components {
+  .facility-lockers { @apply absolute bottom-[14%] left-[12%] right-[12%] flex justify-around; }
+  .facility-lockers i { @apply h-4 w-2 rounded-sm border border-white/50 bg-sky-200/70 shadow-inner; }
+  .lifeguard-flag { @apply absolute bottom-[12%] right-[14%] h-10 w-7 border-l-2 border-red-700/70; }
+  .lifeguard-flag:before { content:""; @apply absolute left-0 top-0 h-5 w-6 rounded-r bg-red-500 shadow; }
+  .lifeguard-flag span { @apply absolute left-1 top-1 z-10 text-[9px] font-black text-white; }
+  .park-event-ribbon { @apply relative z-10 mx-2 mb-2 flex items-center gap-2 rounded-xl bg-violet-950 px-3 py-2 text-[9px] font-black uppercase tracking-wide text-white shadow-lg ring-1 ring-white/20; }
+  .park-event-ribbon b { @apply ml-auto hidden max-w-[55%] truncate text-[8px] font-bold normal-case tracking-normal text-white/60 sm:block; }
+  .park-event-ribbon.storm { @apply bg-slate-950; }
+}
