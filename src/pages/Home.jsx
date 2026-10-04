@@ -162,6 +162,7 @@ export default function Home() {
                 uptime={game.uptime}
                 safety={game.safety}
                 cleanliness={game.cleanliness}
+                entertainment={game.entertainment}
                 onHire={game.hireStaff}
                 onFire={game.fireStaff}
               />

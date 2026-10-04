@@ -59,7 +59,7 @@ function pickAttraction(guest, options) {
   return options[options.length - 1];
 }
 
-export function simulateVisits({ demand, placedItems, incidents, uptime, safety, cleanliness, incomeMult }) {
+export function simulateVisits({ demand, placedItems, incidents, uptime, safety, cleanliness, incomeMult, entertainment = 0, facilityBonus = 1 }) {
   const empty = { income: 0, avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {} };
   if (demand <= 0 || !placedItems || placedItems.length === 0) return empty;
 
@@ -90,7 +90,7 @@ export function simulateVisits({ demand, placedItems, incidents, uptime, safety,
       const avail = options.filter((o) => !guest.visited.has(o.idx) && o.load < o.cap);
       if (avail.length === 0) break;
       const pick = pickAttraction(guest, avail);
-      const price = perVisitSpend(pick.attr, pick.level);
+      const price = perVisitSpend(pick.attr, pick.level) * (pick.attr.category === "facility" ? facilityBonus : 1);
       if (guest.spend + price > guest.budget) break;
       guest.spend += price;
       guest.visited.add(pick.idx);
@@ -116,6 +116,7 @@ export function simulateVisits({ demand, placedItems, incidents, uptime, safety,
       if (guest.hunger > 80) guest.mood -= 4;
       guest.mood += (safety - 0.7) * 6;
       guest.mood += (cleanliness - 0.6) * 5;
+      guest.mood += entertainment;
       guest.mood = Math.max(0, Math.min(100, guest.mood));
     }
     totalMood += guest.mood;

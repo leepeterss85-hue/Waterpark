@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import {
   ATTRACTIONS, getAttraction, STAFF, MAX_UPGRADE, upgradeCost,
   INITIAL_GRID_SIZE, EXPAND_ROW, MAX_EXPANSIONS, MAX_GRID_SIZE,
-  expandCost, expandLevelReq, levelFromXp, xpForLevel,
+  expandCost, expandLevelReq, levelFromXp, xpForLevel, staffWages, staffEffects,
 } from "@/data/gameData";
 import { MISSIONS, missionProgress } from "@/data/missions";
 import { rollChallenge } from "@/data/challenges";
@@ -136,14 +136,14 @@ export function useGameState() {
     const funOf = (p) => Math.min(10, p.attr.fun + p.level * 0.5);
     const upkeepOf = (p) => p.attr.maintenance * (1 + 0.1 * p.level);
 
-    const counts = currentStaff || { lifeguard: 0, mechanic: 0, cleaner: 0 };
-    const uptime = Math.min(1, 0.65 + (counts.mechanic || 0) * 0.07);
-    const safety = Math.min(1, 0.7 + (counts.lifeguard || 0) * 0.06);
-    const cleanliness = Math.min(1, 0.6 + (counts.cleaner || 0) * 0.1);
-    const staffWages =
-      (counts.lifeguard || 0) * STAFF.lifeguard.wage +
-      (counts.mechanic || 0) * STAFF.mechanic.wage +
-      (counts.cleaner || 0) * STAFF.cleaner.wage;
+    const counts = currentStaff || {};
+    const fx = staffEffects(counts);
+    const uptime = fx.uptime;
+    const safety = fx.safety;
+    const cleanliness = fx.cleanliness;
+    const entertainment = fx.entertainment;
+    const facilityBonus = fx.facilityBonus;
+    const wages = staffWages(counts);
 
     // --- Resolve active incidents: staff improve the odds of a fix ---
     const mechPower = Math.min(0.9, 0.3 + (counts.mechanic || 0) * 0.2);
@@ -182,6 +182,8 @@ export function useGameState() {
         safety,
         cleanliness,
         incomeMult: eff.incomeMult ?? 1,
+        entertainment,
+        facilityBonus,
       });
       income = sim.income;
       visitorStats = sim;
@@ -196,6 +198,7 @@ export function useGameState() {
       if (facilities.some((f) => f.attr.id === "lockers")) repDelta += 0.3;
       repDelta += (cleanliness - 0.6) * 1.5;
       repDelta += (safety - 0.7) * 0.8;
+      repDelta += (counts.gardener || 0) * 0.1;
       repDelta -= remaining.reduce(
         (s, inc) => s + (inc.type === "breakdown" ? 1.2 : 0.6),
         0
@@ -212,8 +215,8 @@ export function useGameState() {
     const newIncidents = [];
     if (eligible.length > 0) {
       const pick = eligible[Math.floor(Math.random() * eligible.length)];
-      const breakChance = Math.max(0, 0.15 - 0.02 * (counts.mechanic || 0));
-      const maintChance = Math.max(0, 0.12 - 0.02 * (counts.cleaner || 0));
+      const breakChance = Math.max(0, 0.15 - 0.02 * (counts.mechanic || 0) - 0.02 * (counts.security || 0));
+      const maintChance = Math.max(0, 0.12 - 0.02 * (counts.cleaner || 0) - 0.02 * (counts.gardener || 0));
       const r = Math.random();
       if (r < breakChance) {
         newIncidents.push({ tileIndex: pick.idx, type: "breakdown", attractionId: pick.id, since: d + 1 });
@@ -225,7 +228,7 @@ export function useGameState() {
 
     const expenses =
       placedItems.reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) +
-      staffWages * (eff.wageMult ?? 1);
+      wages * (eff.wageMult ?? 1);
     const net = Math.round(income - expenses);
 
     // --- Build log entries (newest first) ---
@@ -555,11 +558,16 @@ export function useGameState() {
       peakGuests,
       lifetimeEarnings,
       builtCount: builtAttractionIds.length,
+      builtAttractionIds,
       maxedUpgrades: upgrades.filter((lv) => lv >= MAX_UPGRADE).length,
       expansionsDone,
       day,
       money,
       reputation,
+      staffTotal: Object.values(staff).reduce((s, n) => s + (n || 0), 0),
+      facilityCount: grid.filter((id) => id && getAttraction(id)?.category === "facility").length,
+      avgMood: visitorStats?.avgMood || 0,
+      avgSpendPerVisit: visitorStats?.avgSpendPerVisit || 0,
     },
     missionState: {
       attractionCount: grid.filter((id) => id && getAttraction(id)?.category === "attraction").length,
@@ -572,13 +580,8 @@ export function useGameState() {
       expansionsDone,
       maxedUpgrades: upgrades.filter((lv) => lv >= MAX_UPGRADE).length,
     },
-    uptime: Math.min(1, 0.65 + (staff.mechanic || 0) * 0.07),
-    safety: Math.min(1, 0.7 + (staff.lifeguard || 0) * 0.06),
-    cleanliness: Math.min(1, 0.6 + (staff.cleaner || 0) * 0.1),
-    staffWages:
-      (staff.lifeguard || 0) * STAFF.lifeguard.wage +
-      (staff.mechanic || 0) * STAFF.mechanic.wage +
-      (staff.cleaner || 0) * STAFF.cleaner.wage,
+    ...staffEffects(staff),
+    staffWages: staffWages(staff),
     GRID_SIZE,
     setPlaying,
     setSpeed,

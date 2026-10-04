@@ -27,6 +27,7 @@ export default function StaffPanel({
   uptime,
   safety,
   cleanliness,
+  entertainment,
   onHire,
   onFire,
 }) {
@@ -42,7 +43,7 @@ export default function StaffPanel({
         </span>
       </div>
 
-      <div className="mb-4 grid grid-cols-3 gap-2">
+      <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
         <EffectMeter
           label="Uptime"
           value={uptime}
@@ -57,6 +58,11 @@ export default function StaffPanel({
           label="Clean"
           value={cleanliness}
           color="bg-gradient-to-r from-emerald-400 to-green-500"
+        />
+        <EffectMeter
+          label="Vibe"
+          value={Math.min(1, (entertainment || 0) / 6)}
+          color="bg-gradient-to-r from-pink-400 to-rose-500"
         />
       </div>
 
