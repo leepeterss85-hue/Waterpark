@@ -487,6 +487,7 @@ export const PARK_OBJECTS = [
 ];
 
 export const getAttraction = (id) => ATTRACTIONS.find((a) => a.id === id);
+export const getParkItem = (id) => ATTRACTIONS.find((a) => a.id === id) || PARK_OBJECTS.find((a) => a.id === id);
 
 export const STAFF = {
   lifeguard: {
