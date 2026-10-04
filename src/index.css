@@ -777,21 +777,22 @@
 @layer components {
   .game-map-surface {
     background:
-      radial-gradient(ellipse at 12% 10%, rgba(255,255,255,.34) 0 6%, transparent 14%),
-      radial-gradient(ellipse at 88% 90%, rgba(28,78,46,.20) 0 8%, transparent 18%),
-      radial-gradient(ellipse at 68% 22%, rgba(255,255,255,.10) 0 9%, transparent 22%),
-      linear-gradient(135deg, #a8cf86 0%, #82b56e 40%, #6fa45c 72%, #5d9553 100%) !important;
+      radial-gradient(ellipse at 14% 12%, rgba(255,255,255,.40) 0 6%, transparent 15%),
+      radial-gradient(ellipse at 86% 88%, rgba(13,148,136,.22) 0 9%, transparent 20%),
+      radial-gradient(ellipse at 70% 24%, rgba(255,255,255,.12) 0 9%, transparent 22%),
+      linear-gradient(135deg, #efd9a8 0%, #e6cd92 38%, #d9c178 68%, #cbb86a 100%) !important;
   }
   .game-map-surface:after {
     background:
-      radial-gradient(circle at 16% 30%, rgba(255,255,255,.14) 0 2px, transparent 3px),
-      radial-gradient(circle at 82% 60%, rgba(255,255,255,.11) 0 2px, transparent 3px),
-      radial-gradient(circle at 50% 86%, rgba(22,101,52,.12) 0 2px, transparent 3px),
-      repeating-linear-gradient(32deg, transparent 0 64px, rgba(255,255,255,.022) 65px 66px);
+      radial-gradient(circle at 16% 30%, rgba(255,255,255,.16) 0 2px, transparent 3px),
+      radial-gradient(circle at 82% 60%, rgba(255,255,255,.12) 0 2px, transparent 3px),
+      radial-gradient(circle at 50% 86%, rgba(13,148,136,.14) 0 2px, transparent 3px),
+      repeating-linear-gradient(32deg, transparent 0 64px, rgba(255,255,255,.03) 65px 66px);
   }
   .game-map-grid > button:not(:has(.ride-art)):not(:has(.facility-art)):not(:has(.park-entrance-art)):not(:has(.service-road)):not(:has(.queue-rail)) {
-    background: rgba(150,196,118,.08) !important;
-    border-color: rgba(255,255,255,.06) !important;
+    background: rgba(255,251,235,.22) !important;
+    border-color: rgba(255,255,255,.12) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.4) !important;
   }
   .game-board-shell {
     border-width: 3px !important;
@@ -867,9 +868,12 @@
     border: 3px solid rgba(255,255,255,.42) !important;
   }
   .map-scenery span { background: rgba(255,255,255,.65) !important; }
-  .park-land-scenery { opacity: .85; }
-  .land-flower { box-shadow: 0 0 0 2px rgba(244,114,182,.24), 0 1px 2px rgba(15,23,42,.18) !important; }
-  .land-stone { background: rgba(71,85,60,.3) !important; }
+  .park-land-scenery { opacity: .9; }
+  .land-flower { background: rgba(125,211,252,.55) !important; box-shadow: 0 0 4px rgba(125,211,252,.5), 0 1px 2px rgba(15,23,42,.14) !important; }
+  .land-flower-1 { background: rgba(186,230,253,.6) !important; }
+  .land-flower-2 { background: rgba(103,232,249,.5) !important; }
+  .land-stone { background: rgba(120,100,53,.28) !important; }
+  .land-grass { border-top-color: rgba(120,100,53,.32) !important; }
 }
 @media (prefers-reduced-motion: reduce) {
   .ride-splash-overlay i { animation: none !important; }
