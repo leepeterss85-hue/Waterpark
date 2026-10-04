@@ -206,5 +206,32 @@
   .ride-art-generic { @apply grid place-items-center; }
   .ride-generic-water { @apply absolute inset-[18%] rounded-[35%] bg-cyan-300/30 ring-2 ring-white/35; }
   .ride-generic-icon { @apply relative z-10 grid h-10 w-10 place-items-center rounded-2xl bg-black/15 ring-1 ring-white/35; }
+  .facility-art { @apply absolute inset-0; }
+  .facility-building { @apply absolute left-[16%] right-[16%] bottom-[16%] top-[28%] rounded-lg border-2 border-white/50 bg-white/25 shadow-[0_5px_8px_rgba(15,23,42,.22)]; }
+  .facility-roof { @apply absolute left-[11%] right-[11%] top-[17%] h-4 -skew-x-6 rounded-md border border-white/40 bg-slate-800/35 shadow-sm; }
+  .facility-awning { @apply absolute left-0 right-0 top-0 h-2 rounded-t-md bg-white/45; }
+  .facility-window { @apply absolute left-2 top-4 flex gap-1; }
+  .facility-window span { @apply h-4 w-4 rounded-sm border border-white/60 bg-cyan-100/70 shadow-inner; }
+  .facility-door { @apply absolute bottom-0 right-2 h-7 w-4 rounded-t border border-white/50 bg-slate-700/50; }
+  .facility-sign { @apply absolute left-1/2 top-[7%] z-10 -translate-x-1/2 rounded bg-white/90 px-1.5 py-0.5 text-[6px] font-black tracking-wide text-slate-800 shadow; }
+  .facility-table { @apply absolute bottom-[10%] left-[9%] flex gap-1; }
+  .facility-table i { @apply h-2 w-2 rounded-full bg-amber-200/90 shadow-sm; }
+  .facility-umbrella { @apply absolute bottom-[8%] right-[8%] text-xl drop-shadow; }
+  .facility-lights { @apply absolute bottom-[18%] left-[15%] flex gap-1; }
+  .facility-lights i { @apply h-2 w-2 rounded-full bg-yellow-200 shadow-[0_0_5px_rgba(255,255,255,.8)]; }
+  .facility-dining .facility-building, .facility-coffee_bar .facility-building { @apply bg-orange-100/30; }
+  .facility-cabanas .facility-building, .facility-vip_lounge .facility-building { @apply bg-violet-100/30; }
+  .facility-lockers .facility-building, .facility-first_aid .facility-building { @apply bg-slate-100/25; }
+  .facility-retail .facility-building { @apply bg-emerald-100/30; }
+  .facility-gym .facility-building { @apply bg-emerald-200/25; }
+  .facility-spa .facility-building { @apply bg-pink-100/30; }
+  .facility-arcade .facility-building { @apply bg-indigo-200/30; }
+  .facility-party_room .facility-building, .facility-photo_kiosk .facility-building { @apply bg-fuchsia-100/25; }
+  .service-road { @apply bg-slate-500/80 shadow-inner; }
+  .service-road:before { content:""; @apply absolute inset-y-0 left-1/2 w-1 -translate-x-1/2 border-l-2 border-dashed border-yellow-200/70; }
+  .service-road span { @apply absolute left-[12%] h-2 w-2 rounded-full bg-white/30; }
+  .service-road span:nth-child(1) { @apply top-[12%]; }
+  .service-road span:nth-child(2) { @apply top-1/2; }
+  .service-road span:nth-child(3) { @apply bottom-[12%]; }
   @keyframes waterpark-wave { 0%,100% { transform: translateX(0); opacity:.55; } 50% { transform: translateX(5px); opacity:1; } }
 }
