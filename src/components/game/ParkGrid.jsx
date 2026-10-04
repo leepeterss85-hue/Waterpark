@@ -9,7 +9,13 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
   const incidentMap = new Map((incidents || []).map((i) => [i.tileIndex, i]));
   const phase = ((day - 1) % 8);
   const timeOfDay = phase <= 1 ? "morning" : phase <= 5 ? "day" : phase === 6 ? "sunset" : "night";
-  const weatherId = weather?.id || "clear";\n  const attractionCount = grid.filter((id) => getParkItem(id)?.category === "attraction").length;\n  const lifeguardStations = grid.filter((id) => id === "lifeguard_station").length;\n  const toilets = grid.filter((id) => id === "toilets" || id === "lockers").length;\n  const requiredGuards = Math.max(1, Math.ceil(attractionCount / 3));\n  const guardCoverage = Math.min(1, lifeguardTotal / requiredGuards + lifeguardStations * 0.12);\n  const facilityStatus = { toilets: guests <= Math.max(1, toilets) * 80 ? "COVERED" : "OVERLOADED", lifeguard_station: guardCoverage >= 0.7 ? "COVERED" : "OVERLOADED" };
+  const weatherId = weather?.id || "clear";
+  const attractionCount = grid.filter((id) => getParkItem(id)?.category === "attraction").length;
+  const lifeguardStations = grid.filter((id) => id === "lifeguard_station").length;
+  const toilets = grid.filter((id) => id === "toilets" || id === "lockers").length;
+  const requiredGuards = Math.max(1, Math.ceil(attractionCount / 3));
+  const guardCoverage = Math.min(1, lifeguardTotal / requiredGuards + lifeguardStations * 0.12);
+  const facilityStatus = { toilets: guests <= Math.max(1, toilets) * 80 ? "COVERED" : "OVERLOADED", lifeguard_station: guardCoverage >= 0.7 ? "COVERED" : "OVERLOADED" };
 
   return (
     <section className={"game-board-shell park-time-" + timeOfDay + " park-weather-" + weatherId}>
