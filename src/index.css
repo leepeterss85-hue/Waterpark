@@ -290,3 +290,78 @@
   .entrance-banner { @apply absolute bottom-[4%] left-1/2 -translate-x-1/2 rounded-full bg-white/90 px-1.5 py-0.5 text-[5px] font-black tracking-widest text-emerald-800 shadow; }
   .service-road { background-image: repeating-linear-gradient(90deg, transparent 0 10px, rgba(255,255,255,.06) 10px 11px); }
 }
+
+
+@layer components {
+  .game-board-shell { position: relative; }
+  .park-atmosphere {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: 16px;
+    transition: background .6s ease;
+  }
+  .park-sun {
+    position: absolute;
+    right: 5%;
+    top: 3%;
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    background: rgba(255,247,190,.9);
+    box-shadow: 0 0 0 7px rgba(255,236,120,.16), 0 0 28px rgba(255,225,90,.55);
+    opacity: 0;
+    transition: opacity .5s ease;
+  }
+  .park-cloud {
+    position: absolute;
+    width: 74px;
+    height: 22px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.48);
+    filter: blur(.2px);
+    opacity: .35;
+    animation: park-cloud-drift 24s linear infinite;
+  }
+  .park-cloud:before, .park-cloud:after {
+    content: "";
+    position: absolute;
+    border-radius: 999px;
+    background: inherit;
+  }
+  .park-cloud:before { width: 28px; height: 28px; left: 14px; bottom: 5px; }
+  .park-cloud:after { width: 36px; height: 34px; right: 12px; bottom: 2px; }
+  .park-cloud-a { left: 12%; top: 8%; }
+  .park-cloud-b { left: 55%; top: 17%; transform: scale(.72); animation-delay: -10s; }
+  .park-rain {
+    position: absolute;
+    inset: -20%;
+    opacity: 0;
+    background-image: repeating-linear-gradient(105deg, transparent 0 13px, rgba(190,235,255,.5) 14px 15px, transparent 16px 28px);
+    transform: rotate(3deg);
+  }
+  .park-time-morning .park-sun { opacity: .72; right: 12%; top: 8%; }
+  .park-time-day .park-sun { opacity: .95; }
+  .park-time-sunset .park-sun { opacity: .65; background: rgba(255,184,92,.9); box-shadow: 0 0 0 7px rgba(255,150,60,.15), 0 0 28px rgba(255,120,50,.5); }
+  .park-time-night .park-atmosphere { background: linear-gradient(180deg, rgba(12,27,55,.42), rgba(4,18,36,.14)); }
+  .park-time-night .park-sun { opacity: .18; width: 25px; height: 25px; background: rgba(220,235,255,.85); box-shadow: 0 0 0 5px rgba(200,220,255,.08), 0 0 18px rgba(190,215,255,.3); }
+  .park-time-night .park-cloud { opacity: .16; }
+  .park-weather-rain .park-rain,
+  .park-weather-storm .park-rain { opacity: .34; animation: park-rain-fall .7s linear infinite; }
+  .park-weather-rain .park-atmosphere { background: rgba(80,105,120,.13); }
+  .park-weather-storm .park-atmosphere { background: rgba(35,50,70,.2); }
+  .park-weather-cloudy .park-sun { opacity: .28; }
+  .park-weather-sunny .park-cloud { opacity: .18; }
+  @keyframes park-cloud-drift {
+    0% { transform: translateX(-35px); }
+    50% { transform: translateX(35px); }
+    100% { transform: translateX(-35px); }
+  }
+  @keyframes park-rain-fall {
+    0% { transform: translate3d(-2%, -3%, 0) rotate(3deg); }
+    100% { transform: translate3d(2%, 3%, 0) rotate(3deg); }
+  }
+  .game-board-shell .relative.grid { position: relative; z-index: 4; }
+}
