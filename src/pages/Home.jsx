@@ -90,7 +90,7 @@ export default function Home() {
           <div className="flex min-w-0 flex-col gap-4">
             <ChallengeBanner challenge={game.challenge} />
             <ExpansionPanel gridSize={game.gridSize} expansionsDone={game.expansionsDone} level={game.level} money={game.money} onExpand={game.expandPark} />
-            <ParkGrid grid={game.grid} parkZones={game.parkZones} upgrades={game.upgrades} selectedBuild={game.selectedBuild} selectedTile={game.selectedTile} selectedZone={game.selectedZone} incidents={game.incidents} guests={game.guests} visitorMovements={game.visitorStats?.movements} staffTotal={Object.values(game.staff || {}).reduce((sum, n) => sum + (n || 0), 0)} day={game.day} weather={game.weather} onTileClick={game.handleTileClick} />
+            <ParkGrid grid={game.grid} parkZones={game.parkZones} upgrades={game.upgrades} selectedBuild={game.selectedBuild} selectedTile={game.selectedTile} selectedZone={game.selectedZone} incidents={game.incidents} guests={game.guests} visitorMovements={game.visitorStats?.movements} staffTotal={Object.values(game.staff || {}).reduce((sum, n) => sum + (n || 0), 0)} day={game.day} weather={game.weather} seasonEvent={game.seasonEvent} onTileClick={game.handleTileClick} />
             <EventLog log={game.log} issueCount={game.incidents.length} />
             <VisitorInsights visitorStats={game.visitorStats} />
             <MissionsPanel level={game.level} xp={game.xp} xpForNext={game.xpForNext} missionState={game.missionState} claimedMissions={game.claimedMissions} onClaim={game.claimMission} />
