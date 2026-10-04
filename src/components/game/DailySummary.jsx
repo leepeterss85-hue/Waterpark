@@ -19,8 +19,8 @@ export default function DailySummary({ report, onClose }) {
           <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/10" />
           <div className="relative flex items-start justify-between">
             <div>
-              <div className="text-[9px] font-black uppercase tracking-[0.22em] text-white/65">Daily Operations Report</div>
-              <h2 className="mt-1 font-display text-2xl font-black">Day ${report.day} complete</h2>
+              <div className="text-[9px] font-black uppercase tracking-[0.22em] text-white/65">Monthly Operations Report</div>
+              <h2 className="mt-1 font-display text-2xl font-black">Month ${report.month || Math.ceil((report.day || 1) / 30)} complete</h2>
               <p className="mt-1 text-[11px] font-semibold text-white/75">${report.weather || "Normal conditions"}${report.event ? " · " + report.event : ""}</p>
             </div>
             <button onClick={onClose} aria-label="Close daily report" className="rounded-xl bg-white/15 p-2 hover:bg-white/25"><X className="h-4 w-4" /></button>
