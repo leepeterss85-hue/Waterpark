@@ -649,3 +649,36 @@
 @media (prefers-reduced-motion:reduce) {
   .pool-water:after,.water-track:after,.water-track i,.play-splash i { animation:none!important; }
 }
+
+
+/* === Android water-park game visual overhaul === */
+@layer components {
+  .game-board-shell { border-width:3px; border-color:#174b38; border-radius:30px; box-shadow:0 24px 60px rgba(15,72,54,.28),0 4px 14px rgba(15,23,42,.12); }
+  .game-board-titlebar { min-height:66px; background:radial-gradient(circle at 8% 30%,rgba(255,255,255,.14),transparent 24%),linear-gradient(135deg,#083f31,#087f68 55%,#075985); }
+  .game-board-frame { background:linear-gradient(180deg,#d9c58e 0%,#c9b477 100%); padding:9px; }
+  .game-map-toolbar { min-height:46px; border-radius:15px; background:rgba(255,252,239,.96); box-shadow:0 5px 14px rgba(74,60,28,.12),inset 0 1px 0 rgba(255,255,255,.9); }
+  .game-map-surface { position:relative; overflow:hidden; border:0!important; border-radius:23px!important; padding:12px!important; background:radial-gradient(circle at 18% 15%,rgba(255,255,255,.34),transparent 17%),radial-gradient(circle at 78% 78%,rgba(45,111,61,.18),transparent 25%),linear-gradient(135deg,#8fbd78,#70a95e 48%,#5d9955); box-shadow:inset 0 0 0 2px rgba(255,255,255,.22),inset 0 -18px 35px rgba(33,87,43,.16),0 12px 28px rgba(31,71,42,.2); }
+  .game-map-surface:before { content:""; position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse at 16% 78%,rgba(255,255,255,.12) 0 5%,transparent 6%),radial-gradient(ellipse at 72% 18%,rgba(255,255,255,.10) 0 4%,transparent 5%),repeating-linear-gradient(125deg,transparent 0 42px,rgba(255,255,255,.025) 43px 44px); opacity:.9; }
+  .game-map-grid { gap:6px!important; filter:drop-shadow(0 12px 10px rgba(25,73,37,.13)); }
+  .game-map-grid>button { border-color:rgba(255,255,255,.42)!important; border-width:1px!important; border-radius:14px!important; box-shadow:0 3px 8px rgba(25,63,37,.12)!important; }
+  .game-map-grid>button:not(:has(.ride-art)):not(:has(.facility-art)):not(:has(.park-entrance-art)):not(:has(.service-road)):not(:has(.queue-rail)) { border-color:transparent!important; box-shadow:none!important; background:rgba(146,190,116,.28)!important; }
+  .game-map-grid>button:has(.ride-art),.game-map-grid>button:has(.facility-art),.game-map-grid>button:has(.park-entrance-art) { transform:translateY(-1px); }
+  .game-map-grid>button:has(.ride-art):hover,.game-map-grid>button:has(.facility-art):hover { transform:translateY(-3px) scale(1.015); }
+  .game-map-grid>button:has(.ride-art) .ride-art,.game-map-grid>button:has(.facility-art) .facility-art { filter:saturate(1.08) drop-shadow(0 5px 4px rgba(15,23,42,.18)); }
+  .game-board-legend { min-height:38px; align-items:center; background:linear-gradient(90deg,#164f39,#227052,#164f39); }
+  .waterpark-panel { border-radius:22px!important; border:1px solid rgba(255,255,255,.92)!important; background:linear-gradient(150deg,rgba(255,255,255,.98),rgba(239,250,247,.90))!important; box-shadow:0 16px 38px rgba(15,76,66,.11),0 3px 10px rgba(15,23,42,.06),inset 0 1px 0 white!important; }
+  .waterpark-panel> .border-b { background:linear-gradient(90deg,rgba(8,145,178,.06),rgba(255,255,255,.45),rgba(16,185,129,.05)); }
+  .waterpark-panel button:not(.game-primary-button):not(.game-action-button) { transition:transform .16s ease,box-shadow .16s ease,filter .16s ease,background .16s ease; }
+  .waterpark-panel button:not(.game-primary-button):not(.game-action-button):hover { transform:translateY(-1px); }
+  .waterpark-panel input,.waterpark-panel select { min-height:38px; border-radius:13px!important; background:rgba(248,250,252,.92)!important; box-shadow:inset 0 1px 2px rgba(15,23,42,.04); }
+  .game-control-bar { border-radius:22px; padding:2px; box-shadow:0 14px 32px rgba(15,23,42,.24),inset 0 1px 0 rgba(255,255,255,.08); }
+  .game-primary-button { min-height:44px; border-radius:14px; box-shadow:0 7px 16px rgba(15,23,42,.24),inset 0 1px 0 rgba(255,255,255,.3); }
+  .game-action-button { min-height:44px; border-radius:14px; background:rgba(255,255,255,.10); }
+  .game-speed-picker { min-height:42px; border-radius:14px; }
+  .build-catalog-card { min-height:92px; border-radius:16px!important; border-width:1px!important; box-shadow:0 5px 12px rgba(15,23,42,.07); }
+  .build-catalog-card:hover { box-shadow:0 10px 22px rgba(8,145,178,.14); }
+  .build-category-toggle { min-height:42px; border-radius:13px!important; background:linear-gradient(90deg,#f0fdfa,#f8fafc)!important; box-shadow:inset 0 1px 0 white; }
+}
+@media (max-width:640px) {
+  .game-board-frame{padding:7px}.game-map-surface{padding:8px!important;border-radius:19px!important}.game-map-grid{gap:4px!important}.game-map-grid>button{border-radius:11px!important}.game-board-titlebar{min-height:60px}.waterpark-panel{border-radius:19px!important}
+}
