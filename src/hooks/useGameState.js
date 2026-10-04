@@ -93,7 +93,7 @@ const [selectedZone, setSelectedZone] = useState(null);
   const [challenge, setChallenge] = useState(null);
   const [lifetimeEarnings, setLifetimeEarnings] = useState(0);
   const [builtAttractionIds, setBuiltAttractionIds] = useState([]);
-  const [visitorStats, setVisitorStats] = useState({ avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null });
+  const [visitorStats, setVisitorStats] = useState({ avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {}, guestTypes: {} });
 
   const level = levelFromXp(xp);
   const gridSize = grid.length;
@@ -435,11 +435,17 @@ const [selectedZone, setSelectedZone] = useState(null);
     setGrid((g) => {
       if (!g[index]) return g;
       const attr = getParkItem(g[index]);
-      setMoney((m) => m + Math.floor(attr.cost * 0.5));
+      setMoney((m) => m + Math.floor((attr?.cost || 0) * 0.5));
       setUpgrades((u) => {
         const nu = [...u];
         nu[index] = 0;
         return nu;
+      });
+      setIncidents((items) => items.filter((item) => item.tileIndex !== index));
+      setParkZones((zones) => {
+        const next = [...zones];
+        next[index] = null;
+        return next;
       });
       const ng = [...g];
       ng[index] = null;
@@ -504,11 +510,9 @@ const [selectedZone, setSelectedZone] = useState(null);
   }, []);
 
   const chooseZone = useCallback((zoneId) => {
-    setSelectedZone((z) => (z === zoneId ? null : zoneId));
+    setSelectedZone((current) => (current === zoneId ? null : zoneId));
     setSelectedBuild(null);
-    setSelectedZone(null);
     setSelectedTile(null);
-    setSelectedZone(zoneId);
   }, []);
 
   const claimMission = useCallback(
@@ -593,7 +597,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     if (data.adBudget != null) setAdBudget(data.adBudget);
     if (data.priorityPass != null) setPriorityPass(data.priorityPass);
     setHistory(data.history ?? []);
-    setStaff(data.staff ?? { lifeguard: 0, mechanic: 0, cleaner: 0 });
+    setStaff({ ...DEFAULT_STAFF, ...(data.staff || {}) });
     setIncidents(data.incidents ?? []);
     setUpgrades(data.upgrades ?? Array(GRID_SIZE).fill(0));
     setXp(data.xp ?? 0);
@@ -604,7 +608,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setChallenge(data.challenge ?? null);
     setLifetimeEarnings(data.lifetimeEarnings ?? 0);
     setBuiltAttractionIds(data.builtAttractionIds ?? []);
-    setVisitorStats(data.visitorStats ?? { avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null });
+    setVisitorStats(data.visitorStats ?? { avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {}, guestTypes: {} });
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
     setLastNet(data.lastNet ?? 0);
     setPlaying(false);
@@ -650,7 +654,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setChallenge(null);
     setLifetimeEarnings(0);
     setBuiltAttractionIds([]);
-    setVisitorStats({ avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null });
+    setVisitorStats({ avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {}, guestTypes: {} });
   }, []);
 
   return {
