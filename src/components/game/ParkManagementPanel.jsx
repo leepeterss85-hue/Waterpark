@@ -1,2 +1,2 @@
 import React from "react";
-export default function ParkManagementPanel(){return null;}
+export default function ParkManagementPanel({ title = "Business Office" }) { return <section className="waterpark-panel p-4"><h3 className="font-display text-lg font-extrabold text-slate-900">{title}</h3><p className="mt-1 text-xs text-slate-500">Manage admissions, marketing and premium services.</p></section>; }
