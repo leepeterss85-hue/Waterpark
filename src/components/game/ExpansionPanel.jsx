@@ -21,6 +21,9 @@ export default function ExpansionPanel({
   const levelOk = level >= req;
   const canAfford = money >= cost;
   const canExpand = !maxed && levelOk && canAfford;
+  const themes = ["Starter Grounds", "Family Shores", "Thrill Coast", "Resort Gardens", "Extreme Point", "VIP Lagoon", "Grand Water Resort"];
+  const currentTheme = themes[Math.min(expansionsDone, themes.length - 1)];
+  const nextTheme = themes[Math.min(expansionsDone + 1, themes.length - 1)];
 
   return (
     <div className="rounded-2xl bg-gradient-to-br from-sky-50 to-cyan-50 p-4 shadow-sm ring-1 ring-sky-100">
@@ -32,6 +35,8 @@ export default function ExpansionPanel({
           {gridSize} / {MAX_GRID_SIZE} lots
         </span>
       </div>
+
+      <div className="mt-2 flex items-center justify-between text-[10px] font-bold text-slate-500"><span>{currentTheme}</span>{!maxed && <span className="text-cyan-600">Next: {nextTheme}</span>}</div>
 
       <div className="mt-2 mb-3 h-1.5 w-full overflow-hidden rounded-full bg-white/70">
         <div
