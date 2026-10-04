@@ -228,6 +228,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       const sim = simulateVisits({
         demand: newGuests,
         placedItems: [...attractions, ...facilities],
+        queuePaths: environment.filter((p) => p.id === "queue_path"),
         incidents: incidentByTile,
         uptime,
         safety,
