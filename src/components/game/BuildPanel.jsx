@@ -49,7 +49,8 @@ function BuildCard({ item, selected, affordable, onSelect }) {
 }
 
 export default function BuildPanel({ money, selectedBuild, onSelect }) {
-  const [query, setQuery] = useState("");\n  const [expanded, setExpanded] = useState({ attraction: true, facility: false, environment: false });
+  const [query, setQuery] = useState("");
+  const [expanded, setExpanded] = useState({ attraction: true, facility: false, environment: false });
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const allItems = [...ATTRACTIONS, ...PARK_OBJECTS];
