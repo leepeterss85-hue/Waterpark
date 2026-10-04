@@ -6,6 +6,7 @@ import { getIcon } from "./icons";
 function BuildCard({ item, selected, affordable, onSelect }) {
   const Icon = getIcon(item.icon);
   const isWater = item.category === "attraction";
+  const isEnvironment = item.category === "environment";
   return (
     <button
       onClick={() => onSelect(selected ? null : item.id)}
@@ -30,7 +31,7 @@ function BuildCard({ item, selected, affordable, onSelect }) {
             <div className="min-w-0 flex-1">
               <div className="truncate text-sm font-extrabold">{item.name}</div>
               <div className={"mt-0.5 text-[9px] font-bold uppercase tracking-wider " + (selected ? "text-cyan-200" : isWater ? "text-cyan-600" : "text-amber-600")}>
-                {isWater ? "Water attraction" : "Park facility"}
+                {isWater ? "Water attraction" : isEnvironment ? "Park essential" : "Park facility"}
               </div>
             </div>
             {selected ? <Check className="h-4 w-4 shrink-0 text-cyan-300" /> : !affordable ? <LockKeyhole className="h-4 w-4 shrink-0 text-slate-300" /> : null}
@@ -63,7 +64,7 @@ export default function BuildPanel({ money, selectedBuild, onSelect }) {
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Find a pool, slide or facility..."
+          placeholder="Find a pool, slide, path or facility..."
           className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-xs font-semibold text-slate-700 outline-none transition focus:border-cyan-400 focus:bg-white focus:ring-2 focus:ring-cyan-100"
         />
       </div>
@@ -86,7 +87,7 @@ export default function BuildPanel({ money, selectedBuild, onSelect }) {
           </div>
         );
       })}
-      {!filtered.length && <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-5 text-center text-xs font-semibold text-slate-400">No attractions or facilities match "{query}".</div>}
+      {!filtered.length && <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-5 text-center text-xs font-semibold text-slate-400">No rides, facilities or park objects match "{query}".</div>}
     </div>
   );
 }
