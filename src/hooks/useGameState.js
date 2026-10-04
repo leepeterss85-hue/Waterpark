@@ -562,6 +562,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         lifetimeEarnings,
         builtAttractionIds,
         visitorStats,
+        weather,
         savedAt: new Date().toISOString(),
       };
       writeSlots(slots);
