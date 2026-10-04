@@ -354,3 +354,33 @@ export const MAX_UPGRADE = 5;
 export function upgradeCost(baseCost, level) {
   return Math.round(baseCost * 0.5 * (level + 1));
 }
+
+// --- Park expansion ---
+export const INITIAL_GRID_SIZE = 48;
+export const EXPAND_ROW = 8;
+export const MAX_EXPANSIONS = 6;
+export const MAX_GRID_SIZE = INITIAL_GRID_SIZE + EXPAND_ROW * MAX_EXPANSIONS;
+
+export function expandCost(expansionsDone) {
+  return 12000 * (expansionsDone + 1);
+}
+
+export function expandLevelReq(expansionsDone) {
+  return expansionsDone + 2;
+}
+
+// --- Player levels (XP thresholds) ---
+export const LEVEL_XP = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700, 3300];
+
+export function levelFromXp(xp) {
+  let lvl = 1;
+  for (let i = 0; i < LEVEL_XP.length; i++) {
+    if (xp >= LEVEL_XP[i]) lvl = i + 1;
+  }
+  return lvl;
+}
+
+export function xpForLevel(level) {
+  if (level >= LEVEL_XP.length) return LEVEL_XP[LEVEL_XP.length - 1];
+  return LEVEL_XP[level];
+}

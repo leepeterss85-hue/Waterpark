@@ -9,6 +9,8 @@ import GameControls from "@/components/game/GameControls";
 import EventLog from "@/components/game/EventLog";
 import StaffPanel from "@/components/game/StaffPanel";
 import SaveLoadPanel from "@/components/game/SaveLoadPanel";
+import ExpansionPanel from "@/components/game/ExpansionPanel";
+import MissionsPanel from "@/components/game/MissionsPanel";
 import { TileDetailPanel } from "@/components/game/TileDetail";
 import { getAttraction } from "@/data/gameData";
 
@@ -58,6 +60,7 @@ export default function Home() {
           guests={game.guests}
           reputation={game.reputation}
           lastNet={game.lastNet}
+          level={game.level}
         />
 
         {/* Controls */}
@@ -75,6 +78,13 @@ export default function Home() {
         {/* Main layout */}
         <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
           <div className="flex flex-col gap-5">
+            <ExpansionPanel
+              gridSize={game.gridSize}
+              expansionsDone={game.expansionsDone}
+              level={game.level}
+              money={game.money}
+              onExpand={game.expandPark}
+            />
             <ParkGrid
               grid={game.grid}
               selectedBuild={game.selectedBuild}
@@ -83,6 +93,14 @@ export default function Home() {
               onTileClick={game.handleTileClick}
             />
             <EventLog log={game.log} issueCount={game.incidents.length} />
+            <MissionsPanel
+              level={game.level}
+              xp={game.xp}
+              xpForNext={game.xpForNext}
+              missionState={game.missionState}
+              claimedMissions={game.claimedMissions}
+              onClaim={game.claimMission}
+            />
           </div>
 
           <aside className="flex flex-col gap-4">

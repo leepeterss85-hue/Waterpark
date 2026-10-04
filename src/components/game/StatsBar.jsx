@@ -1,5 +1,5 @@
 import React from "react";
-import { DollarSign, CalendarDays, Users, Star, TrendingUp, TrendingDown } from "lucide-react";
+import { DollarSign, CalendarDays, Users, Star, TrendingUp, TrendingDown, Trophy } from "lucide-react";
 
 function Stat({ icon: Icon, label, value, tone }) {
   return (
@@ -19,14 +19,15 @@ function Stat({ icon: Icon, label, value, tone }) {
   );
 }
 
-export default function StatsBar({ money, day, guests, reputation, lastNet }) {
+export default function StatsBar({ money, day, guests, reputation, lastNet, level }) {
   const netTone = lastNet >= 0 ? "text-emerald-600" : "text-rose-600";
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
       <Stat icon={DollarSign} label="Cash" value={`$${money.toLocaleString()}`} tone="bg-gradient-to-br from-emerald-400 to-green-500" />
       <Stat icon={CalendarDays} label="Day" value={day} tone="bg-gradient-to-br from-sky-400 to-blue-500" />
       <Stat icon={Users} label="Guests" value={guests.toLocaleString()} tone="bg-gradient-to-br from-cyan-400 to-teal-500" />
       <Stat icon={Star} label="Reputation" value={`${reputation}%`} tone="bg-gradient-to-br from-amber-400 to-orange-500" />
+      <Stat icon={Trophy} label="Level" value={`Lv ${level ?? 1}`} tone="bg-gradient-to-br from-violet-400 to-fuchsia-500" />
       <div className="col-span-2 flex items-center gap-3 rounded-2xl bg-white/80 backdrop-blur px-4 py-3 shadow-sm ring-1 ring-white/60 sm:col-span-1">
         <div className={`grid h-10 w-10 place-items-center rounded-xl ${lastNet >= 0 ? "bg-gradient-to-br from-emerald-400 to-green-500" : "bg-gradient-to-br from-rose-400 to-red-500"}`}>
           {lastNet >= 0 ? <TrendingUp className="h-5 w-5 text-white" /> : <TrendingDown className="h-5 w-5 text-white" />}

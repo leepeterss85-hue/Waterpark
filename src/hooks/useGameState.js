@@ -1,9 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { ATTRACTIONS, getAttraction, STAFF, MAX_UPGRADE, upgradeCost } from "@/data/gameData";
+import {
+  ATTRACTIONS, getAttraction, STAFF, MAX_UPGRADE, upgradeCost,
+  INITIAL_GRID_SIZE, EXPAND_ROW, MAX_EXPANSIONS, MAX_GRID_SIZE,
+  expandCost, expandLevelReq, levelFromXp, xpForLevel,
+} from "@/data/gameData";
+import { MISSIONS, missionProgress } from "@/data/missions";
 
 const STORAGE_KEY = "waterpark-tycoon-save-v1";
 const SLOTS_KEY = "waterpark-tycoon-slots";
-const GRID_SIZE = 48;
+const GRID_SIZE = INITIAL_GRID_SIZE;
 const INITIAL_MONEY = 50000;
 
 function readSlots() {
@@ -52,6 +57,14 @@ export function useGameState() {
   const [saves, setSaves] = useState([]);
   const [incidents, setIncidents] = useState([]);
   const [upgrades, setUpgrades] = useState(() => Array(GRID_SIZE).fill(0));
+  const [xp, setXp] = useState(0);
+  const [expansionsDone, setExpansionsDone] = useState(0);
+  const [peakGuests, setPeakGuests] = useState(0);
+  const [totalUpgrades, setTotalUpgrades] = useState(0);
+  const [claimedMissions, setClaimedMissions] = useState([]);
+
+  const level = levelFromXp(xp);
+  const gridSize = grid.length;
 
   const stateRef = useRef({});
   stateRef.current = { money, day, reputation, grid, staff, incidents, upgrades };
@@ -68,6 +81,11 @@ export function useGameState() {
         if (data.grid) setGrid(data.grid);
         if (data.history) setHistory(data.history);
         if (data.staff) setStaff(data.staff);
+        if (data.xp != null) setXp(data.xp);
+        if (data.expansionsDone != null) setExpansionsDone(data.expansionsDone);
+        if (data.peakGuests != null) setPeakGuests(data.peakGuests);
+        if (data.totalUpgrades != null) setTotalUpgrades(data.totalUpgrades);
+        if (data.claimedMissions) setClaimedMissions(data.claimedMissions);
       }
     } catch {
       /* ignore */
@@ -80,14 +98,14 @@ export function useGameState() {
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, grid, history, staff, incidents, upgrades })
+          JSON.stringify({ money, day, reputation, grid, history, staff, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions })
         );
       } catch {
         /* ignore */
       }
     }, 300);
     return () => clearTimeout(t);
-  }, [money, day, reputation, grid, history, staff, incidents, upgrades]);
+  }, [money, day, reputation, grid, history, staff, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions]);
 
   // Load save slots list on mount
   useEffect(() => {
@@ -238,6 +256,7 @@ export function useGameState() {
     setMoney((m) => m + net);
     setDay((x) => x + 1);
     setGuests(newGuests);
+    setPeakGuests((p) => Math.max(p, newGuests));
     setReputation(Math.round(newReputation));
     setLastNet(net);
     setHistory((h) =>
@@ -313,6 +332,7 @@ export function useGameState() {
         return nu;
       });
       setMoney((m) => m - cost);
+      setTotalUpgrades((t) => t + 1);
     },
     [grid, upgrades, money]
   );
@@ -324,6 +344,40 @@ export function useGameState() {
   const fireStaff = useCallback((type) => {
     setStaff((s) => ({ ...s, [type]: Math.max(0, (s[type] || 0) - 1) }));
   }, []);
+
+  const expandPark = useCallback(() => {
+    if (expansionsDone >= MAX_EXPANSIONS) return;
+    if (level < expandLevelReq(expansionsDone)) return;
+    const cost = expandCost(expansionsDone);
+    if (money < cost) return;
+    setGrid((g) => [...g, ...Array(EXPAND_ROW).fill(null)]);
+    setUpgrades((u) => [...u, ...Array(EXPAND_ROW).fill(0)]);
+    setMoney((m) => m - cost);
+    setExpansionsDone((e) => e + 1);
+  }, [expansionsDone, level, money]);
+
+  const claimMission = useCallback(
+    (id) => {
+      const mission = MISSIONS.find((m) => m.id === id);
+      if (!mission || claimedMissions.includes(id) || level < mission.level) return;
+      const ms = {
+        attractionCount: grid.filter((x) => x && getAttraction(x)?.category === "attraction").length,
+        peakGuests,
+        money,
+        reputation,
+        day,
+        staffTotal: (staff.lifeguard || 0) + (staff.mechanic || 0) + (staff.cleaner || 0),
+        totalUpgrades,
+        expansionsDone,
+        maxedUpgrades: upgrades.filter((lv) => lv >= MAX_UPGRADE).length,
+      };
+      if (missionProgress(mission, ms) < mission.target) return;
+      setMoney((m) => m + mission.reward.money);
+      setXp((x) => x + mission.reward.xp);
+      setClaimedMissions((c) => [...c, id]);
+    },
+    [claimedMissions, level, grid, upgrades, peakGuests, money, reputation, day, staff, totalUpgrades, expansionsDone]
+  );
 
   const savePark = useCallback(
     (name) => {
@@ -342,13 +396,18 @@ export function useGameState() {
         lastNet,
         incidents,
         upgrades,
+        xp,
+        expansionsDone,
+        peakGuests,
+        totalUpgrades,
+        claimedMissions,
         savedAt: new Date().toISOString(),
       };
       writeSlots(slots);
       setSaves(Object.entries(slots).map(([n, s]) => slotMeta(n, s)));
       return true;
     },
-    [money, day, reputation, guests, grid, history, staff, log, lastNet]
+    [money, day, reputation, guests, grid, history, staff, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions]
   );
 
   const loadPark = useCallback((name) => {
@@ -364,6 +423,11 @@ export function useGameState() {
     setStaff(data.staff ?? { lifeguard: 0, mechanic: 0, cleaner: 0 });
     setIncidents(data.incidents ?? []);
     setUpgrades(data.upgrades ?? Array(GRID_SIZE).fill(0));
+    setXp(data.xp ?? 0);
+    setExpansionsDone(data.expansionsDone ?? 0);
+    setPeakGuests(data.peakGuests ?? 0);
+    setTotalUpgrades(data.totalUpgrades ?? 0);
+    setClaimedMissions(data.claimedMissions ?? []);
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
     setLastNet(data.lastNet ?? 0);
     setPlaying(false);
@@ -393,6 +457,11 @@ export function useGameState() {
     setStaff({ lifeguard: 0, mechanic: 0, cleaner: 0 });
     setIncidents([]);
     setUpgrades(Array(GRID_SIZE).fill(0));
+    setXp(0);
+    setExpansionsDone(0);
+    setPeakGuests(0);
+    setTotalUpgrades(0);
+    setClaimedMissions([]);
   }, []);
 
   return {
@@ -412,6 +481,28 @@ export function useGameState() {
     incidents,
     upgrades,
     upgradeAttraction,
+    level,
+    xp,
+    xpForNext: xpForLevel(level),
+    expansionsDone,
+    gridSize,
+    maxGridSize: MAX_GRID_SIZE,
+    expandPark,
+    peakGuests,
+    totalUpgrades,
+    claimedMissions,
+    claimMission,
+    missionState: {
+      attractionCount: grid.filter((id) => id && getAttraction(id)?.category === "attraction").length,
+      peakGuests,
+      money,
+      reputation,
+      day,
+      staffTotal: (staff.lifeguard || 0) + (staff.mechanic || 0) + (staff.cleaner || 0),
+      totalUpgrades,
+      expansionsDone,
+      maxedUpgrades: upgrades.filter((lv) => lv >= MAX_UPGRADE).length,
+    },
     uptime: Math.min(1, 0.65 + (staff.mechanic || 0) * 0.07),
     safety: Math.min(1, 0.7 + (staff.lifeguard || 0) * 0.06),
     cleanliness: Math.min(1, 0.6 + (staff.cleaner || 0) * 0.1),
