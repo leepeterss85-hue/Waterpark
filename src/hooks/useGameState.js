@@ -50,9 +50,10 @@ export function useGameState() {
   const [history, setHistory] = useState([]);
   const [staff, setStaff] = useState({ lifeguard: 0, mechanic: 0, cleaner: 0 });
   const [saves, setSaves] = useState([]);
+  const [incidents, setIncidents] = useState([]);
 
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, grid, staff };
+  stateRef.current = { money, day, reputation, grid, staff, incidents };
 
   // Load saved game
   useEffect(() => {
@@ -78,14 +79,14 @@ export function useGameState() {
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, grid, history, staff })
+          JSON.stringify({ money, day, reputation, grid, history, staff, incidents })
         );
       } catch {
         /* ignore */
       }
     }, 300);
     return () => clearTimeout(t);
-  }, [money, day, reputation, grid, history, staff]);
+  }, [money, day, reputation, grid, history, staff, incidents]);
 
   // Load save slots list on mount
   useEffect(() => {
@@ -94,11 +95,12 @@ export function useGameState() {
   }, []);
 
   const advanceDay = useCallback(() => {
-    const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff } = stateRef.current;
-    const placed = prevGrid.filter(Boolean).map(getAttraction).filter(Boolean);
-    const attractions = placed.filter((a) => a.category === "attraction");
-    const facilities = placed.filter((a) => a.category === "facility");
-    const totalCapacity = attractions.reduce((s, a) => s + a.capacity, 0);
+    const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, incidents: currentIncidents } = stateRef.current;
+    const placedItems = prevGrid
+      .map((id, idx) => (id ? { id, idx, attr: getAttraction(id) } : null))
+      .filter(Boolean);
+    const attractions = placedItems.filter((p) => p.attr.category === "attraction");
+    const facilities = placedItems.filter((p) => p.attr.category === "facility");
 
     const counts = currentStaff || { lifeguard: 0, mechanic: 0, cleaner: 0 };
     const uptime = Math.min(1, 0.65 + (counts.mechanic || 0) * 0.07);
@@ -108,6 +110,24 @@ export function useGameState() {
       (counts.lifeguard || 0) * STAFF.lifeguard.wage +
       (counts.mechanic || 0) * STAFF.mechanic.wage +
       (counts.cleaner || 0) * STAFF.cleaner.wage;
+
+    // --- Resolve active incidents: staff improve the odds of a fix ---
+    const mechPower = Math.min(0.9, 0.3 + (counts.mechanic || 0) * 0.2);
+    const cleanPower = Math.min(0.9, 0.35 + (counts.cleaner || 0) * 0.2);
+    const remaining = [];
+    const resolved = [];
+    for (const inc of currentIncidents || []) {
+      const power = inc.type === "breakdown" ? mechPower : cleanPower;
+      if (Math.random() < power) resolved.push(inc);
+      else remaining.push(inc);
+    }
+    const incidentByTile = new Map(remaining.map((i) => [i.tileIndex, i]));
+
+    // --- Guests & income: broken attractions take no riders ---
+    const workingAttractions = attractions.filter(
+      (p) => incidentByTile.get(p.idx)?.type !== "breakdown"
+    );
+    const totalCapacity = workingAttractions.reduce((s, p) => s + p.attr.capacity, 0);
 
     let newGuests = 0;
     let income = 0;
@@ -120,32 +140,95 @@ export function useGameState() {
       newGuests = Math.min(demand, totalCapacity);
       const fillRatio = totalCapacity > 0 ? newGuests / totalCapacity : 0;
       const attractionIncome =
-        attractions.reduce((s, a) => s + a.income * fillRatio, 0) * uptime;
+        attractions.reduce((s, p) => {
+          const inc = incidentByTile.get(p.idx);
+          let mult = 1;
+          if (inc?.type === "breakdown") mult = 0;
+          else if (inc?.type === "maintenance") mult = 0.5;
+          return s + p.attr.income * fillRatio * mult;
+        }, 0) * uptime;
       const facilityIncome = facilities.reduce(
-        (s, f) => s + f.income * Math.min(1, newGuests / 60),
+        (s, f) => s + f.attr.income * Math.min(1, newGuests / 60),
         0
       );
       income = attractionIncome + facilityIncome;
 
       const avgFun =
-        attractions.reduce((s, a) => s + a.fun * a.capacity, 0) / totalCapacity;
+        totalCapacity > 0
+          ? workingAttractions.reduce((s, p) => s + p.attr.fun * p.attr.capacity, 0) /
+            totalCapacity
+          : 0;
       const overcrowded = newGuests > totalCapacity * 0.85;
       let repDelta = 0;
       if (avgFun >= 7) repDelta += 1.5;
       else if (avgFun < 4) repDelta -= 1;
       if (overcrowded) repDelta -= 2 * (1 - safety);
-      if (facilities.some((f) => f.id === "first_aid")) repDelta += 0.5;
-      if (facilities.some((f) => f.id === "dining")) repDelta += 0.5;
-      if (facilities.some((f) => f.id === "lockers")) repDelta += 0.3;
+      if (facilities.some((f) => f.attr.id === "first_aid")) repDelta += 0.5;
+      if (facilities.some((f) => f.attr.id === "dining")) repDelta += 0.5;
+      if (facilities.some((f) => f.attr.id === "lockers")) repDelta += 0.3;
       repDelta += (cleanliness - 0.6) * 1.5;
       repDelta += (safety - 0.7) * 0.8;
+      // ongoing incident reputation drain
+      repDelta -= remaining.reduce(
+        (s, inc) => s + (inc.type === "breakdown" ? 1.2 : 0.6),
+        0
+      );
       newReputation = Math.max(0, Math.min(100, rep + repDelta));
     } else {
       newReputation = Math.max(0, rep - 1);
     }
 
-    const expenses = placed.reduce((s, a) => s + a.maintenance, 0) + staffWages;
+    // --- Roll at most one new incident per day (staff reduce the odds) ---
+    const incidentTiles = new Set(remaining.map((i) => i.tileIndex));
+    const eligible = attractions.filter((p) => !incidentTiles.has(p.idx));
+    const newIncidents = [];
+    if (eligible.length > 0) {
+      const pick = eligible[Math.floor(Math.random() * eligible.length)];
+      const breakChance = Math.max(0, 0.15 - 0.02 * (counts.mechanic || 0));
+      const maintChance = Math.max(0, 0.12 - 0.02 * (counts.cleaner || 0));
+      const r = Math.random();
+      if (r < breakChance) {
+        newIncidents.push({ tileIndex: pick.idx, type: "breakdown", attractionId: pick.id, since: d + 1 });
+      } else if (r < breakChance + maintChance) {
+        newIncidents.push({ tileIndex: pick.idx, type: "maintenance", attractionId: pick.id, since: d + 1 });
+      }
+    }
+    setIncidents([...remaining, ...newIncidents]);
+
+    const expenses = placedItems.reduce((s, p) => s + p.attr.maintenance, 0) + staffWages;
     const net = Math.round(income - expenses);
+
+    // --- Build log entries (newest first) ---
+    const entries = [];
+    for (const inc of newIncidents) {
+      const a = getAttraction(inc.attractionId);
+      entries.push({
+        day: d + 1,
+        text:
+          inc.type === "breakdown"
+            ? `Day ${d + 1}: ⚠️ ${a.name} broke down! Hire mechanics to repair it.`
+            : `Day ${d + 1}: 🔧 ${a.name} needs maintenance. Cleaners can speed it up.`,
+      });
+    }
+    for (const inc of resolved) {
+      const a = getAttraction(inc.attractionId);
+      entries.push({
+        day: d + 1,
+        text:
+          inc.type === "breakdown"
+            ? `Day ${d + 1}: ✅ Mechanics repaired the ${a.name}!`
+            : `Day ${d + 1}: ✅ Cleaners restored the ${a.name}.`,
+      });
+    }
+    entries.push({
+      day: d + 1,
+      text:
+        attractions.length === 0
+          ? `Day ${d + 1}: No attractions yet — build something to draw guests!`
+          : `Day ${d + 1}: ${newGuests} guests · income $${Math.round(
+              income
+            )} · upkeep $${expenses} · net ${net >= 0 ? "+" : ""}$${net}`,
+    });
 
     setMoney((m) => m + net);
     setDay((x) => x + 1);
@@ -155,20 +238,7 @@ export function useGameState() {
     setHistory((h) =>
       [...h, { day: d + 1, income: Math.round(income), guests: newGuests, reputation: Math.round(newReputation), net }].slice(-60)
     );
-    setLog((l) =>
-      [
-        {
-          day: d + 1,
-          text:
-            attractions.length === 0
-              ? `Day ${d + 1}: No attractions yet — build something to draw guests!`
-              : `Day ${d + 1}: ${newGuests} guests · income $${Math.round(
-                  income
-                )} · upkeep $${expenses} · net ${net >= 0 ? "+" : ""}$${net}`,
-        },
-        ...l,
-      ].slice(0, 10)
-    );
+    setLog((l) => [...entries, ...l].slice(0, 12));
   }, []);
 
   // Game loop
@@ -241,6 +311,7 @@ export function useGameState() {
         staff,
         log,
         lastNet,
+        incidents,
         savedAt: new Date().toISOString(),
       };
       writeSlots(slots);
@@ -261,6 +332,7 @@ export function useGameState() {
     setGrid(data.grid ?? Array(GRID_SIZE).fill(null));
     setHistory(data.history ?? []);
     setStaff(data.staff ?? { lifeguard: 0, mechanic: 0, cleaner: 0 });
+    setIncidents(data.incidents ?? []);
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
     setLastNet(data.lastNet ?? 0);
     setPlaying(false);
@@ -288,6 +360,7 @@ export function useGameState() {
     setLog([{ day: 0, text: "New park started! Place an attraction to begin." }]);
     setHistory([]);
     setStaff({ lifeguard: 0, mechanic: 0, cleaner: 0 });
+    setIncidents([]);
   }, []);
 
   return {
@@ -304,6 +377,7 @@ export function useGameState() {
     log,
     history,
     staff,
+    incidents,
     uptime: Math.min(1, 0.65 + (staff.mechanic || 0) * 0.07),
     safety: Math.min(1, 0.7 + (staff.lifeguard || 0) * 0.06),
     cleanliness: Math.min(1, 0.6 + (staff.cleaner || 0) * 0.1),

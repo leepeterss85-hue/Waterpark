@@ -1,8 +1,9 @@
 import React from "react";
+import { Wrench, Sparkles } from "lucide-react";
 import { getAttraction } from "@/data/gameData";
 import { getIcon } from "./icons";
 
-export default function Tile({ value, index, selectedBuild, isSelected, onClick }) {
+export default function Tile({ value, index, selectedBuild, isSelected, incident, onClick }) {
   const attr = value ? getAttraction(value) : null;
   const Icon = attr ? getIcon(attr.icon) : null;
   const canPlace = !attr && selectedBuild;
@@ -27,6 +28,20 @@ export default function Tile({ value, index, selectedBuild, isSelected, onClick 
         <span className="text-sky-300 text-lg font-light">+</span>
       ) : (
         <span className="h-1.5 w-1.5 rounded-full bg-slate-200" />
+      )}
+      {incident && (
+        <span
+          className={`absolute right-1 top-1 grid h-4 w-4 place-items-center rounded-full text-white shadow ring-1 ring-white/60 ${
+            incident.type === "breakdown" ? "animate-pulse bg-rose-500" : "bg-amber-500"
+          }`}
+          title={incident.type === "breakdown" ? "Broken down" : "Needs maintenance"}
+        >
+          {incident.type === "breakdown" ? (
+            <Wrench className="h-2.5 w-2.5" />
+          ) : (
+            <Sparkles className="h-2.5 w-2.5" />
+          )}
+        </span>
       )}
     </button>
   );

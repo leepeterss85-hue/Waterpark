@@ -70,9 +70,10 @@ export default function Home() {
               grid={game.grid}
               selectedBuild={game.selectedBuild}
               selectedTile={game.selectedTile}
+              incidents={game.incidents}
               onTileClick={game.handleTileClick}
             />
-            <EventLog log={game.log} />
+            <EventLog log={game.log} issueCount={game.incidents.length} />
           </div>
 
           <aside className="flex flex-col gap-4">
