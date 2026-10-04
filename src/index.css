@@ -79,14 +79,27 @@
   }
 }
 
-
+@layer components {
+  .waterpark-panel {
+    @apply rounded-2xl border border-white/80 bg-white/75 shadow-[0_12px_35px_rgba(30,64,50,.08)] ring-1 ring-slate-200/50 backdrop-blur;
+  }
+}
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
 
+  html {
+    min-height: 100%;
+  }
+
   body {
-    @apply bg-background text-foreground font-body;
+    @apply min-h-screen bg-background text-foreground font-body antialiased;
+  }
+
+  button,
+  input {
+    font: inherit;
   }
 }
