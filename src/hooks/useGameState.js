@@ -83,6 +83,7 @@ const [selectedZone, setSelectedZone] = useState(null);
   ]);
   const [history, setHistory] = useState([]);
   const [staff, setStaff] = useState(DEFAULT_STAFF);
+  const [staffAssignments, setStaffAssignments] = useState({});
   const [saves, setSaves] = useState([]);
   const [incidents, setIncidents] = useState([]);
   const [upgrades, setUpgrades] = useState(() => Array(GRID_SIZE).fill(0));
@@ -101,7 +102,7 @@ const [selectedZone, setSelectedZone] = useState(null);
 
   /** @type {import("react").MutableRefObject<Record<string, any>>} */
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, grid, staff, incidents, upgrades, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass };
+  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass };
 
   // Load saved game
   useEffect(() => {
@@ -122,6 +123,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (data.priorityPass != null) setPriorityPass(data.priorityPass);
         if (data.history) setHistory(data.history);
         if (data.staff) setStaff({ ...DEFAULT_STAFF, ...data.staff });
+        if (data.staffAssignments) setStaffAssignments(data.staffAssignments);
         if (data.xp != null) setXp(data.xp);
         if (data.expansionsDone != null) setExpansionsDone(data.expansionsDone);
         if (data.peakGuests != null) setPeakGuests(data.peakGuests);
@@ -143,14 +145,14 @@ const [selectedZone, setSelectedZone] = useState(null);
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, grid, parkZones, history, staff, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass })
+          JSON.stringify({ money, day, reputation, grid, parkZones, history, staff, staffAssignments, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass })
         );
       } catch {
         /* ignore */
       }
     }, 300);
     return () => clearTimeout(t);
-  }, [money, day, reputation, grid, parkZones, history, staff, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass]);
+  }, [money, day, reputation, grid, parkZones, history, staff, staffAssignments, incidents, upgrades, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass]);
 
   // Load save slots list on mount
   useEffect(() => {
@@ -159,7 +161,7 @@ const [selectedZone, setSelectedZone] = useState(null);
   }, []);
 
   const advanceDay = useCallback(() => {
-    const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, incidents: currentIncidents, upgrades: currentUpgrades, challenge: currentChallenge, parkZones: currentZones, forecast: currentForecast, seasonEvent: currentSeasonEvent, ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass } = stateRef.current;
+    const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, staffAssignments: currentAssignments, incidents: currentIncidents, upgrades: currentUpgrades, challenge: currentChallenge, parkZones: currentZones, forecast: currentForecast, seasonEvent: currentSeasonEvent, ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass } = stateRef.current;
     const dayWeather = currentForecast || rollWeather(d + 1);
     const dayForecast = rollWeather(d + 2);
     const eff = currentChallenge?.effects || {};
@@ -193,8 +195,18 @@ const [selectedZone, setSelectedZone] = useState(null);
     const cleanPower = Math.min(0.9, 0.35 + (counts.cleaner || 0) * 0.2);
     const remaining = [];
     const resolved = [];
+    const assignedCount = (role, tileIndex) => {
+      const zone = currentZones?.[tileIndex] || "";
+      const assignment = currentAssignments?.[role] || "";
+      return assignment && assignment !== zone ? 0 : (counts[role] || 0);
+    };
     for (const inc of currentIncidents || []) {
-      const power = inc.type === "breakdown" ? mechPower : cleanPower;
+      const zone = currentZones?.[inc.tileIndex] || "";
+      const mechanicCount = (currentAssignments?.mechanic && currentAssignments.mechanic !== zone) ? 0 : (counts.mechanic || 0);
+      const cleanerCount = (currentAssignments?.cleaner && currentAssignments.cleaner !== zone) ? 0 : (counts.cleaner || 0);
+      const power = inc.type === "breakdown"
+        ? Math.min(0.9, 0.3 + mechanicCount * 0.2)
+        : Math.min(0.9, 0.35 + cleanerCount * 0.2);
       if (Math.random() < power) resolved.push(inc);
       else remaining.push(inc);
     }
@@ -527,6 +539,11 @@ const [selectedZone, setSelectedZone] = useState(null);
     trackEvent("staff_fired", { type });
   }, []);
 
+  const assignStaff = useCallback((type, zone) => {
+    setStaffAssignments((current) => ({ ...current, [type]: zone || "" }));
+    trackEvent("staff_assigned", { type, zone: zone || "park-wide" });
+  }, []);
+
   const expandPark = useCallback(() => {
     if (expansionsDone >= MAX_EXPANSIONS) return;
     if (level < expandLevelReq(expansionsDone)) return;
@@ -600,6 +617,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         parkZones,
         history,
         staff,
+        staffAssignments,
         log,
         lastNet,
         incidents,
@@ -626,7 +644,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       trackEvent("park_saved", { name: trimmed });
       return true;
     },
-    [money, day, reputation, guests, grid, parkZones, history, staff, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass]
+    [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass]
   );
 
   const loadPark = useCallback((name) => {
@@ -647,6 +665,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     if (data.priorityPass != null) setPriorityPass(data.priorityPass);
     setHistory(data.history ?? []);
     setStaff({ ...DEFAULT_STAFF, ...(data.staff || {}) });
+    setStaffAssignments(data.staffAssignments || {});
     setIncidents(data.incidents ?? []);
     setUpgrades(data.upgrades ?? Array(GRID_SIZE).fill(0));
     setXp(data.xp ?? 0);
@@ -694,6 +713,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setLog([{ day: 0, text: "New park started! Your entrance is ready — now build the attractions guests will come for." }]);
     setHistory([]);
     setStaff(DEFAULT_STAFF);
+    setStaffAssignments({});
     setIncidents([]);
     setUpgrades(Array(GRID_SIZE).fill(0));
     setXp(0);
@@ -731,6 +751,8 @@ const [selectedZone, setSelectedZone] = useState(null);
     log,
     history,
     staff,
+    staffAssignments,
+    assignStaff,
     incidents,
     upgrades,
     upgradeAttraction,
