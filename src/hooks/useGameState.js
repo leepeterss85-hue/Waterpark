@@ -566,6 +566,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         forecast,
         seasonEvent,
         ticketPrice,
+        adBudget,
         savedAt: new Date().toISOString(),
       };
       writeSlots(slots);
