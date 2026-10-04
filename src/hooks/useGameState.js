@@ -141,7 +141,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, grid, parkZones, history, staff, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, seasonEvent, forecast, seasonEvent, ticketPrice, adBudget, priorityPass })
+          JSON.stringify({ money, day, reputation, grid, parkZones, history, staff, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, ticketPrice, seasonEvent, forecast, seasonEvent, ticketPrice, adBudget, priorityPass })
         );
       } catch {
         /* ignore */
