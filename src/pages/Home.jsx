@@ -19,7 +19,8 @@ import VisitorInsights from "@/components/game/VisitorInsights";
 import { TileDetailPanel } from "@/components/game/TileDetail";
 import ParkToolbar from "@/components/game/ParkToolbar";
 import ParkManagementPanel from "@/components/game/ParkManagementPanel";
-import ParkObjectDetail from "@/components/game/ParkObjectDetail";\nimport PlayerProgressPanel from "@/components/game/PlayerProgressPanel";
+import ParkObjectDetail from "@/components/game/ParkObjectDetail";
+import PlayerProgressPanel from "@/components/game/PlayerProgressPanel";
 
 export default function Home() {
   const game = useGameState();
@@ -78,7 +79,8 @@ export default function Home() {
           </div>
         </div>
 
-        <StatsBar money={game.money} day={game.day} guests={game.guests} reputation={game.reputation} lastNet={game.lastNet} level={game.level} />\n        <div className="mt-3"><PlayerProgressPanel level={game.level} xp={game.xp} xpForNext={game.xpForNext} onCheat={game.applyCheat} /></div>
+        <StatsBar money={game.money} day={game.day} guests={game.guests} reputation={game.reputation} lastNet={game.lastNet} level={game.level} />
+        <div className="mt-3"><PlayerProgressPanel level={game.level} xp={game.xp} xpForNext={game.xpForNext} onCheat={game.applyCheat} /></div>
 
         <div className="mt-4"><GameControls playing={game.playing} speed={game.speed} onTogglePlay={() => game.setPlaying(!game.playing)} onSpeed={game.setSpeed} onAdvance={game.advanceDay} onReset={game.resetGame} /></div>
         <div className="mt-4"><ParkToolbar weather={game.weather} forecast={game.forecast} season={game.season} seasonEvent={game.seasonEvent} guests={game.guests} selectedZone={game.selectedZone} onZoneSelect={game.setSelectedZone} /></div>
