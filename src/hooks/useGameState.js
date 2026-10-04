@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { ATTRACTIONS, getAttraction } from "@/data/gameData";
+import { ATTRACTIONS, getAttraction, STAFF } from "@/data/gameData";
 
 const STORAGE_KEY = "waterpark-tycoon-save-v1";
 const GRID_SIZE = 48;
@@ -20,9 +20,10 @@ export function useGameState() {
     { day: 0, text: "Welcome to your new water park! Place an attraction to get started." },
   ]);
   const [history, setHistory] = useState([]);
+  const [staff, setStaff] = useState({ lifeguard: 0, mechanic: 0, cleaner: 0 });
 
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, grid };
+  stateRef.current = { money, day, reputation, grid, staff };
 
   // Load saved game
   useEffect(() => {
@@ -35,6 +36,7 @@ export function useGameState() {
         if (data.reputation != null) setReputation(data.reputation);
         if (data.grid) setGrid(data.grid);
         if (data.history) setHistory(data.history);
+        if (data.staff) setStaff(data.staff);
       }
     } catch {
       /* ignore */
@@ -47,21 +49,30 @@ export function useGameState() {
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, grid, history })
+          JSON.stringify({ money, day, reputation, grid, history, staff })
         );
       } catch {
         /* ignore */
       }
     }, 300);
     return () => clearTimeout(t);
-  }, [money, day, reputation, grid, history]);
+  }, [money, day, reputation, grid, history, staff]);
 
   const advanceDay = useCallback(() => {
-    const { grid: prevGrid, reputation: rep, day: d } = stateRef.current;
+    const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff } = stateRef.current;
     const placed = prevGrid.filter(Boolean).map(getAttraction).filter(Boolean);
     const attractions = placed.filter((a) => a.category === "attraction");
     const facilities = placed.filter((a) => a.category === "facility");
     const totalCapacity = attractions.reduce((s, a) => s + a.capacity, 0);
+
+    const counts = currentStaff || { lifeguard: 0, mechanic: 0, cleaner: 0 };
+    const uptime = Math.min(1, 0.65 + (counts.mechanic || 0) * 0.07);
+    const safety = Math.min(1, 0.7 + (counts.lifeguard || 0) * 0.06);
+    const cleanliness = Math.min(1, 0.6 + (counts.cleaner || 0) * 0.1);
+    const staffWages =
+      (counts.lifeguard || 0) * STAFF.lifeguard.wage +
+      (counts.mechanic || 0) * STAFF.mechanic.wage +
+      (counts.cleaner || 0) * STAFF.cleaner.wage;
 
     let newGuests = 0;
     let income = 0;
@@ -73,10 +84,8 @@ export function useGameState() {
       );
       newGuests = Math.min(demand, totalCapacity);
       const fillRatio = totalCapacity > 0 ? newGuests / totalCapacity : 0;
-      const attractionIncome = attractions.reduce(
-        (s, a) => s + a.income * fillRatio,
-        0
-      );
+      const attractionIncome =
+        attractions.reduce((s, a) => s + a.income * fillRatio, 0) * uptime;
       const facilityIncome = facilities.reduce(
         (s, f) => s + f.income * Math.min(1, newGuests / 60),
         0
@@ -89,16 +98,18 @@ export function useGameState() {
       let repDelta = 0;
       if (avgFun >= 7) repDelta += 1.5;
       else if (avgFun < 4) repDelta -= 1;
-      if (overcrowded) repDelta -= 2;
+      if (overcrowded) repDelta -= 2 * (1 - safety);
       if (facilities.some((f) => f.id === "first_aid")) repDelta += 0.5;
       if (facilities.some((f) => f.id === "dining")) repDelta += 0.5;
       if (facilities.some((f) => f.id === "lockers")) repDelta += 0.3;
+      repDelta += (cleanliness - 0.6) * 1.5;
+      repDelta += (safety - 0.7) * 0.8;
       newReputation = Math.max(0, Math.min(100, rep + repDelta));
     } else {
       newReputation = Math.max(0, rep - 1);
     }
 
-    const expenses = placed.reduce((s, a) => s + a.maintenance, 0);
+    const expenses = placed.reduce((s, a) => s + a.maintenance, 0) + staffWages;
     const net = Math.round(income - expenses);
 
     setMoney((m) => m + net);
@@ -172,6 +183,14 @@ export function useGameState() {
     setSelectedTile(null);
   }, []);
 
+  const hireStaff = useCallback((type) => {
+    setStaff((s) => ({ ...s, [type]: (s[type] || 0) + 1 }));
+  }, []);
+
+  const fireStaff = useCallback((type) => {
+    setStaff((s) => ({ ...s, [type]: Math.max(0, (s[type] || 0) - 1) }));
+  }, []);
+
   const resetGame = useCallback(() => {
     setMoney(INITIAL_MONEY);
     setDay(1);
@@ -184,6 +203,7 @@ export function useGameState() {
     setLastNet(0);
     setLog([{ day: 0, text: "New park started! Place an attraction to begin." }]);
     setHistory([]);
+    setStaff({ lifeguard: 0, mechanic: 0, cleaner: 0 });
   }, []);
 
   return {
@@ -199,6 +219,14 @@ export function useGameState() {
     lastNet,
     log,
     history,
+    staff,
+    uptime: Math.min(1, 0.65 + (staff.mechanic || 0) * 0.07),
+    safety: Math.min(1, 0.7 + (staff.lifeguard || 0) * 0.06),
+    cleanliness: Math.min(1, 0.6 + (staff.cleaner || 0) * 0.1),
+    staffWages:
+      (staff.lifeguard || 0) * STAFF.lifeguard.wage +
+      (staff.mechanic || 0) * STAFF.mechanic.wage +
+      (staff.cleaner || 0) * STAFF.cleaner.wage,
     GRID_SIZE,
     setPlaying,
     setSpeed,
@@ -208,5 +236,7 @@ export function useGameState() {
     sellAttraction,
     advanceDay,
     resetGame,
+    hireStaff,
+    fireStaff,
   };
 }

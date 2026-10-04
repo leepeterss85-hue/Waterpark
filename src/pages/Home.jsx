@@ -7,6 +7,7 @@ import ParkGrid from "@/components/game/ParkGrid";
 import BuildPanel from "@/components/game/BuildPanel";
 import GameControls from "@/components/game/GameControls";
 import EventLog from "@/components/game/EventLog";
+import StaffPanel from "@/components/game/StaffPanel";
 import { TileDetailPanel } from "@/components/game/TileDetail";
 import { getAttraction } from "@/data/gameData";
 
@@ -96,6 +97,18 @@ export default function Home() {
                 money={game.money}
                 selectedBuild={game.selectedBuild}
                 onSelect={game.setSelectedBuild}
+              />
+            </div>
+            <div className="rounded-2xl bg-white/70 p-4 shadow-sm ring-1 ring-slate-100">
+              <StaffPanel
+                money={game.money}
+                staff={game.staff}
+                staffWages={game.staffWages}
+                uptime={game.uptime}
+                safety={game.safety}
+                cleanliness={game.cleanliness}
+                onHire={game.hireStaff}
+                onFire={game.fireStaff}
               />
             </div>
           </aside>

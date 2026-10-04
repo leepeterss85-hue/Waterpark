@@ -148,6 +148,33 @@ export const ATTRACTIONS = [
 
 export const getAttraction = (id) => ATTRACTIONS.find((a) => a.id === id);
 
+export const STAFF = {
+  lifeguard: {
+    id: "lifeguard",
+    name: "Lifeguard",
+    wage: 200,
+    icon: "ShieldCheck",
+    color: "from-cyan-400 to-blue-500",
+    description: "Boosts safety — eases overcrowding and lifts satisfaction.",
+  },
+  mechanic: {
+    id: "mechanic",
+    name: "Mechanic",
+    wage: 250,
+    icon: "Wrench",
+    color: "from-amber-400 to-orange-500",
+    description: "Keeps rides running — raises attraction uptime and income.",
+  },
+  cleaner: {
+    id: "cleaner",
+    name: "Cleaner",
+    wage: 150,
+    icon: "Sparkles",
+    color: "from-emerald-400 to-green-500",
+    description: "Maintains cleanliness — lifts park reputation over time.",
+  },
+};
+
 export const CATEGORIES = [
   { id: "attraction", label: "Core Water Attractions" },
   { id: "facility", label: "Facilities & Services" },

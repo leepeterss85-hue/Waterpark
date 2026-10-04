@@ -10,6 +10,9 @@ import {
   Lock,
   ShoppingBag,
   HeartPulse,
+  ShieldCheck,
+  Wrench,
+  Sparkles,
 } from "lucide-react";
 
 export const ICONS = {
@@ -24,6 +27,9 @@ export const ICONS = {
   Lock,
   ShoppingBag,
   HeartPulse,
+  ShieldCheck,
+  Wrench,
+  Sparkles,
 };
 
 export function getIcon(name) {
