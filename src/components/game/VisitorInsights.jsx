@@ -1,9 +1,9 @@
 import React from "react";
-import { Heart, DollarSign, TrendingUp, MapPin } from "lucide-react";
+import { Heart, DollarSign, TrendingUp, MapPin, Users } from "lucide-react";
 import { getIcon } from "./icons";
 
 export default function VisitorInsights({ visitorStats }) {
-  const { avgMood, avgSpendPerVisit, totalVisits, topAttraction } = visitorStats || {};
+  const { avgMood, avgSpendPerVisit, totalVisits, topAttraction, guestTypes } = visitorStats || {};
   const top = topAttraction;
   const TopIcon = top ? getIcon(top.icon) : null;
   const mood = Math.round(avgMood || 0);
@@ -53,6 +53,10 @@ export default function VisitorInsights({ visitorStats }) {
           )}
           <div className="text-[11px] text-slate-400">most visited</div>
         </div>
+      </div>
+      <div className="mt-3 rounded-xl bg-fuchsia-50 p-3 ring-1 ring-fuchsia-100">
+        <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-fuchsia-800"><Users className="h-3.5 w-3.5" /> Guest mix</div>
+        <div className="mt-2 flex flex-wrap gap-1.5">{Object.entries(guestTypes || {}).sort((a,b)=>b[1]-a[1]).map(([type,count])=><span key={type} className="rounded-full bg-white px-2 py-1 text-[10px] font-bold text-slate-600 ring-1 ring-fuchsia-100">{type} · {Math.round(count)}</span>)}</div>
       </div>
     </div>
   );
