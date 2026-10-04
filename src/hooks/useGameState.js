@@ -546,6 +546,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         reputation,
         guests,
         grid,
+        parkZones,
         history,
         staff,
         log,
