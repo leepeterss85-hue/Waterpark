@@ -1,7 +1,7 @@
 import React from "react";
 import { DollarSign, CalendarDays, Users, Star, TrendingUp, TrendingDown, Trophy } from "lucide-react";
 
-function Stat({ icon: Icon, label, value, tone, valueClass, helper }) {
+function Stat({ icon: Icon, label, value, tone, valueClass = "", helper = "" }) {
   return (
     <div className="waterpark-panel flex min-w-0 items-center gap-3 px-3 py-3 sm:px-4">
       <div className={"grid h-10 w-10 shrink-0 place-items-center rounded-xl shadow-inner " + tone}><Icon className="h-5 w-5 text-white" /></div>
