@@ -12,7 +12,7 @@ function BuildCard({ item, selected, affordable, onSelect }) {
       onClick={() => onSelect(selected ? null : item.id)}
       disabled={!affordable && !selected}
       className={
-        "group w-full rounded-2xl border p-3 text-left transition-all duration-200 " +
+        "group w-full rounded-xl border p-2 text-left transition-all duration-200 " +
         (selected
           ? "border-cyan-500 bg-slate-950 text-white shadow-lg ring-2 ring-cyan-300/60"
           : affordable
@@ -22,24 +22,24 @@ function BuildCard({ item, selected, affordable, onSelect }) {
       title={!affordable && !selected ? "You need more cash" : item.description}
     >
       <div className="flex items-start gap-3">
-        <div className={"relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-xl bg-gradient-to-br " + item.color}>
+        <div className={"relative grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-lg bg-gradient-to-br " + item.color}>
           <div className="absolute inset-0 bg-white/15" />
-          {Icon && <Icon className="relative z-10 h-5 w-5 text-white drop-shadow" />}
+          {Icon && <Icon className="relative z-10 h-4 w-4 text-white drop-shadow" />}
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-start gap-2">
             <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-extrabold">{item.name}</div>
+              <div className="line-clamp-2 text-[11px] font-extrabold leading-4">{item.name}</div>
               <div className={"mt-0.5 text-[9px] font-bold uppercase tracking-wider " + (selected ? "text-cyan-200" : isWater ? "text-cyan-600" : "text-amber-600")}>
                 {isWater ? "Water attraction" : isEnvironment ? "Park essential" : "Park facility"}
               </div>
             </div>
             {selected ? <Check className="h-4 w-4 shrink-0 text-cyan-300" /> : !affordable ? <LockKeyhole className="h-4 w-4 shrink-0 text-slate-300" /> : null}
           </div>
-          <div className={"mt-2 text-xs font-extrabold " + (selected ? "text-white" : "text-slate-800")}>
+          <div className={"mt-1 text-[11px] font-extrabold " + (selected ? "text-white" : "text-slate-800")}>
             ${item.cost.toLocaleString()}
           </div>
-          <div className={"mt-1 line-clamp-2 text-[10px] leading-4 " + (selected ? "text-slate-300" : "text-slate-500")}>
+          <div className={"mt-1 line-clamp-2 text-[9px] leading-3.5 " + (selected ? "text-slate-300" : "text-slate-500")}>
             {item.description}
           </div>
         </div>
@@ -49,7 +49,7 @@ function BuildCard({ item, selected, affordable, onSelect }) {
 }
 
 export default function BuildPanel({ money, selectedBuild, onSelect }) {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState("");\n  const [expanded, setExpanded] = useState({ attraction: true, facility: false, environment: false });
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const allItems = [...ATTRACTIONS, ...PARK_OBJECTS];
@@ -77,13 +77,13 @@ export default function BuildPanel({ money, selectedBuild, onSelect }) {
         if (!items.length) return null;
         return (
           <div key={cat.id}>
-            <div className="mb-2 flex items-center justify-between px-1">
-              <h3 className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-slate-500">{cat.label}</h3>
-              <span className="text-[9px] font-semibold text-slate-400">{items.length}</span>
-            </div>
-            <div className="grid grid-cols-1 gap-2">
+            <button onClick={() => setExpanded((state) => ({ ...state, [cat.id]: !state[cat.id] }))} className="mb-2 flex w-full items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-left ring-1 ring-slate-100 hover:bg-slate-100">
+              <span className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-slate-600">{cat.label}</span>
+              <span className="flex items-center gap-2 text-[9px] font-semibold text-slate-400">{items.length} <span className="text-sm">{expanded[cat.id] ? "−" : "+"}</span></span>
+            </button>
+            {expanded[cat.id] && <div className="grid grid-cols-2 gap-2">
               {items.map((item) => <BuildCard key={item.id} item={item} selected={selectedBuild === item.id} affordable={money >= item.cost} onSelect={onSelect} />)}
-            </div>
+            </div>}
           </div>
         );
       })}
