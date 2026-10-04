@@ -4,6 +4,7 @@ import {
   INITIAL_GRID_SIZE, EXPAND_ROW, MAX_EXPANSIONS, MAX_GRID_SIZE,
   expandCost, expandLevelReq, levelFromXp, xpForLevel, staffWages, staffEffects,
 } from "@/data/gameData";
+import { WEATHER, getSeason, rollWeather, rollSeasonEvent } from "@/data/parkSystems";
 import { MISSIONS, missionProgress } from "@/data/missions";
 import { rollChallenge } from "@/data/challenges";
 import { simulateVisits } from "@/data/visitorLogic";
@@ -12,6 +13,23 @@ const STORAGE_KEY = "waterpark-tycoon-save-v1";
 const SLOTS_KEY = "waterpark-tycoon-slots";
 const GRID_SIZE = INITIAL_GRID_SIZE;
 const INITIAL_MONEY = 50000;
+
+const DEFAULT_TICKET_PRICE = 28;
+const DEFAULT_AD_BUDGET = 250;
+const DEFAULT_STAFF = Object.fromEntries(Object.keys(STAFF).map((id) => [id, 0]));
+
+function makeStartingGrid() {
+  const g = Array(GRID_SIZE).fill(null);
+  g[GRID_SIZE - 8] = "park_entrance";
+  g[GRID_SIZE - 7] = "main_path";
+  g[GRID_SIZE - 6] = "main_path";
+  g[GRID_SIZE - 5] = "main_path";
+  return g;
+}
+
+function makeEmptyZones(size) {
+  return Array(size).fill(null);
+}
 
 function readSlots() {
   try {
@@ -45,9 +63,17 @@ export function useGameState() {
   const [day, setDay] = useState(1);
   const [reputation, setReputation] = useState(50);
   const [guests, setGuests] = useState(0);
-  const [grid, setGrid] = useState(() => Array(GRID_SIZE).fill(null));
+  const [grid, setGrid] = useState(() => makeStartingGrid());
+const [parkZones, setParkZones] = useState(() => makeEmptyZones(GRID_SIZE));
+const [selectedZone, setSelectedZone] = useState(null);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
+  const [weather, setWeather] = useState(WEATHER[0]);
+  const [forecast, setForecast] = useState(WEATHER[1]);
+  const [seasonEvent, setSeasonEvent] = useState(null);
+  const [ticketPrice, setTicketPrice] = useState(DEFAULT_TICKET_PRICE);
+  const [adBudget, setAdBudget] = useState(DEFAULT_AD_BUDGET);
+  const [priorityPass, setPriorityPass] = useState(false);
   const [selectedBuild, setSelectedBuild] = useState(null);
   const [selectedTile, setSelectedTile] = useState(null);
   const [lastNet, setLastNet] = useState(0);
@@ -55,7 +81,7 @@ export function useGameState() {
     { day: 0, text: "Welcome to your new water park! Place an attraction to get started." },
   ]);
   const [history, setHistory] = useState([]);
-  const [staff, setStaff] = useState({ lifeguard: 0, mechanic: 0, cleaner: 0 });
+  const [staff, setStaff] = useState(DEFAULT_STAFF);
   const [saves, setSaves] = useState([]);
   const [incidents, setIncidents] = useState([]);
   const [upgrades, setUpgrades] = useState(() => Array(GRID_SIZE).fill(0));
@@ -73,7 +99,7 @@ export function useGameState() {
   const gridSize = grid.length;
 
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, grid, staff, incidents, upgrades, challenge };
+  stateRef.current = { money, day, reputation, grid, staff, incidents, upgrades, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass };
 
   // Load saved game
   useEffect(() => {
@@ -85,8 +111,15 @@ export function useGameState() {
         if (data.day != null) setDay(data.day);
         if (data.reputation != null) setReputation(data.reputation);
         if (data.grid) setGrid(data.grid);
+        if (data.parkZones) setParkZones(data.parkZones);
+        if (data.weather) setWeather(data.weather);
+        if (data.forecast) setForecast(data.forecast);
+        if (data.seasonEvent) setSeasonEvent(data.seasonEvent);
+        if (data.ticketPrice != null) setTicketPrice(data.ticketPrice);
+        if (data.adBudget != null) setAdBudget(data.adBudget);
+        if (data.priorityPass != null) setPriorityPass(data.priorityPass);
         if (data.history) setHistory(data.history);
-        if (data.staff) setStaff(data.staff);
+        if (data.staff) setStaff({ ...DEFAULT_STAFF, ...data.staff });
         if (data.xp != null) setXp(data.xp);
         if (data.expansionsDone != null) setExpansionsDone(data.expansionsDone);
         if (data.peakGuests != null) setPeakGuests(data.peakGuests);
@@ -108,14 +141,14 @@ export function useGameState() {
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, grid, history, staff, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats })
+          JSON.stringify({ money, day, reputation, grid, parkZones, history, staff, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass })
         );
       } catch {
         /* ignore */
       }
     }, 300);
     return () => clearTimeout(t);
-  }, [money, day, reputation, grid, history, staff, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats]);
+  }, [money, day, reputation, grid, parkZones, history, staff, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass]);
 
   // Load save slots list on mount
   useEffect(() => {
@@ -124,13 +157,20 @@ export function useGameState() {
   }, []);
 
   const advanceDay = useCallback(() => {
-    const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, incidents: currentIncidents, upgrades: currentUpgrades, challenge: currentChallenge } = stateRef.current;
+    const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, incidents: currentIncidents, upgrades: currentUpgrades, challenge: currentChallenge, parkZones: currentZones, weather: currentWeather, forecast: currentForecast, seasonEvent: currentSeasonEvent, ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass } = stateRef.current;
+    const dayWeather = currentForecast || rollWeather(d + 1);
+    const dayForecast = rollWeather(d + 2);
+    const daySeason = getSeason(d + 1);
     const eff = currentChallenge?.effects || {};
     const placedItems = prevGrid
       .map((id, idx) => (id ? { id, idx, attr: getAttraction(id), level: (currentUpgrades || [])[idx] || 0 } : null))
       .filter(Boolean);
     const attractions = placedItems.filter((p) => p.attr.category === "attraction");
     const facilities = placedItems.filter((p) => p.attr.category === "facility");
+    const environment = placedItems.filter((p) => p.attr.category === "environment");
+    const hasEntrance = environment.some((p) => p.id === "park_entrance");
+    const pathCount = environment.filter((p) => p.id === "main_path" || p.id === "service_road").length;
+    const scenicCount = environment.filter((p) => ["palm_tree", "bench", "shade_umbrella", "fountain", "wayfinding_sign"].includes(p.id)).length;
     const capOf = (p) => p.attr.capacity * (1 + 0.2 * p.level);
     const incOf = (p) => p.attr.income * (1 + 0.15 * p.level);
     const funOf = (p) => Math.min(10, p.attr.fun + p.level * 0.5);
@@ -170,13 +210,19 @@ export function useGameState() {
 
     if (attractions.length > 0) {
       const demand = Math.floor(
-        (rep / 100) * totalCapacity * 1.15 * (1 + d / 80) * (eff.guestMult ?? 1)
+        (rep / 100) * totalCapacity * 1.15 * (1 + d / 80) *
+        (eff.guestMult ?? 1) *
+        (dayWeather.guestMult ?? 1) *
+        (currentSeasonEvent?.guestMult ?? 1) *
+        (1 + currentAdBudget / 5000) *
+        (hasEntrance ? 1 : 0.9) *
+        Math.max(0.65, Math.min(1.25, 1.12 - (currentTicketPrice - 20) * 0.012))
       );
       newGuests = Math.min(demand, totalCapacity);
 
       const sim = simulateVisits({
         demand: newGuests,
-        placedItems,
+        placedItems: [...attractions, ...facilities],
         incidents: incidentByTile,
         uptime,
         safety,
@@ -204,6 +250,12 @@ export function useGameState() {
         0
       );
       repDelta += eff.repDelta ?? 0;
+      if (dayWeather.id === "rain") repDelta -= 0.8;
+      else if (dayWeather.id === "sunny") repDelta += 0.35;
+      repDelta += Math.min(1.5, scenicCount * 0.08 + pathCount * 0.03);
+      if (hasEntrance) repDelta += 0.2;
+      if (environment.filter((p) => currentZones?.[p.idx]).length >= 5) repDelta += 0.25;
+      if (currentSeasonEvent) repDelta += currentSeasonEvent.repDelta || 0;
       newReputation = Math.max(0, Math.min(100, rep + repDelta));
     } else {
       newReputation = Math.max(0, rep - 1);
@@ -226,10 +278,23 @@ export function useGameState() {
     }
     setIncidents([...remaining, ...newIncidents]);
 
+    const ticketRevenue = newGuests * currentTicketPrice;
+    const rideIncome = income *
+      (dayWeather.incomeMult ?? 1) *
+      (currentSeasonEvent?.incomeMult ?? 1) *
+      (currentPriorityPass ? 1.08 : 1);
+    const utilities = Math.round(
+      (150 + attractions.length * 45 + facilities.length * 18 + newGuests * 2.2) *
+      (dayWeather.utilityMult ?? 1)
+    );
     const expenses =
       placedItems.reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) +
-      wages * (eff.wageMult ?? 1);
-    const net = Math.round(income - expenses);
+      wages * (eff.wageMult ?? 1) +
+      utilities +
+      currentAdBudget +
+      (currentPriorityPass ? 120 : 0);
+    const grossIncome = Math.round(ticketRevenue + rideIncome);
+    const net = Math.round(grossIncome - expenses);
 
     // --- Build log entries (newest first) ---
     const entries = [];
@@ -265,6 +330,8 @@ export function useGameState() {
 
     setMoney((m) => m + net);
     setDay((x) => x + 1);
+    setWeather(dayWeather);
+    setForecast(dayForecast);
     setGuests(newGuests);
     setPeakGuests((p) => Math.max(p, newGuests));
     setVisitorStats(visitorStats);
@@ -275,6 +342,23 @@ export function useGameState() {
       [...h, { day: d + 1, income: Math.round(income), guests: newGuests, reputation: Math.round(newReputation), net }].slice(-60)
     );
     setLog((l) => [...entries, ...l].slice(0, 12));
+
+    // --- Resolve seasonal park events ---
+    if (currentSeasonEvent) {
+      const daysLeft = currentSeasonEvent.daysLeft - 1;
+      if (daysLeft <= 0) {
+        setSeasonEvent(null);
+        setLog((l) => [{ day: d + 1, text: `Day ${d + 1}: Event ended — ${currentSeasonEvent.name}.` }, ...l].slice(0, 12));
+      } else {
+        setSeasonEvent({ ...currentSeasonEvent, daysLeft });
+      }
+    } else {
+      const nextEvent = rollSeasonEvent(d + 1);
+      if (nextEvent) {
+        setSeasonEvent({ ...nextEvent, daysLeft: nextEvent.duration });
+        setLog((l) => [{ day: d + 1, text: `Day ${d + 1}: ${nextEvent.name}! ${nextEvent.description}` }, ...l].slice(0, 12));
+      }
+    }
 
     // --- Resolve / advance / roll a random challenge ---
     const challengeEntries = [];
@@ -337,13 +421,15 @@ export function useGameState() {
 
   const handleTileClick = useCallback(
     (index) => {
-      if (grid[index]) {
+      if (selectedZone) {
+        paintZone(index);
+      } else if (grid[index]) {
         setSelectedTile(index);
       } else if (selectedBuild) {
         placeAttraction(index);
       }
     },
-    [grid, selectedBuild, placeAttraction]
+    [grid, selectedBuild, selectedZone, placeAttraction, paintZone]
   );
 
   const sellAttraction = useCallback((index) => {
@@ -368,6 +454,7 @@ export function useGameState() {
       const id = grid[index];
       if (!id) return;
       const attr = getAttraction(id);
+      if (!attr || attr.category === "environment") return;
       const level = upgrades[index] || 0;
       if (level >= MAX_UPGRADE) return;
       const cost = upgradeCost(attr.cost, level);
@@ -397,10 +484,32 @@ export function useGameState() {
     const cost = expandCost(expansionsDone);
     if (money < cost) return;
     setGrid((g) => [...g, ...Array(EXPAND_ROW).fill(null)]);
+    setParkZones((z) => [...z, ...Array(EXPAND_ROW).fill(null)]);
     setUpgrades((u) => [...u, ...Array(EXPAND_ROW).fill(0)]);
     setMoney((m) => m - cost);
     setExpansionsDone((e) => e + 1);
   }, [expansionsDone, level, money]);
+
+  const paintZone = useCallback((index) => {
+    if (!selectedZone) return;
+    setParkZones((z) => {
+      const nz = [...z];
+      nz[index] = selectedZone;
+      return nz;
+    });
+  }, [selectedZone]);
+
+  const chooseBuild = useCallback((id) => {
+    setSelectedBuild(id);
+    setSelectedZone(null);
+  }, []);
+
+  const chooseZone = useCallback((zoneId) => {
+    setSelectedZone((z) => (z === zoneId ? null : zoneId));
+    setSelectedBuild(null);
+    setSelectedZone(null);
+    setSelectedTile(null);
+  }, []);
 
   const claimMission = useCallback(
     (id) => {
@@ -412,7 +521,7 @@ export function useGameState() {
         money,
         reputation,
         day,
-        staffTotal: (staff.lifeguard || 0) + (staff.mechanic || 0) + (staff.cleaner || 0),
+        staffTotal: Object.values(staff).reduce((sum, n) => sum + (n || 0), 0),
         totalUpgrades,
         expansionsDone,
         maxedUpgrades: upgrades.filter((lv) => lv >= MAX_UPGRADE).length,
@@ -501,14 +610,22 @@ export function useGameState() {
     setDay(1);
     setReputation(50);
     setGuests(0);
-    setGrid(Array(GRID_SIZE).fill(null));
+    setGrid(makeStartingGrid());
+    setParkZones(makeEmptyZones(GRID_SIZE));
+    setSelectedZone(null);
     setPlaying(false);
     setSelectedBuild(null);
     setSelectedTile(null);
     setLastNet(0);
-    setLog([{ day: 0, text: "New park started! Place an attraction to begin." }]);
+    setWeather(WEATHER[0]);
+    setForecast(WEATHER[1]);
+    setSeasonEvent(null);
+    setTicketPrice(DEFAULT_TICKET_PRICE);
+    setAdBudget(DEFAULT_AD_BUDGET);
+    setPriorityPass(false);
+    setLog([{ day: 0, text: "New park started! Your entrance is ready — now build the attractions guests will come for." }]);
     setHistory([]);
-    setStaff({ lifeguard: 0, mechanic: 0, cleaner: 0 });
+    setStaff(DEFAULT_STAFF);
     setIncidents([]);
     setUpgrades(Array(GRID_SIZE).fill(0));
     setXp(0);
@@ -530,6 +647,15 @@ export function useGameState() {
     grid,
     playing,
     speed,
+    weather,
+    forecast,
+    season: getSeason(day),
+    seasonEvent,
+    ticketPrice,
+    adBudget,
+    priorityPass,
+    parkZones,
+    selectedZone,
     selectedBuild,
     selectedTile,
     lastNet,
@@ -582,10 +708,13 @@ export function useGameState() {
     },
     ...staffEffects(staff),
     staffWages: staffWages(staff),
+    estimatedUtilities: Math.round((150 + grid.filter((id) => id && getAttraction(id)?.category === "attraction").length * 45 + grid.filter((id) => id && getAttraction(id)?.category === "facility").length * 18 + guests * 2.2) * (weather?.utilityMult ?? 1)),
     GRID_SIZE,
     setPlaying,
     setSpeed,
-    setSelectedBuild,
+    setSelectedBuild: chooseBuild,
+    setSelectedZone: chooseZone,
+    paintZone,
     setSelectedTile,
     handleTileClick,
     sellAttraction,
