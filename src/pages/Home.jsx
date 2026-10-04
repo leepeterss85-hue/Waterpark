@@ -22,6 +22,7 @@ import { trackEvent } from "@/lib/gameAnalytics";
 import ParkManagementPanel from "@/components/game/ParkManagementPanel";
 import ParkObjectDetail from "@/components/game/ParkObjectDetail";
 import PlayerProgressPanel from "@/components/game/PlayerProgressPanel";
+import DailySummary from "@/components/game/DailySummary";
 
 export default function Home() {
   const game = useGameState();
@@ -29,6 +30,16 @@ export default function Home() {
   const selectedAttrId = game.selectedTile != null ? game.grid[game.selectedTile] : null;
   const selectedItem = selectedAttrId ? getParkItem(selectedAttrId) : null;
   const prevUnlocked = useRef(null);
+  const prevDay = useRef(game.day);
+  const [dailyReport, setDailyReport] = React.useState(null);
+
+  useEffect(() => {
+    if (prevDay.current !== game.day) {
+      const report = game.history?.[game.history.length - 1];
+      if (report?.day === game.day) setDailyReport(report);
+      prevDay.current = game.day;
+    }
+  }, [game.day, game.history]);
 
   useEffect(() => {
     const unlocked = ACHIEVEMENTS.filter((a) => a.check(game.achievementState)).map((a) => a.id);
@@ -162,6 +173,7 @@ export default function Home() {
           </aside>
         </div>
       </main>
+      <DailySummary report={dailyReport} onClose={() => setDailyReport(null)} />
     </div>
   );
 }
