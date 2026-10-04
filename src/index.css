@@ -454,3 +454,144 @@
 .ride-crowd-heavy{box-shadow:0 0 0 2px rgba(251,146,60,.55),0 0 12px rgba(251,146,60,.35)}
 .facility-covered{background:#047857!important}.facility-overloaded{background:#dc2626!important;animation:facility-alert 1.1s ease-in-out infinite}
 @keyframes theme-pulse{50%{filter:saturate(1.3) brightness(1.08)}}@keyframes night-light{50%{transform:scale(1.7);opacity:.55}}@keyframes facility-alert{50%{transform:scale(1.04);opacity:.78}}
+
+
+/* === Premium water-park UI polish === */
+@layer components {
+  .waterpark-panel {
+    position: relative;
+    overflow: hidden;
+    border-color: rgba(255,255,255,.92);
+    background: linear-gradient(145deg,rgba(255,255,255,.94),rgba(240,253,250,.82));
+    box-shadow: 0 18px 45px rgba(15,76,66,.10), 0 2px 8px rgba(15,23,42,.06), inset 0 1px 0 rgba(255,255,255,.9);
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  }
+  .waterpark-panel:hover {
+    border-color: rgba(103,232,249,.65);
+    box-shadow: 0 22px 52px rgba(15,76,66,.13), 0 4px 12px rgba(15,23,42,.07), inset 0 1px 0 rgba(255,255,255,.95);
+  }
+
+  .game-welcome-banner {
+    position: relative;
+    isolation: isolate;
+    background:
+      radial-gradient(circle at 12% 20%,rgba(255,255,255,.22) 0 3%,transparent 4%),
+      radial-gradient(circle at 86% 72%,rgba(255,255,255,.18) 0 2%,transparent 3%),
+      linear-gradient(120deg,#075985 0%,#0891b2 42%,#0f766e 72%,#047857 100%);
+    box-shadow: 0 20px 45px rgba(8,89,133,.18), inset 0 1px 0 rgba(255,255,255,.28);
+  }
+  .game-welcome-banner:before {
+    content:"";
+    position:absolute;
+    width:260px;height:260px;
+    right:-70px;top:-130px;
+    border-radius:50%;
+    border:28px solid rgba(255,255,255,.08);
+    box-shadow:0 0 0 22px rgba(255,255,255,.035),0 0 0 52px rgba(255,255,255,.025);
+    pointer-events:none;
+  }
+  .game-welcome-banner:after {
+    content:"";
+    position:absolute;
+    left:-5%;right:-5%;bottom:-22px;height:45px;
+    border-radius:50% 50% 0 0;
+    background:rgba(255,255,255,.08);
+    transform:rotate(-2deg);
+    pointer-events:none;
+  }
+
+  .game-hud-card {
+    position:relative;
+    overflow:hidden;
+    border-color:rgba(255,255,255,.95);
+    background:linear-gradient(145deg,rgba(255,255,255,.98),rgba(241,250,249,.88));
+    box-shadow:0 12px 26px rgba(15,76,66,.09),inset 0 1px 0 rgba(255,255,255,.95);
+    transition:transform .18s ease,box-shadow .18s ease;
+  }
+  .game-hud-card:before {
+    content:"";
+    position:absolute;
+    left:-18px;top:-24px;
+    width:72px;height:72px;
+    border-radius:50%;
+    background:rgba(255,255,255,.45);
+    pointer-events:none;
+  }
+  .game-hud-card:hover {
+    transform:translateY(-2px);
+    box-shadow:0 16px 32px rgba(15,76,66,.13),inset 0 1px 0 rgba(255,255,255,.95);
+  }
+  .game-hud-icon {
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 6px 12px rgba(15,23,42,.16);
+  }
+
+  .game-control-bar {
+    background:
+      radial-gradient(circle at 90% 0%,rgba(34,211,238,.12),transparent 28%),
+      linear-gradient(135deg,#0f172a,#123c3c 55%,#082f49);
+    border-color:rgba(255,255,255,.14);
+    box-shadow:0 18px 42px rgba(15,23,42,.22),inset 0 1px 0 rgba(255,255,255,.08);
+  }
+  .game-primary-button,.game-action-button,.game-speed,.game-reset-button {
+    transition:transform .16s ease,background-color .16s ease,box-shadow .16s ease;
+  }
+  .game-primary-button:hover,.game-action-button:hover,.game-speed:hover,.game-reset-button:hover {
+    transform:translateY(-1px);
+  }
+  .game-button-go,.game-button-stop {
+    box-shadow:0 7px 16px rgba(16,185,129,.18),inset 0 1px 0 rgba(255,255,255,.3);
+  }
+
+  .game-board-shell {
+    border-width:5px;
+    border-color:#174e3a;
+    box-shadow:0 28px 70px rgba(21,61,42,.28),0 5px 14px rgba(15,23,42,.10),inset 0 1px 0 rgba(255,255,255,.16);
+  }
+  .game-board-titlebar {
+    position:relative;
+    overflow:hidden;
+    background:
+      radial-gradient(circle at 85% 0%,rgba(103,232,249,.16),transparent 25%),
+      linear-gradient(105deg,#103f31,#237053 52%,#0f4c3b);
+    box-shadow:inset 0 -1px 0 rgba(255,255,255,.08);
+  }
+  .game-board-titlebar:after {
+    content:"";
+    position:absolute;
+    left:-5%;right:-5%;bottom:-15px;height:28px;
+    background:rgba(255,255,255,.035);
+    border-radius:50%;
+    transform:rotate(-1deg);
+    pointer-events:none;
+  }
+  .game-board-frame {
+    background:
+      radial-gradient(circle at 20% 15%,rgba(255,255,255,.22),transparent 20%),
+      linear-gradient(135deg,#d9c486,#c6a85d);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.22);
+  }
+  .game-map-toolbar {
+    border:1px solid rgba(255,255,255,.85);
+    background:linear-gradient(180deg,#fffdf4,#f4edd9);
+    box-shadow:0 6px 15px rgba(77,63,31,.12),inset 0 1px 0 rgba(255,255,255,.9);
+  }
+
+  .park-expansion-theme-family,.park-expansion-theme-thrill,.park-expansion-theme-resort,
+  .park-expansion-theme-extreme,.park-expansion-theme-vip,.park-expansion-theme-grand {
+    transition:filter .25s ease,box-shadow .25s ease;
+  }
+  .park-expansion-theme-family:hover { filter:saturate(1.08); }
+  .park-expansion-theme-thrill:hover { filter:saturate(1.12) contrast(1.02); }
+  .park-expansion-theme-resort:hover { filter:saturate(1.08); }
+  .park-expansion-theme-extreme:hover { filter:saturate(1.12); }
+  .park-expansion-theme-vip:hover { filter:saturate(1.10); }
+  .park-expansion-theme-grand:hover { filter:saturate(1.08); }
+
+  .park-atmosphere { mix-blend-mode:normal; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .waterpark-panel,.game-hud-card,.game-primary-button,.game-action-button,.game-speed,.game-reset-button {
+    transition:none;
+  }
+}
