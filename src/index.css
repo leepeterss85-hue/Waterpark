@@ -773,6 +773,108 @@
 }
 @media (prefers-reduced-motion:reduce){.map-scenery span{animation:none}}
 
+/* === Lush island map pass: richer water, softer terrain, stronger ride depth === */
+@layer components {
+  .game-map-surface {
+    background:
+      radial-gradient(ellipse at 12% 10%, rgba(255,255,255,.34) 0 6%, transparent 14%),
+      radial-gradient(ellipse at 88% 90%, rgba(28,78,46,.20) 0 8%, transparent 18%),
+      radial-gradient(ellipse at 68% 22%, rgba(255,255,255,.10) 0 9%, transparent 22%),
+      linear-gradient(135deg, #a8cf86 0%, #82b56e 40%, #6fa45c 72%, #5d9553 100%) !important;
+  }
+  .game-map-surface:after {
+    background:
+      radial-gradient(circle at 16% 30%, rgba(255,255,255,.14) 0 2px, transparent 3px),
+      radial-gradient(circle at 82% 60%, rgba(255,255,255,.11) 0 2px, transparent 3px),
+      radial-gradient(circle at 50% 86%, rgba(22,101,52,.12) 0 2px, transparent 3px),
+      repeating-linear-gradient(32deg, transparent 0 64px, rgba(255,255,255,.022) 65px 66px);
+  }
+  .game-map-grid > button:not(:has(.ride-art)):not(:has(.facility-art)):not(:has(.park-entrance-art)):not(:has(.service-road)):not(:has(.queue-rail)) {
+    background: rgba(150,196,118,.08) !important;
+    border-color: rgba(255,255,255,.06) !important;
+  }
+  .game-board-shell {
+    border-width: 3px !important;
+    border-color: #24543e !important;
+    box-shadow: 0 16px 36px rgba(32,68,45,.24), 0 4px 12px rgba(15,23,42,.10) !important;
+  }
+  .game-board-titlebar {
+    background: linear-gradient(110deg, #164c39 0%, #30774f 52%, #19533e 100%) !important;
+  }
+  .game-board-frame {
+    background: linear-gradient(135deg, #cfc58a 0%, #e7d99c 40%, #b9c878 100%) !important;
+  }
+  .game-map-toolbar {
+    border: 1px solid #e5d8b2 !important;
+    background: linear-gradient(115deg, #f9f2dd, #fff9e9) !important;
+    box-shadow: 0 5px 12px rgba(107,98,64,.13), inset 0 1px 0 rgba(255,255,255,.9) !important;
+  }
+  .game-board-legend {
+    background: #20593e !important;
+    color: #eef5d8 !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.06) !important;
+  }
+  .game-board-legend .legend-dot {
+    box-shadow: inset 0 1px 2px rgba(255,255,255,.55) !important;
+  }
+  .game-board-legend .legend-dot.water { background: #4bcfe0 !important; }
+  .game-board-legend .legend-dot.path { background: #e6d8b0 !important; }
+  .game-board-legend .legend-dot.land { background: #9cca74 !important; }
+  .game-live-pill {
+    color: #a9f4bc !important;
+    background: rgba(135,217,156,.16) !important;
+    border: 1px solid rgba(141,221,156,.4) !important;
+  }
+  .game-live-pill > span { background: #a9f4bc !important; box-shadow: 0 0 6px rgba(169,244,188,.6); }
+}
+@layer components {
+  .pool-water {
+    background:
+      linear-gradient(145deg, rgba(186,230,253,.78) 0%, rgba(56,189,248,.62) 38%, rgba(14,165,233,.58) 72%, rgba(29,78,216,.62) 100%) !important;
+    box-shadow: inset 0 4px 12px rgba(255,255,255,.5), inset 0 -6px 14px rgba(8,47,73,.28), 0 3px 6px rgba(15,23,42,.12) !important;
+  }
+  .pool-water:after {
+    background: repeating-linear-gradient(155deg, transparent 0 14px, rgba(255,255,255,.14) 15px 17px, transparent 18px 28px) !important;
+  }
+  .water-track {
+    background:
+      linear-gradient(145deg, rgba(186,230,253,.55) 0%, rgba(56,189,248,.42) 40%, rgba(8,145,178,.4) 100%) !important;
+    box-shadow: inset 0 4px 12px rgba(255,255,255,.28), 0 3px 6px rgba(15,23,42,.14) !important;
+  }
+  .water-track:after {
+    background: repeating-linear-gradient(120deg, transparent 0 15px, rgba(255,255,255,.2) 16px 18px, transparent 19px 30px) !important;
+  }
+  .ride-art {
+    filter: saturate(1.1) drop-shadow(0 6px 5px rgba(15,23,42,.24)) !important;
+  }
+  .ride-art-slide, .ride-art-pool, .ride-art-water, .ride-art-family {
+    box-shadow: inset 0 2px 6px rgba(255,255,255,.4), 0 8px 10px rgba(15,23,42,.22) !important;
+  }
+  .facility-art {
+    filter: drop-shadow(0 6px 5px rgba(15,23,42,.2)) !important;
+  }
+  .ride-splash-overlay i {
+    background: rgba(255,255,255,.85) !important;
+    box-shadow: 0 0 6px rgba(255,255,255,.6) !important;
+    animation: ride-splash 1.6s ease-in-out infinite !important;
+  }
+  .ride-splash-overlay i:nth-child(1) { animation-delay: 0s !important; }
+  .ride-splash-overlay i:nth-child(2) { animation-delay: .3s !important; }
+  .ride-splash-overlay i:nth-child(3) { animation-delay: .6s !important; }
+  .map-scenery {
+    background: linear-gradient(145deg, rgba(186,230,253,.9), rgba(56,189,248,.68) 48%, rgba(29,78,216,.78)) !important;
+    box-shadow: inset 0 4px 12px rgba(255,255,255,.6), inset 0 -8px 14px rgba(8,47,73,.24), 0 6px 12px rgba(15,76,66,.14) !important;
+    border: 3px solid rgba(255,255,255,.42) !important;
+  }
+  .map-scenery span { background: rgba(255,255,255,.65) !important; }
+  .park-land-scenery { opacity: .85; }
+  .land-flower { box-shadow: 0 0 0 2px rgba(244,114,182,.24), 0 1px 2px rgba(15,23,42,.18) !important; }
+  .land-stone { background: rgba(71,85,60,.3) !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ride-splash-overlay i { animation: none !important; }
+}
+
 /* === 3D attraction finish + connected resort paths === */
 @layer components {
   .game-map-grid > button:has(.ride-art),
