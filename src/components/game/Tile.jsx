@@ -59,7 +59,7 @@ function AttractionMark({ attr }) {
   </div>;
 }
 
-export default function Tile({ value, index, grid, zone, selectedBuild, isSelected, incident, queueWait, onClick }) {
+export default function Tile({ value, index, grid, zone, upgradeLevel = 0, selectedBuild, isSelected, incident, queueWait, queueConnected, onClick }) {
   const attr = value ? getParkItem(value) : null;
   const canPlace = !attr && selectedBuild;
   const isWater = attr?.category === "attraction";
@@ -69,13 +69,13 @@ export default function Tile({ value, index, grid, zone, selectedBuild, isSelect
     {attr?.category === "environment" ? <ParkObject attr={attr} grid={grid} index={index} /> : attr ? <AttractionMark attr={attr} /> : null}
     {canPlace && <div className="relative z-10 flex h-full flex-col items-center justify-center gap-1"><div className="grid h-8 w-8 place-items-center rounded-full bg-white shadow-sm ring-1 ring-cyan-200"><span className="text-xl font-light text-cyan-500">+</span></div><span className="text-[8px] font-extrabold uppercase tracking-wider text-cyan-700">Build</span></div>}
     {zoneTint && <div className={"pointer-events-none absolute inset-0 z-10 rounded-[15px] ring-2 " + zoneTint} />}
-    {isWater && queueWait > 0 && <div className="absolute bottom-1 left-1 z-20 rounded-md bg-black/55 px-1.5 py-0.5 text-[7px] font-black text-white">{queueWait}m wait</div>}
+    {isWater && <><div className="absolute left-1 top-1 z-20 rounded bg-white/80 px-1 py-0.5 text-[6px] font-black text-slate-700">IN</div><div className="absolute right-1 bottom-1 z-20 rounded bg-black/45 px-1 py-0.5 text-[6px] font-black text-white">OUT</div>{queueWait > 0 && <div className="absolute bottom-1 left-1 z-20 rounded-md bg-black/60 px-1.5 py-0.5 text-[7px] font-black text-white">{queueWait}m wait</div>}{queueConnected === false && <div className="absolute left-1/2 top-1 z-20 -translate-x-1/2 rounded bg-amber-100 px-1 py-0.5 text-[6px] font-black text-amber-800">ADD QUEUE</div>}</>}
     {incident && <span className={"absolute right-1.5 top-1.5 z-20 grid h-6 w-6 place-items-center rounded-full border-2 border-white text-white shadow-lg " + (incident.type === "breakdown" ? "animate-pulse bg-rose-500" : "bg-amber-500")}>{incident.type === "breakdown" ? <Wrench className="h-3 w-3" /> : <Sparkles className="h-3 w-3" />}</span>}
     {!attr && !canPlace && <span className="absolute bottom-1.5 left-1.5 text-[7px] font-bold uppercase tracking-wider text-emerald-900/35"><Footprints className="inline h-2.5 w-2.5" /></span>}
     {attr?.id === "sun_lounge" && <span className="absolute bottom-1 left-1 grid h-4 w-4 place-items-center rounded-full bg-white/25"><Umbrella className="h-2.5 w-2.5 text-white" /></span>}
     {attr?.id === "bench" && <Users className="absolute bottom-1 right-1 h-3 w-3 text-white/50" />}
     {attr?.id === "fence" && <span className="absolute inset-0 z-10 rounded-[15px] border-4 border-stone-500/80" />}
     {attr?.id === "park_entrance" && <MapPin className="absolute right-1 top-1 z-20 h-3.5 w-3.5 text-amber-300" />}
-    {isSelected && <CircleDot className="absolute bottom-1.5 right-1.5 z-20 h-3.5 w-3.5 text-white drop-shadow" />}
+    {upgradeLevel > 0 && isWater && <span className="absolute right-1 top-1 z-20 rounded bg-slate-900/65 px-1 py-0.5 text-[6px] font-black text-white">LV {upgradeLevel}</span>}{isSelected && <CircleDot className="absolute bottom-1.5 right-1.5 z-20 h-3.5 w-3.5 text-white drop-shadow" />}
   </button>;
 }
