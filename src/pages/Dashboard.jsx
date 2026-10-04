@@ -7,6 +7,7 @@ import IncomeChart from "@/components/dashboard/IncomeChart";
 import VisitorsChart from "@/components/dashboard/VisitorsChart";
 import SatisfactionChart from "@/components/dashboard/SatisfactionChart";
 import AttractionBreakdown from "@/components/dashboard/AttractionBreakdown";
+import VisitorGrowthChart from "@/components/dashboard/VisitorGrowthChart";
 
 export default function Dashboard() {
   const game = useGameState();
@@ -41,6 +42,9 @@ export default function Dashboard() {
           lastNet={game.lastNet}
         />
         <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
+          <div className="lg:col-span-2">
+            <VisitorGrowthChart history={game.history} />
+          </div>
           <IncomeChart history={game.history} />
           <VisitorsChart history={game.history} />
           <SatisfactionChart history={game.history} />
