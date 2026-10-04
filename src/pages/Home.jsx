@@ -35,8 +35,33 @@ export default function Home() {
 
   useEffect(() => {
     if (prevDay.current !== game.day) {
-      const report = game.history?.[game.history.length - 1];
-      if (report?.day === game.day) setDailyReport(report);
+      // Show one consolidated operations report at the end of each 30-day month.
+      if (game.day > 1 && game.day % 30 === 0) {
+        const monthHistory = (game.history || []).filter(
+          (entry) => entry.day > game.day - 30 && entry.day <= game.day
+        );
+        if (monthHistory.length) {
+          const sum = (key) => monthHistory.reduce((total, entry) => total + (Number(entry[key]) || 0), 0);
+          const latest = monthHistory[monthHistory.length - 1];
+          setDailyReport({
+            ...latest,
+            period: "month",
+            month: Math.ceil(game.day / 30),
+            guests: sum("guests"),
+            income: sum("income"),
+            net: sum("net"),
+            ticketRevenue: sum("ticketRevenue"),
+            rideIncome: sum("rideIncome"),
+            upkeep: sum("upkeep"),
+            wages: sum("wages"),
+            utilities: sum("utilities"),
+            marketing: sum("marketing"),
+            premium: sum("premium"),
+            weather: "30-day operating period",
+            event: null,
+          });
+        }
+      }
       prevDay.current = game.day;
     }
   }, [game.day, game.history]);
