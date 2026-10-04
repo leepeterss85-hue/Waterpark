@@ -48,14 +48,56 @@ function ParkObject({ attr, grid, index }) {
   return <div className={"absolute inset-1 flex items-center justify-center rounded-[15px] bg-gradient-to-br " + attr.color}><Icon className="h-7 w-7 text-white drop-shadow-md" /></div>;
 }
 
+function RideArtwork({ attr }) {
+  const id = attr.id;
+  if (["body_slide","speed_slide","kamikaze_slide","aqua_loop","multi_racer","bowl_slide","halfpipe"].includes(id)) {
+    return <div className="ride-art ride-art-slide">
+      <div className="ride-tower"><span /><span /><span /></div>
+      <div className="ride-slide"><i /><i /><i /></div>
+      {id === "aqua_loop" && <div className="ride-loop" />}
+      {id === "halfpipe" && <div className="ride-halfpipe" />}
+    </div>;
+  }
+  if (["wave_pool","kiddie_pool","lap_sports_pool","diving_platform","flowrider"].includes(id)) {
+    return <div className="ride-art ride-art-pool">
+      <div className="pool-water"><i /><i /><i /><i /></div>
+      <div className="pool-deck" />
+      {id === "diving_platform" && <div className="dive-board"><b /><b /></div>}
+      {id === "flowrider" && <div className="flow-wave" />}
+      {id === "lap_sports_pool" && <div className="pool-lanes"><i /><i /><i /></div>}
+    </div>;
+  }
+  if (["lazy_river","raft_tube","family_raft","tornado_bowl","water_coaster","ninja_course"].includes(id)) {
+    return <div className="ride-art ride-art-water">
+      <div className="water-track"><i /><i /><i /><i /></div>
+      {id === "tornado_bowl" && <div className="ride-bowl"><i /></div>}
+      {id === "water_coaster" && <div className="coaster-hill"><i /></div>}
+      {id === "ninja_course" && <div className="ninja-obstacles"><i /><i /><i /></div>}
+      <div className="ride-tube" />
+    </div>;
+  }
+  if (["play_structure","splash_pad","soft_play"].includes(id)) {
+    return <div className="ride-art ride-art-family">
+      <div className="play-tower"><span /><span /><span /></div>
+      <div className="play-roof" />
+      <div className="play-splash"><i /><i /><i /></div>
+    </div>;
+  }
+  return <div className="ride-art ride-art-generic"><div className="ride-generic-water" /><div className="ride-generic-icon"><IconForRide icon={attr.icon} /></div></div>;
+}
+
+function IconForRide({ icon }) {
+  const Icon = getIcon(icon);
+  return <Icon className="h-6 w-6 text-white drop-shadow-md" />;
+}
+
 function AttractionMark({ attr }) {
-  const Icon = getIcon(attr.icon);
-  const slide = ["body_slide","speed_slide","kamikaze_slide","aqua_loop","tornado_bowl","water_coaster","multi_racer","bowl_slide","halfpipe"].includes(attr.id);
   return <div className={"absolute inset-0 overflow-hidden rounded-[16px] bg-gradient-to-br " + (WATER[attr.id] || attr.color)}>
-    <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_15%,rgba(255,255,255,.45),transparent_28%)]" />
-    {attr.id === "wave_pool" || attr.id === "lazy_river" ? <div className="absolute bottom-2 left-2 right-2 h-5 rounded-full border-t-2 border-white/60 opacity-80" /> : null}
-    {slide ? <><div className="absolute left-2 top-2 h-7 w-3 rounded-sm bg-white/35" /><div className="absolute bottom-2 left-2 h-1.5 w-9 -rotate-12 rounded-full bg-white/85" /><div className="absolute bottom-4 right-2 h-1.5 w-7 rotate-12 rounded-full bg-white/60" /></> : null}
-    <div className="relative z-10 flex h-full flex-col items-center justify-center gap-1 text-center"><Icon className="h-7 w-7 text-white drop-shadow-md" /><span className="max-w-[92%] truncate rounded-md bg-black/20 px-1.5 py-0.5 text-[7px] font-extrabold uppercase tracking-wide text-white">{attr.name}</span></div>
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_15%,rgba(255,255,255,.5),transparent_28%)]" />
+    <RideArtwork attr={attr} />
+    <div className="relative z-10 flex h-full flex-col items-center justify-end pb-1.5 text-center">
+      <span className="max-w-[92%] truncate rounded-md bg-slate-950/45 px-1.5 py-0.5 text-[7px] font-extrabold uppercase tracking-wide text-white shadow-sm">{attr.name}</span>
+    </div>
   </div>;
 }
 
