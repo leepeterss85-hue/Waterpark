@@ -2,6 +2,7 @@ import React from "react";
 import { Wrench, Sparkles, Footprints, Umbrella, Trees, CircleDot, Droplets, MapPin, Users, Flag } from "lucide-react";
 import { getParkItem } from "@/data/gameData";
 import { getIcon } from "./icons";
+import RideArtwork from "@/components/game/WaterRideArtwork";
 
 const WATER = {
   wave_pool:"from-sky-300 via-cyan-400 to-blue-600", lazy_river:"from-sky-200 via-cyan-400 to-blue-500",
@@ -72,43 +73,7 @@ function FacilityArtwork({ attr }) {
   </div>;
 }
 
-function RideArtwork({ attr }) {
-  const id = attr.id;
-  if (["body_slide","speed_slide","kamikaze_slide","aqua_loop","multi_racer","bowl_slide","halfpipe"].includes(id)) {
-    return <div className="ride-art ride-art-slide">
-      <div className="ride-tower"><span /><span /><span /></div>
-      <div className="ride-slide"><i /><i /><i /></div>
-      {id === "aqua_loop" && <div className="ride-loop" />}
-      {id === "halfpipe" && <div className="ride-halfpipe" />}
-    </div>;
-  }
-  if (["wave_pool","kiddie_pool","lap_sports_pool","diving_platform","flowrider"].includes(id)) {
-    return <div className="ride-art ride-art-pool">
-      <div className="pool-water"><i /><i /><i /><i /></div>
-      <div className="pool-deck" />
-      {id === "diving_platform" && <div className="dive-board"><b /><b /></div>}
-      {id === "flowrider" && <div className="flow-wave" />}
-      {id === "lap_sports_pool" && <div className="pool-lanes"><i /><i /><i /></div>}
-    </div>;
-  }
-  if (["lazy_river","raft_tube","family_raft","tornado_bowl","water_coaster","ninja_course"].includes(id)) {
-    return <div className="ride-art ride-art-water">
-      <div className="water-track"><i /><i /><i /><i /></div>
-      {id === "tornado_bowl" && <div className="ride-bowl"><i /></div>}
-      {id === "water_coaster" && <div className="coaster-hill"><i /></div>}
-      {id === "ninja_course" && <div className="ninja-obstacles"><i /><i /><i /></div>}
-      <div className="ride-tube" />
-    </div>;
-  }
-  if (["play_structure","splash_pad","soft_play"].includes(id)) {
-    return <div className="ride-art ride-art-family">
-      <div className="play-tower"><span /><span /><span /></div>
-      <div className="play-roof" />
-      <div className="play-splash"><i /><i /><i /></div>
-    </div>;
-  }
-  return <div className="ride-art ride-art-generic"><div className="ride-generic-water" /><div className="ride-generic-icon"><IconForRide icon={attr.icon} /></div></div>;
-}
+
 
 function ExpansionDecor({ theme, night, nightSwim }) {
   const items = {
@@ -121,13 +86,9 @@ function ExpansionDecor({ theme, night, nightSwim }) {
   </div>;
 }
 
-function IconForRide({ icon }) {
-  const Icon = getIcon(icon);
-  return <Icon className="h-6 w-6 text-white drop-shadow-md" />;
-}
 
 function AttractionMark({ attr }) {
-  return <div className={"absolute inset-0 overflow-hidden rounded-[16px] bg-gradient-to-br " + (WATER[attr.id] || attr.color)}>
+  return <div className={"aquatic-attraction absolute inset-0 overflow-hidden rounded-[16px] bg-gradient-to-br " + (WATER[attr.id] || attr.color)}>
     <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_15%,rgba(255,255,255,.5),transparent_28%)]" />
     <RideArtwork attr={attr} />
     {["wave_pool","splash_pad","play_structure","flowrider","water_coaster"].includes(attr.id) && <div className="ride-splash-overlay" aria-hidden="true"><i /><i /><i /></div>}
@@ -144,16 +105,13 @@ export default function Tile({ value, index, grid, zone, expansionTheme = "start
   const zoneTint = zone ? ZONE_TINT[zone] : "";
   const isBusy = isWater && movement > (attr.capacity || 1) * 0.8;
   const isNight = timeOfDay === "night";
-  return <button onClick={onClick} title={attr ? attr.name : canPlace ? "Build here" : zone ? "Park zone" : "Open land"} className={"group relative aspect-square overflow-hidden rounded-[17px] border-2 transition-all duration-200 park-expansion-theme-" + expansionTheme + " " + (attr ? (isSelected ? "scale-[.97] border-white ring-4 ring-cyan-300/80 shadow-[0_10px_24px_rgba(15,23,42,.24)]" : "border-white/75 shadow-[0_6px_15px_rgba(15,23,42,.13)] hover:-translate-y-0.5 hover:shadow-[0_10px_20px_rgba(15,23,42,.18)]") : canPlace ? "border-dashed border-cyan-300 bg-cyan-50 hover:bg-white" : "border-white/70 bg-[#b9d6ae] hover:bg-[#c7dfbd]")}>
-    {!attr && <><div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,.5),transparent_18%)]" /><div className="absolute left-[14%] top-[17%]"><Trees className="h-3.5 w-3.5 text-emerald-700/45" /></div><div className="absolute bottom-[18%] right-[16%]"><Trees className="h-3 w-3 text-emerald-800/35" /></div></>}
+  return <button onClick={onClick} data-park-tile={index} data-kind={attr?.category || "empty"} data-buildable={Boolean(canPlace)} title={attr ? attr.name : canPlace ? "Build here" : zone ? "Park zone" : "Open land"} className={"group relative aspect-square overflow-hidden rounded-[17px] border-2 transition-all duration-200 park-expansion-theme-" + expansionTheme + " " + (attr ? (isSelected ? "scale-[.97] border-white ring-4 ring-cyan-300/80 shadow-[0_10px_24px_rgba(15,23,42,.24)]" : "border-white/75 shadow-[0_6px_15px_rgba(15,23,42,.13)] hover:-translate-y-0.5 hover:shadow-[0_10px_20px_rgba(15,23,42,.18)]") : canPlace ? "border-dashed border-cyan-300 bg-cyan-50 hover:bg-white" : "border-white/70 bg-[#b9d6ae] hover:bg-[#c7dfbd]")}>
     {attr?.category === "environment" ? <ParkObject attr={attr} grid={grid} index={index} /> : attr?.category === "facility" ? <div className={"absolute inset-0 overflow-hidden rounded-[16px] bg-gradient-to-br " + attr.color}><FacilityArtwork attr={attr} /><div className="relative z-20 flex h-full items-end justify-center pb-1"><span className="rounded-md bg-slate-950/50 px-1.5 py-0.5 text-[7px] font-extrabold uppercase tracking-wide text-white shadow">{attr.name}</span></div></div> : attr ? <AttractionMark attr={attr} /> : null}
-    {!attr && !canPlace && <div className="park-land-scenery" aria-hidden="true"><i className={"land-flower land-flower-" + (index % 3)} /><i className={"land-stone land-stone-" + (index % 4)} /><i className="land-grass land-grass-a" /><i className="land-grass land-grass-b" /></div>}
-    {canPlace && <div className="relative z-10 flex h-full flex-col items-center justify-center gap-1"><div className="grid h-8 w-8 place-items-center rounded-full bg-white shadow-sm ring-1 ring-cyan-200"><span className="text-xl font-light text-cyan-500">+</span></div><span className="text-[8px] font-extrabold uppercase tracking-wider text-cyan-700">Build</span></div>}
+    {canPlace && <div className="park-build-hint relative z-10 flex h-full flex-col items-center justify-center gap-1"><div className="park-build-symbol grid h-8 w-8 place-items-center rounded-full bg-white shadow-sm ring-1 ring-cyan-200"><span className="text-xl font-light text-cyan-500">+</span></div><span className="park-build-label text-[8px] font-extrabold uppercase tracking-wider text-cyan-700">Build</span></div>}
     {zoneTint && <div className={"pointer-events-none absolute inset-0 z-10 rounded-[15px] ring-2 " + zoneTint} />}
 {isWater && <><div className="absolute left-1 top-1 z-20 rounded bg-white/80 px-1 py-0.5 text-[6px] font-black text-slate-700">IN</div><div className="absolute right-1 bottom-1 z-20 rounded bg-black/45 px-1 py-0.5 text-[6px] font-black text-white">OUT</div>{queueWait > 0 && <div className="absolute bottom-1 left-1 z-20 rounded-md bg-black/60 px-1.5 py-0.5 text-[7px] font-black text-white">{queueWait}m wait</div>}{queueConnected === false && <div className="absolute left-1/2 top-1 z-20 -translate-x-1/2 rounded bg-amber-100 px-1 py-0.5 text-[6px] font-black text-amber-800">ADD QUEUE</div>}<div className={"absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 rounded-full px-1.5 py-0.5 text-[6px] font-black shadow " + (incident?.type === "breakdown" ? "bg-rose-600 text-white" : incident?.type === "maintenance" ? "bg-amber-400 text-slate-900" : isBusy ? "bg-orange-500 text-white" : "bg-emerald-500/90 text-white")}>{incident?.type === "breakdown" ? "CLOSED" : incident?.type === "maintenance" ? "MAINT" : movement > (attr.capacity || 1) * 0.8 ? "BUSY" : "OPEN"}</div>{movement > 0 && <div className={"ride-crowd-dots" + (isBusy ? " ride-crowd-heavy" : "")} aria-hidden="true"><i /><i /><i /><i /><i /></div>}{isWater && condition < 75 && <div className={"absolute right-1 bottom-1 z-20 rounded px-1.5 py-0.5 text-[7px] font-black text-white " + (condition < 30 ? "bg-rose-600" : condition < 50 ? "bg-amber-500" : "bg-slate-600")} title={"Ride condition " + Math.round(condition) + "%"}>⚙ {Math.round(condition)}%</div>}</>}
     {attr?.category === "facility" && facilityStatus?.[attr.id] && <span className={"absolute bottom-1 left-1 z-20 rounded bg-slate-950/65 px-1 py-0.5 text-[6px] font-black text-white " + (facilityStatus[attr.id] === "OVERLOADED" ? "facility-overloaded" : "facility-covered")}>{facilityStatus[attr.id]}</span>}
     {incident && <span className={"absolute right-1.5 top-1.5 z-20 grid h-6 w-6 place-items-center rounded-full border-2 border-white text-white shadow-lg " + (incident.type === "breakdown" ? "animate-pulse bg-rose-500" : "bg-amber-500")}>{incident.type === "breakdown" ? <Wrench className="h-3 w-3" /> : <Sparkles className="h-3 w-3" />}</span>}
-    {!attr && !canPlace && <span className="absolute bottom-1.5 left-1.5 text-[7px] font-bold uppercase tracking-wider text-emerald-900/35"><Footprints className="inline h-2.5 w-2.5" /></span>}
     {attr?.id === "sun_lounge" && <span className="absolute bottom-1 left-1 grid h-4 w-4 place-items-center rounded-full bg-white/25"><Umbrella className="h-2.5 w-2.5 text-white" /></span>}
     {attr?.id === "bench" && <Users className="absolute bottom-1 right-1 h-3 w-3 text-white/50" />}
     {attr?.id === "fence" && <span className="absolute inset-0 z-10 rounded-[15px] border-4 border-stone-500/80" />}

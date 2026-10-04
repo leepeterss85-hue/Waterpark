@@ -1,0 +1,80 @@
+/* Scoped scene styling: the grid stays the only interactive building surface. */
+.aquatic-map .game-board-titlebar { background: linear-gradient(115deg,hsl(var(--park-ink)),hsl(var(--park-deep))) !important; }
+.aquatic-map .game-board-frame { background: hsl(var(--park-edge)) !important; }
+.aquatic-map .game-map-surface { padding: 0 !important; min-height: 0; border-radius: 16px !important; background: hsl(var(--park-deck)) !important; box-shadow: inset 0 0 0 1px hsl(var(--park-edge)),0 7px 20px hsl(var(--park-ink)/.14); }
+.aquatic-map .game-map-surface::before,.aquatic-map .game-map-surface::after { display: none; }
+.aquatic-map .game-map-stage { position: relative; padding: 8px; background: linear-gradient(0deg,hsl(var(--park-edge)/.3),transparent),repeating-linear-gradient(0deg,transparent 0 23px,hsl(var(--park-edge)/.28) 23px 24px),repeating-linear-gradient(90deg,transparent 0 23px,hsl(var(--park-edge)/.28) 23px 24px),hsl(var(--park-deck)); border-top: 3px solid hsl(var(--park-rim)); }
+.aquatic-map .park-playfield { min-width: 560px; }
+.aquatic-map .game-map-grid { gap: 3px !important; filter: none; }
+.aquatic-map .game-map-grid > button[data-kind="empty"]:not(:has(.ride-art)):not(:has(.facility-art)):not(:has(.park-entrance-art)):not(:has(.service-road)):not(:has(.queue-rail)) { border: 1px dashed hsl(var(--park-ink)/.13) !important; border-radius: 5px !important; background: transparent !important; box-shadow: none !important; }
+.aquatic-map .game-map-grid > button[data-kind="empty"]:not(:has(.ride-art)):not(:has(.facility-art)):not(:has(.park-entrance-art)):not(:has(.service-road)):not(:has(.queue-rail)):hover { background: hsl(var(--park-water)/.12) !important; border-color: hsl(var(--park-deep)/.6) !important; }
+.aquatic-map .game-map-grid > button[data-kind="empty"][data-buildable="true"]:not(:has(.ride-art)):not(:has(.facility-art)):not(:has(.park-entrance-art)):not(:has(.service-road)):not(:has(.queue-rail)) { background: hsl(var(--park-water)/.11) !important; border-color: hsl(var(--park-deep)/.65) !important; }
+.aquatic-map .game-map-grid > button:focus-visible { outline: 3px solid hsl(var(--park-water)); outline-offset: 1px; }
+.aquatic-map .park-build-hint { gap: 1px; }
+.aquatic-map .park-build-symbol { width: 45%; height: auto; aspect-ratio: 1; box-shadow: none; }
+.aquatic-map .park-build-symbol > span { font-size: clamp(12px,2.2vw,20px); line-height: 1; }
+.aquatic-map .park-build-label { font-size: clamp(5px,1vw,8px); line-height: 1.2; }
+.aquatic-map .game-map-grid > button[data-kind="attraction"] { background: hsl(var(--park-deck)) !important; border-color: hsl(var(--park-rim)/.85) !important; border-radius: 9px !important; box-shadow: 0 3px 5px hsl(var(--park-ink)/.16) !important; }
+.aquatic-map .aquatic-attraction { background: hsl(var(--park-deck)) !important; border-radius: 9px; }
+.aquatic-map .aquatic-ride-art { position: absolute; inset: 0 !important; width: 100%; height: 100%; transform: none; border-radius: 0 !important; background: none; box-shadow: none !important; filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.17)) !important; }
+.aquatic-map .aquatic-ride-art::before,.aquatic-map .aquatic-ride-art::after { display: none; }
+.aquatic-map .game-board-legend { background: hsl(var(--park-ink)) !important; color: hsl(var(--park-rim)) !important; }
+.aquatic-map .game-board-legend .legend-dot.water { background: hsl(var(--park-water)) !important; }
+.aquatic-map .game-board-legend .legend-dot.land { background: hsl(var(--park-deck)) !important; }
+.poolside-scenery { position: relative; display: block; width: 100%; height: auto; aspect-ratio: 20/7; pointer-events: none; }
+.pool-deck-fill { fill: hsl(var(--park-deck)); }
+.pool-paver { fill: none; stroke: hsl(var(--park-edge)); stroke-width: .7; }
+.pool-stop-light { stop-color: hsl(var(--park-water)); }
+.pool-stop-deep { stop-color: hsl(var(--park-deep)); }
+.pool-caustic { stroke: hsl(var(--park-rim)/.3); stroke-width: 1.2; fill: none; }
+.pool-rim { fill: hsl(var(--park-rim)); stroke: hsl(var(--park-rim)); }
+.pool-lagoon { stroke: hsl(var(--park-deep)/.5); stroke-width: 2; }
+.scenery-shadow { fill: hsl(var(--park-ink)/.13); }
+.pool-river-rim,.pool-river-water,.pool-river-glint { fill: none; stroke-linecap: round; }
+.pool-river-rim { stroke: hsl(var(--park-rim)); stroke-width: 52; }
+.pool-river-water { stroke: hsl(var(--park-water)); stroke-width: 35; }
+.pool-river-glint { stroke: hsl(var(--park-rim)/.55); stroke-width: 2; stroke-dasharray: 18 23; }
+.pool-chair { fill: hsl(var(--park-rim)); stroke: hsl(var(--park-edge)); stroke-width: 1.5; }
+.pool-chair-stripe { stroke: hsl(var(--park-deep)/.55); stroke-width: 3; }
+.pool-parasol { fill: hsl(var(--park-sun)); stroke: hsl(var(--park-rim)); stroke-width: 1.5; }
+.pool-parasol-rib { fill: none; stroke: hsl(var(--park-rim)/.7); stroke-width: 2; }
+.pool-palm-trunk { fill: none; stroke: hsl(var(--park-edge)); stroke-width: 8; stroke-linecap: round; }
+.pool-palm-leaf { fill: hsl(var(--park-green)); stroke: hsl(var(--park-ink)/.16); stroke-width: 1; }
+.pool-swim-lane { stroke: hsl(var(--park-rim)/.8); stroke-width: 2; stroke-dasharray: 5 4; }
+.pool-tower { fill: hsl(var(--park-edge)); stroke: hsl(var(--park-ink)/.3); stroke-width: 2; }
+.pool-tower-leg { stroke: hsl(var(--park-ink)/.55); stroke-width: 7; }
+.pool-tower-rail { fill: none; stroke: hsl(var(--park-rim)); stroke-width: 2; }
+.pool-slide-shadow,.pool-scenic-slide,.pool-slide-highlight { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.pool-slide-shadow { stroke: hsl(var(--park-ink)/.25); stroke-width: 20; transform: translate(3px,5px); }
+.pool-scenic-slide { stroke-width: 16; }
+.pool-slide-coral { stroke: hsl(var(--park-slide)); }
+.pool-slide-gold { stroke: hsl(var(--park-sun)); }
+.pool-slide-blue { stroke: hsl(var(--park-deep)); }
+.pool-slide-highlight { stroke: hsl(var(--park-rim)/.65); stroke-width: 3; }
+.pool-float-coral { fill: hsl(var(--park-slide)); stroke: hsl(var(--park-rim)); stroke-width: 1; }
+.pool-float-gold { fill: hsl(var(--park-sun)); stroke: hsl(var(--park-rim)); stroke-width: 1; }
+.pool-float-hole { fill: hsl(var(--park-water)); }
+.pool-ladder { fill: none; stroke: hsl(var(--park-rim)); stroke-width: 2.5; stroke-linejoin: round; }
+.pool-splash-wave { fill: none; stroke: hsl(var(--park-rim)); stroke-width: 3; stroke-linecap: round; }
+.pool-splash-drop { fill: hsl(var(--park-rim)); }
+.pool-splash { animation: pool-spray 1.8s ease-in-out infinite; }
+.ride-river-rim,.ride-river-water,.ride-river-glint { fill: none; }
+.ride-river-rim { stroke: hsl(var(--park-rim)); stroke-width: 19; }
+.ride-river-water { stroke: hsl(var(--park-water)); stroke-width: 12; }
+.ride-river-glint { stroke: hsl(var(--park-rim)/.6); stroke-width: 1; stroke-dasharray: 5 6; }
+.ride-river-island { fill: hsl(var(--park-green)); stroke: hsl(var(--park-edge)); stroke-width: 3; }
+.ride-tower-leg { stroke: hsl(var(--park-ink)/.6); stroke-width: 3; }
+.ride-slide-shadow,.ride-water-slide,.ride-slide-highlight { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.ride-slide-shadow { stroke: hsl(var(--park-ink)/.25); stroke-width: 11; transform: translate(1px,3px); }
+.ride-water-slide { stroke-width: 8; }
+.ride-slide-highlight { stroke: hsl(var(--park-rim)/.7); stroke-width: 1.5; }
+.ride-loop-ring { fill: none; stroke: hsl(var(--park-slide)); stroke-width: 7; }
+.ride-bowl-ring { fill: hsl(var(--park-deep)); stroke: hsl(var(--park-sun)); stroke-width: 5; }
+.ride-swim-lane { stroke: hsl(var(--park-rim)/.9); stroke-width: 1.2; stroke-dasharray: 3 2; }
+.ride-wave-line,.ride-water-glint { fill: none; stroke: hsl(var(--park-rim)/.8); stroke-width: 2; stroke-linecap: round; }
+.ride-surf-wave { fill: hsl(var(--park-rim)/.8); }
+.pool-slide-coral-fill { fill: hsl(var(--park-slide)); }
+.ride-fountain { fill: none; stroke: hsl(var(--park-rim)); stroke-width: 2; }
+@keyframes pool-spray { 0%,100% { transform: translateY(1px); opacity: .55; } 50% { transform: translateY(-4px); opacity: 1; } }
+@media (max-width:640px) { .aquatic-map .game-map-stage { padding: 5px; } .aquatic-map .game-map-grid { gap: 2px !important; } }
+@media (prefers-reduced-motion:reduce) { .pool-splash { animation: none; } }
