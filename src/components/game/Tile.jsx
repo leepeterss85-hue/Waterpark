@@ -66,7 +66,9 @@ function FacilityArtwork({ attr }) {
     <div className="facility-sign">{labels[id] || "PARK"}</div>
     {id === "dining" || id === "ice_cream" || id === "coffee_bar" ? <div className="facility-table"><i /><i /><i /></div> : null}
     {id === "cabanas" || id === "sun_lounge" ? <div className="facility-umbrella">☂</div> : null}
-    {id === "arcade" ? <div className="facility-lights"><i /><i /><i /></div> : null}\n    {id === "toilets" ? <div className="facility-lockers"><i /><i /><i /><i /></div> : null}\n    {id === "lifeguard_station" ? <div className="lifeguard-flag"><span>+</span></div> : null}
+    {id === "arcade" ? <div className="facility-lights"><i /><i /><i /></div> : null}
+    {id === "toilets" ? <div className="facility-lockers"><i /><i /><i /><i /></div> : null}
+    {id === "lifeguard_station" ? <div className="lifeguard-flag"><span>+</span></div> : null}
   </div>;
 }
 
