@@ -590,7 +590,7 @@ export function expandLevelReq(expansionsDone) {
 }
 
 // --- Player levels (XP thresholds) ---
-export const LEVEL_XP = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700, 3300];
+export const LEVEL_XP = [0,100,250,450,700,1000,1350,1750,2200,2700,3300,4000,4800,5700,6700,7800,9000,10300,11700,13200,14800,16500,18300,20200,22200,24300,26500,28800,31200,33700];
 
 export function levelFromXp(xp) {
   let lvl = 1;
