@@ -168,6 +168,8 @@ const [selectedZone, setSelectedZone] = useState(null);
       .filter(Boolean);
     const attractions = placedItems.filter((p) => p.attr.category === "attraction");
     const facilities = placedItems.filter((p) => p.attr.category === "facility");
+    const lifeguardStations = facilities.filter((p) => p.id === "lifeguard_station").length;
+    const toilets = facilities.filter((p) => p.id === "toilets" || p.id === "lockers").length;
     const environment = placedItems.filter((p) => p.attr.category === "environment");
     const hasEntrance = environment.some((p) => p.id === "park_entrance");
     const pathCount = environment.filter((p) => p.id === "main_path" || p.id === "service_road").length;
@@ -219,7 +221,9 @@ const [selectedZone, setSelectedZone] = useState(null);
         (hasEntrance ? 1 : 0.9) *
         Math.max(0.65, Math.min(1.25, 1.12 - (currentTicketPrice - 20) * 0.012))
       );
-      newGuests = Math.min(demand, totalCapacity);
+      const safetyCoverage = Math.min(1, (counts.lifeguard || 0) / Math.max(1, Math.ceil(attractions.length / 3)) + lifeguardStations * 0.12);
+      const guestSafetyMult = safetyCoverage < 0.45 ? 0.88 : safetyCoverage < 0.7 ? 0.96 : 1;
+      newGuests = Math.min(demand, Math.round(totalCapacity * guestSafetyMult));
 
       const sim = simulateVisits({
         demand: newGuests,
@@ -242,7 +246,9 @@ const [selectedZone, setSelectedZone] = useState(null);
       else if (avgMood < 55) repDelta -= 0.5;
       if (facilities.some((f) => f.attr.id === "first_aid")) repDelta += 0.5;
       if (facilities.some((f) => f.attr.id === "dining")) repDelta += 0.5;
-      if (facilities.some((f) => f.attr.id === "lockers")) repDelta += 0.3;
+      if (facilities.some((f) => f.attr.id === "lockers" || f.attr.id === "toilets")) repDelta += 0.3;
+      if (toilets > 0) repDelta += Math.min(0.4, toilets * 0.08);
+      if (lifeguardStations > 0) repDelta += Math.min(0.5, lifeguardStations * 0.1);
       repDelta += (cleanliness - 0.6) * 1.5;
       repDelta += (safety - 0.7) * 0.8;
       repDelta += (counts.gardener || 0) * 0.1;
@@ -295,6 +301,11 @@ const [selectedZone, setSelectedZone] = useState(null);
       currentAdBudget +
       (currentPriorityPass ? 120 : 0);
     const grossIncome = Math.round(ticketRevenue + rideIncome);
+    const upkeep = Math.round(placedItems.reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1));
+    const wageCost = Math.round(wages * (eff.wageMult ?? 1));
+    const marketingCost = currentAdBudget;
+    const utilityCost = utilities;
+    const premiumCost = currentPriorityPass ? 120 : 0;
     const net = Math.round(grossIncome - expenses);
 
     // --- Build log entries (newest first) ---
@@ -340,7 +351,22 @@ const [selectedZone, setSelectedZone] = useState(null);
     setReputation(Math.round(newReputation));
     setLastNet(net);
     setHistory((h) =>
-      [...h, { day: d + 1, income: grossIncome, guests: newGuests, reputation: Math.round(newReputation), net }].slice(-60)
+      [...h, {
+        day: d + 1,
+        income: grossIncome,
+        guests: newGuests,
+        reputation: Math.round(newReputation),
+        net,
+        ticketRevenue: Math.round(ticketRevenue),
+        rideIncome: Math.round(rideIncome),
+        upkeep,
+        wages: wageCost,
+        utilities: utilityCost,
+        marketing: marketingCost,
+        premium: premiumCost,
+        weather: dayWeather.name,
+        event: currentSeasonEvent?.name || null,
+      }].slice(-60)
     );
     setLog((l) => [...entries, ...l].slice(0, 12));
 
