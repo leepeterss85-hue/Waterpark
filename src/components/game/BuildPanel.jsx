@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Search, Waves, Utensils, Check, LockKeyhole } from "lucide-react";
-import { ATTRACTIONS, CATEGORIES } from "@/data/gameData";
+import { ATTRACTIONS, PARK_OBJECTS, CATEGORIES } from "@/data/gameData";
 import { getIcon } from "./icons";
 
 function BuildCard({ item, selected, affordable, onSelect }) {
@@ -51,8 +51,9 @@ export default function BuildPanel({ money, selectedBuild, onSelect }) {
   const [query, setQuery] = useState("");
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return ATTRACTIONS;
-    return ATTRACTIONS.filter((item) => item.name.toLowerCase().includes(q) || item.description.toLowerCase().includes(q) || item.category.toLowerCase().includes(q));
+    const allItems = [...ATTRACTIONS, ...PARK_OBJECTS];
+    if (!q) return allItems;
+    return allItems.filter((item) => item.name.toLowerCase().includes(q) || item.description.toLowerCase().includes(q) || item.category.toLowerCase().includes(q));
   }, [query]);
 
   return (
