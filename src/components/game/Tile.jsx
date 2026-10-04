@@ -32,14 +32,14 @@ function ConnectedLine({ grid, index, kind }) {
     {up || down ? <div className={"absolute left-1/2 top-0 h-full w-2 -translate-x-1/2 rounded-full " + line} /> : null}
     {left || right ? <div className={"absolute left-0 top-1/2 h-2 w-full -translate-y-1/2 rounded-full " + line} /> : null}
     {!up && !down && !left && !right ? <div className={"absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full " + line} /> : null}
-    {kind === "queue_path" && <div className="absolute inset-2 rounded-xl border border-dashed border-white/70" />}
+    {kind === "queue_path" && <><div className="absolute inset-2 rounded-xl border border-dashed border-white/70" /><div className="queue-rail queue-rail-a" /><div className="queue-rail queue-rail-b" /><span className="queue-post queue-post-a" /><span className="queue-post queue-post-b" /><span className="queue-post queue-post-c" /></>}
   </div>;
 }
 
 function ParkObject({ attr, grid, index }) {
   if (attr.id === "main_path" || attr.id === "queue_path") return <ConnectedLine grid={grid} index={index} kind={attr.id} />;
   const Icon = getIcon(attr.icon);
-  if (attr.id === "park_entrance") return <div className="absolute inset-0 bg-gradient-to-br from-slate-600 to-slate-800"><div className="absolute left-2 right-2 top-2 h-5 rounded-t-2xl border-2 border-amber-300 bg-slate-800/80" /><div className="absolute left-3 top-4 h-5 w-2 rounded-b bg-amber-300" /><div className="absolute right-3 top-4 h-5 w-2 rounded-b bg-amber-300" /><div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[7px] font-black uppercase tracking-widest text-white">Gate</div></div>;
+  if (attr.id === "park_entrance") return <div className="park-entrance-art"><div className="entrance-arch"><span /><span /><b>WATER PARK</b></div><div className="entrance-gate" /><div className="entrance-banner">WELCOME</div></div>;
   if (attr.id === "palm_tree") return <div className="absolute inset-0 flex flex-col items-center justify-center"><div className="palm-art"><span className="palm-trunk" /><span className="palm-crown">🌴</span></div><div className="h-2 w-7 rounded-full bg-emerald-950/20" /></div>;
   if (attr.id === "bench") return <div className="absolute inset-0 flex items-center justify-center"><div className="bench-art"><span /><span /></div></div>;
   if (attr.id === "shade_umbrella") return <div className="absolute inset-0 flex items-center justify-center"><div className="umbrella-art"><Umbrella className="h-8 w-8 text-amber-500 drop-shadow" /><span /></div></div>;
