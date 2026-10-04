@@ -574,7 +574,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       setSaves(Object.entries(slots).map(([n, s]) => slotMeta(n, s)));
       return true;
     },
-    [money, day, reputation, guests, grid, parkZones, history, staff, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather]
+    [money, day, reputation, guests, grid, parkZones, history, staff, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast]
   );
 
   const loadPark = useCallback((name) => {
