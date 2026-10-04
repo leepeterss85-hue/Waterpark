@@ -427,3 +427,17 @@
   0%, 100% { transform: translateY(1px); opacity: .55; }
   50% { transform: translateY(-2px); opacity: 1; }
 }
+
+/* Expansion identity: each newly unlocked row gets a distinct park atmosphere. */
+.park-expansion-theme-family:not(:has(.facility-art)):not(:has(.ride-art)){background:linear-gradient(135deg,rgba(254,240,138,.30),rgba(187,247,208,.25))}
+.park-expansion-theme-thrill:not(:has(.facility-art)):not(:has(.ride-art)){background:linear-gradient(135deg,rgba(254,205,211,.28),rgba(254,215,170,.24))}
+.park-expansion-theme-resort:not(:has(.facility-art)):not(:has(.ride-art)){background:linear-gradient(135deg,rgba(221,214,254,.30),rgba(167,243,208,.22))}
+.park-expansion-theme-extreme:not(:has(.facility-art)):not(:has(.ride-art)){background:linear-gradient(135deg,rgba(254,215,170,.30),rgba(254,202,202,.25))}
+.park-expansion-theme-vip:not(:has(.facility-art)):not(:has(.ride-art)){background:linear-gradient(135deg,rgba(233,213,255,.34),rgba(219,234,254,.28))}
+.park-expansion-theme-grand:not(:has(.facility-art)):not(:has(.ride-art)){background:linear-gradient(135deg,rgba(207,250,254,.34),rgba(224,231,255,.30))}
+.park-expansion-theme-family{box-shadow:inset 0 0 0 2px rgba(251,191,36,.10)}
+.park-expansion-theme-thrill{box-shadow:inset 0 0 0 2px rgba(244,63,94,.12)}
+.park-expansion-theme-resort{box-shadow:inset 0 0 0 2px rgba(139,92,246,.12)}
+.park-expansion-theme-extreme{box-shadow:inset 0 0 0 2px rgba(249,115,22,.14)}
+.park-expansion-theme-vip{box-shadow:inset 0 0 0 2px rgba(168,85,247,.16)}
+.park-expansion-theme-grand{box-shadow:inset 0 0 0 2px rgba(14,116,144,.16)}
