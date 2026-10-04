@@ -340,6 +340,32 @@ export const ATTRACTIONS = [
     description: "Shops selling swim gear, towels, and souvenirs.",
   },
   {
+    id: "toilets",
+    name: "Toilets & Changing Rooms",
+    category: "facility",
+    cost: 3500,
+    income: 250,
+    capacity: 0,
+    fun: 0,
+    maintenance: 60,
+    icon: "DoorOpen",
+    color: "from-sky-400 to-cyan-600",
+    description: "Clean toilets, showers and changing cubicles for guests.",
+  },
+  {
+    id: "lifeguard_station",
+    name: "Lifeguard Station",
+    category: "facility",
+    cost: 4500,
+    income: 0,
+    capacity: 0,
+    fun: 0,
+    maintenance: 80,
+    icon: "ShieldCheck",
+    color: "from-red-400 to-orange-500",
+    description: "Visible safety post that supports lifeguards around busy water areas.",
+  },
+  {
     id: "first_aid",
     name: "First Aid Station",
     category: "facility",
@@ -485,6 +511,39 @@ export const PARK_OBJECTS = [
   { id:"wayfinding_sign", name:"Wayfinding Sign", category:"environment", cost:180, income:0, capacity:0, fun:0, maintenance:3, icon:"Flag", color:"from-orange-300 to-orange-600", description:"Helps guests find slides, pools, food and facilities." },
   { id:"service_road", name:"Service Road", category:"environment", cost:350, income:0, capacity:0, fun:0, maintenance:10, icon:"Footprints", color:"from-slate-300 to-slate-500", description:"Back-of-house route for maintenance and service vehicles." }
 ];
+
+export const ATTRACTION_PROFILES = {
+  wave_pool: { popularity: 9, safety: "High", lifeguards: 2, zone: "family" },
+  lazy_river: { popularity: 7, safety: "Medium", lifeguards: 1, zone: "relax" },
+  kiddie_pool: { popularity: 8, safety: "High", lifeguards: 1, zone: "family" },
+  splash_pad: { popularity: 7, safety: "Medium", lifeguards: 1, zone: "family" },
+  diving_platform: { popularity: 8, safety: "High", lifeguards: 2, zone: "thrill" },
+  lap_sports_pool: { popularity: 6, safety: "Medium", lifeguards: 1, zone: "relax" },
+  flowrider: { popularity: 8, safety: "High", lifeguards: 1, zone: "thrill" },
+  ninja_course: { popularity: 8, safety: "High", lifeguards: 1, zone: "family" },
+};
+
+export function getAttractionProfile(id) {
+  const attr = ATTRACTIONS.find((a) => a.id === id);
+  if (!attr) return null;
+  const known = ATTRACTION_PROFILES[id] || {};
+  return {
+    popularity: known.popularity ?? Math.max(5, Math.min(10, Math.round(attr.fun))),
+    safety: known.safety ?? (attr.capacity >= 80 ? "High" : "Medium"),
+    lifeguards: known.lifeguards ?? Math.max(1, Math.ceil((attr.capacity || 40) / 80)),
+    zone: known.zone ?? (attr.fun >= 9 ? "thrill" : "family"),
+  };
+}
+
+export function unlockLevelFor(item) {
+  if (!item) return 99;
+  if (item.category === "environment") return 1;
+  if (item.cost <= 7000) return 1;
+  if (item.cost <= 12000) return 2;
+  if (item.cost <= 18000) return 3;
+  if (item.cost <= 23000) return 4;
+  return 5;
+}
 
 export const getAttraction = (id) => ATTRACTIONS.find((a) => a.id === id);
 export const getParkItem = (id) => ATTRACTIONS.find((a) => a.id === id) || PARK_OBJECTS.find((a) => a.id === id);
