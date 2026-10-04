@@ -112,6 +112,7 @@ export default function Home() {
                   money={game.money}
                   incident={game.incidents.find((x) => x.tileIndex === game.selectedTile) || null}
                   guests={game.guests}
+                  queueWait={selectedItem?.capacity ? Math.min(45, Math.round(Math.max(0, ((game.visitorStats?.movements?.[selectedAttrId] || 0) / (selectedItem.capacity * 1.4) - 0.35) * 18))) : 0}
                   onUpgrade={() => game.upgradeAttraction(game.selectedTile)}
                   onSell={() => game.sellAttraction(game.selectedTile)}
                   onClose={() => game.setSelectedTile(null)}
