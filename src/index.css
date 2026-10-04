@@ -595,3 +595,57 @@
     transition:none;
   }
 }
+
+
+/* Living park artwork pass: stronger ride depth, animated water and subtle ground detail. */
+@layer components {
+  .park-land-scenery { position:absolute; inset:0; pointer-events:none; overflow:hidden; opacity:.78; }
+  .land-flower,.land-stone,.land-grass { position:absolute; display:block; }
+  .land-flower { width:5px; height:5px; border-radius:50%; background:#fef3c7; box-shadow:0 0 0 2px rgba(244,114,182,.22),0 1px 2px rgba(15,23,42,.16); }
+  .land-flower-0 { left:34%; top:36%; }
+  .land-flower-1 { left:68%; top:60%; background:#fbcfe8; }
+  .land-flower-2 { left:45%; top:72%; background:#fde68a; }
+  .land-stone { width:7px; height:4px; border-radius:50%; background:rgba(71,85,60,.25); }
+  .land-stone-0 { right:28%; top:35%; }
+  .land-stone-1 { right:42%; bottom:25%; }
+  .land-stone-2 { left:26%; bottom:32%; }
+  .land-stone-3 { right:18%; top:62%; }
+  .land-grass { width:7px; height:4px; border-top:1px solid rgba(22,101,52,.38); border-radius:50%; transform:rotate(-25deg); }
+  .land-grass-a { left:24%; top:62%; }
+  .land-grass-b { right:24%; bottom:30%; transform:rotate(25deg); }
+
+  .ride-art { filter:drop-shadow(0 5px 4px rgba(15,23,42,.20)); }
+  .ride-art-slide:before {
+    content:""; position:absolute; left:17%; top:18%; width:17%; height:67%;
+    border-left:3px solid rgba(255,255,255,.48); border-right:2px solid rgba(15,23,42,.18);
+    transform:skewY(-8deg); border-radius:3px;
+  }
+  .ride-art-slide:after {
+    content:""; position:absolute; left:25%; top:27%; width:70%; height:9px;
+    border-top:3px solid rgba(255,255,255,.65); border-radius:50%; transform:rotate(-7deg);
+    background:linear-gradient(90deg,rgba(255,255,255,.18),rgba(255,255,255,.02));
+  }
+  .ride-tower { background:linear-gradient(90deg,rgba(255,255,255,.34),rgba(15,23,42,.12)); border:1px solid rgba(255,255,255,.42); }
+  .ride-tower:after { content:""; position:absolute; left:48%; top:0; bottom:0; border-left:1px solid rgba(255,255,255,.55); }
+  .ride-slide i { height:7px; background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(186,230,253,.55)); box-shadow:0 2px 3px rgba(15,23,42,.18); }
+  .ride-loop { filter:drop-shadow(0 3px 2px rgba(15,23,42,.25)); }
+  .ride-art-pool { background:linear-gradient(145deg,rgba(255,255,255,.12),rgba(8,47,73,.18)); }
+  .pool-water { background:linear-gradient(145deg,rgba(186,230,253,.72),rgba(6,182,212,.48) 48%,rgba(29,78,216,.52)); box-shadow:inset 0 3px 9px rgba(255,255,255,.42),inset 0 -5px 10px rgba(8,47,73,.2); }
+  .pool-water:after { content:""; position:absolute; inset:0; background:repeating-linear-gradient(155deg,transparent 0 12px,rgba(255,255,255,.10) 13px 15px,transparent 16px 25px); animation:pool-shimmer 4s linear infinite; }
+  .pool-deck { box-shadow:0 3px 5px rgba(15,23,42,.18),inset 0 1px 0 rgba(255,255,255,.65); }
+  .water-track { border-color:rgba(255,255,255,.34); background:linear-gradient(145deg,rgba(186,230,253,.4),rgba(8,145,178,.25)); box-shadow:inset 0 4px 10px rgba(255,255,255,.22),0 3px 6px rgba(15,23,42,.12); }
+  .water-track:after { content:""; position:absolute; inset:0; border-radius:inherit; background:repeating-linear-gradient(120deg,transparent 0 13px,rgba(255,255,255,.16) 14px 16px,transparent 17px 27px); animation:river-flow 5s linear infinite; }
+  .water-track i { z-index:1; box-shadow:0 0 5px rgba(255,255,255,.9); animation:waterpark-wave 2s ease-in-out infinite; }
+  .ride-tube { box-shadow:inset 0 2px 3px rgba(255,255,255,.7),0 3px 6px rgba(15,23,42,.25); }
+  .ride-bowl { box-shadow:inset 0 4px 8px rgba(255,255,255,.24),0 4px 8px rgba(15,23,42,.2); }
+  .ride-art-family { background:linear-gradient(145deg,rgba(255,255,255,.16),rgba(120,53,15,.12)); }
+  .play-tower { box-shadow:0 4px 6px rgba(15,23,42,.2),inset 0 1px 0 rgba(255,255,255,.45); }
+  .play-splash i { animation:ride-splash 1.6s ease-in-out infinite; }
+  .play-splash i:nth-child(2) { animation-delay:.35s; }
+  .play-splash i:nth-child(3) { animation-delay:.7s; }
+}
+@keyframes pool-shimmer { to { transform:translateX(18px); } }
+@keyframes river-flow { to { background-position:42px 0; } }
+@media (prefers-reduced-motion:reduce) {
+  .pool-water:after,.water-track:after,.water-track i,.play-splash i { animation:none!important; }
+}
