@@ -2,161 +2,227 @@ import { getAttraction } from "./gameData";
 
 const MAX_AGENTS = 200;
 const FACILITY_CAPACITY = 60;
-
-function rand(min, max) {
-  return Math.random() * (max - min) + min;
-}
-
 const GUEST_PROFILES = [
-  { type: "Family", mood: [50, 78], hunger: [20, 50], budget: [70, 150] },
-  { type: "Thrill seeker", mood: [58, 88], hunger: [10, 40], budget: [60, 130] },
-  { type: "Relaxed guest", mood: [45, 75], hunger: [15, 45], budget: [80, 170] },
-  { type: "Premium guest", mood: [55, 82], hunger: [15, 40], budget: [120, 220] },
+  { type: "Family", group: "Family group", mood: [50, 78], hunger: [20, 50], thirst: [15, 45], energy: [55, 90], budget: [70, 150], patience: 62 },
+  { type: "Thrill seeker", group: "Friends group", mood: [58, 88], hunger: [10, 40], thirst: [15, 40], energy: [65, 100], budget: [60, 130], patience: 48 },
+  { type: "Relaxed guest", group: "Couple", mood: [45, 75], hunger: [15, 45], thirst: [20, 50], energy: [45, 80], budget: [80, 170], patience: 75 },
+  { type: "Premium guest", group: "VIP group", mood: [55, 82], hunger: [15, 40], thirst: [10, 35], energy: [60, 90], budget: [120, 220], patience: 68 },
+  { type: "Teen group", group: "Friends group", mood: [55, 85], hunger: [15, 45], thirst: [20, 55], energy: [70, 100], budget: [45, 100], patience: 42 },
 ];
+
+const clamp = (value, min = 0, max = 100) => Math.max(min, Math.min(max, value));
+const rand = (min, max) => Math.random() * (max - min) + min;
 
 function createGuest() {
   const profile = GUEST_PROFILES[Math.floor(Math.random() * GUEST_PROFILES.length)];
   return {
     type: profile.type,
-    mood: rand(profile.mood[0], profile.mood[1]),
-    hunger: rand(profile.hunger[0], profile.hunger[1]),
+    group: profile.group,
+    mood: rand(...profile.mood),
+    hunger: rand(...profile.hunger),
+    thirst: rand(...profile.thirst),
+    energy: rand(...profile.energy),
+    patience: profile.patience,
+    budget: rand(...profile.budget),
     spend: 0,
     visited: new Set(),
-    budget: rand(profile.budget[0], profile.budget[1]),
   };
 }
 
-function perVisitSpend(attr, level) {
-  const inc = attr.income * (1 + 0.15 * level);
-  const base = attr.capacity > 0 ? attr.capacity : FACILITY_CAPACITY;
-  return inc / base;
+function perVisitSpend(item, level) {
+  const attr = item.attr;
+  const income = attr.income * (1 + 0.15 * level);
+  return income / (attr.capacity > 0 ? attr.capacity : FACILITY_CAPACITY);
 }
 
-function popularity(attr, level) {
-  return attr.fun + level * 0.5;
-}
-
-function scoreAttraction(guest, p) {
-  const attr = p.attr;
-  let score = popularity(attr, p.level) * 0.4 + 1;
+function scoreDestination(guest, item) {
+  const attr = item.attr;
+  let score = Math.max(0.5, attr.fun * 0.4 + 1);
   if (attr.category === "facility") {
-    if (attr.id === "dining" || attr.id === "ice_cream" || attr.id === "coffee_bar") {
-      score += guest.hunger * 0.08;
-    }
-    if (guest.type === "Premium guest" && ["cabanas", "vip_lounge", "spa", "retail"].includes(attr.id)) score += 3;
-    score *= 0.85;
+    if (["dining", "ice_cream", "coffee_bar"].includes(attr.id)) score += guest.hunger * 0.075;
+    if (["drinking_fountain", "concessions"].includes(attr.id)) score += guest.thirst * 0.08;
+    if (["toilets", "lockers", "cabanas", "sun_lounge"].includes(attr.id)) score += (100 - guest.energy) * 0.045;
+    if (guest.type === "Premium guest" && ["cabanas", "vip_lounge", "spa", "retail"].includes(attr.id)) score += 4;
+    score *= 0.8;
   } else {
-    if (attr.fun >= 8 && guest.mood > 60) score += 2.5;
+    if (attr.fun >= 8 && guest.mood > 60) score += 2;
     if (guest.type === "Thrill seeker" && attr.fun >= 8) score += 4;
     if (guest.type === "Family" && ["kiddie_pool", "play_structure", "family_raft", "splash_pad", "soft_play", "lazy_river"].includes(attr.id)) score += 4;
-    if (guest.type === "Relaxed guest" && ["lazy_river", "flowrider", "sun_lounge", "lap_sports_pool"].includes(attr.id)) score += 3;
-    if (attr.fun <= 5 && (guest.mood < 45 || guest.hunger > 55)) score += 2;
+    if (guest.type === "Relaxed guest" && ["lazy_river", "sun_lounge", "lap_sports_pool"].includes(attr.id)) score += 3;
+    if (guest.type === "Teen group" && ["multi_racer", "speed_slide", "kamikaze", "aqua_loop", "flowrider"].includes(attr.id)) score += 3;
   }
-  if (p.overcrowded) score *= 0.6;
-  score *= 0.5 + guest.mood / 100;
-  return Math.max(0.1, score);
+  if (item.overcrowded) score *= 0.58;
+  return Math.max(0.1, score * (0.45 + guest.mood / 100));
 }
 
-function pickAttraction(guest, options) {
-  let total = 0;
-  const weights = options.map((o) => {
-    const w = scoreAttraction(guest, o);
-    total += w;
-    return w;
-  });
-  let r = Math.random() * total;
-  for (let i = 0; i < options.length; i++) {
-    r -= weights[i];
-    if (r <= 0) return options[i];
+function chooseDestination(guest, options) {
+  const weights = options.map((item) => scoreDestination(guest, item));
+  const total = weights.reduce((sum, value) => sum + value, 0);
+  let roll = Math.random() * total;
+  for (let index = 0; index < options.length; index += 1) {
+    roll -= weights[index];
+    if (roll <= 0) return options[index];
   }
   return options[options.length - 1];
 }
 
-export function simulateVisits({ demand, placedItems, incidents, uptime, safety, cleanliness, incomeMult, entertainment = 0, facilityBonus = 1 }) {
-  const empty = { income: 0, avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {}, guestTypes: {} };
-  if (demand <= 0 || !placedItems || placedItems.length === 0) return empty;
+export function simulateVisits({
+  demand,
+  placedItems,
+  incidents,
+  uptime,
+  safety,
+  cleanliness,
+  incomeMult,
+  entertainment = 0,
+  facilityBonus = 1,
+}) {
+  const empty = {
+    income: 0, avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0,
+    topAttraction: null, movements: {}, guestTypes: {}, queueStats: {},
+    spendingByCategory: { rides: 0, food: 0, retail: 0, premium: 0, other: 0 },
+    guestExperience: { happy: 0, content: 0, unhappy: 0 },
+    needs: { hunger: 0, thirst: 0, fatigue: 0 },
+    groupTypes: {},
+  };
+  if (demand <= 0 || !placedItems?.length) return empty;
 
   const options = placedItems
-    .filter((p) => incidents.get(p.idx)?.type !== "breakdown")
-    .map((p) => {
-      const inc = incidents.get(p.idx);
-      const cap = p.attr.capacity > 0 ? p.attr.capacity * (1 + 0.2 * p.level) : FACILITY_CAPACITY;
-      const capMult = inc?.type === "maintenance" ? 0.5 : 1;
-      return { ...p, cap: cap * capMult, load: 0, overcrowded: false };
+    .filter((item) => incidents.get(item.idx)?.type !== "breakdown")
+    .map((item) => {
+      const incident = incidents.get(item.idx);
+      const capacity = item.attr.capacity > 0
+        ? item.attr.capacity * (1 + 0.2 * item.level)
+        : FACILITY_CAPACITY;
+      return {
+        ...item,
+        cap: capacity * (incident?.type === "maintenance" ? 0.5 : 1),
+        load: 0,
+        overcrowded: false,
+        queueWait: 0,
+      };
     });
-
-  if (options.length === 0) return { ...empty, avgMood: 35 };
+  if (!options.length) return { ...empty, avgMood: 30, guestExperience: { happy: 0, content: 0, unhappy: demand } };
 
   const agentCount = Math.min(demand, MAX_AGENTS);
   const crowdScale = demand / agentCount;
-
   let totalSpend = 0;
   let totalMood = 0;
   let totalVisits = 0;
+  let finalHunger = 0;
+  let finalThirst = 0;
+  let finalFatigue = 0;
   const movements = {};
   const guestTypes = {};
+  const groupTypes = {};
+  const spendingByCategory = { ...empty.spendingByCategory };
+  const guestExperience = { happy: 0, content: 0, unhappy: 0 };
 
-  for (let a = 0; a < agentCount; a++) {
+  for (let agent = 0; agent < agentCount; agent += 1) {
     const guest = createGuest();
     guestTypes[guest.type] = (guestTypes[guest.type] || 0) + crowdScale;
-    const maxSteps = Math.floor(rand(3, 6));
-    for (let step = 0; step < maxSteps; step++) {
-      for (const o of options) o.overcrowded = o.load > o.cap * 0.85;
-      const avail = options.filter((o) => !guest.visited.has(o.idx) && o.load < o.cap);
-      if (avail.length === 0) break;
-      const pick = pickAttraction(guest, avail);
-      const price = perVisitSpend(pick.attr, pick.level) * (pick.attr.category === "facility" ? facilityBonus : 1);
+    groupTypes[guest.group] = (groupTypes[guest.group] || 0) + crowdScale;
+    const steps = Math.floor(rand(3, 7));
+
+    for (let step = 0; step < steps; step += 1) {
+      for (const item of options) {
+        item.overcrowded = item.load >= item.cap * 0.85;
+        item.queueWait = item.attr.category === "attraction"
+          ? Math.round((item.load / Math.max(1, item.cap)) * (item.attr.duration || 4) * 3)
+          : 0;
+      }
+      const available = options.filter((item) => !guest.visited.has(item.idx) && item.load < item.cap);
+      if (!available.length || guest.energy < 12 || guest.mood < 8) break;
+
+      const pick = chooseDestination(guest, available);
+      const attr = pick.attr;
+      const price = perVisitSpend(pick, pick.level) *
+        (attr.category === "facility" ? facilityBonus : 1);
       if (guest.spend + price > guest.budget) break;
+
       guest.spend += price;
       guest.visited.add(pick.idx);
       pick.load += crowdScale;
       totalSpend += price * crowdScale;
       totalVisits += crowdScale;
-      movements[pick.attr.id] = (movements[pick.attr.id] || 0) + crowdScale;
+      movements[attr.id] = (movements[attr.id] || 0) + crowdScale;
 
-      const attr = pick.attr;
       if (attr.category === "attraction") {
-        const funGain = attr.fun + pick.level * 0.5;
-        guest.mood += (funGain - 5) * 0.8;
+        spendingByCategory.rides += price * crowdScale;
+        guest.mood += (attr.fun + pick.level * 0.5 - 5) * 0.8;
+        guest.energy -= rand(7, 13);
         guest.hunger += 7;
-      } else if (attr.id === "dining" || attr.id === "ice_cream" || attr.id === "coffee_bar") {
-        guest.hunger = Math.max(0, guest.hunger - 35);
+        guest.thirst += 10;
+      } else if (["dining", "ice_cream", "coffee_bar", "concessions"].includes(attr.id)) {
+        spendingByCategory.food += price * crowdScale;
+        guest.hunger = Math.max(0, guest.hunger - 38);
+        guest.thirst = Math.max(0, guest.thirst - (attr.id === "concessions" ? 22 : 8));
         guest.mood += 3;
-        guest.hunger += 4;
+        guest.energy += 3;
+      } else if (["retail", "gift_shop", "photo_kiosk"].includes(attr.id)) {
+        spendingByCategory.retail += price * crowdScale;
+        guest.mood += 2;
+      } else if (["cabanas", "vip_lounge", "spa"].includes(attr.id)) {
+        spendingByCategory.premium += price * crowdScale;
+        guest.mood += 4;
+        guest.energy += 8;
       } else {
+        spendingByCategory.other += price * crowdScale;
         guest.mood += 1.5;
-        guest.hunger += 4;
+        guest.energy += 5;
       }
+
+      guest.hunger = clamp(guest.hunger + 3);
+      guest.thirst = clamp(guest.thirst + 4);
+      guest.energy = clamp(guest.energy, 0, 100);
+      guest.mood += (safety - 0.7) * 6 + (cleanliness - 0.6) * 5 + entertainment;
       if (pick.overcrowded) guest.mood -= 2;
+      if (pick.queueWait > guest.patience / 5) guest.mood -= 3;
       if (guest.hunger > 80) guest.mood -= 4;
-      guest.mood += (safety - 0.7) * 6;
-      guest.mood += (cleanliness - 0.6) * 5;
-      guest.mood += entertainment;
-      guest.mood = Math.max(0, Math.min(100, guest.mood));
+      if (guest.thirst > 80) guest.mood -= 5;
+      if (guest.energy < 25) guest.mood -= 3;
+      guest.mood = clamp(guest.mood);
     }
+
     totalMood += guest.mood;
+    finalHunger += guest.hunger;
+    finalThirst += guest.thirst;
+    finalFatigue += 100 - guest.energy;
+    if (guest.mood >= 70) guestExperience.happy += crowdScale;
+    else if (guest.mood >= 45) guestExperience.content += crowdScale;
+    else guestExperience.unhappy += crowdScale;
   }
 
-  const income = totalSpend * uptime * incomeMult;
+  const queueStats = {};
+  let longestQueue = { id: null, wait: 0, guests: 0 };
+  for (const item of options) {
+    if (item.attr.category !== "attraction") continue;
+    const guestsInQueue = Math.max(0, Math.round(item.load - item.cap * 0.55));
+    const wait = Math.min(90, Math.round((item.load / Math.max(1, item.cap)) * (item.attr.duration || 4) * 3));
+    queueStats[item.idx] = { id: item.attr.id, guests: guestsInQueue, wait, load: Math.round(item.load), capacity: Math.round(item.cap) };
+    if (wait > longestQueue.wait) longestQueue = { id: item.attr.id, wait, guests: guestsInQueue };
+  }
+
   const avgMood = totalMood / agentCount;
   const avgSpendPerVisit = totalVisits > 0 ? totalSpend / totalVisits : 0;
-  let topId = null;
-  let topCount = 0;
-  for (const [id, c] of Object.entries(movements)) {
-    if (c > topCount) {
-      topCount = c;
-      topId = id;
-    }
-  }
-  const topAttraction = topId ? getAttraction(topId) : null;
-
+  const topId = Object.entries(movements).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
   return {
-    income,
+    income: totalSpend * uptime * incomeMult,
     avgMood,
     avgSpendPerVisit,
     totalVisits: Math.round(totalVisits),
-    topAttraction,
+    topAttraction: topId ? getAttraction(topId) : null,
     movements,
     guestTypes,
+    groupTypes,
+    queueStats,
+    longestQueue,
+    spendingByCategory,
+    guestExperience,
+    needs: {
+      hunger: Math.round(finalHunger / agentCount),
+      thirst: Math.round(finalThirst / agentCount),
+      fatigue: Math.round(finalFatigue / agentCount),
+    },
   };
 }
