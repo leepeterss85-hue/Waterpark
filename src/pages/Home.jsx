@@ -126,7 +126,7 @@ export default function Home() {
           <div className="flex min-w-0 flex-col gap-4">
             <ChallengeBanner challenge={game.challenge} />
             <ExpansionPanel gridSize={game.gridSize} expansionsDone={game.expansionsDone} level={game.level} money={game.money} onExpand={game.expandPark} />
-            <ParkGrid grid={game.grid} parkZones={game.parkZones} upgrades={game.upgrades} selectedBuild={game.selectedBuild} selectedTile={game.selectedTile} selectedZone={game.selectedZone} incidents={game.incidents} guests={game.guests} visitorMovements={game.visitorStats?.movements} queueStats={game.visitorStats?.queueStats} staff={game.staff} staffAssignments={game.staffAssignments} lifeguardTotal={game.staff?.lifeguard || 0} day={game.day} weather={game.weather} seasonEvent={game.seasonEvent} onTileClick={game.handleTileClick} />
+            <ParkGrid grid={game.grid} parkZones={game.parkZones} upgrades={game.upgrades} selectedBuild={game.selectedBuild} selectedTile={game.selectedTile} selectedZone={game.selectedZone} incidents={game.incidents} guests={game.guests} visitorMovements={game.visitorStats?.movements} queueStats={game.visitorStats?.queueStats} attractionCondition={game.attractionCondition} staff={game.staff} staffAssignments={game.staffAssignments} lifeguardTotal={game.staff?.lifeguard || 0} day={game.day} weather={game.weather} seasonEvent={game.seasonEvent} onTileClick={game.handleTileClick} />
             <EventLog log={game.log} issueCount={game.incidents.length} />
             <VisitorInsights visitorStats={game.visitorStats} />
             <MissionsPanel level={game.level} xp={game.xp} xpForNext={game.xpForNext} missionState={game.missionState} claimedMissions={game.claimedMissions} onClaim={game.claimMission} />
@@ -147,6 +147,7 @@ export default function Home() {
                   level={game.upgrades[game.selectedTile] || 0}
                   money={game.money}
                   incident={game.incidents.find((x) => x.tileIndex === game.selectedTile) || null}
+                  condition={game.attractionCondition?.[game.selectedTile] ?? 100}
                   guests={game.guests}
                   queueWait={selectedItem?.capacity ? Math.min(45, Math.round(Math.max(0, ((game.visitorStats?.movements?.[selectedAttrId] || 0) / (selectedItem.capacity * 1.4) - 0.35) * 18))) : 0}
                   lifeguards={game.staff?.lifeguard || 0}
