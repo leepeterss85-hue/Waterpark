@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Footprints, Users, Map, Sparkles } from "lucide-react";
+import { Footprints, Users, Map as MapIcon, Sparkles } from "lucide-react";
 import { getParkItem } from "@/data/gameData";
 import Tile from "./Tile";
 import GuestLayer from "./GuestLayer";
@@ -12,7 +12,7 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
     <section className="game-board-shell">
       <div className="game-board-titlebar">
         <div className="flex min-w-0 items-center gap-3">
-          <div className="game-board-icon"><Map className="h-5 w-5" /></div>
+          <div className="game-board-icon"><MapIcon className="h-5 w-5" /></div>
           <div className="min-w-0">
             <div className="flex items-center gap-2"><h2 className="font-display text-base font-black text-white sm:text-lg">Your Water Park</h2><span className="game-live-pill"><span /> LIVE</span></div>
             <p className="hidden text-[10px] font-bold text-white/60 sm:block">Build, decorate and manage your resort.</p>

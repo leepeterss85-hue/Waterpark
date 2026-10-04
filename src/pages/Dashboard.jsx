@@ -10,6 +10,7 @@ import AttractionBreakdown from "@/components/dashboard/AttractionBreakdown";
 import VisitorGrowthChart from "@/components/dashboard/VisitorGrowthChart";
 import AchievementsGallery from "@/components/dashboard/AchievementsGallery";
 import LayoutAnalytics from "@/components/dashboard/LayoutAnalytics";
+import PlayerActivityFeed from "@/components/dashboard/PlayerActivityFeed";
 
 export default function Dashboard() {
   const game = useGameState();
@@ -35,6 +36,7 @@ export default function Dashboard() {
           <AttractionBreakdown grid={game.grid} />
         </div>
         <div className="mt-5"><LayoutAnalytics grid={game.grid} history={game.history} peakGuests={game.peakGuests} lifetimeEarnings={game.lifetimeEarnings} reputation={game.reputation} guests={game.guests} day={game.day} /></div>
+        <div className="mt-5"><PlayerActivityFeed /></div>
         <div className="mt-5"><AchievementsGallery achievementState={game.achievementState} /></div>
       </main>
     </div>

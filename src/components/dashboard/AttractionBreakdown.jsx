@@ -16,14 +16,17 @@ export default function AttractionBreakdown({ grid }) {
   grid.filter(Boolean).forEach((id) => {
     counts[id] = (counts[id] || 0) + 1;
   });
-  const data = Object.entries(counts).map(([id, count]) => {
-    const a = getAttraction(id);
-    return {
-      name: a.name.split(" ")[0],
-      income: a.income * count,
-      upkeep: a.maintenance * count,
-    };
-  });
+  const data = Object.entries(counts)
+    .map(([id, count]) => {
+      const a = getAttraction(id);
+      if (!a) return null;
+      return {
+        name: a.name.split(" ")[0],
+        income: a.income * count,
+        upkeep: a.maintenance * count,
+      };
+    })
+    .filter(Boolean);
   return (
     <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
       <h3 className="mb-1 font-display text-lg font-bold text-slate-800">Attraction Performance</h3>

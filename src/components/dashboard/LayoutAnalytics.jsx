@@ -9,7 +9,7 @@ import {
   CartesianGrid,
   Legend,
 } from "recharts";
-import { LayoutGrid } from "lucide-react";
+import { LayoutGrid, Medal } from "lucide-react";
 import { getAttraction } from "@/data/gameData";
 
 const SLOTS_KEY = "waterpark-tycoon-slots";
@@ -79,6 +79,17 @@ export default function LayoutAnalytics({
     "Avg Daily Guests": l.avgGuests,
   }));
 
+  const scored = useMemo(
+    () =>
+      layouts
+        .map((l) => ({
+          ...l,
+          score: l.avgIncome * 10 + l.peakGuests * 2 + l.reputation * 5,
+        }))
+        .sort((a, b) => b.score - a.score),
+    [layouts]
+  );
+  const best = scored[0];
   const onlyCurrent = layouts.length <= 1;
 
   return (
@@ -98,6 +109,18 @@ export default function LayoutAnalytics({
         </div>
       )}
 
+      {!onlyCurrent && best && (
+        <div className="mb-4 flex items-center gap-3 rounded-xl bg-gradient-to-r from-amber-50 to-emerald-50 p-4 ring-1 ring-amber-100">
+          <Medal className="h-6 w-6 shrink-0 text-amber-500" />
+          <div className="min-w-0">
+            <div className="text-sm font-bold text-slate-800">Best performing layout: {best.name}</div>
+            <div className="text-xs text-slate-500">
+              ${best.avgIncome.toLocaleString()}/day avg · {best.peakGuests.toLocaleString()} peak guests · {best.reputation}% reputation
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] text-sm">
           <thead>
@@ -112,10 +135,15 @@ export default function LayoutAnalytics({
             </tr>
           </thead>
           <tbody>
-            {layouts.map((l) => (
-              <tr key={l.name} className="border-t border-slate-100">
+            {scored.map((l, rank) => {
+              const isBest = !onlyCurrent && l.name === best.name;
+              return (
+              <tr key={l.name} className={`border-t border-slate-100 ${isBest ? "bg-amber-50/60" : ""}`}>
                 <td className="py-2.5 pr-3 font-semibold text-slate-700">
-                  {l.name}
+                  <span className="flex items-center gap-1.5">
+                    {rank === 0 && !onlyCurrent && <Medal className="h-4 w-4 text-amber-500" />}
+                    {l.name}
+                  </span>
                   <span className="block text-[11px] font-normal text-slate-400">
                     Day {l.day}
                   </span>
@@ -140,7 +168,8 @@ export default function LayoutAnalytics({
                   ${l.lifetimeEarnings.toLocaleString()}
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>

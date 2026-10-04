@@ -8,6 +8,7 @@ import { WEATHER, getSeason, rollWeather, rollSeasonEvent } from "@/data/parkSys
 import { MISSIONS, missionProgress } from "@/data/missions";
 import { rollChallenge } from "@/data/challenges";
 import { simulateVisits } from "@/data/visitorLogic";
+import { trackEvent } from "@/lib/gameAnalytics";
 
 const STORAGE_KEY = "waterpark-tycoon-save-v1";
 const SLOTS_KEY = "waterpark-tycoon-slots";
@@ -415,6 +416,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       if (attr.category === "attraction") {
         setBuiltAttractionIds((ids) => (ids.includes(selectedBuild) ? ids : [...ids, selectedBuild]));
       }
+      trackEvent("attraction_built", { id: selectedBuild, category: attr.category, cost: attr.cost });
     },
     [selectedBuild, money]
   );
@@ -461,6 +463,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       ng[index] = null;
       return ng;
     });
+    trackEvent("attraction_sold", { id: grid[index] });
     setSelectedTile(null);
   }, []);
 
@@ -482,16 +485,19 @@ const [selectedZone, setSelectedZone] = useState(null);
       setMoney((m) => m - cost);
       setTotalUpgrades((t) => t + 1);
       setXp((x) => x + 15);
+      trackEvent("attraction_upgraded", { id, level: level + 1, cost });
     },
     [grid, upgrades, money]
   );
 
   const hireStaff = useCallback((type) => {
     setStaff((s) => ({ ...s, [type]: (s[type] || 0) + 1 }));
+    trackEvent("staff_hired", { type });
   }, []);
 
   const fireStaff = useCallback((type) => {
     setStaff((s) => ({ ...s, [type]: Math.max(0, (s[type] || 0) - 1) }));
+    trackEvent("staff_fired", { type });
   }, []);
 
   const expandPark = useCallback(() => {
@@ -504,6 +510,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setUpgrades((u) => [...u, ...Array(EXPAND_ROW).fill(0)]);
     setMoney((m) => m - cost);
     setExpansionsDone((e) => e + 1);
+    trackEvent("park_expanded", { expansions: expansionsDone + 1, cost });
   }, [expansionsDone, level, money]);
 
   const chooseBuild = useCallback((id) => {
@@ -547,6 +554,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       setMoney((m) => m + mission.reward.money);
       setXp((x) => x + mission.reward.xp);
       setClaimedMissions((c) => [...c, id]);
+      trackEvent("mission_claimed", { id, money: mission.reward.money, xp: mission.reward.xp });
     },
     [claimedMissions, level, grid, upgrades, peakGuests, money, reputation, day, staff, totalUpgrades, expansionsDone]
   );
@@ -588,6 +596,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       };
       writeSlots(slots);
       setSaves(Object.entries(slots).map(([n, s]) => slotMeta(n, s)));
+      trackEvent("park_saved", { name: trimmed });
       return true;
     },
     [money, day, reputation, guests, grid, parkZones, history, staff, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass]
@@ -627,6 +636,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setPlaying(false);
     setSelectedBuild(null);
     setSelectedTile(null);
+    trackEvent("park_loaded", { name });
   }, []);
 
   const deleteSave = useCallback((name) => {
@@ -668,6 +678,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setLifetimeEarnings(0);
     setBuiltAttractionIds([]);
     setVisitorStats({ avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {}, guestTypes: {} });
+    trackEvent("park_reset");
   }, []);
 
   return {
