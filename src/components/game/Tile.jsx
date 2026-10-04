@@ -54,7 +54,7 @@ function FacilityArtwork({ attr }) {
   const labels = {
     dining:"FOOD", cabanas:"CABANAS", lockers:"LOCKERS", retail:"SHOP", first_aid:"FIRST AID",
     sun_lounge:"LOUNGE", ice_cream:"ICE CREAM", coffee_bar:"CAFÉ", gym:"GYM", spa:"SPA",
-    arcade:"ARCADE", vip_lounge:"VIP", party_room:"PARTY", photo_kiosk:"PHOTO"
+    arcade:"ARCADE", vip_lounge:"VIP", party_room:"PARTY", photo_kiosk:"PHOTO", toilets:"TOILETS", lifeguard_station:"LIFEGUARD"
   };
   return <div className={"facility-art facility-" + id}>
     <div className="facility-roof" />
@@ -66,7 +66,7 @@ function FacilityArtwork({ attr }) {
     <div className="facility-sign">{labels[id] || "PARK"}</div>
     {id === "dining" || id === "ice_cream" || id === "coffee_bar" ? <div className="facility-table"><i /><i /><i /></div> : null}
     {id === "cabanas" || id === "sun_lounge" ? <div className="facility-umbrella">☂</div> : null}
-    {id === "arcade" ? <div className="facility-lights"><i /><i /><i /></div> : null}
+    {id === "arcade" ? <div className="facility-lights"><i /><i /><i /></div> : null}\n    {id === "toilets" ? <div className="facility-lockers"><i /><i /><i /><i /></div> : null}\n    {id === "lifeguard_station" ? <div className="lifeguard-flag"><span>+</span></div> : null}
   </div>;
 }
 
@@ -123,7 +123,7 @@ function AttractionMark({ attr }) {
   </div>;
 }
 
-export default function Tile({ value, index, grid, zone, upgradeLevel = 0, selectedBuild, isSelected, incident, queueWait, queueConnected, onClick }) {
+export default function Tile({ value, index, grid, zone, upgradeLevel = 0, selectedBuild, isSelected, incident, queueWait, queueConnected, movement = 0, onClick }) {
   const attr = value ? getParkItem(value) : null;
   const canPlace = !attr && selectedBuild;
   const isWater = attr?.category === "attraction";
@@ -133,7 +133,7 @@ export default function Tile({ value, index, grid, zone, upgradeLevel = 0, selec
     {attr?.category === "environment" ? <ParkObject attr={attr} grid={grid} index={index} /> : attr?.category === "facility" ? <div className={"absolute inset-0 overflow-hidden rounded-[16px] bg-gradient-to-br " + attr.color}><FacilityArtwork attr={attr} /><div className="relative z-20 flex h-full items-end justify-center pb-1"><span className="rounded-md bg-slate-950/50 px-1.5 py-0.5 text-[7px] font-extrabold uppercase tracking-wide text-white shadow">{attr.name}</span></div></div> : attr ? <AttractionMark attr={attr} /> : null}
     {canPlace && <div className="relative z-10 flex h-full flex-col items-center justify-center gap-1"><div className="grid h-8 w-8 place-items-center rounded-full bg-white shadow-sm ring-1 ring-cyan-200"><span className="text-xl font-light text-cyan-500">+</span></div><span className="text-[8px] font-extrabold uppercase tracking-wider text-cyan-700">Build</span></div>}
     {zoneTint && <div className={"pointer-events-none absolute inset-0 z-10 rounded-[15px] ring-2 " + zoneTint} />}
-    {isWater && <><div className="absolute left-1 top-1 z-20 rounded bg-white/80 px-1 py-0.5 text-[6px] font-black text-slate-700">IN</div><div className="absolute right-1 bottom-1 z-20 rounded bg-black/45 px-1 py-0.5 text-[6px] font-black text-white">OUT</div>{queueWait > 0 && <div className="absolute bottom-1 left-1 z-20 rounded-md bg-black/60 px-1.5 py-0.5 text-[7px] font-black text-white">{queueWait}m wait</div>}{queueConnected === false && <div className="absolute left-1/2 top-1 z-20 -translate-x-1/2 rounded bg-amber-100 px-1 py-0.5 text-[6px] font-black text-amber-800">ADD QUEUE</div>}</>}
+{isWater && <><div className="absolute left-1 top-1 z-20 rounded bg-white/80 px-1 py-0.5 text-[6px] font-black text-slate-700">IN</div><div className="absolute right-1 bottom-1 z-20 rounded bg-black/45 px-1 py-0.5 text-[6px] font-black text-white">OUT</div>{queueWait > 0 && <div className="absolute bottom-1 left-1 z-20 rounded-md bg-black/60 px-1.5 py-0.5 text-[7px] font-black text-white">{queueWait}m wait</div>}{queueConnected === false && <div className="absolute left-1/2 top-1 z-20 -translate-x-1/2 rounded bg-amber-100 px-1 py-0.5 text-[6px] font-black text-amber-800">ADD QUEUE</div>}<div className={"absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 rounded-full px-1.5 py-0.5 text-[6px] font-black shadow " + (incident?.type === "breakdown" ? "bg-rose-600 text-white" : incident?.type === "maintenance" ? "bg-amber-400 text-slate-900" : movement > (attr.capacity || 1) * 0.8 ? "bg-orange-500 text-white" : "bg-emerald-500/90 text-white")}>{incident?.type === "breakdown" ? "CLOSED" : incident?.type === "maintenance" ? "MAINT" : movement > (attr.capacity || 1) * 0.8 ? "BUSY" : "OPEN"}</div></>}
     {incident && <span className={"absolute right-1.5 top-1.5 z-20 grid h-6 w-6 place-items-center rounded-full border-2 border-white text-white shadow-lg " + (incident.type === "breakdown" ? "animate-pulse bg-rose-500" : "bg-amber-500")}>{incident.type === "breakdown" ? <Wrench className="h-3 w-3" /> : <Sparkles className="h-3 w-3" />}</span>}
     {!attr && !canPlace && <span className="absolute bottom-1.5 left-1.5 text-[7px] font-bold uppercase tracking-wider text-emerald-900/35"><Footprints className="inline h-2.5 w-2.5" /></span>}
     {attr?.id === "sun_lounge" && <span className="absolute bottom-1 left-1 grid h-4 w-4 place-items-center rounded-full bg-white/25"><Umbrella className="h-2.5 w-2.5 text-white" /></span>}
