@@ -6,6 +6,7 @@ import {
 } from "@/data/gameData";
 import { MISSIONS, missionProgress } from "@/data/missions";
 import { rollChallenge } from "@/data/challenges";
+import { simulateVisits } from "@/data/visitorLogic";
 
 const STORAGE_KEY = "waterpark-tycoon-save-v1";
 const SLOTS_KEY = "waterpark-tycoon-slots";
@@ -66,6 +67,7 @@ export function useGameState() {
   const [challenge, setChallenge] = useState(null);
   const [lifetimeEarnings, setLifetimeEarnings] = useState(0);
   const [builtAttractionIds, setBuiltAttractionIds] = useState([]);
+  const [visitorStats, setVisitorStats] = useState({ avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null });
 
   const level = levelFromXp(xp);
   const gridSize = grid.length;
@@ -93,6 +95,7 @@ export function useGameState() {
         if (data.challenge) setChallenge(data.challenge);
         if (data.lifetimeEarnings != null) setLifetimeEarnings(data.lifetimeEarnings);
         if (data.builtAttractionIds) setBuiltAttractionIds(data.builtAttractionIds);
+        if (data.visitorStats) setVisitorStats(data.visitorStats);
       }
     } catch {
       /* ignore */
@@ -105,14 +108,14 @@ export function useGameState() {
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, grid, history, staff, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds })
+          JSON.stringify({ money, day, reputation, grid, history, staff, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats })
         );
       } catch {
         /* ignore */
       }
     }, 300);
     return () => clearTimeout(t);
-  }, [money, day, reputation, grid, history, staff, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds]);
+  }, [money, day, reputation, grid, history, staff, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats]);
 
   // Load save slots list on mount
   useEffect(() => {
@@ -154,7 +157,7 @@ export function useGameState() {
     }
     const incidentByTile = new Map(remaining.map((i) => [i.tileIndex, i]));
 
-    // --- Guests & income: broken attractions take no riders ---
+    // --- Guests & income: agent-based visitor simulation ---
     const workingAttractions = attractions.filter(
       (p) => incidentByTile.get(p.idx)?.type !== "breakdown"
     );
@@ -163,43 +166,36 @@ export function useGameState() {
     let newGuests = 0;
     let income = 0;
     let newReputation = rep;
+    let visitorStats = { avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null };
 
     if (attractions.length > 0) {
       const demand = Math.floor(
         (rep / 100) * totalCapacity * 1.15 * (1 + d / 80) * (eff.guestMult ?? 1)
       );
       newGuests = Math.min(demand, totalCapacity);
-      const fillRatio = totalCapacity > 0 ? newGuests / totalCapacity : 0;
-      const attractionIncome =
-        attractions.reduce((s, p) => {
-          const inc = incidentByTile.get(p.idx);
-          let mult = 1;
-          if (inc?.type === "breakdown") mult = 0;
-          else if (inc?.type === "maintenance") mult = 0.5;
-          return s + incOf(p) * fillRatio * mult;
-        }, 0) * uptime;
-      const facilityIncome = facilities.reduce(
-        (s, f) => s + incOf(f) * Math.min(1, newGuests / 60),
-        0
-      );
-      income = (attractionIncome + facilityIncome) * (eff.incomeMult ?? 1);
 
-      const avgFun =
-        totalCapacity > 0
-          ? workingAttractions.reduce((s, p) => s + funOf(p) * capOf(p), 0) /
-            totalCapacity
-          : 0;
-      const overcrowded = newGuests > totalCapacity * 0.85;
+      const sim = simulateVisits({
+        demand: newGuests,
+        placedItems,
+        incidents: incidentByTile,
+        uptime,
+        safety,
+        cleanliness,
+        incomeMult: eff.incomeMult ?? 1,
+      });
+      income = sim.income;
+      visitorStats = sim;
+
+      const avgMood = sim.avgMood;
       let repDelta = 0;
-      if (avgFun >= 7) repDelta += 1.5;
-      else if (avgFun < 4) repDelta -= 1;
-      if (overcrowded) repDelta -= 2 * (1 - safety);
+      if (avgMood >= 70) repDelta += 1.5;
+      else if (avgMood < 40) repDelta -= 1.5;
+      else if (avgMood < 55) repDelta -= 0.5;
       if (facilities.some((f) => f.attr.id === "first_aid")) repDelta += 0.5;
       if (facilities.some((f) => f.attr.id === "dining")) repDelta += 0.5;
       if (facilities.some((f) => f.attr.id === "lockers")) repDelta += 0.3;
       repDelta += (cleanliness - 0.6) * 1.5;
       repDelta += (safety - 0.7) * 0.8;
-      // ongoing incident reputation drain
       repDelta -= remaining.reduce(
         (s, inc) => s + (inc.type === "breakdown" ? 1.2 : 0.6),
         0
@@ -268,6 +264,7 @@ export function useGameState() {
     setDay((x) => x + 1);
     setGuests(newGuests);
     setPeakGuests((p) => Math.max(p, newGuests));
+    setVisitorStats(visitorStats);
     setLifetimeEarnings((e) => e + Math.round(income));
     setReputation(Math.round(newReputation));
     setLastNet(net);
@@ -450,13 +447,14 @@ export function useGameState() {
         challenge,
         lifetimeEarnings,
         builtAttractionIds,
+        visitorStats,
         savedAt: new Date().toISOString(),
       };
       writeSlots(slots);
       setSaves(Object.entries(slots).map(([n, s]) => slotMeta(n, s)));
       return true;
     },
-    [money, day, reputation, guests, grid, history, staff, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds]
+    [money, day, reputation, guests, grid, history, staff, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats]
   );
 
   const loadPark = useCallback((name) => {
@@ -480,6 +478,7 @@ export function useGameState() {
     setChallenge(data.challenge ?? null);
     setLifetimeEarnings(data.lifetimeEarnings ?? 0);
     setBuiltAttractionIds(data.builtAttractionIds ?? []);
+    setVisitorStats(data.visitorStats ?? { avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null });
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
     setLastNet(data.lastNet ?? 0);
     setPlaying(false);
@@ -517,6 +516,7 @@ export function useGameState() {
     setChallenge(null);
     setLifetimeEarnings(0);
     setBuiltAttractionIds([]);
+    setVisitorStats({ avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null });
   }, []);
 
   return {
@@ -549,6 +549,7 @@ export function useGameState() {
     claimMission,
     challenge,
     lifetimeEarnings,
+    visitorStats,
     builtCount: builtAttractionIds.length,
     achievementState: {
       peakGuests,

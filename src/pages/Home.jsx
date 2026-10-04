@@ -14,6 +14,7 @@ import SaveLoadPanel from "@/components/game/SaveLoadPanel";
 import ExpansionPanel from "@/components/game/ExpansionPanel";
 import MissionsPanel from "@/components/game/MissionsPanel";
 import ChallengeBanner from "@/components/game/ChallengeBanner";
+import VisitorInsights from "@/components/game/VisitorInsights";
 import { TileDetailPanel } from "@/components/game/TileDetail";
 import { getAttraction } from "@/data/gameData";
 
@@ -114,6 +115,7 @@ export default function Home() {
               onTileClick={game.handleTileClick}
             />
             <EventLog log={game.log} issueCount={game.incidents.length} />
+            <VisitorInsights visitorStats={game.visitorStats} />
             <MissionsPanel
               level={game.level}
               xp={game.xp}
