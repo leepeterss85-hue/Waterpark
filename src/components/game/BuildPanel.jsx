@@ -1,16 +1,16 @@
 import React, { useMemo, useState } from "react";
 import { Search, Waves, Utensils, Check, LockKeyhole } from "lucide-react";
-import { ATTRACTIONS, PARK_OBJECTS, CATEGORIES } from "@/data/gameData";
+import { ATTRACTIONS, PARK_OBJECTS, CATEGORIES, unlockLevelFor } from "@/data/gameData";
 import { getIcon } from "./icons";
 
-function BuildCard({ item, selected, affordable, onSelect }) {
+function BuildCard({ item, selected, affordable, unlocked, onSelect }) {
   const Icon = getIcon(item.icon);
   const isWater = item.category === "attraction";
   const isEnvironment = item.category === "environment";
   return (
     <button
       onClick={() => onSelect(selected ? null : item.id)}
-      disabled={!affordable && !selected}
+      disabled={(!affordable || !unlocked) && !selected}
       className={
         "group w-full rounded-xl border p-2 text-left transition-all duration-200 " +
         (selected
@@ -19,7 +19,7 @@ function BuildCard({ item, selected, affordable, onSelect }) {
           ? "border-slate-200 bg-white text-slate-700 shadow-sm hover:-translate-y-0.5 hover:border-cyan-200 hover:shadow-md"
           : "cursor-not-allowed border-slate-100 bg-slate-50 text-slate-300")
       }
-      title={!affordable && !selected ? "You need more cash" : item.description}
+      title={!unlocked ? "Unlocks at a higher park level" : !affordable && !selected ? "You need more cash" : item.description}
     >
       <div className="flex items-start gap-3">
         <div className={"relative grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-lg bg-gradient-to-br " + item.color}>
@@ -34,9 +34,10 @@ function BuildCard({ item, selected, affordable, onSelect }) {
                 {isWater ? "Water attraction" : isEnvironment ? "Park essential" : "Park facility"}
               </div>
             </div>
-            {selected ? <Check className="h-4 w-4 shrink-0 text-cyan-300" /> : !affordable ? <LockKeyhole className="h-4 w-4 shrink-0 text-slate-300" /> : null}
+            {selected ? <Check className="h-4 w-4 shrink-0 text-cyan-300" /> : !unlocked ? <LockKeyhole className="h-4 w-4 shrink-0 text-amber-400" /> : !affordable ? <LockKeyhole className="h-4 w-4 shrink-0 text-slate-300" /> : null}
           </div>
           <div className={"mt-1 text-[11px] font-extrabold " + (selected ? "text-white" : "text-slate-800")}>
+            {!unlocked && <div className="mb-1 text-[8px] font-black uppercase tracking-wider text-amber-600">Unlocks at Level {unlockLevelFor(item)}</div>}
             ${item.cost.toLocaleString()}
           </div>
           <div className={"mt-1 line-clamp-2 text-[9px] leading-3.5 " + (selected ? "text-slate-300" : "text-slate-500")}>
@@ -48,7 +49,7 @@ function BuildCard({ item, selected, affordable, onSelect }) {
   );
 }
 
-export default function BuildPanel({ money, selectedBuild, onSelect }) {
+export default function BuildPanel({ money, level = 1, selectedBuild, onSelect }) {
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState({ attraction: true, facility: false, environment: false });
   const filtered = useMemo(() => {
@@ -83,7 +84,7 @@ export default function BuildPanel({ money, selectedBuild, onSelect }) {
               <span className="flex items-center gap-2 text-[9px] font-semibold text-slate-400">{items.length} <span className="text-sm">{expanded[cat.id] ? "−" : "+"}</span></span>
             </button>
             {expanded[cat.id] && <div className="grid grid-cols-2 gap-2">
-              {items.map((item) => <BuildCard key={item.id} item={item} selected={selectedBuild === item.id} affordable={money >= item.cost} onSelect={onSelect} />)}
+              {items.map((item) => <BuildCard key={item.id} item={item} selected={selectedBuild === item.id} affordable={money >= item.cost} unlocked={level >= unlockLevelFor(item)} onSelect={onSelect} />)}
             </div>}
           </div>
         );
