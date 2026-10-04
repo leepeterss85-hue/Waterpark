@@ -23,7 +23,7 @@ const ZONE_TINT = {
 };
 
 function ConnectedLine({ grid, index, kind }) {
-  const same = (i) => grid[i]?.id === kind;
+  const same = (i) => grid[i] === kind;
   const row = Math.floor(index / 8), col = index % 8;
   const up = row > 0 && same(index - 8), down = row < Math.ceil(grid.length / 8) - 1 && same(index + 8);
   const left = col > 0 && same(index - 1), right = col < 7 && same(index + 1);
