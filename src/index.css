@@ -682,3 +682,82 @@
 @media (max-width:640px) {
   .game-board-frame{padding:7px}.game-map-surface{padding:8px!important;border-radius:19px!important}.game-map-grid{gap:4px!important}.game-map-grid>button{border-radius:11px!important}.game-board-titlebar{min-height:60px}.waterpark-panel{border-radius:19px!important}
 }
+
+/* === Premium map terrain pass === */
+@layer components {
+  .game-map-surface {
+    min-height: 360px;
+    background:
+      radial-gradient(ellipse at 9% 8%,rgba(255,255,255,.30) 0 5%,transparent 12%),
+      radial-gradient(ellipse at 93% 92%,rgba(30,88,46,.22) 0 7%,transparent 17%),
+      radial-gradient(ellipse at 70% 24%,rgba(255,255,255,.09) 0 8%,transparent 20%),
+      linear-gradient(135deg,#9ac77c 0%,#78b064 42%,#6aa35b 100%) !important;
+  }
+  .game-map-surface:after {
+    content:"";
+    position:absolute; inset:0; pointer-events:none; z-index:1;
+    background:
+      radial-gradient(circle at 18% 32%,rgba(255,255,255,.13) 0 2px,transparent 3px),
+      radial-gradient(circle at 83% 61%,rgba(255,255,255,.10) 0 2px,transparent 3px),
+      radial-gradient(circle at 54% 88%,rgba(22,101,52,.10) 0 2px,transparent 3px),
+      repeating-linear-gradient(28deg,transparent 0 58px,rgba(255,255,255,.025) 59px 60px);
+    opacity:.9;
+  }
+  .game-map-grid {
+    position:relative;
+    z-index:8;
+    gap:4px !important;
+    filter:drop-shadow(0 16px 16px rgba(25,73,37,.12));
+  }
+  .game-map-grid > button {
+    border-color:rgba(255,255,255,.18) !important;
+    box-shadow:0 2px 5px rgba(25,63,37,.08) !important;
+    background:rgba(145,190,112,.18) !important;
+  }
+  .game-map-grid > button:not(:has(.ride-art)):not(:has(.facility-art)):not(:has(.park-entrance-art)):not(:has(.service-road)):not(:has(.queue-rail)) {
+    background:rgba(148,194,116,.10) !important;
+    border-color:rgba(255,255,255,.08) !important;
+    box-shadow:none !important;
+  }
+  .game-map-stage { z-index:8; }
+  .map-scenery {
+    position:absolute; pointer-events:none; z-index:2; overflow:hidden;
+    border-radius:48%;
+    background:linear-gradient(145deg,rgba(186,230,253,.85),rgba(6,182,212,.62) 48%,rgba(29,78,216,.72));
+    box-shadow:inset 0 4px 12px rgba(255,255,255,.55),inset 0 -8px 14px rgba(8,47,73,.20),0 5px 10px rgba(15,76,66,.12);
+    border:3px solid rgba(255,255,255,.38);
+  }
+  .map-scenery-water-a { width:92px;height:54px;left:-24px;top:17%;transform:rotate(-9deg); }
+  .map-scenery-water-b { width:100px;height:58px;right:-28px;bottom:14%;transform:rotate(11deg); }
+  .map-scenery span { position:absolute;height:3px;border-radius:99px;background:rgba(255,255,255,.55);width:26px;animation:map-water-glint 2.8s ease-in-out infinite; }
+  .map-scenery span:nth-child(1){left:20%;top:35%}.map-scenery span:nth-child(2){right:14%;top:58%;animation-delay:.7s}.map-scenery span:nth-child(3){left:36%;bottom:18%;animation-delay:1.3s}
+  .map-scenery-maple {
+    position:absolute;z-index:3;pointer-events:none;left:8%;bottom:5%;width:55px;height:45px;
+    border-radius:50%;background:radial-gradient(circle at 35% 35%,#65a85b 0 24%,#3f8149 25% 58%,transparent 60%);
+    filter:drop-shadow(0 5px 3px rgba(15,64,35,.22));
+  }
+  .map-scenery-maple span { position:absolute;width:7px;height:16px;background:#855c36;border-radius:4px;left:24px;top:30px;transform:rotate(-8deg); }
+  .map-scenery-palm { position:absolute;z-index:3;pointer-events:none;font-size:31px;filter:drop-shadow(0 4px 3px rgba(15,23,42,.22));opacity:.9; }
+  .map-scenery-palm-a { right:4%;top:5%;transform:rotate(-7deg); }
+  .map-scenery-palm-b { left:2%;top:48%;transform:rotate(8deg); }
+  .map-scenery-deck {
+    position:absolute;z-index:2;pointer-events:none;left:0;right:0;top:48%;height:34px;
+    background:linear-gradient(180deg,rgba(218,190,126,.10),rgba(218,190,126,.25),rgba(218,190,126,.10));
+    border-top:1px solid rgba(255,255,255,.12);border-bottom:1px solid rgba(106,78,30,.10);
+    transform:rotate(-1deg);
+  }
+  .map-map-label {
+    position:absolute;z-index:4;pointer-events:none;right:2.5%;top:2.5%;
+    display:flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;
+    background:rgba(17,61,46,.55);color:white;box-shadow:0 3px 9px rgba(15,23,42,.18);
+    backdrop-filter:blur(5px);font-size:7px;letter-spacing:.12em;font-weight:900;
+  }
+  .map-map-label span { color:#fde68a;font-size:11px; }
+  @keyframes map-water-glint { 0%,100%{transform:translateX(-4px);opacity:.35}50%{transform:translateX(8px);opacity:.9} }
+}
+@media (max-width:640px) {
+  .game-map-surface{min-height:310px;padding:7px!important}
+  .map-scenery-water-a{width:70px;height:42px}.map-scenery-water-b{width:74px;height:43px}
+  .map-scenery-palm{font-size:24px}.map-map-label{font-size:6px;padding:4px 6px}
+}
+@media (prefers-reduced-motion:reduce){.map-scenery span{animation:none}}
