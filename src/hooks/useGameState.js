@@ -182,7 +182,30 @@ const [selectedZone, setSelectedZone] = useState(null);
     const upkeepOf = (p) => p.attr.maintenance * (1 + 0.1 * p.level);
 
     const counts = currentStaff || {};
-    const fx = staffEffects(counts);
+    const attractionZoneCoverage = (role) => {
+      const assignedZone = currentAssignments?.[role] || "";
+      if (!assignedZone) return 1;
+      if (!attractions.length) return 0;
+      return attractions.filter((item) => (currentZones?.[item.idx] || "") === assignedZone).length / attractions.length;
+    };
+    const serviceZoneCoverage = (role) => {
+      const assignedZone = currentAssignments?.[role] || "";
+      if (!assignedZone) return 1;
+      const serviceTargets = [...attractions, ...facilities];
+      if (!serviceTargets.length) return 0;
+      return serviceTargets.filter((item) => (currentZones?.[item.idx] || "") === assignedZone).length / serviceTargets.length;
+    };
+    const effectiveStaff = {
+      ...counts,
+      lifeguard: (counts.lifeguard || 0) * attractionZoneCoverage("lifeguard"),
+      mechanic: (counts.mechanic || 0) * attractionZoneCoverage("mechanic"),
+      cleaner: (counts.cleaner || 0) * serviceZoneCoverage("cleaner"),
+      security: (counts.security || 0) * attractionZoneCoverage("security"),
+      entertainer: (counts.entertainer || 0) * serviceZoneCoverage("entertainer"),
+      fitness_coach: (counts.fitness_coach || 0) * serviceZoneCoverage("fitness_coach"),
+      gardener: (counts.gardener || 0) * serviceZoneCoverage("gardener"),
+    };
+    const fx = staffEffects(effectiveStaff);
     const uptime = fx.uptime;
     const safety = fx.safety;
     const cleanliness = fx.cleanliness;
@@ -233,7 +256,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         (hasEntrance ? 1 : 0.9) *
         Math.max(0.65, Math.min(1.25, 1.12 - (currentTicketPrice - 20) * 0.012))
       );
-      const safetyCoverage = Math.min(1, (counts.lifeguard || 0) / Math.max(1, Math.ceil(attractions.length / 3)) + lifeguardStations * 0.12);
+      const safetyCoverage = Math.min(1, (effectiveStaff.lifeguard || 0) / Math.max(1, Math.ceil(attractions.length / 3)) + lifeguardStations * 0.12);
       const guestSafetyMult = safetyCoverage < 0.45 ? 0.88 : safetyCoverage < 0.7 ? 0.96 : 1;
       newGuests = Math.min(demand, Math.round(totalCapacity * guestSafetyMult));
 
@@ -264,7 +287,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       if (lifeguardStations > 0) repDelta += Math.min(0.5, lifeguardStations * 0.1);
       repDelta += (cleanliness - 0.6) * 1.5;
       repDelta += (safety - 0.7) * 0.8;
-      repDelta += (counts.gardener || 0) * 0.1;
+      repDelta += (effectiveStaff.gardener || 0) * 0.1;
       repDelta -= remaining.reduce(
         (s, inc) => s + (inc.type === "breakdown" ? 1.2 : 0.6),
         0
