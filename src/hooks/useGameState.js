@@ -567,6 +567,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         seasonEvent,
         ticketPrice,
         adBudget,
+        priorityPass,
         savedAt: new Date().toISOString(),
       };
       writeSlots(slots);
