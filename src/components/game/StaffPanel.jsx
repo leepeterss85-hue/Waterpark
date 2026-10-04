@@ -30,6 +30,9 @@ export default function StaffPanel({
   entertainment,
   onHire,
   onFire,
+  assignments = {},
+  zones = [],
+  onAssign,
 }) {
   const types = Object.values(STAFF);
   return (
@@ -43,6 +46,7 @@ export default function StaffPanel({
         </span>
       </div>
 
+      <p className="mb-3 text-[11px] leading-4 text-slate-500">Assign each team to a colour-coded park zone. Unassigned staff continue to cover the whole park. Mechanics and cleaners respond to incidents in their assigned area.</p>
       <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
         <EffectMeter
           label="Uptime"
@@ -84,6 +88,13 @@ export default function StaffPanel({
                   </div>
                   <p className="truncate text-[11px] text-slate-400">{s.description}</p>
                 </div>
+              </div>
+              <div className="mt-2.5">
+                <label className="mb-1 block text-[10px] font-bold uppercase tracking-wide text-slate-400">Work area</label>
+                <select value={assignments[s.id] || ""} onChange={(event) => onAssign?.(s.id, event.target.value)} className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-600 outline-none focus:border-cyan-400">
+                  <option value="">Whole park · automatic</option>
+                  {zones.map((zone) => <option key={zone.id} value={zone.id}>{zone.label}</option>)}
+                </select>
               </div>
               <div className="mt-2.5 flex items-center justify-between">
                 <span className="flex items-center gap-1 text-xs font-semibold text-slate-500">
