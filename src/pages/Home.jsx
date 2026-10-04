@@ -8,6 +8,7 @@ import BuildPanel from "@/components/game/BuildPanel";
 import GameControls from "@/components/game/GameControls";
 import EventLog from "@/components/game/EventLog";
 import StaffPanel from "@/components/game/StaffPanel";
+import SaveLoadPanel from "@/components/game/SaveLoadPanel";
 import { TileDetailPanel } from "@/components/game/TileDetail";
 import { getAttraction } from "@/data/gameData";
 
@@ -109,6 +110,14 @@ export default function Home() {
                 cleanliness={game.cleanliness}
                 onHire={game.hireStaff}
                 onFire={game.fireStaff}
+              />
+            </div>
+            <div className="rounded-2xl bg-white/70 p-4 shadow-sm ring-1 ring-slate-100">
+              <SaveLoadPanel
+                saves={game.saves}
+                onSave={game.savePark}
+                onLoad={game.loadPark}
+                onDelete={game.deleteSave}
               />
             </div>
           </aside>

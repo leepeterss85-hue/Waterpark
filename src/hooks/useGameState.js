@@ -2,8 +2,36 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { ATTRACTIONS, getAttraction, STAFF } from "@/data/gameData";
 
 const STORAGE_KEY = "waterpark-tycoon-save-v1";
+const SLOTS_KEY = "waterpark-tycoon-slots";
 const GRID_SIZE = 48;
 const INITIAL_MONEY = 50000;
+
+function readSlots() {
+  try {
+    return JSON.parse(localStorage.getItem(SLOTS_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function writeSlots(obj) {
+  try {
+    localStorage.setItem(SLOTS_KEY, JSON.stringify(obj));
+  } catch {
+    /* ignore */
+  }
+}
+
+function slotMeta(name, s) {
+  return {
+    name,
+    savedAt: s.savedAt,
+    day: s.day,
+    money: s.money,
+    reputation: s.reputation,
+    guests: s.guests,
+  };
+}
 
 export function useGameState() {
   const [money, setMoney] = useState(INITIAL_MONEY);
@@ -21,6 +49,7 @@ export function useGameState() {
   ]);
   const [history, setHistory] = useState([]);
   const [staff, setStaff] = useState({ lifeguard: 0, mechanic: 0, cleaner: 0 });
+  const [saves, setSaves] = useState([]);
 
   const stateRef = useRef({});
   stateRef.current = { money, day, reputation, grid, staff };
@@ -57,6 +86,12 @@ export function useGameState() {
     }, 300);
     return () => clearTimeout(t);
   }, [money, day, reputation, grid, history, staff]);
+
+  // Load save slots list on mount
+  useEffect(() => {
+    const slots = readSlots();
+    setSaves(Object.entries(slots).map(([name, s]) => slotMeta(name, s)));
+  }, []);
 
   const advanceDay = useCallback(() => {
     const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff } = stateRef.current;
@@ -191,6 +226,55 @@ export function useGameState() {
     setStaff((s) => ({ ...s, [type]: Math.max(0, (s[type] || 0) - 1) }));
   }, []);
 
+  const savePark = useCallback(
+    (name) => {
+      const trimmed = (name || "").trim();
+      if (!trimmed) return false;
+      const slots = readSlots();
+      slots[trimmed] = {
+        money,
+        day,
+        reputation,
+        guests,
+        grid,
+        history,
+        staff,
+        log,
+        lastNet,
+        savedAt: new Date().toISOString(),
+      };
+      writeSlots(slots);
+      setSaves(Object.entries(slots).map(([n, s]) => slotMeta(n, s)));
+      return true;
+    },
+    [money, day, reputation, guests, grid, history, staff, log, lastNet]
+  );
+
+  const loadPark = useCallback((name) => {
+    const slots = readSlots();
+    const data = slots[name];
+    if (!data) return;
+    setMoney(data.money ?? INITIAL_MONEY);
+    setDay(data.day ?? 1);
+    setReputation(data.reputation ?? 50);
+    setGuests(data.guests ?? 0);
+    setGrid(data.grid ?? Array(GRID_SIZE).fill(null));
+    setHistory(data.history ?? []);
+    setStaff(data.staff ?? { lifeguard: 0, mechanic: 0, cleaner: 0 });
+    setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
+    setLastNet(data.lastNet ?? 0);
+    setPlaying(false);
+    setSelectedBuild(null);
+    setSelectedTile(null);
+  }, []);
+
+  const deleteSave = useCallback((name) => {
+    const slots = readSlots();
+    delete slots[name];
+    writeSlots(slots);
+    setSaves((prev) => prev.filter((s) => s.name !== name));
+  }, []);
+
   const resetGame = useCallback(() => {
     setMoney(INITIAL_MONEY);
     setDay(1);
@@ -238,5 +322,9 @@ export function useGameState() {
     resetGame,
     hireStaff,
     fireStaff,
+    saves,
+    savePark,
+    loadPark,
+    deleteSave,
   };
 }
