@@ -12,7 +12,7 @@ function Row({ label, value }) {
   );
 }
 
-export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0, incident = null, guests = 0, queueWait = 0, lifeguards = 0, movementCount = 0, totalVisits = 0, onUpgrade, onSell, onClose }) {
+export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0, incident = null, condition = 100, guests = 0, queueWait = 0, lifeguards = 0, movementCount = 0, totalVisits = 0, onUpgrade, onSell, onClose }) {
   if (gridIndex == null || !attractionId) return null;
   const attr = getAttraction(attractionId);
   const profile = getAttractionProfile(attractionId);
@@ -28,6 +28,9 @@ export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0,
   const estimatedLoad = attr.capacity ? Math.min(100, Math.round((guests / Math.max(1, effectiveCapacity)) * 100)) : 0;
   const popularity = totalVisits ? Math.min(100, Math.round((movementCount / totalVisits) * 100)) : 0;
   const guardGap = Math.max(0, (profile?.lifeguards || 0) - lifeguards);
+  const conditionValue = Math.max(0, Math.min(100, Math.round(condition)));
+  const conditionLabel = conditionValue >= 75 ? "Excellent" : conditionValue >= 50 ? "Good" : conditionValue >= 30 ? "Worn" : "Critical";
+  const conditionClass = conditionValue >= 75 ? "bg-emerald-500" : conditionValue >= 50 ? "bg-lime-500" : conditionValue >= 30 ? "bg-amber-500" : "bg-rose-500";
   return (
     <div className="rounded-2xl bg-white/70 p-4 shadow-sm ring-1 ring-slate-100">
       <div className="mb-3 flex items-start justify-between">
@@ -49,7 +52,7 @@ export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0,
         <div className="flex items-center gap-1.5">{statusIcon}{status}</div>
         {incident?.type === "breakdown" ? <span>Needs mechanic</span> : incident?.type === "maintenance" ? <span>Needs cleaning</span> : <span>Ready for guests</span>}
       </div>
-      <div className="divide-y divide-slate-100">
+      <div className="mb-3 rounded-xl bg-slate-50 p-3 ring-1 ring-slate-100"><div className="flex items-center justify-between text-xs font-extrabold"><span className="text-slate-500">Ride condition</span><span className="text-slate-800">{conditionValue}% · {conditionLabel}</span></div><div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200"><div className={"h-full rounded-full transition-all " + conditionClass} style={{ width: conditionValue + "%" }} /></div><div className="mt-1 text-[9px] text-slate-400">Use causes wear. Mechanics restore condition during operating cycles.</div></div><div className="divide-y divide-slate-100">
         <Row label="Build cost" value={`$${attr.cost.toLocaleString()}`} />
         <Row label="Daily income" value={`$${attr.income.toLocaleString()}`} />
         <Row label="Upkeep" value={`$${attr.maintenance.toLocaleString()}`} />
