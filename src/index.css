@@ -377,3 +377,28 @@
   .park-event-ribbon b { @apply ml-auto hidden max-w-[55%] truncate text-[8px] font-bold normal-case tracking-normal text-white/60 sm:block; }
   .park-event-ribbon.storm { @apply bg-slate-950; }
 }
+
+
+@layer components {
+  .ride-splash-overlay { @apply pointer-events-none absolute inset-0 z-10 overflow-hidden; }
+  .ride-splash-overlay i { @apply absolute h-2 w-2 rounded-full bg-white/70; animation: ride-splash 1.8s ease-in-out infinite; }
+  .ride-splash-overlay i:nth-child(1) { left: 28%; bottom: 30%; animation-delay: 0s; }
+  .ride-splash-overlay i:nth-child(2) { left: 52%; bottom: 22%; animation-delay: .35s; }
+  .ride-splash-overlay i:nth-child(3) { left: 72%; bottom: 32%; animation-delay: .7s; }
+  .ride-crowd-dots { @apply pointer-events-none absolute bottom-7 right-1 z-20 flex gap-0.5 rounded-full bg-slate-950/35 px-1 py-0.5; }
+  .ride-crowd-dots i { @apply h-1.5 w-1.5 rounded-full bg-fuchsia-300; animation: crowd-bob 1s ease-in-out infinite; }
+  .ride-crowd-dots i:nth-child(2) { animation-delay: .15s; }
+  .ride-crowd-dots i:nth-child(3) { animation-delay: .3s; }
+  .ride-crowd-dots i:nth-child(4) { animation-delay: .45s; }
+  .park-time-night .game-map-toolbar,
+  .park-time-night .game-board-legend { box-shadow: 0 0 22px rgba(150,200,255,.12); }
+  .park-time-night .game-board-frame { box-shadow: inset 0 0 0 2px rgba(120,180,255,.08), 0 0 30px rgba(40,100,180,.18); }
+}
+@keyframes ride-splash {
+  0%, 100% { transform: translateY(5px) scale(.7); opacity: .15; }
+  45% { transform: translateY(-12px) scale(1); opacity: .8; }
+}
+@keyframes crowd-bob {
+  0%, 100% { transform: translateY(1px); opacity: .55; }
+  50% { transform: translateY(-2px); opacity: 1; }
+}
