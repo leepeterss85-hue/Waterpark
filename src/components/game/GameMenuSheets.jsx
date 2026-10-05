@@ -1,7 +1,7 @@
 import React from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame } from "lucide-react";
+import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays } from "lucide-react";
 import { MISSIONS, missionProgress } from "@/data/missions";
 import BuildPanel from "@/components/game/BuildPanel";
 import ExpansionPanel from "@/components/game/ExpansionPanel";
@@ -19,6 +19,7 @@ import CampaignPanel from "@/components/game/CampaignPanel";
 import ResortPanel from "@/components/game/ResortPanel";
 import PricingPanel from "@/components/game/PricingPanel";
 import RidePopularityPanel from "@/components/game/RidePopularityPanel";
+import EventsPanel from "@/components/game/EventsPanel";
 import { getHotelDef, hotelRooms, isHotelItem } from "@/data/hotels";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
@@ -141,6 +142,10 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
 
       <SheetShell open={openSheet === "trends"} onOpenChange={(v) => !v && close()} title="Ride Trends" icon={Flame} width="sm:max-w-md">
         <RidePopularityPanel grid={game.grid} upgrades={game.upgrades} popularity={game.popularity} popularityTrend={game.popularityTrend} prevPopularity={game.prevPopularity} visitorStats={game.visitorStats} />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "events"} onOpenChange={(v) => !v && close()} title="Park Events" icon={CalendarDays} width="sm:max-w-lg">
+        <EventsPanel money={game.money} level={game.level} day={game.day} activeEvents={game.activeEvents} onLaunch={game.launchEvent} />
       </SheetShell>
     </>
   );
