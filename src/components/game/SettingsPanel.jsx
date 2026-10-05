@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Volume2, VolumeX, Vibrate, VibrateOff, Play, RotateCcw, Save, SlidersHorizontal, HardHat } from "lucide-react";
+import { Volume2, VolumeX, Vibrate, VibrateOff, Play, RotateCcw, Save, SlidersHorizontal, HardHat, ArrowLeft } from "lucide-react";
 import { sound } from "@/lib/soundManager";
 import { getSettings, saveSettings, haptics, DIFFICULTIES } from "@/lib/settings";
 import SaveLoadPanel from "@/components/game/SaveLoadPanel";
+import StarterParkPicker from "@/components/game/StarterParkPicker";
 
 function Row({ icon: Icon, title, desc, children }) {
   return (
@@ -36,7 +37,7 @@ export default function SettingsPanel({ saves, onSave, onLoad, onDelete, onNewGa
   const [soundOn, setSoundOn] = useState(!sound.isMuted());
   const [vibrationOn, setVibrationOn] = useState(haptics.isEnabled());
   const [difficulty, setDifficulty] = useState(getSettings().difficulty);
-  const [confirmNew, setConfirmNew] = useState(false);
+  const [showParkPicker, setShowParkPicker] = useState(false);
 
   const toggleSound = () => {
     const m = sound.toggle();
@@ -61,14 +62,33 @@ export default function SettingsPanel({ saves, onSave, onLoad, onDelete, onNewGa
   };
 
   const handleNewGame = () => {
-    if (!confirmNew) {
-      setConfirmNew(true);
-      return;
-    }
-    haptics.buzz(30);
-    onNewGame();
-    setConfirmNew(false);
+    setShowParkPicker(true);
   };
+
+  const handlePickPark = (parkId) => {
+    haptics.buzz(30);
+    onNewGame(parkId);
+    setShowParkPicker(false);
+  };
+
+  if (showParkPicker) {
+    return (
+      <div className="flex flex-col gap-3">
+        <button
+          type="button"
+          onClick={() => setShowParkPicker(false)}
+          className="flex items-center gap-1.5 self-start text-xs font-bold text-slate-500 transition hover:text-slate-700"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" /> Back
+        </button>
+        <div className="flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-slate-500">
+          <RotateCcw className="h-3.5 w-3.5" /> New Game · Choose a Park
+        </div>
+        <p className="rounded-lg bg-amber-50 px-3 py-2 text-[10px] font-semibold text-amber-600 ring-1 ring-amber-100">Starting a new park wipes your current one. Save first if you want to keep it.</p>
+        <StarterParkPicker onPick={handlePickPark} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -80,9 +100,9 @@ export default function SettingsPanel({ saves, onSave, onLoad, onDelete, onNewGa
           <button
             type="button"
             onClick={handleNewGame}
-            className={`flex items-center justify-center gap-1.5 rounded-xl px-3 py-3 text-xs font-black shadow-sm transition ${confirmNew ? "bg-rose-500 text-white ring-1 ring-rose-300" : "bg-gradient-to-b from-emerald-400 to-emerald-600 text-white"}`}
+            className="flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-b from-emerald-400 to-emerald-600 px-3 py-3 text-xs font-black text-white shadow-sm transition hover:from-emerald-300 hover:to-emerald-500"
           >
-            <RotateCcw className="h-4 w-4" /> {confirmNew ? "Tap again to confirm" : "New Game"}
+            <RotateCcw className="h-4 w-4" /> New Game
           </button>
           <button
             type="button"
@@ -92,7 +112,6 @@ export default function SettingsPanel({ saves, onSave, onLoad, onDelete, onNewGa
             <Play className="h-4 w-4" /> Continue
           </button>
         </div>
-        {confirmNew && <p className="mt-1.5 text-[10px] font-semibold text-rose-500">This wipes your current park. Save first if you want to keep it.</p>}
       </div>
 
       <div>

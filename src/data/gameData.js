@@ -858,10 +858,28 @@ export const CATEGORIES = [
   { id: "environment", label: "Paths, Landscaping & Essentials" },
 ];
 
-export const MAX_UPGRADE = 5;
+export const MAX_UPGRADE = 10;
 
 export function upgradeCost(baseCost, level) {
   return Math.round(baseCost * 0.5 * (level + 1));
+}
+
+// Level tiers — gives each level range a label and accent color so the
+// current player level is always visually distinct in the HUD.
+export const LEVEL_TIERS = [
+  { min: 1, label: "Rookie", tone: "text-cyan-300", ring: "ring-cyan-300/40", glow: "from-cyan-400 to-sky-500" },
+  { min: 4, label: "Pro", tone: "text-sky-300", ring: "ring-sky-300/50", glow: "from-sky-400 to-blue-600" },
+  { min: 7, label: "Expert", tone: "text-violet-300", ring: "ring-violet-300/50", glow: "from-violet-400 to-purple-600" },
+  { min: 10, label: "Master", tone: "text-amber-300", ring: "ring-amber-300/50", glow: "from-amber-400 to-orange-500" },
+  { min: 15, label: "Legend", tone: "text-rose-300", ring: "ring-rose-300/50", glow: "from-rose-400 to-fuchsia-600" },
+];
+
+export function levelTier(level) {
+  let tier = LEVEL_TIERS[0];
+  for (const t of LEVEL_TIERS) {
+    if (level >= t.min) tier = t;
+  }
+  return tier;
 }
 
 // --- Park expansion ---

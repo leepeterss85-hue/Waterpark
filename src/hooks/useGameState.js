@@ -12,6 +12,7 @@ import { simulateVisits } from "@/data/visitorLogic";
 import { generateFeedback } from "@/data/guestFeedback";
 import { trackEvent } from "@/lib/gameAnalytics";
 import { getSettings, getDifficulty } from "@/lib/settings";
+import { getStarterPark } from "@/data/starterParks";
 
 const STORAGE_KEY = "waterpark-tycoon-save-v1";
 const SLOTS_KEY = "waterpark-tycoon-slots";
@@ -826,14 +827,27 @@ const [selectedZone, setSelectedZone] = useState(null);
     setSaves((prev) => prev.filter((s) => s.name !== name));
   }, []);
 
-  const resetGame = useCallback(() => {
+  const resetGame = useCallback((starterParkId = "empty_lot") => {
     const diff = getDifficulty(getSettings().difficulty);
-    setMoney(Math.round(INITIAL_MONEY * diff.moneyMult));
+    const park = getStarterPark(starterParkId);
+    const baseMoney = park.money;
+    const startGrid = park.grid && park.grid.length === GRID_SIZE ? [...park.grid] : makeStartingGrid();
+    const startZones = makeEmptyZones(startGrid.length);
+    const startUpgrades = Array(startGrid.length).fill(0);
+    const startCondition = Array(startGrid.length).fill(100);
+    const builtIds = [];
+    for (const id of startGrid) {
+      if (id) {
+        const item = getParkItem(id);
+        if (item && item.category === "attraction" && !builtIds.includes(id)) builtIds.push(id);
+      }
+    }
+    setMoney(Math.round(baseMoney * diff.moneyMult));
     setDay(1);
     setReputation(50);
     setGuests(0);
-    setGrid(makeStartingGrid());
-    setParkZones(makeEmptyZones(GRID_SIZE));
+    setGrid(startGrid);
+    setParkZones(startZones);
     setSelectedZone(null);
     setPlaying(false);
     setSelectedBuild(null);
@@ -845,26 +859,26 @@ const [selectedZone, setSelectedZone] = useState(null);
     setTicketPrice(DEFAULT_TICKET_PRICE);
     setAdBudget(DEFAULT_AD_BUDGET);
     setPriorityPass(false);
-    setLog([{ day: 0, text: "New park started! Your entrance is ready — now build the attractions guests will come for." }]);
+    setLog([{ day: 0, text: `Welcome to ${park.name}! ${park.description}` }]);
     setHistory([]);
     setStaff(DEFAULT_STAFF);
     setStaffAssignments({});
     setIncidents([]);
-    setAttractionCondition(Array(GRID_SIZE).fill(100));
-    setUpgrades(Array(GRID_SIZE).fill(0));
-    setXp(0);
+    setAttractionCondition(startCondition);
+    setUpgrades(startUpgrades);
+    setXp(park.xp || 0);
     setExpansionsDone(0);
     setPeakGuests(0);
     setTotalUpgrades(0);
     setClaimedMissions([]);
     setChallenge(null);
     setLifetimeEarnings(0);
-    setBuiltAttractionIds([]);
+    setBuiltAttractionIds(builtIds);
     setVisitorStats({ avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {}, guestTypes: {} });
     setFeedback([]);
     setResearchPoints(0);
     setCompletedResearch([]);
-    trackEvent("park_reset");
+    trackEvent("park_reset", { starterPark: park.id, level: park.level, money: baseMoney });
   }, []);
 
   return {

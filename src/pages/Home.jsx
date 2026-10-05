@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Waves, BarChart3, Save, DollarSign, CalendarDays, Users, Star, Trophy } from "lucide-react";
-import { getParkItem } from "@/data/gameData";
+import { getParkItem, levelTier } from "@/data/gameData";
 import { Link } from "react-router-dom";
 import { useGameState } from "@/hooks/useGameState";
 import { ACHIEVEMENTS } from "@/data/achievements";
@@ -33,6 +33,19 @@ const StatPill = ({ icon: Icon, value, tone }) => (
     <span className="text-xs font-black text-white">{value}</span>
   </div>
 );
+
+const LevelPill = ({ level }) => {
+  const tier = levelTier(level);
+  return (
+    <div className={`flex shrink-0 items-center gap-1.5 rounded-lg bg-gradient-to-br ${tier.glow} px-2.5 py-1 ring-1 ${tier.ring} shadow-sm`}>
+      <Trophy className="h-3.5 w-3.5 text-white" />
+      <div className="flex flex-col leading-none">
+        <span className="text-xs font-black text-white">Lv {level}</span>
+        <span className="text-[7px] font-bold uppercase tracking-wider text-white/80">{tier.label}</span>
+      </div>
+    </div>
+  );
+};
 
 export default function Home() {
   const game = useGameState();
@@ -170,7 +183,7 @@ export default function Home() {
           <StatPill icon={CalendarDays} value={game.day} tone="text-sky-300" />
           <StatPill icon={Users} value={game.guests.toLocaleString()} tone="text-cyan-300" />
           <div className="hidden sm:block"><StatPill icon={Star} value={`${game.reputation}%`} tone="text-amber-300" /></div>
-          <StatPill icon={Trophy} value={`Lv ${game.level}`} tone="text-violet-300" />
+          <LevelPill level={game.level} />
         </div>
         <div className="flex shrink-0 items-center gap-1.5">
           <SoundToggle />
