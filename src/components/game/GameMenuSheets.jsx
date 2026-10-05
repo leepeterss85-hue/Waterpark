@@ -1,7 +1,7 @@
 import React from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy } from "lucide-react";
+import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2 } from "lucide-react";
 import { MISSIONS, missionProgress } from "@/data/missions";
 import BuildPanel from "@/components/game/BuildPanel";
 import ExpansionPanel from "@/components/game/ExpansionPanel";
@@ -22,6 +22,7 @@ import RidePopularityPanel from "@/components/game/RidePopularityPanel";
 import EventsPanel from "@/components/game/EventsPanel";
 import MembershipsPanel from "@/components/game/MembershipsPanel";
 import AwardsPanel from "@/components/game/AwardsPanel";
+import SocialMediaPanel from "@/components/game/SocialMediaPanel";
 import { getHotelDef, hotelRooms, isHotelItem } from "@/data/hotels";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
@@ -156,6 +157,10 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
 
       <SheetShell open={openSheet === "awards"} onOpenChange={(v) => !v && close()} title="Park Awards" icon={Trophy} width="sm:max-w-lg">
         <AwardsPanel awards={game.awards} awardCeremonyTimer={game.awardCeremonyTimer} awardStats={game.awardStats} evaluation={game.awardEvaluation} />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "social"} onOpenChange={(v) => !v && close()} title="Social Media" icon={Share2} width="sm:max-w-lg">
+        <SocialMediaPanel socialPosts={game.socialPosts} socialReputation={game.socialReputation} />
       </SheetShell>
     </>
   );

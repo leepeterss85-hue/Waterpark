@@ -1,5 +1,5 @@
 import React from "react";
-import { Hammer, Settings, Users, Activity, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy } from "lucide-react";
+import { Hammer, Settings, Users, Activity, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2 } from "lucide-react";
 
 const MENUS = [
   { key: "build", icon: Hammer, label: "Build" },
@@ -10,6 +10,7 @@ const MENUS = [
   { key: "events", icon: CalendarDays, label: "Events" },
   { key: "memberships", icon: Ticket, label: "Members" },
   { key: "awards", icon: Trophy, label: "Awards" },
+  { key: "social", icon: Share2, label: "Social" },
   { key: "trends", icon: Flame, label: "Trends" },
   { key: "info", icon: Activity, label: "Activity" },
   { key: "conditions", icon: CloudSun, label: "Weather" },
