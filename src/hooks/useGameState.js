@@ -838,15 +838,18 @@ const [selectedZone, setSelectedZone] = useState(null);
     const startUpgrades = Array(startGrid.length).fill(0);
     const startCondition = Array(startGrid.length).fill(100);
     const builtIds = [];
+    const starterResearch = [];
     for (const id of startGrid) {
       if (id) {
         const item = getParkItem(id);
         if (item && item.category === "attraction" && !builtIds.includes(id)) builtIds.push(id);
+        const req = researchReqFor(id);
+        if (req && !starterResearch.includes(req.id)) starterResearch.push(req.id);
       }
     }
     setMoney(Math.round(baseMoney * diff.moneyMult));
     setDay(1);
-    setReputation(50);
+    setReputation(park.reputation ?? 50);
     setGuests(0);
     setGrid(startGrid);
     setParkZones(startZones);
@@ -858,8 +861,8 @@ const [selectedZone, setSelectedZone] = useState(null);
     setWeather(WEATHER[0]);
     setForecast(WEATHER[1]);
     setSeasonEvent(null);
-    setTicketPrice(DEFAULT_TICKET_PRICE);
-    setAdBudget(DEFAULT_AD_BUDGET);
+    setTicketPrice(park.ticketPrice ?? DEFAULT_TICKET_PRICE);
+    setAdBudget(park.adBudget ?? DEFAULT_AD_BUDGET);
     setPriorityPass(false);
     setLog([{ day: 0, text: `Welcome to ${park.name}! ${park.description}` }]);
     setHistory([]);
@@ -879,7 +882,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setVisitorStats({ avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {}, guestTypes: {} });
     setFeedback([]);
     setResearchPoints(0);
-    setCompletedResearch([]);
+    setCompletedResearch(starterResearch);
     trackEvent("park_reset", { starterPark: park.id, level: park.level, money: baseMoney });
   }, []);
 
