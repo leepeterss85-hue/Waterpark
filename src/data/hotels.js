@@ -127,7 +127,7 @@ export function calculateResortRating(hotels, upgrades) {
 }
 
 // Simulate one day of hotel operations
-export function simulateHotelDay({ hotels, hotelGuests, upgrades, day, reputation, resortRating, seasonEvent, weather, parkMood, sandbox }) {
+export function simulateHotelDay({ hotels, hotelGuests, upgrades, day, reputation, resortRating, seasonEvent, weather, parkMood, sandbox, hotelPriceMult = 1 }) {
   // 1. Check out guests whose stay is over
   const remaining = [];
   const checkedOut = [];
@@ -156,12 +156,13 @@ export function simulateHotelDay({ hotels, hotelGuests, upgrades, day, reputatio
   const availableRooms = totalRooms - totalOccupied;
   const newCheckIns = [];
   if (availableRooms > 0 && hotels.length > 0) {
+ const priceDemandMult = Math.max(0.5, 1 - Math.max(0, (hotelPriceMult - 1) * 0.6));
     const baseDemand = (reputation / 100) * totalRooms * 0.35;
     const ratingMult = 0.6 + (resortRating / 5) * 0.8;
     const seasonMult = seasonEvent?.guestMult ?? 1;
     const weatherMult = weather?.id === "sunny" ? 1.15 : weather?.id === "rain" ? 0.7 : 1;
     const moodMult = parkMood > 60 ? 1.1 : parkMood < 40 ? 0.85 : 1;
-    const demand = Math.floor(baseDemand * ratingMult * seasonMult * weatherMult * moodMult);
+    const demand = Math.floor(baseDemand * ratingMult * seasonMult * weatherMult * moodMult * priceDemandMult);
     const checkInCount = Math.min(availableRooms, Math.max(0, demand));
 
     for (let i = 0; i < checkInCount; i++) {
@@ -192,7 +193,7 @@ export function simulateHotelDay({ hotels, hotelGuests, upgrades, day, reputatio
 
   for (const h of hotels) {
     const level = upgrades[h.tileIndex] || 0;
-    const roomPrice = hotelRoomPrice(h.def, level);
+    const roomPrice = Math.round(hotelRoomPrice(h.def, level) * hotelPriceMult);
     const guestsInHotel = allGuests.filter((g) => g.hotelTile === h.tileIndex);
     roomRevenue += guestsInHotel.length * roomPrice;
     hotelExpenses += h.def.maintenance * (1 + level * 0.1);

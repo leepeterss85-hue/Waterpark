@@ -17,6 +17,7 @@ import { CAMPAIGNS, campaignEffectiveness, getCampaign } from "@/data/campaigns"
 import { getHotelDef, simulateHotelDay, calculateResortRating } from "@/data/hotels";
 import { getStarterPark } from "@/data/starterParks";
 import { calculateParkAppeal } from "@/data/parkThemes";
+import { DEFAULT_PRICING } from "@/data/pricing";
 
 const STORAGE_KEY = "waterpark-tycoon-save-v1";
 const SLOTS_KEY = "waterpark-tycoon-slots";
@@ -118,13 +119,14 @@ const [selectedZone, setSelectedZone] = useState(null);
   const [hotelGuests, setHotelGuests] = useState([]);
   const [hotelStats, setHotelStats] = useState({ roomRevenue: 0, hotelExpenses: 0, parkSpend: 0, occupancy: 0, avgHappiness: 0, totalGuests: 0, totalRooms: 0, guestsByHotel: {} });
   const [resortRating, setResortRating] = useState(0);
+  const [pricing, setPricing] = useState(DEFAULT_PRICING);
 
   const level = levelFromXp(xp);
   const gridSize = grid.length;
 
   /** @type {import("react").MutableRefObject<Record<string, any>>} */
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, completedResearch, parkAppeal, disaster, sandbox, activeCampaigns, hotelGuests, resortRating };
+  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, completedResearch, parkAppeal, disaster, sandbox, activeCampaigns, hotelGuests, resortRating, pricing };
 
   // Load saved game
   useEffect(() => {
@@ -169,6 +171,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (data.hotelGuests) setHotelGuests(data.hotelGuests);
         if (data.hotelStats) setHotelStats(data.hotelStats);
         if (data.resortRating != null) setResortRating(data.resortRating);
+        if (data.pricing) setPricing({ ...DEFAULT_PRICING, ...data.pricing });
       }
     } catch {
       /* ignore */
@@ -181,7 +184,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating })
+          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing })
         );
       } catch {
         /* ignore */
@@ -316,6 +319,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       const guestSafetyMult = safetyCoverage < 0.45 ? 0.88 : safetyCoverage < 0.7 ? 0.96 : 1;
       newGuests = Math.min(demand, Math.round(totalCapacity * guestSafetyMult));
 
+      const currentPricing = stateRef.current.pricing || DEFAULT_PRICING;
       const sim = simulateVisits({
         demand: newGuests,
         placedItems: [...attractions, ...facilities],
@@ -328,6 +332,9 @@ const [selectedZone, setSelectedZone] = useState(null);
         entertainment,
         facilityBonus,
         appealBonus: (calculatedAppeal.score - 50) * 0.025,
+        pricing: currentPricing,
+        weather: dayWeather,
+        seasonEvent: currentSeasonEvent,
       });
       income = sim.income;
       visitorStats = sim;
@@ -442,6 +449,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         weather: dayWeather,
         parkMood: visitorStats?.avgMood || 50,
         sandbox: isSandbox,
+        hotelPriceMult: (stateRef.current.pricing || DEFAULT_PRICING).hotelPriceMult,
       });
       newResortRating = calculateResortRating(placedHotels, currentUpgrades);
       setHotelGuests(hotelResult.remainingGuests);
@@ -960,6 +968,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         hotelGuests,
         hotelStats,
         resortRating,
+        pricing,
         savedAt: new Date().toISOString(),
       };
       writeSlots(slots);
@@ -1011,6 +1020,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     if (data.hotelGuests) setHotelGuests(data.hotelGuests);
     if (data.hotelStats) setHotelStats(data.hotelStats);
     if (data.resortRating != null) setResortRating(data.resortRating);
+    if (data.pricing) setPricing({ ...DEFAULT_PRICING, ...data.pricing });
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
     setLastNet(data.lastNet ?? 0);
     setPlaying(false);
@@ -1087,6 +1097,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setHotelGuests([]);
     setHotelStats({ roomRevenue: 0, hotelExpenses: 0, parkSpend: 0, occupancy: 0, avgHappiness: 0, totalGuests: 0, totalRooms: 0, guestsByHotel: {} });
     setResortRating(0);
+    setPricing(DEFAULT_PRICING);
     trackEvent("park_reset", { starterPark: park.id, level: park.level, money: baseMoney });
   }, []);
 
@@ -1147,6 +1158,8 @@ const [selectedZone, setSelectedZone] = useState(null);
     toggleSandbox,
     activeCampaigns,
     launchCampaign,
+    pricing,
+    setPricing,
     hotels: grid.map((id, idx) => { const def = getHotelDef(id); return def ? { def, tileIndex: idx } : null; }).filter(Boolean),
     hotelGuests,
     hotelStats,

@@ -1,5 +1,6 @@
 import { getAttraction } from "./gameData";
 import { getThemeGuestAffinity } from "./parkThemes";
+import { adjustedVisitSpend, pricingMoodPenalty } from "./pricing";
 
 const MAX_AGENTS = 200;
 const FACILITY_CAPACITY = 60;
@@ -299,6 +300,9 @@ export function simulateVisits({
   facilityBonus = 1,
   queuePaths = [],
   appealBonus = 0,
+  pricing = null,
+  weather = null,
+  seasonEvent = null,
 }) {
   const empty = {
     income: 0, avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0,
@@ -373,6 +377,7 @@ export function simulateVisits({
       const attr = pick.attr;
       let price = perVisitSpend(pick, pick.level) *
         (attr.category === "facility" ? facilityBonus : 1);
+      price = adjustedVisitSpend(price, attr.category, guest.type, pricing, weather, seasonEvent);
 
       // Pricing reaction: price-sensitive guests are more likely to skip expensive activities.
       const budgetFraction = price / Math.max(1, guest.budget);
@@ -431,6 +436,7 @@ export function simulateVisits({
       guest.thirst = clamp(guest.thirst + 4);
       guest.energy = clamp(guest.energy, 0, 100);
       guest.mood += (safety - 0.7) * 6 + (cleanliness - 0.6) * 5 + entertainment + appealBonus;
+      guest.mood -= pricingMoodPenalty(pricing) * 0.3;
       if (pick.overcrowded) guest.mood -= 2;
       // Queue reaction: impatient guests lose more mood in long queues
       if (pick.queueWait > guest.patience / 5) guest.mood -= 2 + (guest.patience < 50 ? 2 : 0);

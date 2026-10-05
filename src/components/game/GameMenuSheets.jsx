@@ -17,6 +17,7 @@ import SettingsPanel from "@/components/game/SettingsPanel";
 import ParkAppealPanel from "@/components/game/ParkAppealPanel";
 import CampaignPanel from "@/components/game/CampaignPanel";
 import ResortPanel from "@/components/game/ResortPanel";
+import PricingPanel from "@/components/game/PricingPanel";
 import { getHotelDef, hotelRooms, isHotelItem } from "@/data/hotels";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
@@ -70,6 +71,14 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
           onAdmission={game.setTicketPrice}
           onMarketing={game.setAdBudget}
           onExpressLane={game.setPriorityPass}
+        />
+        <PricingPanel
+          pricing={game.pricing}
+          ticketPrice={game.ticketPrice}
+          weather={game.weather}
+          seasonEvent={game.seasonEvent}
+          onChange={game.setPricing}
+          onTicketChange={game.setTicketPrice}
         />
         <CampaignPanel money={game.money} activeCampaigns={game.activeCampaigns} grid={game.grid} onLaunch={game.launchCampaign} />
       </SheetShell>
