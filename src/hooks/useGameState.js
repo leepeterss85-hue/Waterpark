@@ -181,13 +181,16 @@ const [selectedZone, setSelectedZone] = useState(null);
   }, []);
 
   const advanceDay = useCallback(() => {
-    const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, staffAssignments: currentAssignments, incidents: currentIncidents, upgrades: currentUpgrades, attractionCondition: currentCondition, challenge: currentChallenge, parkZones: currentZones, forecast: currentForecast, seasonEvent: currentSeasonEvent,     ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass, vipVisit: currentVipVisit, completedResearch: currentResearch } = stateRef.current;
+    const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, staffAssignments: currentAssignments, incidents: currentIncidents, upgrades: currentUpgrades, attractionCondition: currentCondition, challenge: currentChallenge, parkZones: currentZones, forecast: currentForecast, seasonEvent: currentSeasonEvent, parkAppeal: currentParkAppeal,     ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass, vipVisit: currentVipVisit, completedResearch: currentResearch } = stateRef.current;
     const hasResearch = (id) => (currentResearch || []).includes(id);
     const upkeepResearchMult = hasResearch("efficiency") ? 0.85 : 1;
     const ticketResearchMult = hasResearch("marketing") ? 1.10 : 1;
     const dayWeather = currentForecast || rollWeather(d + 1);
     const dayForecast = rollWeather(d + 2);
     const eff = currentChallenge?.effects || {};
+    const calculatedAppeal = calculateParkAppeal({ grid: prevGrid, zones: currentZones, getItem: getParkItem });
+    setParkAppeal(calculatedAppeal);
+    const appealDemandMult = 0.85 + (calculatedAppeal.score / 100) * 0.30;
     const placedItems = prevGrid
       .map((id, idx) => (id ? { id, idx, attr: getParkItem(id), level: (currentUpgrades || [])[idx] || 0 } : null))
       .filter(Boolean);
@@ -277,6 +280,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         (dayWeather.guestMult ?? 1) *
         (currentSeasonEvent?.guestMult ?? 1) *
         (1 + currentAdBudget / 5000) *
+        appealDemandMult *
         (hasEntrance ? 1 : 0.9) *
         Math.max(0.65, Math.min(1.25, 1.12 - (currentTicketPrice - 20) * 0.012))
       );
@@ -322,6 +326,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       if (dayWeather.id === "rain") repDelta -= 0.8;
       else if (dayWeather.id === "sunny") repDelta += 0.35;
       repDelta += Math.min(1.5, scenicCount * 0.08 + pathCount * 0.03);
+      repDelta += (calculatedAppeal.score - 50) * 0.035;
       if (hasEntrance) repDelta += 0.2;
       if (environment.filter((p) => currentZones?.[p.idx]).length >= 5) repDelta += 0.25;
       if (currentSeasonEvent) repDelta += currentSeasonEvent.repDelta || 0;
@@ -456,6 +461,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         premium: premiumCost,
         weather: dayWeather.name,
         event: currentSeasonEvent?.name || null,
+        parkAppeal: calculatedAppeal.score,
       }].slice(-60)
     );
     setLog((l) => [...entries, ...l].slice(0, 12));
