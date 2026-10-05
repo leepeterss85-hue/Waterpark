@@ -12,7 +12,7 @@ const MENUS = [
 
 export default function MapMenuBar({ openSheet, onOpen, missionsBadge = 0, incidentBadge = 0 }) {
   return (
-    <div className="absolute bottom-1.5 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 rounded-2xl bg-slate-950/92 p-1.5 shadow-xl ring-1 ring-white/15 backdrop-blur sm:gap-1.5 sm:p-2">
+    <div className="game-control-bar absolute bottom-1.5 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 p-1.5 sm:gap-1.5 sm:p-2">
       {MENUS.map((m) => {
         const Icon = m.icon;
         const active = openSheet === m.key;
@@ -25,14 +25,14 @@ export default function MapMenuBar({ openSheet, onOpen, missionsBadge = 0, incid
             className={
               "relative flex flex-col items-center gap-0.5 rounded-xl px-2 py-1.5 transition active:scale-95 sm:px-2.5 " +
               (active
-                ? "bg-cyan-500 text-white"
-                : "text-white/80 hover:bg-white/10 hover:text-white")
+                ? "bg-cyan-500 text-white shadow-md"
+                : "text-slate-700 hover:bg-slate-100 hover:text-slate-900")
             }
           >
             <Icon className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={2.5} />
             <span className="text-[9px] font-bold tracking-wide sm:text-[10px]">{m.label}</span>
             {badge > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-rose-500 px-1 text-[9px] font-black text-white shadow ring-2 ring-slate-950">
+              <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-rose-500 px-1 text-[9px] font-black text-white shadow ring-2 ring-white">
                 {badge}
               </span>
             )}
