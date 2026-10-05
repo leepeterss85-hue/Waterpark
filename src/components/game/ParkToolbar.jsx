@@ -2,6 +2,7 @@ import React from "react";
 import { CalendarDays, Users, Palette } from "lucide-react";
 import { getIcon } from "./icons";
 import { ZONES, getSeasonLabel } from "@/data/parkSystems";
+import { PARK_THEMES } from "@/data/parkThemes";
 
 export default function ParkToolbar({ weather, forecast, season, seasonEvent, guests, selectedZone, onZoneSelect }) {
   const WeatherIcon = getIcon(weather?.icon || "Sun");
@@ -44,6 +45,14 @@ export default function ParkToolbar({ weather, forecast, season, seasonEvent, gu
           const active = selectedZone === zone.id;
           return <button key={zone.id} onClick={() => onZoneSelect(zone.id)} className={"flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-[10px] font-extrabold transition ring-1 " + (active ? zone.className + " shadow-sm" : "bg-white text-slate-500 ring-slate-200 hover:bg-slate-50")}>
             <Icon className="h-3.5 w-3.5" /> {zone.name.replace(" Zone","")}
+          </button>;
+        })}
+        <span className="mx-1 h-5 w-px bg-slate-200" aria-hidden="true" />
+        {PARK_THEMES.map((theme) => {
+          const active = selectedZone === theme.id;
+          const emoji = theme.id === "tropical" ? "🌴" : theme.id === "family" ? "👨‍👩‍👧" : theme.id === "thrill" ? "⚡" : theme.id === "resort" ? "🏝️" : "🧭";
+          return <button key={theme.id} onClick={() => onZoneSelect(theme.id)} title={theme.description} className={"flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-[10px] font-extrabold transition ring-1 " + (active ? "bg-cyan-100 text-cyan-800 ring-cyan-400 shadow-sm" : "bg-white text-slate-500 ring-slate-200 hover:bg-slate-50")}>
+            <span>{emoji}</span> {theme.name.replace(" Zone","")}
           </button>;
         })}
         {selectedZone && <button onClick={() => onZoneSelect(null)} className="ml-auto rounded-xl px-3 py-1.5 text-[10px] font-extrabold text-slate-400 hover:bg-slate-100">Exit zoning mode</button>}
