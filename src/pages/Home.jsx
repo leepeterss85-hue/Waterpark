@@ -1,36 +1,34 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Waves, BarChart3, Save, Hammer, Settings, Users, Activity, Target } from "lucide-react";
+import { Waves, BarChart3, Save, DollarSign, CalendarDays, Users, Star, Trophy } from "lucide-react";
 import { getParkItem } from "@/data/gameData";
 import { Link } from "react-router-dom";
 import { useGameState } from "@/hooks/useGameState";
 import { ACHIEVEMENTS } from "@/data/achievements";
 import { MISSIONS, missionProgress } from "@/data/missions";
 import { useToast } from "@/components/ui/use-toast";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import StatsBar from "@/components/game/StatsBar";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import ParkGrid from "@/components/game/ParkGrid";
-import BuildPanel from "@/components/game/BuildPanel";
 import GameControls from "@/components/game/GameControls";
-import ActivityLog from "@/components/game/ActivityLog";
-import StaffPanel from "@/components/game/StaffPanel";
-import SaveLoadPanel from "@/components/game/SaveLoadPanel";
-import ExpansionPanel from "@/components/game/ExpansionPanel";
-import MissionsPanel from "@/components/game/MissionsPanel";
 import ChallengeBanner from "@/components/game/ChallengeBanner";
-import VisitorInsight from "@/components/game/VisitorInsights";
+import MapMenuBar from "@/components/game/MapMenuBar";
+import GameMenuSheets from "@/components/game/GameMenuSheets";
 import { TileDetailPanel } from "@/components/game/TileDetail";
-import ParkToolbar from "@/components/game/ParkToolbar";
-import { trackEvent } from "@/lib/gameAnalytics";
-import ParkManagementPanel from "@/components/game/ParkManagementPanel";
 import ParkObjectDetail from "@/components/game/ParkObjectDetail";
-import PlayerProgressPanel from "@/components/game/PlayerProgressPanel";
 import DailySummary from "@/components/game/DailySummary";
 import DayTransition from "@/components/game/DayTransition";
 import FloatingRewards from "@/components/game/FloatingRewards";
 import SoundToggle from "@/components/game/SoundToggle";
 import LevelUpCelebration from "@/components/game/LevelUpCelebration";
+import { trackEvent } from "@/lib/gameAnalytics";
 import { sound } from "@/lib/soundManager";
 import confetti from "canvas-confetti";
+
+const StatPill = ({ icon: Icon, value, tone }) => (
+  <div className="flex shrink-0 items-center gap-1 rounded-lg bg-white/80 px-2 py-1 shadow-sm ring-1 ring-slate-200">
+    <Icon className={`h-3.5 w-3.5 ${tone}`} />
+    <span className="text-xs font-black text-slate-900">{value}</span>
+  </div>
+);
 
 export default function Home() {
   const game = useGameState();
@@ -41,8 +39,7 @@ export default function Home() {
   const prevDay = useRef(game.day);
   const prevLevel = useRef(game.level);
   const [dailyReport, setDailyReport] = useState(null);
-  const [sidebarTab, setSidebarTab] = useState("build");
-  const [infoTab, setInfoTab] = useState("activity");
+  const [openSheet, setOpenSheet] = useState(null);
   const [dayTrigger, setDayTrigger] = useState(null);
   const [rewardTrigger, setRewardTrigger] = useState(null);
   const [shake, setShake] = useState(false);
@@ -100,7 +97,6 @@ export default function Home() {
     prevUnlocked.current = unlocked;
   }, [game.achievementState, toast]);
 
-  // Floating money on income
   useEffect(() => {
     if (game.lastNet && game.lastNet !== 0) {
       setRewardTrigger(Date.now());
@@ -108,7 +104,6 @@ export default function Home() {
     }
   }, [game.lastNet]);
 
-  // Incident alert + screen shake
   useEffect(() => {
     const count = game.incidents.length;
     if (count > prevIncidentCount.current) {
@@ -120,7 +115,6 @@ export default function Home() {
     prevIncidentCount.current = count;
   }, [game.incidents.length]);
 
-  // Level-up celebration
   useEffect(() => {
     if (game.level > prevLevel.current) {
       setLevelUpTrigger(Date.now());
@@ -129,9 +123,8 @@ export default function Home() {
     prevLevel.current = game.level;
   }, [game.level]);
 
-  // Jump to the build tab when a tile is selected so the detail panel is visible
   useEffect(() => {
-    if (game.selectedTile != null) setSidebarTab("build");
+    if (game.selectedTile != null) setOpenSheet(null);
   }, [game.selectedTile]);
 
   const handleTileClickWithSound = (index) => {
@@ -146,62 +139,98 @@ export default function Home() {
     }
   };
 
-  const zones = [...new Set((game.parkZones || []).filter(Boolean))].map((id) => ({
-    id,
-    label: String(id).replace(/[-_]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()),
-  }));
+  const handleOpenMenu = (key) => {
+    if (key) game.setSelectedTile(null);
+    setOpenSheet(key);
+  };
 
   const claimableMissions = MISSIONS.filter((m) => game.level >= m.level && !game.claimedMissions.includes(m.id) && missionProgress(m, game.missionState) >= m.target).length;
   const incidentCount = game.incidents.length;
-  const Badge = ({ count }) => count > 0 ? <span className="absolute -right-0.5 -top-0.5 z-10 grid h-4 min-w-4 place-items-center rounded-full bg-rose-500 px-1 text-[8px] font-black text-white shadow ring-2 ring-white">{count}</span> : null;
 
   return (
-    <div className={"min-h-screen bg-[radial-gradient(circle_at_10%_0%,rgba(34,211,238,.35),transparent_28%),radial-gradient(circle_at_90%_12%,rgba(250,204,21,.16),transparent_24%),linear-gradient(180deg,#bdefff_0%,#e8f8ed_42%,#c8e1c0_100%)]" + (shake ? " screen-shake" : "")}>
+    <div
+      className={`h-screen flex flex-col overflow-hidden bg-[radial-gradient(circle_at_10%_0%,rgba(34,211,238,.35),transparent_28%),radial-gradient(circle_at_90%_12%,rgba(250,204,21,.16),transparent_24%),linear-gradient(180deg,#bdefff_0%,#e8f8ed_42%,#c8e1c0_100%)]${shake ? " screen-shake" : ""}`}
+      style={{ height: "100dvh" }}
+    >
       <DayTransition day={game.day} weather={game.weather} seasonEvent={game.seasonEvent} trigger={dayTrigger} />
       <LevelUpCelebration level={game.level} trigger={levelUpTrigger} />
       <FloatingRewards amount={game.lastNet} trigger={rewardTrigger} />
-      <header className="sticky top-0 z-40 border-b border-white/70 bg-white/85 shadow-sm backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 sm:py-3.5">
-          <div className="relative grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-2xl bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-700 shadow-lg">
+
+      <header className="z-40 shrink-0 border-b border-white/70 bg-white/85 shadow-sm backdrop-blur-xl">
+        <div className="flex items-center gap-2 px-3 py-2 sm:gap-3 sm:px-4">
+          <div className="relative grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-xl bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-700 shadow-lg">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,.55),transparent_24%)]" />
-            <Waves className="relative z-10 h-5 w-5 text-white" />
+            <Waves className="relative z-10 h-4 w-4 text-white" />
           </div>
-          <div className="min-w-0">
-            <h1 className="font-display text-lg font-extrabold tracking-tight text-slate-900 sm:text-xl">Splash Tycoon</h1>
+          <h1 className="hidden font-display text-base font-extrabold tracking-tight text-slate-900 sm:block">Splash Tycoon</h1>
+          <div className="flex flex-1 items-center gap-1.5 overflow-x-auto sm:justify-center sm:gap-2">
+            <StatPill icon={DollarSign} value={`$${game.money.toLocaleString()}`} tone="text-emerald-600" />
+            <StatPill icon={CalendarDays} value={game.day} tone="text-sky-600" />
+            <StatPill icon={Users} value={game.guests.toLocaleString()} tone="text-cyan-600" />
+            <div className="hidden sm:block"><StatPill icon={Star} value={`${game.reputation}%`} tone="text-amber-600" /></div>
+            <StatPill icon={Trophy} value={`Lv ${game.level}`} tone="text-violet-600" />
           </div>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5">
             <SoundToggle />
-            <Link to="/load" className="flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-bold text-slate-700 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:bg-sky-50">
-              <Save className="h-4 w-4 text-cyan-600" /><span className="hidden sm:inline">Saves</span>
+            <Link to="/load" className="grid h-9 w-9 place-items-center rounded-xl bg-white text-slate-700 shadow-sm ring-1 ring-slate-200 transition hover:bg-sky-50">
+              <Save className="h-4 w-4 text-cyan-600" />
             </Link>
-            <Link to="/dashboard" className="flex items-center gap-2 rounded-xl bg-slate-900 px-3 py-2 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-800">
-              <BarChart3 className="h-4 w-4" /><span className="hidden sm:inline">Dashboard</span>
+            <Link to="/dashboard" className="grid h-9 w-9 place-items-center rounded-xl bg-slate-900 text-white shadow-sm transition hover:bg-slate-800">
+              <BarChart3 className="h-4 w-4" />
             </Link>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-3 py-3 sm:px-4 sm:py-5">
-        <StatsBar money={game.money} day={game.day} guests={game.guests} reputation={game.reputation} lastNet={game.lastNet} level={game.level} />
-        <div className="mt-2.5"><PlayerProgressPanel level={game.level} xp={game.xp} xpForNext={game.xpForNext} onCheat={game.applyCheat} /></div>
+      <main className="relative flex-1 overflow-hidden p-1.5 sm:p-2">
+        <ParkGrid
+          grid={game.grid}
+          parkZones={game.parkZones}
+          upgrades={game.upgrades}
+          selectedBuild={game.selectedBuild}
+          selectedTile={game.selectedTile}
+          selectedZone={game.selectedZone}
+          incidents={game.incidents}
+          guests={game.guests}
+          visitorMovements={game.visitorStats?.movements}
+          queueStats={game.visitorStats?.queueStats}
+          attractionCondition={game.attractionCondition}
+          staff={game.staff}
+          staffAssignments={game.staffAssignments}
+          lifeguardTotal={game.staff?.lifeguard || 0}
+          day={game.day}
+          weather={game.weather}
+          seasonEvent={game.seasonEvent}
+          onTileClick={handleTileClickWithSound}
+        />
 
-        <div className="mt-3"><GameControls playing={game.playing} speed={game.speed} onTogglePlay={() => game.setPlaying(!game.playing)} onSpeed={game.setSpeed} onAdvance={() => { trackEvent("day_advanced", { source: "manual" }); game.advanceDay(); }} onReset={game.resetGame} /></div>
-        <div className="mt-3"><ParkToolbar weather={game.weather} forecast={game.forecast} season={game.season} seasonEvent={game.seasonEvent} guests={game.guests} selectedZone={game.selectedZone} onZoneSelect={game.setSelectedZone} /></div>
+        <div className="absolute bottom-2 left-2 z-30 sm:bottom-3 sm:left-3">
+          <GameControls
+            playing={game.playing}
+            speed={game.speed}
+            onTogglePlay={() => game.setPlaying(!game.playing)}
+            onSpeed={game.setSpeed}
+            onAdvance={() => { trackEvent("day_advanced", { source: "manual" }); game.advanceDay(); }}
+            onReset={game.resetGame}
+          />
+        </div>
 
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-[minmax(0,1fr)_300px] lg:grid-cols-[minmax(0,1fr)_360px]">
-          <div className="flex min-w-0 flex-col gap-3 sm:gap-4">
+        {game.challenge && (
+          <div className="absolute left-2 top-2 z-20 max-w-[55%] sm:left-3 sm:top-3">
             <ChallengeBanner challenge={game.challenge} />
-            <ParkGrid grid={game.grid} parkZones={game.parkZones} upgrades={game.upgrades} selectedBuild={game.selectedBuild} selectedTile={game.selectedTile} selectedZone={game.selectedZone} incidents={game.incidents} guests={game.guests} visitorMovements={game.visitorStats?.movements} queueStats={game.visitorStats?.queueStats} attractionCondition={game.attractionCondition} staff={game.staff} staffAssignments={game.staffAssignments} lifeguardTotal={game.staff?.lifeguard || 0} day={game.day} weather={game.weather} seasonEvent={game.seasonEvent} onTileClick={handleTileClickWithSound} />
           </div>
+        )}
 
-          <aside className="flex min-w-0 flex-col gap-3 sm:gap-4">
-            {selectedItem && (
-              selectedItem.category === "environment" ? (
-                <ParkObjectDetail
-                  itemId={selectedAttrId}
-                  onSell={() => game.sellAttraction(game.selectedTile)}
-                  onClose={() => game.setSelectedTile(null)}
-                />
+        <MapMenuBar openSheet={openSheet} onOpen={handleOpenMenu} missionsBadge={claimableMissions} incidentBadge={incidentCount} />
+
+        <Sheet open={game.selectedTile != null && !!selectedItem} onOpenChange={(v) => { if (!v) game.setSelectedTile(null); }}>
+          <SheetContent side="right" className="flex w-full flex-col overflow-hidden p-0 sm:max-w-md">
+            <div className="flex items-center border-b border-slate-200 bg-white px-4 py-3 pr-12">
+              <SheetTitle className="text-base font-black text-slate-900">{selectedItem?.name || "Tile"}</SheetTitle>
+            </div>
+            <div className="flex-1 overflow-y-auto bg-slate-50 p-3 sm:p-4">
+              {selectedItem && (selectedItem.category === "environment" ? (
+                <ParkObjectDetail itemId={selectedAttrId} onSell={() => game.sellAttraction(game.selectedTile)} onClose={() => game.setSelectedTile(null)} />
               ) : (
                 <TileDetailPanel
                   gridIndex={game.selectedTile}
@@ -219,60 +248,14 @@ export default function Home() {
                   onSell={() => game.sellAttraction(game.selectedTile)}
                   onClose={() => game.setSelectedTile(null)}
                 />
-              )
-            )}
-
-            <Tabs value={sidebarTab} onValueChange={setSidebarTab} className="waterpark-panel bg-white/85 p-3 sm:p-4">
-              <TabsList className="w-full justify-between">
-                <TabsTrigger value="build" className="flex-1 gap-1 text-xs"><Hammer className="h-3.5 w-3.5" /> Build</TabsTrigger>
-                <TabsTrigger value="manage" className="relative flex-1 gap-1 text-xs"><Settings className="h-3.5 w-3.5" /> Manage<Badge count={incidentCount} /></TabsTrigger>
-                <TabsTrigger value="staff" className="flex-1 gap-1 text-xs"><Users className="h-3.5 w-3.5" /> Staff</TabsTrigger>
-                <TabsTrigger value="save" className="flex-1 gap-1 text-xs"><Save className="h-3.5 w-3.5" /> Save</TabsTrigger>
-              </TabsList>
-              <TabsContent value="build" className="flex flex-col gap-3">
-                <ExpansionPanel gridSize={game.gridSize} expansionsDone={game.expansionsDone} level={game.level} money={game.money} onExpand={game.expandPark} />
-                <BuildPanel money={game.money} level={game.level} selectedBuild={game.selectedBuild} onSelect={game.setSelectedBuild} />
-              </TabsContent>
-              <TabsContent value="manage">
-                <ParkManagementPanel
-                  admissionFee={game.ticketPrice}
-                  marketingSpend={game.adBudget}
-                  expressLane={game.priorityPass}
-                  utilities={game.estimatedUtilities}
-                  wages={game.staffWages}
-                  history={game.history}
-                  visitorStats={game.visitorStats}
-                  grid={game.grid}
-                  upgrades={game.upgrades}
-                  incidents={game.incidents}
-                  onAdmission={game.setTicketPrice}
-                  onMarketing={game.setAdBudget}
-                  onExpressLane={game.setPriorityPass}
-                />
-              </TabsContent>
-              <TabsContent value="staff">
-                <StaffPanel money={game.money} staff={game.staff} staffWages={game.staffWages} uptime={game.uptime} safety={game.safety} cleanliness={game.cleanliness} entertainment={game.entertainment} onHire={game.hireStaff} onFire={game.fireStaff} assignments={game.staffAssignments} zones={zones} onAssign={game.assignStaff} />
-              </TabsContent>
-              <TabsContent value="save">
-                <SaveLoadPanel saves={game.saves} onSave={game.savePark} onLoad={game.loadPark} onDelete={game.deleteSave} />
-              </TabsContent>
-            </Tabs>
-          </aside>
-
-          <div className="md:col-span-2 lg:col-span-1">
-            <Tabs value={infoTab} onValueChange={setInfoTab} className="waterpark-panel bg-white/85 p-3 sm:p-4">
-              <TabsList className="w-full justify-between">
-                <TabsTrigger value="activity" className="flex-1 gap-1.5 text-xs"><Activity className="h-3.5 w-3.5" /> Activity</TabsTrigger>
-                <TabsTrigger value="insights" className="flex-1 gap-1.5 text-xs"><BarChart3 className="h-3.5 w-3.5" /> Insights</TabsTrigger>
-                <TabsTrigger value="missions" className="relative flex-1 gap-1.5 text-xs"><Target className="h-3.5 w-3.5" /> Missions<Badge count={claimableMissions} /></TabsTrigger>
-              </TabsList>
-              <TabsContent value="activity"><ActivityLog feedback={game.feedback} log={game.log} issueCount={game.incidents.length} guestExperience={game.visitorStats?.guestExperience} /></TabsContent>
-              <TabsContent value="insights"><VisitorInsight visitorStats={game.visitorStats} /></TabsContent>
-              <TabsContent value="missions"><MissionsPanel level={game.level} xp={game.xp} xpForNext={game.xpForNext} missionState={game.missionState} claimedMissions={game.claimedMissions} onClaim={game.claimMission} /></TabsContent>
-            </Tabs>
-          </div>
-        </div>
+              ))}
+            </div>
+          </SheetContent>
+        </Sheet>
       </main>
+
+      <GameMenuSheets game={game} openSheet={openSheet} setOpenSheet={setOpenSheet} />
+
       <DailySummary report={dailyReport} onClose={() => setDailyReport(null)} />
     </div>
   );
