@@ -25,14 +25,14 @@ export default function MapMenuBar({ openSheet, onOpen, missionsBadge = 0, incid
             className={
               "relative flex flex-col items-center gap-0.5 rounded-xl px-2 py-1.5 transition active:scale-95 sm:px-2.5 " +
               (active
-                ? "bg-cyan-500 text-white shadow-md"
-                : "text-slate-700 hover:bg-slate-100 hover:text-slate-900")
+                ? "bg-emerald-400 text-slate-900 shadow-md"
+                : "text-white/85 hover:bg-white/15 hover:text-white")
             }
           >
             <Icon className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={2.5} />
             <span className="text-[9px] font-bold tracking-wide sm:text-[10px]">{m.label}</span>
             {badge > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-rose-500 px-1 text-[9px] font-black text-white shadow ring-2 ring-white">
+              <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-amber-400 px-1 text-[9px] font-black text-slate-900 shadow ring-2 ring-emerald-950">
                 {badge}
               </span>
             )}

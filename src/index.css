@@ -681,7 +681,7 @@
   .build-catalog-card { min-height:116px; border-radius:18px!important; box-shadow:0 5px 12px rgba(15,23,42,.08),inset 0 1px 0 rgba(255,255,255,.75)!important; }
   .build-catalog-card:hover { box-shadow:0 9px 18px rgba(15,23,42,.13),inset 0 1px 0 rgba(255,255,255,.85)!important; }
   .build-category-toggle { min-height:44px!important; border:1px solid rgba(148,163,184,.16); box-shadow:0 3px 8px rgba(15,23,42,.06),inset 0 1px 0 rgba(255,255,255,.75); }
-  .game-control-bar { border-radius:20px!important; padding:8px!important; background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(239,250,247,.9))!important; border:1px solid rgba(255,255,255,.85)!important; box-shadow:0 9px 24px rgba(21,80,60,.12),inset 0 1px 0 white; }
+  .game-control-bar { border-radius:18px!important; padding:6px!important; background:linear-gradient(110deg,#164c39 0%,#30774f 52%,#19533e 100%)!important; border:2px solid #24543e!important; box-shadow:0 8px 22px rgba(21,61,42,.28),inset 0 1px 0 rgba(255,255,255,.10)!important; }
   .game-primary-button,.game-action-button,.game-speed-picker { min-height:42px!important; border-radius:14px!important; box-shadow:0 4px 9px rgba(15,23,42,.09),inset 0 1px 0 rgba(255,255,255,.6); }
   .game-primary-button:active,.game-action-button:active { transform:translateY(1px) scale(.985); }
   .game-welcome-banner { background:radial-gradient(circle at 84% 18%,rgba(255,255,255,.24),transparent 18%),radial-gradient(circle at 70% 80%,rgba(34,211,238,.3),transparent 25%),linear-gradient(135deg,#087f70,#0e7490 48%,#2563eb); box-shadow:0 16px 32px rgba(8,95,94,.2),inset 0 1px 0 rgba(255,255,255,.35)!important; }
