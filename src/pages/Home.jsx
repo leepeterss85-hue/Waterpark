@@ -150,6 +150,34 @@ export default function Home() {
   const claimableMissions = MISSIONS.filter((m) => game.level >= m.level && !game.claimedMissions.includes(m.id) && missionProgress(m, game.missionState) >= m.target).length;
   const incidentCount = game.incidents.length;
 
+  const statsBar = (
+    <div className="game-board-statsbar">
+      <div className="flex items-center gap-2 sm:gap-3">
+        <div className="relative grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-xl bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-700 shadow-lg ring-1 ring-white/20">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,.55),transparent_24%)]" />
+          <Waves className="relative z-10 h-4 w-4 text-white" />
+        </div>
+        <h1 className="hidden font-display text-base font-extrabold tracking-tight text-white sm:block">Splash Tycoon</h1>
+        <div className="flex flex-1 items-center gap-1.5 overflow-x-auto sm:justify-center sm:gap-2">
+          <StatPill icon={DollarSign} value={`$${game.money.toLocaleString()}`} tone="text-emerald-300" />
+          <StatPill icon={CalendarDays} value={game.day} tone="text-sky-300" />
+          <StatPill icon={Users} value={game.guests.toLocaleString()} tone="text-cyan-300" />
+          <div className="hidden sm:block"><StatPill icon={Star} value={`${game.reputation}%`} tone="text-amber-300" /></div>
+          <StatPill icon={Trophy} value={`Lv ${game.level}`} tone="text-violet-300" />
+        </div>
+        <div className="flex shrink-0 items-center gap-1.5">
+          <SoundToggle />
+          <Link to="/load" className="grid h-9 w-9 place-items-center rounded-xl bg-white/10 text-white ring-1 ring-white/15 transition hover:bg-white/15">
+            <Save className="h-4 w-4 text-cyan-300" />
+          </Link>
+          <Link to="/dashboard" className="grid h-9 w-9 place-items-center rounded-xl bg-white/10 text-white ring-1 ring-white/15 transition hover:bg-white/15">
+            <BarChart3 className="h-4 w-4" />
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div
       className={`h-screen flex flex-col overflow-hidden bg-[radial-gradient(circle_at_10%_0%,rgba(34,211,238,.35),transparent_28%),radial-gradient(circle_at_90%_12%,rgba(250,204,21,.16),transparent_24%),linear-gradient(180deg,#bdefff_0%,#e8f8ed_42%,#c8e1c0_100%)]${shake ? " screen-shake" : ""}`}
@@ -195,6 +223,7 @@ export default function Home() {
             </>
           }
           bottomMenu={<MapMenuBar openSheet={openSheet} onOpen={handleOpenMenu} missionsBadge={claimableMissions} incidentBadge={incidentCount} />}
+          statsBar={statsBar}
         />
 
         <Sheet open={game.selectedTile != null && !!selectedItem} onOpenChange={(v) => { if (!v) game.setSelectedTile(null); }}>
@@ -227,32 +256,6 @@ export default function Home() {
           </SheetContent>
         </Sheet>
       </main>
-
-      <header className="game-control-bar z-40 mx-1.5 mb-1.5 shrink-0 rounded-[18px] px-2 py-2 sm:mx-2 sm:mb-2 sm:px-3">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="relative grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-xl bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-700 shadow-lg ring-1 ring-white/20">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,.55),transparent_24%)]" />
-            <Waves className="relative z-10 h-4 w-4 text-white" />
-          </div>
-          <h1 className="hidden font-display text-base font-extrabold tracking-tight text-white sm:block">Splash Tycoon</h1>
-          <div className="flex flex-1 items-center gap-1.5 overflow-x-auto sm:justify-center sm:gap-2">
-            <StatPill icon={DollarSign} value={`$${game.money.toLocaleString()}`} tone="text-emerald-300" />
-            <StatPill icon={CalendarDays} value={game.day} tone="text-sky-300" />
-            <StatPill icon={Users} value={game.guests.toLocaleString()} tone="text-cyan-300" />
-            <div className="hidden sm:block"><StatPill icon={Star} value={`${game.reputation}%`} tone="text-amber-300" /></div>
-            <StatPill icon={Trophy} value={`Lv ${game.level}`} tone="text-violet-300" />
-          </div>
-          <div className="flex shrink-0 items-center gap-1.5">
-            <SoundToggle />
-            <Link to="/load" className="grid h-9 w-9 place-items-center rounded-xl bg-white/10 text-white ring-1 ring-white/15 transition hover:bg-white/15">
-              <Save className="h-4 w-4 text-cyan-300" />
-            </Link>
-            <Link to="/dashboard" className="grid h-9 w-9 place-items-center rounded-xl bg-white/10 text-white ring-1 ring-white/15 transition hover:bg-white/15">
-              <BarChart3 className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
-      </header>
 
       <GameMenuSheets game={game} openSheet={openSheet} setOpenSheet={setOpenSheet} />
 
