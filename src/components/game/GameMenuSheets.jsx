@@ -92,7 +92,7 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
       </SheetShell>
 
       <SheetShell open={openSheet === "resort"} onOpenChange={(v) => !v && close()} title="Resort" icon={Hotel} width="sm:max-w-md">
-        <ResortPanel resortRating={game.resortRating} hotelStats={game.hotelStats} hotels={game.hotels} upgrades={game.upgrades} />
+        <ResortPanel resortRating={game.resortRating} hotelStats={game.hotelStats} hotels={game.hotels} upgrades={game.upgrades} grid={game.grid} guests={game.guests} reputation={game.reputation} />
       </SheetShell>
 
       <SheetShell open={openSheet === "staff"} onOpenChange={(v) => !v && close()} title="Staff" icon={Users} width="sm:max-w-md">
