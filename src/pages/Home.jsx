@@ -27,9 +27,9 @@ import { sound } from "@/lib/soundManager";
 import confetti from "canvas-confetti";
 
 const StatPill = ({ icon: Icon, value, tone }) => (
-  <div className="flex shrink-0 items-center gap-1 rounded-lg bg-white/80 px-2 py-1 shadow-sm ring-1 ring-slate-200">
+  <div className="flex shrink-0 items-center gap-1 rounded-lg bg-white/10 px-2 py-1 ring-1 ring-white/15">
     <Icon className={`h-3.5 w-3.5 ${tone}`} />
-    <span className="text-xs font-black text-slate-900">{value}</span>
+    <span className="text-xs font-black text-white">{value}</span>
   </div>
 );
 
@@ -159,26 +159,26 @@ export default function Home() {
       <LevelUpCelebration level={game.level} trigger={levelUpTrigger} />
       <FloatingRewards amount={game.lastNet} trigger={rewardTrigger} />
 
-      <header className="z-40 shrink-0 border-b border-white/70 bg-white/85 shadow-sm backdrop-blur-xl">
-        <div className="flex items-center gap-2 px-3 py-2 sm:gap-3 sm:px-4">
-          <div className="relative grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-xl bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-700 shadow-lg">
+      <header className="game-control-bar z-40 mx-1.5 mt-1.5 shrink-0 rounded-[18px] px-2 py-2 sm:mx-2 sm:mt-2 sm:px-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="relative grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-xl bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-700 shadow-lg ring-1 ring-white/20">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,.55),transparent_24%)]" />
             <Waves className="relative z-10 h-4 w-4 text-white" />
           </div>
-          <h1 className="hidden font-display text-base font-extrabold tracking-tight text-slate-900 sm:block">Splash Tycoon</h1>
+          <h1 className="hidden font-display text-base font-extrabold tracking-tight text-white sm:block">Splash Tycoon</h1>
           <div className="flex flex-1 items-center gap-1.5 overflow-x-auto sm:justify-center sm:gap-2">
-            <StatPill icon={DollarSign} value={`$${game.money.toLocaleString()}`} tone="text-emerald-600" />
-            <StatPill icon={CalendarDays} value={game.day} tone="text-sky-600" />
-            <StatPill icon={Users} value={game.guests.toLocaleString()} tone="text-cyan-600" />
-            <div className="hidden sm:block"><StatPill icon={Star} value={`${game.reputation}%`} tone="text-amber-600" /></div>
-            <StatPill icon={Trophy} value={`Lv ${game.level}`} tone="text-violet-600" />
+            <StatPill icon={DollarSign} value={`$${game.money.toLocaleString()}`} tone="text-emerald-300" />
+            <StatPill icon={CalendarDays} value={game.day} tone="text-sky-300" />
+            <StatPill icon={Users} value={game.guests.toLocaleString()} tone="text-cyan-300" />
+            <div className="hidden sm:block"><StatPill icon={Star} value={`${game.reputation}%`} tone="text-amber-300" /></div>
+            <StatPill icon={Trophy} value={`Lv ${game.level}`} tone="text-violet-300" />
           </div>
           <div className="flex shrink-0 items-center gap-1.5">
             <SoundToggle />
-            <Link to="/load" className="grid h-9 w-9 place-items-center rounded-xl bg-white text-slate-700 shadow-sm ring-1 ring-slate-200 transition hover:bg-sky-50">
-              <Save className="h-4 w-4 text-cyan-600" />
+            <Link to="/load" className="grid h-9 w-9 place-items-center rounded-xl bg-white/10 text-white ring-1 ring-white/15 transition hover:bg-white/15">
+              <Save className="h-4 w-4 text-cyan-300" />
             </Link>
-            <Link to="/dashboard" className="grid h-9 w-9 place-items-center rounded-xl bg-slate-900 text-white shadow-sm transition hover:bg-slate-800">
+            <Link to="/dashboard" className="grid h-9 w-9 place-items-center rounded-xl bg-white/10 text-white ring-1 ring-white/15 transition hover:bg-white/15">
               <BarChart3 className="h-4 w-4" />
             </Link>
           </div>
