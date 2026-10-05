@@ -192,7 +192,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setParkAppeal(calculatedAppeal);
     const appealDemandMult = 0.85 + (calculatedAppeal.score / 100) * 0.30;
     const placedItems = prevGrid
-      .map((id, idx) => (id ? { id, idx, attr: getParkItem(id), level: (currentUpgrades || [])[idx] || 0 } : null))
+      .map((id, idx) => (id ? { id, idx, attr: getParkItem(id), zone: currentZones?.[idx] || null, level: (currentUpgrades || [])[idx] || 0 } : null))
       .filter(Boolean);
     const attractions = placedItems.filter((p) => p.attr.category === "attraction");
     const facilities = placedItems.filter((p) => p.attr.category === "facility");
@@ -783,6 +783,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         priorityPass,
         researchPoints,
         completedResearch,
+        parkAppeal,
         savedAt: new Date().toISOString(),
       };
       writeSlots(slots);
@@ -827,6 +828,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setFeedback(data.feedback ?? []);
     setResearchPoints(data.researchPoints ?? 0);
     setCompletedResearch(data.completedResearch ?? []);
+    setParkAppeal(data.parkAppeal ?? calculateParkAppeal({ grid: data.grid ?? makeStartingGrid(), zones: data.parkZones ?? [], getItem: getParkItem }));
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
     setLastNet(data.lastNet ?? 0);
     setPlaying(false);
@@ -896,6 +898,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setFeedback([]);
     setResearchPoints(0);
     setCompletedResearch(starterResearch);
+    setParkAppeal(calculateParkAppeal({ grid: startGrid, zones: startZones, getItem: getParkItem }));
     trackEvent("park_reset", { starterPark: park.id, level: park.level, money: baseMoney });
   }, []);
 
