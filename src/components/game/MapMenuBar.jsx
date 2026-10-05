@@ -23,13 +23,13 @@ export default function MapMenuBar({ openSheet, onOpen, missionsBadge = 0, incid
             onClick={() => onOpen(active ? null : m.key)}
             title={m.label}
             className={
-              "group relative grid h-11 w-11 place-items-center rounded-xl shadow-lg ring-1 backdrop-blur transition active:scale-95 sm:h-12 sm:w-12 " +
+              "group relative grid h-14 w-14 place-items-center rounded-2xl shadow-xl ring-1 backdrop-blur transition active:scale-95 sm:h-16 sm:w-16 " +
               (active
                 ? "bg-cyan-500 text-white ring-cyan-300"
                 : "bg-slate-900/90 text-white/90 ring-white/15 hover:scale-105 hover:bg-slate-800")
             }
           >
-            <Icon className="h-5 w-5" />
+            <Icon className="h-7 w-7 sm:h-8 sm:w-8" strokeWidth={2.5} />
             <span className="pointer-events-none absolute right-full mr-2 hidden whitespace-nowrap rounded-lg bg-slate-900/95 px-2.5 py-1 text-xs font-bold text-white shadow-lg group-hover:block">
               {m.label}
             </span>
