@@ -1,7 +1,7 @@
 // Persistent game settings: vibration + difficulty. Sound is owned by soundManager.
 const KEY = "splash-settings";
 
-const DEFAULTS = { vibration: true, difficulty: "normal" };
+const DEFAULTS = { vibration: true, difficulty: "normal", sandbox: false };
 
 export const DIFFICULTIES = [
   { id: "easy", label: "Easy", desc: "Generous starting budget, lighter upkeep", moneyMult: 1.6, upkeepMult: 0.85 },
