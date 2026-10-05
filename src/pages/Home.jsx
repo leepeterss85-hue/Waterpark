@@ -182,7 +182,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="relative flex-1 overflow-hidden p-1.5 sm:p-2">
+      <main className="relative flex-1 min-h-0 overflow-hidden p-1.5 sm:p-2">
         <ParkGrid
           grid={game.grid}
           parkZones={game.parkZones}
@@ -202,26 +202,21 @@ export default function Home() {
           weather={game.weather}
           seasonEvent={game.seasonEvent}
           onTileClick={handleTileClickWithSound}
+          topControls={
+            <>
+              <GameControls
+                playing={game.playing}
+                speed={game.speed}
+                onTogglePlay={() => game.setPlaying(!game.playing)}
+                onSpeed={game.setSpeed}
+                onAdvance={() => { trackEvent("day_advanced", { source: "manual" }); game.advanceDay(); }}
+                onReset={game.resetGame}
+              />
+              {game.challenge && <div className="park-game-notice"><ChallengeBanner challenge={game.challenge} /></div>}
+            </>
+          }
+          bottomMenu={<MapMenuBar openSheet={openSheet} onOpen={handleOpenMenu} missionsBadge={claimableMissions} incidentBadge={incidentCount} />}
         />
-
-        <div className="absolute left-1/2 top-1.5 z-30 -translate-x-1/2 sm:top-2">
-          <GameControls
-            playing={game.playing}
-            speed={game.speed}
-            onTogglePlay={() => game.setPlaying(!game.playing)}
-            onSpeed={game.setSpeed}
-            onAdvance={() => { trackEvent("day_advanced", { source: "manual" }); game.advanceDay(); }}
-            onReset={game.resetGame}
-          />
-        </div>
-
-        {game.challenge && (
-          <div className="absolute left-2 top-16 z-20 max-w-[55%] sm:left-3 sm:top-20">
-            <ChallengeBanner challenge={game.challenge} />
-          </div>
-        )}
-
-        <MapMenuBar openSheet={openSheet} onOpen={handleOpenMenu} missionsBadge={claimableMissions} incidentBadge={incidentCount} />
 
         <Sheet open={game.selectedTile != null && !!selectedItem} onOpenChange={(v) => { if (!v) game.setSelectedTile(null); }}>
           <SheetContent side="right" className="flex w-full flex-col overflow-hidden p-0 sm:max-w-md">

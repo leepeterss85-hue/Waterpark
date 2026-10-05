@@ -3,25 +3,23 @@ import { Play, Pause, SkipForward, RotateCcw, Clock3, FastForward } from "lucide
 
 export default function GameControls({ playing, speed, onTogglePlay, onSpeed, onAdvance, onReset }) {
   return (
-    <section className="game-control-bar">
-      <div className="flex items-center gap-1.5 p-1.5 sm:gap-2 sm:p-2">
-        <button onClick={onTogglePlay} className={"game-primary-button " + (playing ? "game-button-stop" : "game-button-go") + " !min-h-[36px] !px-3 !py-2 text-xs sm:!min-h-[40px] sm:!px-4"}>
-          {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 fill-current" />}
-          <span className="hidden xs:inline sm:inline">{playing ? "Open" : "Start"}</span>
-        </button>
-        <button onClick={onAdvance} className="game-action-button !min-h-[36px] !px-3 !py-2 text-xs sm:!min-h-[40px] sm:!px-4">
-          <SkipForward className="h-4 w-4 text-cyan-300" /><span className="hidden xs:inline sm:inline">Next Day</span>
-        </button>
-        <div className="game-speed-picker !min-h-[36px] sm:!min-h-[40px]">
-          <Clock3 className="ml-1 h-3.5 w-3.5 text-white/50" />
-          {[1, 2, 3].map((s) => (
-            <button key={s} onClick={() => onSpeed(s)} className={speed === s ? "game-speed active" : "game-speed"}>
-              {s === 3 ? <FastForward className="h-3 w-3" /> : null}{s}×
-            </button>
-          ))}
-        </div>
-        <button onClick={onReset} className="game-reset-button ml-auto !px-2 !py-1.5"><RotateCcw className="h-3.5 w-3.5" /><span className="hidden sm:inline">Reset</span></button>
+    <section className="park-control-row" aria-label="Park controls">
+      <button type="button" onClick={onTogglePlay} aria-label={playing ? "Pause park" : "Open park"} aria-pressed={playing} className="park-control-button park-control-play" data-playing={playing}>
+        {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 fill-current" />}
+        <span>{playing ? "Park Open" : "Open Park"}</span>
+      </button>
+      <button type="button" onClick={onAdvance} className="park-control-button park-control-next">
+        <SkipForward className="h-4 w-4" /><span>Next Day</span>
+      </button>
+      <div className="park-speed-picker" role="group" aria-label="Game speed">
+        <Clock3 className="h-3.5 w-3.5" />
+        {[1, 2, 3].map((s) => (
+          <button type="button" key={s} onClick={() => onSpeed(s)} aria-label={`${s} times speed`} aria-pressed={speed === s}>
+            {s === 3 ? <FastForward className="h-3 w-3" /> : null}{s}×
+          </button>
+        ))}
       </div>
+      <button type="button" onClick={onReset} className="park-control-button park-control-reset"><RotateCcw className="h-4 w-4" /><span>Reset</span></button>
     </section>
   );
 }

@@ -1,0 +1,53 @@
+/* Integrated game rows reserve space instead of floating over the park. */
+.aquatic-map .game-board-titlebar,
+.aquatic-map .park-event-ribbon,
+.aquatic-map .game-map-toolbar,
+.aquatic-map .game-board-legend { flex-shrink: 0; }
+.aquatic-map .park-control-row,
+.aquatic-map .park-menu-row {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  flex-shrink: 0;
+  background: linear-gradient(115deg, hsl(var(--park-ink)), hsl(var(--park-deep)));
+  color: hsl(var(--park-rim));
+  border-top: 1px solid hsl(var(--park-rim) / .18);
+}
+.park-control-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .5rem; padding: .5rem .75rem; }
+.park-control-button,
+.park-speed-picker button {
+  display: flex; align-items: center; justify-content: center; gap: .375rem;
+  min-height: 44px; padding: .5rem .75rem; border-radius: .75rem;
+  font-size: .8125rem; font-weight: 800; white-space: nowrap;
+  background: hsl(var(--park-rim) / .12); color: hsl(var(--park-rim));
+  border: 1px solid hsl(var(--park-rim) / .25);
+}
+.park-control-button > svg { flex-shrink: 0; }
+.park-control-play { background: hsl(var(--park-green)); }
+.park-control-play[data-playing="true"] { background: hsl(var(--park-slide)); }
+.park-control-next { background: hsl(var(--park-rim)); color: hsl(var(--park-ink)); }
+.park-control-reset { background: transparent; }
+.park-speed-picker { display: flex; align-items: center; flex-shrink: 0; gap: .25rem; padding: .25rem; border-radius: .75rem; background: hsl(var(--park-ink) / .45); }
+.park-speed-picker > svg { margin: 0 .25rem; }
+.park-speed-picker button { min-height: 36px; padding: .375rem .625rem; border: 0; background: transparent; }
+.park-speed-picker button[aria-pressed="true"] { background: hsl(var(--park-rim)); color: hsl(var(--park-ink)); }
+.park-menu-row { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: .25rem; padding: .5rem .5rem max(.5rem, env(safe-area-inset-bottom)); }
+.park-menu-button { position: relative; display: flex; min-width: 0; min-height: 52px; flex-direction: column; align-items: center; justify-content: center; gap: .25rem; padding: .25rem .125rem; border-radius: .75rem; }
+.park-menu-icon { width: 1.5rem; height: 1.5rem; flex-shrink: 0; }
+.park-menu-label { font-size: .75rem; font-weight: 700; line-height: 1.25; white-space: nowrap; }
+.park-menu-button[aria-expanded="true"] { background: hsl(var(--park-rim)); color: hsl(var(--park-ink)); }
+.park-menu-badge { position: absolute; right: .25rem; top: 0; display: grid; place-items: center; min-width: 1rem; height: 1rem; padding: 0 .25rem; border-radius: 999px; background: hsl(var(--park-sun)); color: hsl(var(--park-ink)); box-shadow: 0 0 0 2px hsl(var(--park-ink)); font-size: .5625rem; font-weight: 900; }
+.park-game-notice { flex-shrink: 0; padding: .5rem .75rem; background: hsl(var(--park-deck)); }
+.park-control-row button:focus-visible,
+.park-menu-button:focus-visible { outline: 2px solid hsl(var(--park-sun)); outline-offset: -2px; }
+@media (hover: hover) {
+  .park-control-button:hover,
+  .park-menu-button:hover { box-shadow: inset 0 0 0 2px hsl(var(--park-rim) / .3); }
+}
+@media (max-width: 479px) {
+  .park-control-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: .375rem; padding: .5rem; }
+  .park-control-button { padding: .5rem; font-size: .75rem; }
+  .park-speed-picker { grid-column: 1 / -1; grid-row: 2; justify-content: center; }
+  .park-control-reset { grid-column: 3; grid-row: 1; }
+  .park-menu-label { font-size: .6875rem; }
+}
