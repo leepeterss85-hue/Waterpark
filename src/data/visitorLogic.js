@@ -81,6 +81,7 @@ export function simulateVisits({
   entertainment = 0,
   facilityBonus = 1,
   queuePaths = [],
+  appealBonus = 0,
 }) {
   const empty = {
     income: 0, avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0,
@@ -200,7 +201,7 @@ export function simulateVisits({
       guest.hunger = clamp(guest.hunger + 3);
       guest.thirst = clamp(guest.thirst + 4);
       guest.energy = clamp(guest.energy, 0, 100);
-      guest.mood += (safety - 0.7) * 6 + (cleanliness - 0.6) * 5 + entertainment;
+      guest.mood += (safety - 0.7) * 6 + (cleanliness - 0.6) * 5 + entertainment + appealBonus;
       if (pick.overcrowded) guest.mood -= 2;
       if (pick.queueWait > guest.patience / 5) guest.mood -= 3;
       if (guest.hunger > 80) guest.mood -= 4;
