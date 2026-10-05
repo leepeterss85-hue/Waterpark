@@ -80,6 +80,51 @@ export const MISSIONS = [
     level: 5,
     reward: { money: 15000, xp: 200 },
   },
+  {
+    id: "beautiful_grounds",
+    title: "Beautiful Grounds",
+    desc: "Reach 70 Park Appeal by zoning and decorating your park.",
+    type: "park_appeal",
+    target: 70,
+    level: 3,
+    reward: { money: 9000, xp: 130 },
+  },
+  {
+    id: "perfect_districts",
+    title: "Perfect Districts",
+    desc: "Create 3 themed districts with a strong attraction match.",
+    type: "themed_zones",
+    target: 3,
+    level: 5,
+    reward: { money: 18000, xp: 220 },
+  },
+  {
+    id: "five_star_resort",
+    title: "Five-Star Resort",
+    desc: "Reach 90 Park Appeal.",
+    type: "park_appeal",
+    target: 90,
+    level: 8,
+    reward: { money: 30000, xp: 350 },
+  },
+  {
+    id: "happy_crowds",
+    title: "Happy Crowds",
+    desc: "Reach an average guest mood of 75%.",
+    type: "guest_mood",
+    target: 75,
+    level: 6,
+    reward: { money: 16000, xp: 220 },
+  },
+  {
+    id: "water_empire_legend",
+    title: "Water Empire Legend",
+    desc: "Earn $250,000 across the life of your park.",
+    type: "lifetime_earnings",
+    target: 250000,
+    level: 10,
+    reward: { money: 50000, xp: 500 },
+  },
 ];
 
 export function missionProgress(mission, state) {
@@ -100,6 +145,14 @@ export function missionProgress(mission, state) {
       return state.expansionsDone;
     case "maxed_upgrades":
       return state.maxedUpgrades;
+    case "park_appeal":
+      return state.parkAppeal;
+    case "themed_zones":
+      return state.themedZones;
+    case "guest_mood":
+      return state.avgMood;
+    case "lifetime_earnings":
+      return state.lifetimeEarnings;
     default:
       return 0;
   }
