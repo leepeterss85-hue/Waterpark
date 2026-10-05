@@ -41,18 +41,21 @@ function scoreDestination(guest, item) {
   const attr = item.attr;
   let score = Math.max(0.5, attr.fun * 0.4 + 1);
   if (attr.category === "facility") {
-    if (["dining", "ice_cream", "coffee_bar"].includes(attr.id)) score += guest.hunger * 0.075;
-    if (["drinking_fountain", "concessions"].includes(attr.id)) score += guest.thirst * 0.08;
-    if (["toilets", "lockers", "cabanas", "sun_lounge"].includes(attr.id)) score += (100 - guest.energy) * 0.045;
+    if (["dining", "ice_cream", "coffee_bar", "sushi_bar", "juice_bar", "burger_shack", "pizza_stand", "smoothie_bar", "beach_bar"].includes(attr.id)) score += guest.hunger * 0.075;
+    if (["drinking_fountain", "concessions", "juice_bar", "smoothie_bar"].includes(attr.id)) score += guest.thirst * 0.08;
+    if (["toilets", "lockers", "cabanas", "sun_lounge", "towel_rental", "wifi_lounge", "beach_lounging"].includes(attr.id)) score += (100 - guest.energy) * 0.045;
+    if (["lost_found", "atm", "guest_services"].includes(attr.id)) score += 1.5;
     if (attr.id === "guest_services") score += (100 - guest.mood) * 0.03 + 1.5;
     if (guest.type === "Premium guest" && ["cabanas", "vip_lounge", "spa", "retail"].includes(attr.id)) score += 4;
     score *= 0.8;
   } else {
     if (attr.fun >= 8 && guest.mood > 60) score += 2;
     if (guest.type === "Thrill seeker" && attr.fun >= 8) score += 4;
-    if (guest.type === "Family" && ["kiddie_pool", "play_structure", "family_raft", "splash_pad", "soft_play", "lazy_river", "mini_golf", "carousel"].includes(attr.id)) score += 4;
-    if (guest.type === "Relaxed guest" && ["lazy_river", "sun_lounge", "lap_sports_pool", "mini_golf"].includes(attr.id)) score += 3;
-    if (guest.type === "Teen group" && ["multi_racer", "speed_slide", "kamikaze", "aqua_loop", "flowrider", "go_karts"].includes(attr.id)) score += 3;
+    if (guest.type === "Family" && ["kiddie_pool", "play_structure", "family_raft", "splash_pad", "soft_play", "lazy_river", "mini_golf", "carousel", "water_volleyball", "water_playground"].includes(attr.id)) score += 4;
+    if (guest.type === "Relaxed guest" && ["lazy_river", "sun_lounge", "lap_sports_pool", "mini_golf", "adventure_river", "dive_pool"].includes(attr.id)) score += 3;
+    if (guest.type === "Teen group" && ["multi_racer", "speed_slide", "kamikaze", "aqua_loop", "flowrider", "go_karts", "bumper_boats", "surf_wave_pool"].includes(attr.id)) score += 3;
+    if (guest.type === "Thrill seeker" && ["surf_wave_pool", "adventure_river", "dive_pool", "cliff_jump", "freefall_drop"].includes(attr.id)) score += 3;
+    if (guest.type === "Premium guest" && ["surf_wave_pool", "dive_pool", "vip_lounge", "spa", "sushi_bar"].includes(attr.id)) score += 3;
   }
   if (item.overcrowded) score *= 0.58;
   score *= zoneAffinity;
@@ -171,11 +174,11 @@ export function simulateVisits({
         guest.energy -= rand(7, 13);
         guest.hunger += 7;
         guest.thirst += 10;
-      } else if (["dining", "ice_cream", "coffee_bar", "concessions"].includes(attr.id)) {
+      } else if (["dining", "ice_cream", "coffee_bar", "concessions", "sushi_bar", "juice_bar", "burger_shack", "pizza_stand", "smoothie_bar", "beach_bar"].includes(attr.id)) {
         spendingByCategory.food += price * crowdScale;
         guest.hunger = Math.max(0, guest.hunger - 38);
-        guest.thirst = Math.max(0, guest.thirst - (attr.id === "concessions" ? 22 : 8));
-        guest.mood += 3;
+        guest.thirst = Math.max(0, guest.thirst - (["concessions", "juice_bar", "smoothie_bar"].includes(attr.id) ? 22 : 8));
+        guest.mood += attr.id === "sushi_bar" ? 4 : 3;
         guest.energy += 3;
       } else if (["retail", "gift_shop", "photo_kiosk"].includes(attr.id)) {
         spendingByCategory.retail += price * crowdScale;

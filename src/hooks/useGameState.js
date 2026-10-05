@@ -11,7 +11,8 @@ import { RESEARCH, dailyResearchPoints, researchReqFor } from "@/data/research";
 import { simulateVisits } from "@/data/visitorLogic";
 import { generateFeedback } from "@/data/guestFeedback";
 import { trackEvent } from "@/lib/gameAnalytics";
-import { getSettings, getDifficulty } from "@/lib/settings";
+import { getSettings, getDifficulty, saveSettings } from "@/lib/settings";
+import { rollDisaster, disasterMitigation } from "@/data/disasters";
 import { getStarterPark } from "@/data/starterParks";
 import { calculateParkAppeal } from "@/data/parkThemes";
 
@@ -108,13 +109,16 @@ const [selectedZone, setSelectedZone] = useState(null);
   const [researchPoints, setResearchPoints] = useState(0);
   const [completedResearch, setCompletedResearch] = useState([]);
   const [parkAppeal, setParkAppeal] = useState(() => ({ score: 50, label: "Untouched", zones: [], bestZone: null, coverage: 0, variety: 0, scenery: 0 }));
+  const [disaster, setDisaster] = useState(null);
+  const [disastersSurvived, setDisastersSurvived] = useState(0);
+  const [sandbox, setSandbox] = useState(getSettings().sandbox || false);
 
   const level = levelFromXp(xp);
   const gridSize = grid.length;
 
   /** @type {import("react").MutableRefObject<Record<string, any>>} */
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, completedResearch, parkAppeal };
+  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, completedResearch, parkAppeal, disaster, sandbox };
 
   // Load saved game
   useEffect(() => {
@@ -153,6 +157,8 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (data.researchPoints != null) setResearchPoints(data.researchPoints);
         if (data.completedResearch) setCompletedResearch(data.completedResearch);
         if (data.parkAppeal) setParkAppeal(data.parkAppeal);
+        if (data.disaster) setDisaster(data.disaster);
+        if (data.disastersSurvived != null) setDisastersSurvived(data.disastersSurvived);
       }
     } catch {
       /* ignore */
@@ -165,14 +171,14 @@ const [selectedZone, setSelectedZone] = useState(null);
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal })
+          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived })
         );
       } catch {
         /* ignore */
       }
     }, 300);
     return () => clearTimeout(t);
-  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal]);
+  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived]);
 
   // Load save slots list on mount
   useEffect(() => {
@@ -187,7 +193,15 @@ const [selectedZone, setSelectedZone] = useState(null);
     const ticketResearchMult = hasResearch("marketing") ? 1.10 : 1;
     const dayWeather = currentForecast || rollWeather(d + 1);
     const dayForecast = rollWeather(d + 2);
-    const eff = currentChallenge?.effects || {};
+    const currentDisaster = stateRef.current.disaster;
+    const isSandbox = stateRef.current.sandbox;
+    const eff = { ...(currentChallenge?.effects || {}) };
+    if (currentDisaster) {
+      eff.guestMult = (eff.guestMult ?? 1) * (currentDisaster.effects?.guestMult ?? 1);
+      eff.incomeMult = (eff.incomeMult ?? 1) * (currentDisaster.effects?.incomeMult ?? 1);
+      eff.repDelta = (eff.repDelta ?? 0) + (currentDisaster.effects?.repDelta ?? 0);
+      if (currentDisaster.effects?.utilityMult) eff.utilityMult = (eff.utilityMult ?? 1) * currentDisaster.effects.utilityMult;
+    }
     const calculatedAppeal = calculateParkAppeal({ grid: prevGrid, zones: currentZones, getItem: getParkItem });
     setParkAppeal(calculatedAppeal);
     const appealDemandMult = 0.85 + (calculatedAppeal.score / 100) * 0.30;
@@ -303,6 +317,9 @@ const [selectedZone, setSelectedZone] = useState(null);
       });
       income = sim.income;
       visitorStats = sim;
+      if (currentDisaster?.effects?.repDelta) {
+        visitorStats = { ...visitorStats, avgMood: Math.max(0, visitorStats.avgMood - Math.abs(currentDisaster.effects.repDelta) * 4) };
+      }
       dayFeedback = generateFeedback(sim, { day: d + 1, weather: dayWeather, incidents: remaining, cleanliness, safety, entertainment });
       const signatureRides = attractions.filter((p) => ["water_coaster", "mega_slide_complex", "freefall_drop", "cliff_jump", "tornado_bowl", "aqua_loop"].includes(p.id));
       const bigMoment = signatureRides.find((p) => (visitorStats.movements?.[p.id] || 0) >= Math.max(10, p.attr.capacity * 0.08));
@@ -363,7 +380,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     const incidentTiles = new Set(remaining.map((i) => i.tileIndex));
     const eligible = attractions.filter((p) => !incidentTiles.has(p.idx));
     const newIncidents = [];
-    if (eligible.length > 0) {
+    if (eligible.length > 0 && !isSandbox) {
       const pick = eligible[Math.floor(Math.random() * eligible.length)];
       const condition = nextCondition[pick.idx] ?? 100;
       const breakChance = Math.max(0, 0.11 - 0.018 * (counts.mechanic || 0) - 0.015 * (counts.security || 0) + (condition < 35 ? 0.16 : condition < 55 ? 0.06 : 0));
@@ -376,6 +393,11 @@ const [selectedZone, setSelectedZone] = useState(null);
       }
     }
     setIncidents([...remaining, ...newIncidents]);
+    if (currentDisaster?.id === "storm_damage") {
+      for (const p of attractions) {
+        nextCondition[p.idx] = Math.max(0, nextCondition[p.idx] - 12);
+      }
+    }
     setAttractionCondition(nextCondition);
 
     const ticketRevenue = newGuests * currentTicketPrice * ticketResearchMult;
@@ -401,7 +423,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     const marketingCost = currentAdBudget;
     const utilityCost = utilities;
     const premiumCost = currentPriorityPass ? 120 : 0;
-    const net = Math.round(grossIncome - expenses);
+    const net = isSandbox ? Math.round(grossIncome) : Math.round(grossIncome - expenses);
 
     // --- Build log entries (newest first) ---
     const entries = [];
@@ -544,6 +566,32 @@ const [selectedZone, setSelectedZone] = useState(null);
     if (vipEntries.length) {
       setLog((l) => [...vipEntries, ...l].slice(0, 12));
     }
+
+    // --- Resolve / roll disasters ---
+    if (!isSandbox) {
+      const disasterEntries = [];
+      if (currentDisaster) {
+        const daysLeft = currentDisaster.daysLeft - 1;
+        if (daysLeft <= 0) {
+          setDisaster(null);
+          setDisastersSurvived((n) => n + 1);
+          disasterEntries.push({ day: d + 1, text: `Day ${d + 1}: ✅ ${currentDisaster.name} has passed.` });
+        } else {
+          setDisaster({ ...currentDisaster, daysLeft });
+        }
+      } else if (d + 1 >= 5) {
+        const newDisaster = rollDisaster(d + 1, currentResearch);
+        if (newDisaster) {
+          const mitigation = disasterMitigation(newDisaster, counts, currentResearch);
+          const adjustedDuration = Math.max(1, newDisaster.duration - Math.round(mitigation));
+          setDisaster({ ...newDisaster, daysLeft: adjustedDuration });
+          disasterEntries.push({ day: d + 1, text: `Day ${d + 1}: 🚨 ${newDisaster.name}! ${newDisaster.description}` });
+        }
+      }
+      if (disasterEntries.length) {
+        setLog((l) => [...disasterEntries, ...l].slice(0, 12));
+      }
+    }
   }, []);
 
   // Game loop
@@ -558,7 +606,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       if (!selectedBuild) return;
       const attr = getParkItem(selectedBuild);
       if (!attr) return;
-      if (money < attr.cost) return;
+      if (!sandbox && money < attr.cost) return;
       setGrid((g) => {
         if (g[index]) return g;
         const ng = [...g];
@@ -566,14 +614,14 @@ const [selectedZone, setSelectedZone] = useState(null);
         setParkAppeal(calculateParkAppeal({ grid: ng, zones: parkZones, getItem: getParkItem }));
         return ng;
       });
-      setMoney((m) => m - attr.cost);
+      if (!sandbox) setMoney((m) => m - attr.cost);
       if (attr.category === "attraction") {
         setBuiltAttractionIds((ids) => (ids.includes(selectedBuild) ? ids : [...ids, selectedBuild]));
       }
       setLastBuildAction({ index, id: selectedBuild, cost: attr.cost });
       trackEvent("attraction_built", { id: selectedBuild, category: attr.category, cost: attr.cost });
     },
-    [selectedBuild, money, parkZones]
+    [selectedBuild, money, parkZones, sandbox]
   );
 
   const paintZone = useCallback((index) => {
@@ -652,18 +700,18 @@ const [selectedZone, setSelectedZone] = useState(null);
       const level = upgrades[index] || 0;
       if (level >= MAX_UPGRADE) return;
       const cost = upgradeCost(attr.cost, level);
-      if (money < cost) return;
+      if (!sandbox && money < cost) return;
       setUpgrades((u) => {
         const nu = [...u];
         nu[index] = level + 1;
         return nu;
       });
-      setMoney((m) => m - cost);
+      if (!sandbox) setMoney((m) => m - cost);
       setTotalUpgrades((t) => t + 1);
       setXp((x) => x + 15);
       trackEvent("attraction_upgraded", { id, level: level + 1, cost });
     },
-    [grid, upgrades, money]
+    [grid, upgrades, money, sandbox]
   );
 
   const hireStaff = useCallback((type) => {
@@ -685,15 +733,23 @@ const [selectedZone, setSelectedZone] = useState(null);
     if (expansionsDone >= MAX_EXPANSIONS) return;
     if (level < expandLevelReq(expansionsDone)) return;
     const cost = expandCost(expansionsDone);
-    if (money < cost) return;
+    if (!sandbox && money < cost) return;
     setGrid((g) => [...g, ...Array(EXPAND_ROW).fill(null)]);
     setParkZones((z) => [...z, ...Array(EXPAND_ROW).fill(null)]);
     setUpgrades((u) => [...u, ...Array(EXPAND_ROW).fill(0)]);
     setAttractionCondition((conditions) => [...conditions, ...Array(EXPAND_ROW).fill(100)]);
-    setMoney((m) => m - cost);
+    if (!sandbox) setMoney((m) => m - cost);
     setExpansionsDone((e) => e + 1);
     trackEvent("park_expanded", { expansions: expansionsDone + 1, cost });
-  }, [expansionsDone, level, money]);
+  }, [expansionsDone, level, money, sandbox]);
+
+  const toggleSandbox = useCallback(() => {
+    setSandbox((prev) => {
+      const next = !prev;
+      saveSettings({ sandbox: next });
+      return next;
+    });
+  }, []);
 
   const chooseBuild = useCallback((id) => {
     setSelectedBuild(id);
@@ -794,6 +850,8 @@ const [selectedZone, setSelectedZone] = useState(null);
         researchPoints,
         completedResearch,
         parkAppeal,
+        disaster,
+        disastersSurvived,
         savedAt: new Date().toISOString(),
       };
       writeSlots(slots);
@@ -801,7 +859,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       trackEvent("park_saved", { name: trimmed });
       return true;
     },
-    [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, researchPoints, completedResearch, parkAppeal]
+    [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived]
   );
 
   const loadPark = useCallback((name) => {
@@ -839,6 +897,8 @@ const [selectedZone, setSelectedZone] = useState(null);
     setResearchPoints(data.researchPoints ?? 0);
     setCompletedResearch(data.completedResearch ?? []);
     setParkAppeal(data.parkAppeal ?? calculateParkAppeal({ grid: data.grid ?? makeStartingGrid(), zones: data.parkZones ?? [], getItem: getParkItem }));
+    if (data.disaster) setDisaster(data.disaster);
+    if (data.disastersSurvived != null) setDisastersSurvived(data.disastersSurvived);
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
     setLastNet(data.lastNet ?? 0);
     setPlaying(false);
@@ -909,6 +969,8 @@ const [selectedZone, setSelectedZone] = useState(null);
     setResearchPoints(0);
     setCompletedResearch(starterResearch);
     setParkAppeal(calculateParkAppeal({ grid: startGrid, zones: startZones, getItem: getParkItem }));
+    setDisaster(null);
+    setDisastersSurvived(0);
     trackEvent("park_reset", { starterPark: park.id, level: park.level, money: baseMoney });
   }, []);
 
@@ -963,6 +1025,10 @@ const [selectedZone, setSelectedZone] = useState(null);
     researchPoints,
     completedResearch,
     parkAppeal,
+    disaster,
+    disastersSurvived,
+    sandbox,
+    toggleSandbox,
     unlockResearch,
     builtCount: builtAttractionIds.length,
     achievementState: {
@@ -979,6 +1045,8 @@ const [selectedZone, setSelectedZone] = useState(null);
       facilityCount: grid.filter((id) => id && getParkItem(id)?.category === "facility").length,
       avgMood: visitorStats?.avgMood || 0,
       avgSpendPerVisit: visitorStats?.avgSpendPerVisit || 0,
+      disastersSurvived,
+      sandboxUsed: sandbox,
     },
     missionState: {
       attractionCount: grid.filter((id) => id && getParkItem(id)?.category === "attraction").length,

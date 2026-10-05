@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Volume2, VolumeX, Vibrate, VibrateOff, Play, RotateCcw, Save, SlidersHorizontal, HardHat, ArrowLeft } from "lucide-react";
+import { Volume2, VolumeX, Vibrate, VibrateOff, Play, RotateCcw, Save, SlidersHorizontal, HardHat, ArrowLeft, Sparkles, Ban } from "lucide-react";
 import { sound } from "@/lib/soundManager";
 import { getSettings, saveSettings, haptics, DIFFICULTIES } from "@/lib/settings";
 import SaveLoadPanel from "@/components/game/SaveLoadPanel";
@@ -33,7 +33,7 @@ function Toggle({ on, onClick, onIcon: OnIcon, offIcon: OffIcon, onTone = "text-
   );
 }
 
-export default function SettingsPanel({ saves, onSave, onLoad, onDelete, onNewGame, onContinue }) {
+export default function SettingsPanel({ saves, onSave, onLoad, onDelete, onNewGame, onContinue, sandbox, onToggleSandbox }) {
   const [soundOn, setSoundOn] = useState(!sound.isMuted());
   const [vibrationOn, setVibrationOn] = useState(haptics.isEnabled());
   const [difficulty, setDifficulty] = useState(getSettings().difficulty);
@@ -156,6 +156,16 @@ export default function SettingsPanel({ saves, onSave, onLoad, onDelete, onNewGa
           })}
         </div>
         <p className="mt-1.5 text-[10px] font-semibold text-slate-400">Difficulty applies to the next New Game.</p>
+      </div>
+
+      <div>
+        <div className="mb-2 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-slate-500">
+          <Sparkles className="h-3.5 w-3.5" /> Sandbox
+        </div>
+        <Row icon={Sparkles} title="Sandbox Mode" desc="Unlimited money, no incidents, no disasters">
+          <Toggle on={!!sandbox} onClick={onToggleSandbox} onIcon={Sparkles} offIcon={Ban} />
+        </Row>
+        <p className="mt-1.5 text-[10px] font-semibold text-slate-400">Free building with no costs or negative events. Toggles instantly.</p>
       </div>
     </div>
   );

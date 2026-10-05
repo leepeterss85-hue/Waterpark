@@ -25,6 +25,13 @@ export const ACHIEVEMENTS = [
   { id: "joyful", title: "Joyful Guests", desc: "Reach 85% average guest mood.", icon: "HeartPulse", color: "from-pink-400 to-rose-500", check: (s) => (s.avgMood || 0) >= 85 },
   { id: "big_spender", title: "Big Spenders", desc: "Reach $40 average spend per visit.", icon: "ShoppingBag", color: "from-emerald-400 to-green-500", check: (s) => (s.avgSpendPerVisit || 0) >= 40 },
   { id: "fully_staffed", title: "Fully Staffed", desc: "Hire 10 staff members in total.", icon: "Users", color: "from-cyan-400 to-blue-500", check: (s) => (s.staffTotal || 0) >= 10 },
+  { id: "rapids_rider", title: "Rapids Rider", desc: "Build the Adventure Rapids attraction.", icon: "Wind", color: "from-teal-400 to-cyan-600", check: (s) => s.builtAttractionIds?.includes("adventure_river") },
+  { id: "volleyball_pro", title: "Volleyball Pro", desc: "Build the Water Volleyball court.", icon: "CircleDot", color: "from-lime-400 to-emerald-500", check: (s) => s.builtAttractionIds?.includes("water_volleyball") },
+  { id: "playground_builder", title: "Playground Builder", desc: "Build the Giant Water Playground.", icon: "Castle", color: "from-amber-400 to-orange-600", check: (s) => s.builtAttractionIds?.includes("water_playground") },
+  { id: "surf_master", title: "Surf Master", desc: "Build the Surf Wave Pool.", icon: "Waves", color: "from-cyan-500 to-blue-700", check: (s) => s.builtAttractionIds?.includes("surf_wave_pool") },
+  { id: "deep_diver", title: "Deep Diver", desc: "Build the Deep Dive Pool.", icon: "Anchor", color: "from-blue-600 to-indigo-700", check: (s) => s.builtAttractionIds?.includes("dive_pool") },
+  { id: "disaster_survivor", title: "Disaster Survivor", desc: "Survive 3 disasters.", icon: "Shield", color: "from-rose-400 to-red-600", check: (s) => (s.disastersSurvived || 0) >= 3 },
+  { id: "sandbox_explorer", title: "Sandbox Explorer", desc: "Try Sandbox Mode.", icon: "Sparkles", color: "from-amber-400 to-yellow-500", check: (s) => s.sandboxUsed },
 ];
 
 export function unlockedAchievements(state) {

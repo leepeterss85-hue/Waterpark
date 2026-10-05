@@ -22,6 +22,7 @@ import LevelUpCelebration from "@/components/game/LevelUpCelebration";
 import Tutorial from "@/components/game/Tutorial";
 import UndoButton from "@/components/game/UndoButton";
 import VipBanner from "@/components/game/VipBanner";
+import DisasterBanner from "@/components/game/DisasterBanner";
 import { trackEvent } from "@/lib/gameAnalytics";
 import { sound } from "@/lib/soundManager";
 import { haptics } from "@/lib/settings";
@@ -241,6 +242,7 @@ export default function Home() {
               />
               {game.challenge && <div className="park-game-notice"><ChallengeBanner challenge={game.challenge} /></div>}
               {game.vipVisit && <VipBanner vipVisit={game.vipVisit} />}
+              {game.disaster && <DisasterBanner disaster={game.disaster} />}
             </>
           }
           bottomMenu={<MapMenuBar openSheet={openSheet} onOpen={handleOpenMenu} missionsBadge={claimableMissions} incidentBadge={incidentCount} />}

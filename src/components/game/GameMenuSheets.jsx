@@ -95,6 +95,8 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
           onDelete={game.deleteSave}
           onNewGame={game.resetGame}
           onContinue={close}
+          sandbox={game.sandbox}
+          onToggleSandbox={game.toggleSandbox}
         />
       </SheetShell>
 
