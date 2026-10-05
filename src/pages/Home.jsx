@@ -188,24 +188,13 @@ export default function Home() {
         <div className="mt-3"><GameControls playing={game.playing} speed={game.speed} onTogglePlay={() => game.setPlaying(!game.playing)} onSpeed={game.setSpeed} onAdvance={() => { trackEvent("day_advanced", { source: "manual" }); game.advanceDay(); }} onReset={game.resetGame} /></div>
         <div className="mt-3"><ParkToolbar weather={game.weather} forecast={game.forecast} season={game.season} seasonEvent={game.seasonEvent} guests={game.guests} selectedZone={game.selectedZone} onZoneSelect={game.setSelectedZone} /></div>
 
-        <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
-          <div className="flex min-w-0 flex-col gap-4">
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-[minmax(0,1fr)_300px] lg:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="flex min-w-0 flex-col gap-3 sm:gap-4">
             <ChallengeBanner challenge={game.challenge} />
             <ParkGrid grid={game.grid} parkZones={game.parkZones} upgrades={game.upgrades} selectedBuild={game.selectedBuild} selectedTile={game.selectedTile} selectedZone={game.selectedZone} incidents={game.incidents} guests={game.guests} visitorMovements={game.visitorStats?.movements} queueStats={game.visitorStats?.queueStats} attractionCondition={game.attractionCondition} staff={game.staff} staffAssignments={game.staffAssignments} lifeguardTotal={game.staff?.lifeguard || 0} day={game.day} weather={game.weather} seasonEvent={game.seasonEvent} onTileClick={handleTileClickWithSound} />
-
-            <Tabs value={infoTab} onValueChange={setInfoTab} className="waterpark-panel bg-white/85 p-3 sm:p-4">
-              <TabsList className="w-full justify-between">
-                <TabsTrigger value="activity" className="flex-1 gap-1.5 text-xs"><Activity className="h-3.5 w-3.5" /> Activity</TabsTrigger>
-                <TabsTrigger value="insights" className="flex-1 gap-1.5 text-xs"><BarChart3 className="h-3.5 w-3.5" /> Insights</TabsTrigger>
-                <TabsTrigger value="missions" className="relative flex-1 gap-1.5 text-xs"><Target className="h-3.5 w-3.5" /> Missions<Badge count={claimableMissions} /></TabsTrigger>
-              </TabsList>
-              <TabsContent value="activity"><ActivityLog feedback={game.feedback} log={game.log} issueCount={game.incidents.length} guestExperience={game.visitorStats?.guestExperience} /></TabsContent>
-              <TabsContent value="insights"><VisitorInsight visitorStats={game.visitorStats} /></TabsContent>
-              <TabsContent value="missions"><MissionsPanel level={game.level} xp={game.xp} xpForNext={game.xpForNext} missionState={game.missionState} claimedMissions={game.claimedMissions} onClaim={game.claimMission} /></TabsContent>
-            </Tabs>
           </div>
 
-          <aside className="flex min-w-0 flex-col gap-4">
+          <aside className="flex min-w-0 flex-col gap-3 sm:gap-4">
             {selectedItem && (
               selectedItem.category === "environment" ? (
                 <ParkObjectDetail
@@ -269,6 +258,19 @@ export default function Home() {
               </TabsContent>
             </Tabs>
           </aside>
+
+          <div className="md:col-span-2 lg:col-span-1">
+            <Tabs value={infoTab} onValueChange={setInfoTab} className="waterpark-panel bg-white/85 p-3 sm:p-4">
+              <TabsList className="w-full justify-between">
+                <TabsTrigger value="activity" className="flex-1 gap-1.5 text-xs"><Activity className="h-3.5 w-3.5" /> Activity</TabsTrigger>
+                <TabsTrigger value="insights" className="flex-1 gap-1.5 text-xs"><BarChart3 className="h-3.5 w-3.5" /> Insights</TabsTrigger>
+                <TabsTrigger value="missions" className="relative flex-1 gap-1.5 text-xs"><Target className="h-3.5 w-3.5" /> Missions<Badge count={claimableMissions} /></TabsTrigger>
+              </TabsList>
+              <TabsContent value="activity"><ActivityLog feedback={game.feedback} log={game.log} issueCount={game.incidents.length} guestExperience={game.visitorStats?.guestExperience} /></TabsContent>
+              <TabsContent value="insights"><VisitorInsight visitorStats={game.visitorStats} /></TabsContent>
+              <TabsContent value="missions"><MissionsPanel level={game.level} xp={game.xp} xpForNext={game.xpForNext} missionState={game.missionState} claimedMissions={game.claimedMissions} onClaim={game.claimMission} /></TabsContent>
+            </Tabs>
+          </div>
         </div>
       </main>
       <DailySummary report={dailyReport} onClose={() => setDailyReport(null)} />
