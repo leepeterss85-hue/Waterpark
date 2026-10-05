@@ -563,6 +563,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (g[index]) return g;
         const ng = [...g];
         ng[index] = selectedBuild;
+        setParkAppeal(calculateParkAppeal({ grid: ng, zones: parkZones, getItem: getParkItem }));
         return ng;
       });
       setMoney((m) => m - attr.cost);
@@ -572,7 +573,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       setLastBuildAction({ index, id: selectedBuild, cost: attr.cost });
       trackEvent("attraction_built", { id: selectedBuild, category: attr.category, cost: attr.cost });
     },
-    [selectedBuild, money]
+    [selectedBuild, money, parkZones]
   );
 
   const paintZone = useCallback((index) => {
@@ -580,9 +581,10 @@ const [selectedZone, setSelectedZone] = useState(null);
     setParkZones((z) => {
       const nz = [...z];
       nz[index] = selectedZone;
+      setParkAppeal(calculateParkAppeal({ grid, zones: nz, getItem: getParkItem }));
       return nz;
     });
-  }, [selectedZone]);
+  }, [selectedZone, grid]);
 
   const handleTileClick = useCallback(
     (index) => {
