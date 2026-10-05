@@ -1,14 +1,28 @@
 /* Scoped scene styling: the grid stays the only interactive building surface. */
 .aquatic-map .game-board-titlebar { background: linear-gradient(115deg,hsl(var(--park-ink)),hsl(var(--park-deep))) !important; }
 .aquatic-map .game-board-frame { background: hsl(var(--park-edge)) !important; }
-.aquatic-map .game-map-surface { padding: 0 !important; min-height: 0; border-radius: 16px !important; background: hsl(var(--park-deck)) !important; box-shadow: inset 0 0 0 1px hsl(var(--park-edge)),0 7px 20px hsl(var(--park-ink)/.14); }
-.aquatic-map .game-map-surface::before,.aquatic-map .game-map-surface::after { display: none; }
-.aquatic-map .game-map-stage { position: relative; padding: 8px; background: linear-gradient(0deg,hsl(var(--park-edge)/.3),transparent),repeating-linear-gradient(0deg,transparent 0 23px,hsl(var(--park-edge)/.28) 23px 24px),repeating-linear-gradient(90deg,transparent 0 23px,hsl(var(--park-edge)/.28) 23px 24px),hsl(var(--park-deck)); border-top: 3px solid hsl(var(--park-rim)); }
+.aquatic-map .game-map-surface { padding: 0 !important; min-height: 0; border-radius: 16px !important; background:
+  radial-gradient(ellipse at 12% 10%, hsl(var(--park-rim)/.55) 0 1.5%, transparent 2.5%),
+  radial-gradient(ellipse at 88% 90%, hsl(var(--park-rim)/.5) 0 1.5%, transparent 2.5%),
+  repeating-linear-gradient(0deg, transparent 0 28px, hsl(var(--park-edge)/.16) 28px 29px),
+  repeating-linear-gradient(90deg, transparent 0 28px, hsl(var(--park-edge)/.16) 28px 29px),
+  linear-gradient(145deg, hsl(var(--park-deck)) 0%, hsl(42 55% 84%) 55%, hsl(38 50% 80%) 100%) !important;
+  box-shadow: inset 0 0 0 2px hsl(var(--park-rim)/.7), inset 0 0 24px hsl(var(--park-water)/.18), 0 7px 20px hsl(var(--park-ink)/.14); }
+.aquatic-map .game-map-surface::before { content:""; position:absolute; inset:0; pointer-events:none; z-index:1; background:
+  radial-gradient(circle at 20% 30%, hsl(var(--park-water)/.22) 0 6%, transparent 7%),
+  radial-gradient(circle at 75% 65%, hsl(var(--park-water)/.20) 0 5%, transparent 6%),
+  radial-gradient(circle at 50% 85%, hsl(var(--park-water)/.18) 0 4%, transparent 5%); opacity:.7; }
+.aquatic-map .game-map-surface::after { content:""; position:absolute; inset:0; pointer-events:none; z-index:1; border-radius:16px; box-shadow: inset 0 0 0 6px hsl(var(--park-water)/.25), inset 0 0 0 8px hsl(var(--park-rim)/.5); }
+.aquatic-map .game-map-stage { position: relative; padding: 8px; background:
+  linear-gradient(0deg,hsl(var(--park-edge)/.25),transparent),
+  repeating-linear-gradient(0deg,transparent 0 23px,hsl(var(--park-edge)/.22) 23px 24px),
+  repeating-linear-gradient(90deg,transparent 0 23px,hsl(var(--park-edge)/.22) 23px 24px),
+  linear-gradient(145deg,hsl(var(--park-deck)),hsl(42 52% 82%)); border-top: 3px solid hsl(var(--park-rim)); border-radius: 12px; box-shadow: inset 0 0 0 1px hsl(var(--park-rim)/.4), inset 0 2px 8px hsl(var(--park-water)/.12); }
 .aquatic-map .park-playfield { min-width: 704px; }
 .aquatic-map .game-map-grid { gap: 3px !important; filter: none; }
-.aquatic-map .game-map-grid > button[data-kind="empty"]:not(:has(.ride-art)):not(:has(.facility-art)):not(:has(.park-entrance-art)):not(:has(.service-road)):not(:has(.queue-rail)) { border: 1px dashed hsl(var(--park-ink)/.13) !important; border-radius: 5px !important; background: transparent !important; box-shadow: none !important; }
-.aquatic-map .game-map-grid > button[data-kind="empty"]:not(:has(.ride-art)):not(:has(.facility-art)):not(:has(.park-entrance-art)):not(:has(.service-road)):not(:has(.queue-rail)):hover { background: hsl(var(--park-water)/.12) !important; border-color: hsl(var(--park-deep)/.6) !important; }
-.aquatic-map .game-map-grid > button[data-kind="empty"][data-buildable="true"]:not(:has(.ride-art)):not(:has(.facility-art)):not(:has(.park-entrance-art)):not(:has(.service-road)):not(:has(.queue-rail)) { background: hsl(var(--park-water)/.11) !important; border-color: hsl(var(--park-deep)/.65) !important; }
+.aquatic-map .game-map-grid > button[data-kind="empty"]:not(:has(.ride-art)):not(:has(.facility-art)):not(:has(.park-entrance-art)):not(:has(.service-road)):not(:has(.queue-rail)) { border: 1px solid hsl(var(--park-edge)/.45) !important; border-radius: 7px !important; background: linear-gradient(145deg, hsl(var(--park-deck)/.85), hsl(42 48% 80%/.7)) !important; box-shadow: inset 0 1px 0 hsl(var(--park-rim)/.5), inset 0 -2px 4px hsl(var(--park-edge)/.2) !important; }
+.aquatic-map .game-map-grid > button[data-kind="empty"]:not(:has(.ride-art)):not(:has(.facility-art)):not(:has(.park-entrance-art)):not(:has(.service-road)):not(:has(.queue-rail)):hover { background: linear-gradient(145deg, hsl(var(--park-rim)/.6), hsl(var(--park-water)/.3)) !important; border-color: hsl(var(--park-water)/.7) !important; box-shadow: inset 0 0 8px hsl(var(--park-water)/.3), 0 0 0 1px hsl(var(--park-water)/.4) !important; }
+.aquatic-map .game-map-grid > button[data-kind="empty"][data-buildable="true"]:not(:has(.ride-art)):not(:has(.facility-art)):not(:has(.park-entrance-art)):not(:has(.service-road)):not(:has(.queue-rail)) { background: linear-gradient(145deg, hsl(var(--park-water)/.22), hsl(var(--park-rim)/.4)) !important; border-color: hsl(var(--park-water)/.6) !important; box-shadow: inset 0 1px 0 hsl(var(--park-rim)/.7), inset 0 0 10px hsl(var(--park-water)/.25) !important; }
 .aquatic-map .game-map-grid > button:focus-visible { outline: 3px solid hsl(var(--park-water)); outline-offset: 1px; }
 .aquatic-map .park-build-hint { gap: 1px; }
 .aquatic-map .park-build-symbol { width: 45%; height: auto; aspect-ratio: 1; box-shadow: none; }
