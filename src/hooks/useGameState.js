@@ -24,6 +24,7 @@ import { MEMBERSHIP_TIERS, simulateMemberships, totalMemberCount } from "@/data/
 import { AWARD_CATEGORIES, AWARD_CEREMONY_CYCLE, evaluateAwards, totalAwardGuestMult } from "@/data/awards";
 import { generateSocialPosts, computeSocialReputation, socialDemandMult, socialPriceTolerance } from "@/data/socialMedia";
 import { simulateEmergencies, EMERGENCY_TYPES } from "@/data/emergencies";
+import { PROJECT_TYPES, getConstructionDisruption, simulateConstruction } from "@/data/construction";
 
 const STORAGE_KEY = "waterpark-tycoon-save-v1";
 const SLOTS_KEY = "waterpark-tycoon-slots";
@@ -140,13 +141,14 @@ const [selectedZone, setSelectedZone] = useState(null);
   const [socialReputation, setSocialReputation] = useState(50);
   const [emergencies, setEmergencies] = useState([]);
   const [emergencyStats, setEmergencyStats] = useState({ totalEmergencies: 0, totalCost: 0, resolvedCount: 0 });
+  const [constructionProjects, setConstructionProjects] = useState([]);
 
   const level = levelFromXp(xp);
   const gridSize = grid.length;
 
   /** @type {import("react").MutableRefObject<Record<string, any>>} */
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, completedResearch, parkAppeal, disaster, sandbox, activeCampaigns, hotelGuests, resortRating, pricing, popularity, popularityTrend, activeEvents, xp, membershipCounts, membershipTimers, membershipStats, peakGuests, totalUpgrades, awards, awardCeremonyTimer, awardStats, awardGuestMult: totalAwardGuestMult(awards), socialPosts, socialReputation, emergencies };
+  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, completedResearch, parkAppeal, disaster, sandbox, activeCampaigns, hotelGuests, resortRating, pricing, popularity, popularityTrend, activeEvents, xp, membershipCounts, membershipTimers, membershipStats, peakGuests, totalUpgrades, awards, awardCeremonyTimer, awardStats, awardGuestMult: totalAwardGuestMult(awards), socialPosts, socialReputation, emergencies, constructionProjects };
 
   // Load saved game
   useEffect(() => {
@@ -206,6 +208,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (data.socialReputation != null) setSocialReputation(data.socialReputation);
         if (data.emergencies) setEmergencies(data.emergencies);
         if (data.emergencyStats) setEmergencyStats(data.emergencyStats);
+        if (data.constructionProjects) setConstructionProjects(data.constructionProjects);
       }
     } catch {
       /* ignore */
@@ -218,14 +221,14 @@ const [selectedZone, setSelectedZone] = useState(null);
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats })
+          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects })
         );
       } catch {
         /* ignore */
       }
     }, 300);
     return () => clearTimeout(t);
-  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, popularity, popularityTrend, prevPopularity, activeEvents]);
+  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, popularity, popularityTrend, prevPopularity, activeEvents, constructionProjects]);
 
   // Load save slots list on mount
   useEffect(() => {
@@ -257,6 +260,9 @@ const [selectedZone, setSelectedZone] = useState(null);
       eff.incomeMult = (eff.incomeMult ?? 1) * eventFx.incomeMult;
       eff.repDelta = (eff.repDelta ?? 0) + eventFx.repDelta;
     }
+    const constructionDisruption = getConstructionDisruption(stateRef.current.constructionProjects);
+    eff.guestMult = (eff.guestMult ?? 1) * constructionDisruption.guestMult;
+    eff.repDelta = (eff.repDelta ?? 0) + constructionDisruption.repPerDay;
     const calculatedAppeal = calculateParkAppeal({ grid: prevGrid, zones: currentZones, getItem: getParkItem });
     setParkAppeal(calculatedAppeal);
     const appealDemandMult = 0.85 + (calculatedAppeal.score / 100) * 0.30;
@@ -924,6 +930,46 @@ const [selectedZone, setSelectedZone] = useState(null);
     } else {
       setAwardCeremonyTimer(ceremonyTimer - 1);
     }
+
+    // --- Construction project progression ---
+    const constructionResult = simulateConstruction({
+      day: d + 1,
+      projects: stateRef.current.constructionProjects,
+      grid: prevGrid,
+    });
+    setConstructionProjects(constructionResult.updatedProjects);
+    for (const action of constructionResult.completionActions) {
+      if (action.type === "place") {
+        setGrid((g) => { const ng = [...g]; ng[action.tileIndex] = action.itemId; return ng; });
+        setPopularity((p) => { const n = [...p]; while (n.length <= action.tileIndex) n.push(0); n[action.tileIndex] = DEFAULT_POPULARITY; return n; });
+        setPopularityTrend((t) => { const n = [...t]; while (n.length <= action.tileIndex) n.push(0); n[action.tileIndex] = NEW_RIDE_TREND_BOOST; return n; });
+        setBuiltAttractionIds((ids) => ids.includes(action.itemId) ? ids : [...ids, action.itemId]);
+      } else if (action.type === "expand") {
+        setGrid((g) => [...g, ...Array(action.lots).fill(null)]);
+        setParkZones((z) => [...z, ...Array(action.lots).fill(null)]);
+        setUpgrades((u) => [...u, ...Array(action.lots).fill(0)]);
+        setAttractionCondition((c) => [...c, ...Array(action.lots).fill(100)]);
+        setPopularity((p) => [...p, ...Array(action.lots).fill(0)]);
+        setPopularityTrend((t) => [...t, ...Array(action.lots).fill(0)]);
+        setPrevPopularity((p) => [...p, ...Array(action.lots).fill(0)]);
+        setExpansionsDone((e) => e + 1);
+      } else if (action.type === "renovate") {
+        setUpgrades((u) => { const n = [...u]; n[action.tileIndex] = MAX_UPGRADE; return n; });
+        setAttractionCondition((c) => { const n = [...c]; n[action.tileIndex] = 100; return n; });
+        setPopularity((p) => { const n = [...p]; n[action.tileIndex] = Math.min(100, (n[action.tileIndex] || 50) + 30); return n; });
+        setPopularityTrend((t) => { const n = [...t]; n[action.tileIndex] = NEW_RIDE_TREND_BOOST; return n; });
+        setIncidents((items) => items.filter((i) => i.tileIndex !== action.tileIndex));
+      }
+    }
+    if (constructionResult.totalRepReward > 0) {
+      setReputation((rv) => Math.min(100, rv + constructionResult.totalRepReward));
+    }
+    if (constructionResult.totalXpReward > 0) {
+      setXp((x) => x + constructionResult.totalXpReward);
+    }
+    if (constructionResult.logEntries.length) {
+      setLog((l) => [...constructionResult.logEntries, ...l].slice(0, 12));
+    }
   }, []);
 
   // Game loop
@@ -1135,6 +1181,38 @@ const [selectedZone, setSelectedZone] = useState(null);
     trackEvent("event_launched", { id, cost: def.cost });
   }, [activeEvents, day, level, money, sandbox]);
 
+  const startProject = useCallback((projectId, targetTile = null) => {
+    const def = PROJECT_TYPES.find((p) => p.id === projectId);
+    if (!def) return;
+    if ((constructionProjects || []).some((p) => p.projectId === projectId && p.status === "in_progress")) return;
+    if (!sandbox && money < def.cost) return;
+    let finalTargetTile = targetTile;
+    if (def.category === "renovation" && finalTargetTile == null) {
+      let lowestCond = 100;
+      let lowestIdx = -1;
+      for (let i = 0; i < grid.length; i++) {
+        const id = grid[i];
+        if (!id) continue;
+        const item = getParkItem(id);
+        if (item?.category !== "attraction") continue;
+        const cond = attractionCondition[i] ?? 100;
+        if (cond < lowestCond) { lowestCond = cond; lowestIdx = i; }
+      }
+      if (lowestIdx === -1) return;
+      finalTargetTile = lowestIdx;
+    }
+    setConstructionProjects((prev) => [...prev, {
+      projectId,
+      name: def.name,
+      startedDay: day,
+      progress: 0,
+      status: "in_progress",
+      targetTile: finalTargetTile,
+    }]);
+    if (!sandbox) setMoney((m) => m - def.cost);
+    trackEvent("project_started", { id: projectId, cost: def.cost });
+  }, [constructionProjects, money, sandbox, day, grid, attractionCondition]);
+
   const chooseBuild = useCallback((id) => {
     setSelectedBuild(id);
     setSelectedZone(null);
@@ -1255,6 +1333,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         socialReputation,
         emergencies,
         emergencyStats,
+        constructionProjects,
         savedAt: new Date().toISOString(),
       };
       writeSlots(slots);
@@ -1321,6 +1400,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     if (data.socialReputation != null) setSocialReputation(data.socialReputation);
     if (data.emergencies) setEmergencies(data.emergencies);
     if (data.emergencyStats) setEmergencyStats(data.emergencyStats);
+    if (data.constructionProjects) setConstructionProjects(data.constructionProjects);
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
     setLastNet(data.lastNet ?? 0);
     setPlaying(false);
@@ -1405,6 +1485,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setSocialReputation(50);
     setEmergencies([]);
     setEmergencyStats({ totalEmergencies: 0, totalCost: 0, resolvedCount: 0 });
+    setConstructionProjects([]);
     setHotelGuests([]);
     setHotelStats({ roomRevenue: 0, hotelExpenses: 0, parkSpend: 0, occupancy: 0, avgHappiness: 0, totalGuests: 0, totalRooms: 0, guestsByHotel: {} });
     setResortRating(0);
@@ -1501,6 +1582,9 @@ const [selectedZone, setSelectedZone] = useState(null);
     emergencies,
     emergencyStats,
     emergencyTypes: EMERGENCY_TYPES,
+    constructionProjects,
+    startProject,
+    projectTypes: PROJECT_TYPES,
     awardEvaluation: evaluateAwards({
       grid, upgrades, attractionCondition, staff, visitorStats,
       parkAppeal, reputation, incidents, hotelStats, membershipCounts,

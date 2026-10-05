@@ -1,8 +1,9 @@
 import React from "react";
-import { Hammer, Settings, Users, Activity, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren } from "lucide-react";
+import { Hammer, Settings, Users, Activity, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat } from "lucide-react";
 
 const MENUS = [
   { key: "build", icon: Hammer, label: "Build" },
+  { key: "construction", icon: HardHat, label: "Projects" },
   { key: "research", icon: FlaskConical, label: "Research" },
   { key: "manage", icon: Settings, label: "Manage" },
   { key: "resort", icon: Hotel, label: "Resort" },
