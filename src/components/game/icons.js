@@ -5,6 +5,7 @@ import {
   Coffee, Crown, CloudRain, Megaphone, Gem, Flag, CircleDot, Activity, Footprints,
   Flower2, Gamepad2, PartyPopper, Camera, Shield, Music, PersonStanding, Sprout,
   Star, TrendingUp, Trophy, Maximize2, CalendarDays, ToyBrick,
+  Wine, Beef, CupSoda, Shirt, CreditCard, Pizza, Bath, Leaf, Thermometer, Moon,
 } from "lucide-react";
 
 export const ICONS = {
@@ -14,6 +15,7 @@ export const ICONS = {
   Coffee, Crown, CloudRain, Megaphone, Gem, Flag, CircleDot, Activity, Footprints,
   Flower2, Gamepad2, PartyPopper, Camera, Shield, Music, PersonStanding, Sprout,
   Star, TrendingUp, Trophy, Maximize2, CalendarDays, ToyBrick,
+  Wine, Beef, CupSoda, Shirt, CreditCard, Pizza, Bath, Leaf, Thermometer, Moon,
 };
 
 export function getIcon(name) {
