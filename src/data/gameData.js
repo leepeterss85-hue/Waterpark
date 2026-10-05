@@ -1144,15 +1144,17 @@ export function levelTier(level) {
 // --- Park expansion ---
 export const INITIAL_GRID_SIZE = 48;
 export const EXPAND_ROW = 8;
-export const MAX_EXPANSIONS = 6;
+export const MAX_EXPANSIONS = 12;
 export const MAX_GRID_SIZE = INITIAL_GRID_SIZE + EXPAND_ROW * MAX_EXPANSIONS;
 
 export function expandCost(expansionsDone) {
-  return 12000 * (expansionsDone + 1);
+  if (expansionsDone < 6) return 12000 * (expansionsDone + 1);
+  return Math.round(84000 * Math.pow(1.5, expansionsDone - 5));
 }
 
 export function expandLevelReq(expansionsDone) {
-  return expansionsDone + 2;
+  if (expansionsDone < 6) return expansionsDone + 2;
+  return Math.min(30, 8 + (expansionsDone - 6) * 4);
 }
 
 // --- Player levels (XP thresholds) ---

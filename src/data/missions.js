@@ -125,6 +125,61 @@ export const MISSIONS = [
     level: 10,
     reward: { money: 50000, xp: 500 },
   },
+  // --- Endgame missions (levels 15+) ---
+  {
+    id: "resort_magnate",
+    title: "Resort Magnate",
+    desc: "Reach a 4.5-star resort rating.",
+    type: "resort_rating",
+    target: 4.5,
+    level: 15,
+    reward: { money: 50000, xp: 500 },
+  },
+  {
+    id: "mega_resort",
+    title: "Mega Resort",
+    desc: "Welcome 2,000 guests in a single day.",
+    type: "guests",
+    target: 2000,
+    level: 18,
+    reward: { money: 80000, xp: 800 },
+  },
+  {
+    id: "empire_builder",
+    title: "Empire Builder",
+    desc: "Earn $1,000,000 across the life of your park.",
+    type: "lifetime_earnings",
+    target: 1000000,
+    level: 20,
+    reward: { money: 100000, xp: 1000 },
+  },
+  {
+    id: "five_star_legend",
+    title: "Five-Star Legend",
+    desc: "Reach a perfect 5.0-star resort rating.",
+    type: "resort_rating",
+    target: 5.0,
+    level: 22,
+    reward: { money: 150000, xp: 1200 },
+  },
+  {
+    id: "waterpark_empire",
+    title: "Waterpark Empire",
+    desc: "Fill all 144 tiles in your park.",
+    type: "tiles_filled",
+    target: 144,
+    level: 25,
+    reward: { money: 200000, xp: 1500 },
+  },
+  {
+    id: "legendary_tycoon",
+    title: "Legendary Tycoon",
+    desc: "Reach Day 100.",
+    type: "day",
+    target: 100,
+    level: 28,
+    reward: { money: 250000, xp: 2000 },
+  },
 ];
 
 export function missionProgress(mission, state) {
@@ -153,6 +208,10 @@ export function missionProgress(mission, state) {
       return state.avgMood;
     case "lifetime_earnings":
       return state.lifetimeEarnings;
+    case "resort_rating":
+      return state.resortRating || 0;
+    case "tiles_filled":
+      return state.tilesFilled || 0;
     default:
       return 0;
   }

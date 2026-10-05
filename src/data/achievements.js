@@ -32,6 +32,15 @@ export const ACHIEVEMENTS = [
   { id: "deep_diver", title: "Deep Diver", desc: "Build the Deep Dive Pool.", icon: "Anchor", color: "from-blue-600 to-indigo-700", check: (s) => s.builtAttractionIds?.includes("dive_pool") },
   { id: "disaster_survivor", title: "Disaster Survivor", desc: "Survive 3 disasters.", icon: "Shield", color: "from-rose-400 to-red-600", check: (s) => (s.disastersSurvived || 0) >= 3 },
   { id: "sandbox_explorer", title: "Sandbox Explorer", desc: "Try Sandbox Mode.", icon: "Sparkles", color: "from-amber-400 to-yellow-500", check: (s) => s.sandboxUsed },
+  // --- Empire-level achievements ---
+  { id: "empire_founder", title: "Empire Founder", desc: "Reach Tycoon empire tier.", icon: "Crown", color: "from-cyan-400 to-blue-500", check: (s) => (s.empirePoints || 0) >= 0 },
+  { id: "resort_magnate_ach", title: "Resort Magnate", desc: "Reach 4.5-star resort rating.", icon: "Star", color: "from-violet-400 to-purple-600", check: (s) => (s.resortRating || 0) >= 4.5 },
+  { id: "mega_resort_ach", title: "Mega Resort", desc: "Welcome 2,000 guests in a single day.", icon: "Users", color: "from-blue-400 to-indigo-600", check: (s) => s.peakGuests >= 2000 },
+  { id: "billionaire", title: "Billionaire", desc: "Earn $10,000,000 in total revenue.", icon: "TrendingUp", color: "from-emerald-500 to-teal-700", check: (s) => s.lifetimeEarnings >= 10000000 },
+  { id: "empire_legend_ach", title: "Empire Legend", desc: "Reach Legend empire tier (12,000 EP).", icon: "Sparkles", color: "from-yellow-300 via-amber-400 to-rose-500", check: (s) => (s.empirePoints || 0) >= 12000 },
+  { id: "full_empire", title: "Full Empire", desc: "Fill all 144 tiles in your park.", icon: "Maximize2", color: "from-rose-400 to-fuchsia-600", check: (s) => (s.tilesFilled || 0) >= 144 },
+  { id: "century_park", title: "Century Park", desc: "Reach Day 100.", icon: "CalendarDays", color: "from-amber-400 to-orange-600", check: (s) => s.day >= 100 },
+  { id: "legendary_reputation", title: "Legendary Reputation", desc: "Reach 99% reputation.", icon: "Star", color: "from-yellow-400 to-amber-500", check: (s) => s.reputation >= 99 },
 ];
 
 export function unlockedAchievements(state) {
