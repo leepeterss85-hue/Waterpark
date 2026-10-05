@@ -19,6 +19,7 @@ import DayTransition from "@/components/game/DayTransition";
 import FloatingRewards from "@/components/game/FloatingRewards";
 import SoundToggle from "@/components/game/SoundToggle";
 import LevelUpCelebration from "@/components/game/LevelUpCelebration";
+import Tutorial from "@/components/game/Tutorial";
 import { trackEvent } from "@/lib/gameAnalytics";
 import { sound } from "@/lib/soundManager";
 import confetti from "canvas-confetti";
@@ -252,6 +253,7 @@ export default function Home() {
       <GameMenuSheets game={game} openSheet={openSheet} setOpenSheet={setOpenSheet} />
 
       <DailySummary report={dailyReport} onClose={() => setDailyReport(null)} />
+      <Tutorial game={game} />
     </div>
   );
 }
