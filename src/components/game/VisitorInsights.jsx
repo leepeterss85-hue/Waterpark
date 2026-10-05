@@ -62,6 +62,34 @@ export default function VisitorInsights({ visitorStats }) {
           <div className="mt-3 flex flex-wrap gap-1.5">{Object.entries(stats.groupTypes || stats.guestTypes || {}).sort((a,b)=>b[1]-a[1]).map(([type,count])=><span key={type} className="rounded-full bg-cyan-50 px-2 py-1 text-[10px] font-bold text-cyan-800">{type} · {Math.round(count)}</span>)}</div>
         </div>
       </div>
+      <div className="mt-3 rounded-xl bg-white p-3 ring-1 ring-slate-100">
+        <div className="mb-2 flex items-center gap-1.5 text-[11px] font-extrabold text-slate-600"><Users className="h-3.5 w-3.5 text-violet-600" /> Guest demographics</div>
+        {(() => {
+          const types = stats.guestTypes || {};
+          const entries = Object.entries(types).sort((a, b) => b[1] - a[1]);
+          if (!entries.length) return <div className="text-sm text-slate-400">Open the park to see who visits.</div>;
+          const total = entries.reduce((sum, [, n]) => sum + n, 0) || 1;
+          const colors = { Family: "bg-amber-400", "Thrill seeker": "bg-rose-400", "Relaxed guest": "bg-cyan-400", "Premium guest": "bg-violet-400", "Teen group": "bg-fuchsia-400" };
+          return (
+            <div className="space-y-2">
+              {entries.map(([type, count]) => {
+                const pct = Math.round((count / total) * 100);
+                return (
+                  <div key={type}>
+                    <div className="mb-1 flex justify-between text-[10px] font-bold text-slate-500">
+                      <span>{type}</span>
+                      <span>{Math.round(count)} · {pct}%</span>
+                    </div>
+                    <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                      <div className={"h-full rounded-full " + (colors[type] || "bg-slate-400")} style={{ width: pct + "%" }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })()}
+      </div>
     </section>
   );
 }

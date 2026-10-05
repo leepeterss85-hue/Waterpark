@@ -15,6 +15,7 @@ import ParkToolbar from "@/components/game/ParkToolbar";
 import ResearchPanel from "@/components/game/ResearchPanel";
 import SettingsPanel from "@/components/game/SettingsPanel";
 import ParkAppealPanel from "@/components/game/ParkAppealPanel";
+import CampaignPanel from "@/components/game/CampaignPanel";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
   return (
@@ -68,6 +69,7 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
           onMarketing={game.setAdBudget}
           onExpressLane={game.setPriorityPass}
         />
+        <CampaignPanel money={game.money} activeCampaigns={game.activeCampaigns} grid={game.grid} onLaunch={game.launchCampaign} />
       </SheetShell>
 
       <SheetShell open={openSheet === "staff"} onOpenChange={(v) => !v && close()} title="Staff" icon={Users} width="sm:max-w-md">

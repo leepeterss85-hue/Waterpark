@@ -13,6 +13,7 @@ import { generateFeedback } from "@/data/guestFeedback";
 import { trackEvent } from "@/lib/gameAnalytics";
 import { getSettings, getDifficulty, saveSettings } from "@/lib/settings";
 import { rollDisaster, disasterMitigation } from "@/data/disasters";
+import { CAMPAIGNS, campaignEffectiveness, getCampaign } from "@/data/campaigns";
 import { getStarterPark } from "@/data/starterParks";
 import { calculateParkAppeal } from "@/data/parkThemes";
 
@@ -112,13 +113,14 @@ const [selectedZone, setSelectedZone] = useState(null);
   const [disaster, setDisaster] = useState(null);
   const [disastersSurvived, setDisastersSurvived] = useState(0);
   const [sandbox, setSandbox] = useState(getSettings().sandbox || false);
+  const [activeCampaigns, setActiveCampaigns] = useState([]);
 
   const level = levelFromXp(xp);
   const gridSize = grid.length;
 
   /** @type {import("react").MutableRefObject<Record<string, any>>} */
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, completedResearch, parkAppeal, disaster, sandbox };
+  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, completedResearch, parkAppeal, disaster, sandbox, activeCampaigns };
 
   // Load saved game
   useEffect(() => {
@@ -159,6 +161,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (data.parkAppeal) setParkAppeal(data.parkAppeal);
         if (data.disaster) setDisaster(data.disaster);
         if (data.disastersSurvived != null) setDisastersSurvived(data.disastersSurvived);
+        if (data.activeCampaigns) setActiveCampaigns(data.activeCampaigns);
       }
     } catch {
       /* ignore */
@@ -171,14 +174,14 @@ const [selectedZone, setSelectedZone] = useState(null);
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived })
+          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns })
         );
       } catch {
         /* ignore */
       }
     }, 300);
     return () => clearTimeout(t);
-  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived]);
+  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns]);
 
   // Load save slots list on mount
   useEffect(() => {
@@ -195,6 +198,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     const dayForecast = rollWeather(d + 2);
     const currentDisaster = stateRef.current.disaster;
     const isSandbox = stateRef.current.sandbox;
+    const currentCampaigns = stateRef.current.activeCampaigns || [];
     const eff = { ...(currentChallenge?.effects || {}) };
     if (currentDisaster) {
       eff.guestMult = (eff.guestMult ?? 1) * (currentDisaster.effects?.guestMult ?? 1);
@@ -205,6 +209,8 @@ const [selectedZone, setSelectedZone] = useState(null);
     const calculatedAppeal = calculateParkAppeal({ grid: prevGrid, zones: currentZones, getItem: getParkItem });
     setParkAppeal(calculatedAppeal);
     const appealDemandMult = 0.85 + (calculatedAppeal.score / 100) * 0.30;
+    const campaignGuestMult = currentCampaigns.reduce((sum, c) => sum + (c.effectiveBoost || 0), 1);
+    const campaignRepBoost = currentCampaigns.reduce((sum, c) => sum + (c.repBoost || 0), 0);
     const placedItems = prevGrid
       .map((id, idx) => (id ? { id, idx, attr: getParkItem(id), zone: currentZones?.[idx] || null, level: (currentUpgrades || [])[idx] || 0 } : null))
       .filter(Boolean);
@@ -294,6 +300,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         (dayWeather.guestMult ?? 1) *
         (currentSeasonEvent?.guestMult ?? 1) *
         (1 + currentAdBudget / 5000) *
+        campaignGuestMult *
         appealDemandMult *
         (hasEntrance ? 1 : 0.9) *
         Math.max(0.65, Math.min(1.25, 1.12 - (currentTicketPrice - 20) * 0.012))
@@ -344,6 +351,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         0
       );
       repDelta += eff.repDelta ?? 0;
+      repDelta += campaignRepBoost;
       if (dayWeather.id === "rain") repDelta -= 0.8;
       else if (dayWeather.id === "sunny") repDelta += 0.35;
       repDelta += Math.min(1.5, scenicCount * 0.08 + pathCount * 0.03);
@@ -567,6 +575,22 @@ const [selectedZone, setSelectedZone] = useState(null);
       setLog((l) => [...vipEntries, ...l].slice(0, 12));
     }
 
+    // --- Tick active marketing campaigns ---
+    if (currentCampaigns.length) {
+      const updatedCampaigns = [];
+      const expiredEntries = [];
+      for (const c of currentCampaigns) {
+        const daysLeft = c.daysLeft - 1;
+        if (daysLeft <= 0) {
+          expiredEntries.push({ day: d + 1, text: `Day ${d + 1}: 📣 ${c.name} campaign ended.` });
+        } else {
+          updatedCampaigns.push({ ...c, daysLeft });
+        }
+      }
+      setActiveCampaigns(updatedCampaigns);
+      if (expiredEntries.length) setLog((l) => [...expiredEntries, ...l].slice(0, 12));
+    }
+
     // --- Resolve / roll disasters ---
     if (!isSandbox) {
       const disasterEntries = [];
@@ -751,6 +775,19 @@ const [selectedZone, setSelectedZone] = useState(null);
     });
   }, []);
 
+  const launchCampaign = useCallback((id) => {
+    const def = getCampaign(id);
+    if (!def) return;
+    if (!sandbox && money < def.cost) return;
+    const eff = campaignEffectiveness(def, grid);
+    setActiveCampaigns((prev) => [
+      ...prev,
+      { id: def.id, name: def.name, daysLeft: def.duration, duration: def.duration, guestBoost: def.guestBoost, repBoost: def.repBoost, effectiveBoost: def.guestBoost * eff, target: def.target, startedDay: day },
+    ]);
+    if (!sandbox) setMoney((m) => m - def.cost);
+    trackEvent("campaign_launched", { id, cost: def.cost });
+  }, [grid, sandbox, day, money]);
+
   const chooseBuild = useCallback((id) => {
     setSelectedBuild(id);
     setSelectedZone(null);
@@ -852,6 +889,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         parkAppeal,
         disaster,
         disastersSurvived,
+        activeCampaigns,
         savedAt: new Date().toISOString(),
       };
       writeSlots(slots);
@@ -859,7 +897,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       trackEvent("park_saved", { name: trimmed });
       return true;
     },
-    [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived]
+    [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns]
   );
 
   const loadPark = useCallback((name) => {
@@ -899,6 +937,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setParkAppeal(data.parkAppeal ?? calculateParkAppeal({ grid: data.grid ?? makeStartingGrid(), zones: data.parkZones ?? [], getItem: getParkItem }));
     if (data.disaster) setDisaster(data.disaster);
     if (data.disastersSurvived != null) setDisastersSurvived(data.disastersSurvived);
+    if (data.activeCampaigns) setActiveCampaigns(data.activeCampaigns);
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
     setLastNet(data.lastNet ?? 0);
     setPlaying(false);
@@ -971,6 +1010,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setParkAppeal(calculateParkAppeal({ grid: startGrid, zones: startZones, getItem: getParkItem }));
     setDisaster(null);
     setDisastersSurvived(0);
+    setActiveCampaigns([]);
     trackEvent("park_reset", { starterPark: park.id, level: park.level, money: baseMoney });
   }, []);
 
@@ -1029,6 +1069,8 @@ const [selectedZone, setSelectedZone] = useState(null);
     disastersSurvived,
     sandbox,
     toggleSandbox,
+    activeCampaigns,
+    launchCampaign,
     unlockResearch,
     builtCount: builtAttractionIds.length,
     achievementState: {
