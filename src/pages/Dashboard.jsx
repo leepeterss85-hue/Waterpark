@@ -12,6 +12,7 @@ import AchievementsGallery from "@/components/dashboard/AchievementsGallery";
 import LayoutAnalytics from "@/components/dashboard/LayoutAnalytics";
 import PlayerActivityFeed from "@/components/dashboard/PlayerActivityFeed";
 import RidePopularityCard from "@/components/dashboard/RidePopularityCard";
+import MembershipsCard from "@/components/dashboard/MembershipsCard";
 
 export default function Dashboard() {
   const game = useGameState();
@@ -37,6 +38,7 @@ export default function Dashboard() {
           <AttractionBreakdown grid={game.grid} />
         </div>
         <div className="mt-5"><RidePopularityCard grid={game.grid} upgrades={game.upgrades} popularity={game.popularity} popularityTrend={game.popularityTrend} prevPopularity={game.prevPopularity} visitorStats={game.visitorStats} /></div>
+        <div className="mt-5"><MembershipsCard counts={game.membershipCounts} stats={game.membershipStats} level={game.level} /></div>
         <div className="mt-5"><LayoutAnalytics grid={game.grid} history={game.history} peakGuests={game.peakGuests} lifetimeEarnings={game.lifetimeEarnings} reputation={game.reputation} guests={game.guests} day={game.day} /></div>
         <div className="mt-5"><PlayerActivityFeed /></div>
         <div className="mt-5"><AchievementsGallery achievementState={game.achievementState} /></div>

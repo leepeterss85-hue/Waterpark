@@ -1,7 +1,7 @@
 import React from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays } from "lucide-react";
+import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket } from "lucide-react";
 import { MISSIONS, missionProgress } from "@/data/missions";
 import BuildPanel from "@/components/game/BuildPanel";
 import ExpansionPanel from "@/components/game/ExpansionPanel";
@@ -20,6 +20,7 @@ import ResortPanel from "@/components/game/ResortPanel";
 import PricingPanel from "@/components/game/PricingPanel";
 import RidePopularityPanel from "@/components/game/RidePopularityPanel";
 import EventsPanel from "@/components/game/EventsPanel";
+import MembershipsPanel from "@/components/game/MembershipsPanel";
 import { getHotelDef, hotelRooms, isHotelItem } from "@/data/hotels";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
@@ -146,6 +147,10 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
 
       <SheetShell open={openSheet === "events"} onOpenChange={(v) => !v && close()} title="Park Events" icon={CalendarDays} width="sm:max-w-lg">
         <EventsPanel money={game.money} level={game.level} day={game.day} activeEvents={game.activeEvents} onLaunch={game.launchEvent} />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "memberships"} onOpenChange={(v) => !v && close()} title="Memberships" icon={Ticket} width="sm:max-w-lg">
+        <MembershipsPanel counts={game.membershipCounts} stats={game.membershipStats} level={game.level} />
       </SheetShell>
     </>
   );

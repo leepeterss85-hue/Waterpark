@@ -20,6 +20,7 @@ import { calculateParkAppeal } from "@/data/parkThemes";
 import { DEFAULT_PRICING } from "@/data/pricing";
 import { tickPopularity, DEFAULT_POPULARITY, NEW_RIDE_TREND_BOOST } from "@/data/popularity";
 import { getEvent, isEventAvailable, aggregateEventEffects } from "@/data/parkEvents";
+import { MEMBERSHIP_TIERS, simulateMemberships, totalMemberCount } from "@/data/memberships";
 
 const STORAGE_KEY = "waterpark-tycoon-save-v1";
 const SLOTS_KEY = "waterpark-tycoon-slots";
@@ -126,13 +127,16 @@ const [selectedZone, setSelectedZone] = useState(null);
   const [popularityTrend, setPopularityTrend] = useState(() => Array(GRID_SIZE).fill(0));
   const [prevPopularity, setPrevPopularity] = useState(() => Array(GRID_SIZE).fill(0));
   const [activeEvents, setActiveEvents] = useState([]);
+  const [membershipCounts, setMembershipCounts] = useState({ season_pass: 0, family_membership: 0, vip_membership: 0 });
+  const [membershipTimers, setMembershipTimers] = useState({ season_pass: 30, family_membership: 30, vip_membership: 30 });
+  const [membershipStats, setMembershipStats] = useState({ totalMembers: 0, dailyRevenue: 0, totalRevenue: 0, memberVisits: 0, memberSpend: 0, totalRenewed: 0, totalChurned: 0 });
 
   const level = levelFromXp(xp);
   const gridSize = grid.length;
 
   /** @type {import("react").MutableRefObject<Record<string, any>>} */
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, completedResearch, parkAppeal, disaster, sandbox, activeCampaigns, hotelGuests, resortRating, pricing, popularity, popularityTrend, activeEvents };
+  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, completedResearch, parkAppeal, disaster, sandbox, activeCampaigns, hotelGuests, resortRating, pricing, popularity, popularityTrend, activeEvents, xp, membershipCounts, membershipTimers, membershipStats };
 
   // Load saved game
   useEffect(() => {
@@ -182,6 +186,9 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (data.popularityTrend) setPopularityTrend(data.popularityTrend);
         if (data.prevPopularity) setPrevPopularity(data.prevPopularity);
         if (data.activeEvents) setActiveEvents(data.activeEvents);
+        if (data.membershipCounts) setMembershipCounts(data.membershipCounts);
+        if (data.membershipTimers) setMembershipTimers(data.membershipTimers);
+        if (data.membershipStats) setMembershipStats(data.membershipStats);
       }
     } catch {
       /* ignore */
@@ -194,7 +201,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents })
+          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats })
         );
       } catch {
         /* ignore */
@@ -508,6 +515,31 @@ const [selectedZone, setSelectedZone] = useState(null);
     const hotelParkSpend = hotelResult?.parkSpend || 0;
     const hotelExpensesAmount = hotelResult?.hotelExpenses || 0;
 
+    // --- Membership simulation: sales, renewals, member visits & spending ---
+    const currentLevel = levelFromXp(stateRef.current.xp || 0);
+    const membershipResult = simulateMemberships({
+      counts: stateRef.current.membershipCounts || {},
+      daysUntilRenewal: stateRef.current.membershipTimers || {},
+      reputation: Math.round(newReputation),
+      parkAppealScore: calculatedAppeal.score,
+      dayGuests: newGuests,
+      level: currentLevel,
+      weather: dayWeather,
+      seasonEvent: currentSeasonEvent,
+      activeEvents: currentActiveEvents,
+    });
+    setMembershipCounts(membershipResult.counts);
+    setMembershipTimers(membershipResult.daysUntilRenewal);
+    setMembershipStats((prev) => ({
+      totalMembers: totalMemberCount(membershipResult.counts),
+      dailyRevenue: membershipResult.totalRevenue,
+      totalRevenue: (prev?.totalRevenue || 0) + membershipResult.totalRevenue,
+      memberVisits: membershipResult.memberVisits,
+      memberSpend: membershipResult.memberSpend,
+      totalRenewed: (prev?.totalRenewed || 0) + membershipResult.totalRenewed,
+      totalChurned: (prev?.totalChurned || 0) + membershipResult.totalChurned,
+    }));
+
     const ticketRevenue = newGuests * currentTicketPrice * ticketResearchMult;
     const conditionIncomeMult = workingAttractions.length ? workingAttractions.reduce((sum, p) => sum + (0.72 + (nextCondition[p.idx] || 0) * 0.0028), 0) / workingAttractions.length : 0;
     const rideIncome = income * conditionIncomeMult *
@@ -527,7 +559,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       (currentPriorityPass ? 120 : 0)) * diffUpkeepMult +
       hotelExpensesAmount;
     const eventRevenuePerDay = currentActiveEvents.reduce((s, e) => s + (e.revenuePerDay || 0), 0);
-    const grossIncome = Math.round(ticketRevenue + rideIncome + hotelRoomRevenue + hotelParkSpend + eventRevenuePerDay);
+    const grossIncome = Math.round(ticketRevenue + rideIncome + hotelRoomRevenue + hotelParkSpend + eventRevenuePerDay + membershipResult.totalRevenue + membershipResult.memberSpend);
     const upkeep = Math.round(placedItems.filter((p) => p.attr.category !== "hotel").reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) * upkeepResearchMult);
     const wageCost = Math.round(wages * (eff.wageMult ?? 1) * (1 - (fx.wageReduction || 0)));
     const marketingCost = currentAdBudget;
@@ -581,13 +613,20 @@ const [selectedZone, setSelectedZone] = useState(null);
           : `Day ${d + 1}: 🎉 Events active: ${eventNames}`,
       });
     }
+    if (membershipResult.totalRevenue > 0 || membershipResult.memberVisits > 0) {
+      entries.push({
+        day: d + 1,
+        text: `Day ${d + 1}: 🎫 Members: ${totalMemberCount(membershipResult.counts)} active · ${membershipResult.memberVisits} visits · +$${membershipResult.totalRevenue.toLocaleString()} revenue`,
+      });
+    }
 
     setMoney((m) => m + net);
     setDay((x) => x + 1);
     setWeather(dayWeather);
     setForecast(dayForecast);
-    setGuests(newGuests);
-    setPeakGuests((p) => Math.max(p, newGuests));
+    const totalGuestsToday = newGuests + (membershipResult?.memberVisits || 0);
+    setGuests(totalGuestsToday);
+    setPeakGuests((p) => Math.max(p, totalGuestsToday));
     setVisitorStats(visitorStats);
     if (dayFeedback.length) setFeedback((prev) => [...dayFeedback, ...prev].slice(0, 40));
     setLifetimeEarnings((e) => e + grossIncome);
@@ -616,6 +655,9 @@ const [selectedZone, setSelectedZone] = useState(null);
         hotelRevenue: hotelRoomRevenue + hotelParkSpend,
         hotelExpenses: hotelExpensesAmount,
         eventRevenue: eventRevenuePerDay,
+        membershipRevenue: membershipResult.totalRevenue,
+        memberSpend: membershipResult.memberSpend,
+        memberVisits: membershipResult.memberVisits,
       }].slice(-60)
     );
     setLog((l) => [...entries, ...l].slice(0, 12));
@@ -1073,6 +1115,9 @@ const [selectedZone, setSelectedZone] = useState(null);
         popularityTrend,
         prevPopularity,
         activeEvents,
+        membershipCounts,
+        membershipTimers,
+        membershipStats,
         savedAt: new Date().toISOString(),
       };
       writeSlots(slots);
@@ -1129,6 +1174,9 @@ const [selectedZone, setSelectedZone] = useState(null);
     if (data.popularityTrend) setPopularityTrend(data.popularityTrend);
     if (data.prevPopularity) setPrevPopularity(data.prevPopularity);
     if (data.activeEvents) setActiveEvents(data.activeEvents);
+    if (data.membershipCounts) setMembershipCounts(data.membershipCounts);
+    if (data.membershipTimers) setMembershipTimers(data.membershipTimers);
+    if (data.membershipStats) setMembershipStats(data.membershipStats);
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
     setLastNet(data.lastNet ?? 0);
     setPlaying(false);
@@ -1203,6 +1251,9 @@ const [selectedZone, setSelectedZone] = useState(null);
     setDisastersSurvived(0);
     setActiveCampaigns([]);
     setActiveEvents([]);
+    setMembershipCounts({ season_pass: 0, family_membership: 0, vip_membership: 0 });
+    setMembershipTimers({ season_pass: 30, family_membership: 30, vip_membership: 30 });
+    setMembershipStats({ totalMembers: 0, dailyRevenue: 0, totalRevenue: 0, memberVisits: 0, memberSpend: 0, totalRenewed: 0, totalChurned: 0 });
     setHotelGuests([]);
     setHotelStats({ roomRevenue: 0, hotelExpenses: 0, parkSpend: 0, occupancy: 0, avgHappiness: 0, totalGuests: 0, totalRooms: 0, guestsByHotel: {} });
     setResortRating(0);
@@ -1286,6 +1337,10 @@ const [selectedZone, setSelectedZone] = useState(null);
     prevPopularity,
     activeEvents,
     launchEvent,
+    membershipCounts,
+    membershipTimers,
+    membershipStats,
+    membershipTiers: MEMBERSHIP_TIERS,
     hotels: grid.map((id, idx) => { const def = getHotelDef(id); return def ? { def, tileIndex: idx } : null; }).filter(Boolean),
     hotelGuests,
     hotelStats,
