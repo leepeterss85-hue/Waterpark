@@ -912,6 +912,9 @@ const [selectedZone, setSelectedZone] = useState(null);
     lifetimeEarnings,
     visitorStats,
     feedback,
+    researchPoints,
+    completedResearch,
+    unlockResearch,
     builtCount: builtAttractionIds.length,
     achievementState: {
       peakGuests,

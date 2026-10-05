@@ -1,7 +1,7 @@
 import React from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Hammer, Settings, Users, Save, Activity, BarChart3, Target, CloudSun } from "lucide-react";
+import { Hammer, Settings, Users, Save, Activity, BarChart3, Target, CloudSun, FlaskConical } from "lucide-react";
 import { MISSIONS, missionProgress } from "@/data/missions";
 import BuildPanel from "@/components/game/BuildPanel";
 import ExpansionPanel from "@/components/game/ExpansionPanel";
@@ -13,6 +13,7 @@ import VisitorInsight from "@/components/game/VisitorInsights";
 import MissionsPanel from "@/components/game/MissionsPanel";
 import PlayerProgressPanel from "@/components/game/PlayerProgressPanel";
 import ParkToolbar from "@/components/game/ParkToolbar";
+import ResearchPanel from "@/components/game/ResearchPanel";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
   return (
@@ -42,7 +43,11 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
     <>
       <SheetShell open={openSheet === "build"} onOpenChange={(v) => !v && close()} title="Build" icon={Hammer} width="sm:max-w-lg">
         <ExpansionPanel gridSize={game.gridSize} expansionsDone={game.expansionsDone} level={game.level} money={game.money} onExpand={game.expandPark} />
-        <BuildPanel money={game.money} level={game.level} selectedBuild={game.selectedBuild} onSelect={game.setSelectedBuild} />
+        <BuildPanel money={game.money} level={game.level} selectedBuild={game.selectedBuild} onSelect={game.setSelectedBuild} completedResearch={game.completedResearch} />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "research"} onOpenChange={(v) => !v && close()} title="Research" icon={FlaskConical} width="sm:max-w-md">
+        <ResearchPanel researchPoints={game.researchPoints} completedResearch={game.completedResearch} onUnlock={game.unlockResearch} />
       </SheetShell>
 
       <SheetShell open={openSheet === "manage"} onOpenChange={(v) => !v && close()} title="Manage" icon={Settings} width="sm:max-w-md">

@@ -1,9 +1,10 @@
 import React, { useMemo, useState } from "react";
 import { Search, Waves, Utensils } from "lucide-react";
 import { ATTRACTIONS, PARK_OBJECTS, CATEGORIES, unlockLevelFor } from "@/data/gameData";
+import { researchReqFor } from "@/data/research";
 import BuildCard from "@/components/game/BuildCard";
 
-export default function BuildPanel({ money, level = 1, selectedBuild, onSelect }) {
+export default function BuildPanel({ money, level = 1, selectedBuild, onSelect, completedResearch = [] }) {
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState({ attraction: true, facility: false, environment: false });
   const filtered = useMemo(() => {
@@ -38,7 +39,12 @@ export default function BuildPanel({ money, level = 1, selectedBuild, onSelect }
               <span className="flex items-center gap-2 text-[9px] font-semibold text-slate-400">{items.length} <span className="text-sm">{expanded[cat.id] ? "−" : "+"}</span></span>
             </button>
             {expanded[cat.id] && <div className="grid grid-cols-2 gap-2">
-              {items.map((item) => <BuildCard key={item.id} item={item} selected={selectedBuild === item.id} affordable={money >= item.cost} unlocked={level >= unlockLevelFor(item)} onSelect={onSelect} />)}
+              {items.map((item) => {
+                const req = researchReqFor(item.id);
+                const researchLocked = req && !completedResearch.includes(req.id);
+                const unlocked = level >= unlockLevelFor(item) && !researchLocked;
+                return <BuildCard key={item.id} item={item} selected={selectedBuild === item.id} affordable={money >= item.cost} unlocked={unlocked} onSelect={onSelect} lockLabel={researchLocked ? `Research: ${req.name}` : null} />;
+              })}
             </div>}
           </div>
         );
