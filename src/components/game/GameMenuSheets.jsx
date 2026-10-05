@@ -1,7 +1,7 @@
 import React from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat } from "lucide-react";
+import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet } from "lucide-react";
 import { MISSIONS, missionProgress } from "@/data/missions";
 import BuildPanel from "@/components/game/BuildPanel";
 import ExpansionPanel from "@/components/game/ExpansionPanel";
@@ -25,6 +25,7 @@ import AwardsPanel from "@/components/game/AwardsPanel";
 import SocialMediaPanel from "@/components/game/SocialMediaPanel";
 import EmergenciesPanel from "@/components/game/EmergenciesPanel";
 import ConstructionPanel from "@/components/game/ConstructionPanel";
+import EconomyPanel from "@/components/game/EconomyPanel";
 import { getHotelDef, hotelRooms, isHotelItem } from "@/data/hotels";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
@@ -177,6 +178,19 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
           sandbox={game.sandbox}
           onStartProject={game.startProject}
           attractionCount={game.missionState?.attractionCount || 0}
+        />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "economy"} onOpenChange={(v) => !v && close()} title="Park Economy" icon={Wallet} width="sm:max-w-lg">
+        <EconomyPanel
+          history={game.history}
+          money={game.money}
+          day={game.day}
+          grid={game.grid}
+          loans={game.loans}
+          onTakeLoan={game.takeLoan}
+          onRepayLoan={game.repayLoan}
+          sandbox={game.sandbox}
         />
       </SheetShell>
     </>
