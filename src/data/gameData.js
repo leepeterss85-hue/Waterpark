@@ -365,6 +365,46 @@ export const ATTRACTIONS = [
     color: "from-teal-400 to-cyan-600",
     description: "Spinning raft ride that whirls riders through a basin.",
   },
+  // --- Dry-Land Attractions ---
+  {
+    id: "mini_golf",
+    name: "Mini Golf",
+    category: "attraction",
+    cost: 6000,
+    income: 800,
+    capacity: 40,
+    fun: 5,
+    maintenance: 120,
+    icon: "Flag",
+    color: "from-lime-400 to-green-600",
+    description: "Themed 18-hole mini golf course for all ages — no lifeguard needed.",
+  },
+  {
+    id: "carousel",
+    name: "Carousel",
+    category: "attraction",
+    cost: 8000,
+    income: 1000,
+    capacity: 30,
+    fun: 6,
+    maintenance: 150,
+    icon: "Circle",
+    color: "from-pink-400 to-rose-500",
+    description: "Classic merry-go-round with music and painted horses.",
+  },
+  {
+    id: "go_karts",
+    name: "Go-Karts",
+    category: "attraction",
+    cost: 12000,
+    income: 1600,
+    capacity: 20,
+    fun: 8,
+    maintenance: 250,
+    icon: "Car",
+    color: "from-red-400 to-orange-600",
+    description: "Gas-powered go-kart track for teens and thrill seekers.",
+  },
   // --- Facilities & Services ---
   {
     id: "dining",
@@ -719,6 +759,32 @@ export const ATTRACTIONS = [
     color: "from-indigo-400 to-violet-600",
     description: "Sensory-deprivation float pods for premium relaxation.",
   },
+  {
+    id: "guest_services",
+    name: "Guest Services Desk",
+    category: "facility",
+    cost: 4000,
+    income: 200,
+    capacity: 0,
+    fun: 0,
+    maintenance: 80,
+    icon: "Info",
+    color: "from-sky-400 to-blue-600",
+    description: "Info desk that lifts guest mood and handles complaints.",
+  },
+  {
+    id: "drinking_fountain",
+    name: "Drinking Fountains",
+    category: "facility",
+    cost: 1500,
+    income: 100,
+    capacity: 0,
+    fun: 0,
+    maintenance: 30,
+    icon: "Droplet",
+    color: "from-cyan-300 to-sky-500",
+    description: "Free water stations that quench thirst and boost mood.",
+  },
 ];
 
 
@@ -733,7 +799,8 @@ export const PARK_OBJECTS = [
   { id:"shade_umbrella", name:"Shade Umbrella", category:"environment", cost:300, income:0, capacity:0, fun:0, maintenance:6, icon:"Umbrella", color:"from-yellow-300 to-amber-500", description:"Extra shade beside pool decks and family areas." },
   { id:"fountain", name:"Feature Fountain", category:"environment", cost:1200, income:0, capacity:0, fun:0, maintenance:35, icon:"Droplets", color:"from-cyan-300 to-sky-600", description:"Decorative water feature for entrances and resort areas." },
   { id:"wayfinding_sign", name:"Wayfinding Sign", category:"environment", cost:180, income:0, capacity:0, fun:0, maintenance:3, icon:"Flag", color:"from-orange-300 to-orange-600", description:"Helps guests find slides, pools, food and facilities." },
-  { id:"service_road", name:"Service Road", category:"environment", cost:350, income:0, capacity:0, fun:0, maintenance:10, icon:"Footprints", color:"from-slate-300 to-slate-500", description:"Back-of-house route for maintenance and service vehicles." }
+  { id:"service_road", name:"Service Road", category:"environment", cost:350, income:0, capacity:0, fun:0, maintenance:10, icon:"Footprints", color:"from-slate-300 to-slate-500", description:"Back-of-house route for maintenance and service vehicles." },
+  { id:"trash_can", name:"Trash Can", category:"environment", cost:120, income:0, capacity:0, fun:0, maintenance:2, icon:"Trash2", color:"from-stone-300 to-stone-500", description:"Waste bin that passively boosts park cleanliness." }
 ];
 
 export const ATTRACTION_PROFILES = {
@@ -751,6 +818,9 @@ export const ATTRACTION_PROFILES = {
   mega_slide_complex: { popularity: 10, safety: "High", lifeguards: 3, zone: "thrill" },
   freefall_drop: { popularity: 9, safety: "High", lifeguards: 2, zone: "thrill" },
   aqua_spin: { popularity: 7, safety: "Medium", lifeguards: 1, zone: "family" },
+  mini_golf: { popularity: 5, safety: "High", lifeguards: 0, zone: "family" },
+  carousel: { popularity: 6, safety: "High", lifeguards: 0, zone: "family" },
+  go_karts: { popularity: 8, safety: "Medium", lifeguards: 0, zone: "thrill" },
 };
 
 export function getAttractionProfile(id) {
@@ -835,6 +905,14 @@ export const STAFF = {
     color: "from-green-400 to-emerald-500",
     description: "Tends grounds — improves cleanliness and reputation.",
   },
+  manager: {
+    id: "manager",
+    name: "Park Manager",
+    wage: 350,
+    icon: "Briefcase",
+    color: "from-indigo-400 to-blue-600",
+    description: "Oversees operations — boosts all staff efficiency and cuts wage costs.",
+  },
 };
 
 export function staffWages(staff) {
@@ -843,12 +921,14 @@ export function staffWages(staff) {
 
 export function staffEffects(staff) {
   const c = staff || {};
+  const mgrBoost = 1 + (c.manager || 0) * 0.05;
   return {
-    uptime: Math.min(1, 0.65 + (c.mechanic || 0) * 0.07),
-    safety: Math.min(1, 0.7 + (c.lifeguard || 0) * 0.06 + (c.security || 0) * 0.04),
-    cleanliness: Math.min(1, 0.6 + (c.cleaner || 0) * 0.1 + (c.gardener || 0) * 0.05),
-    entertainment: (c.entertainer || 0) * 1.5,
-    facilityBonus: 1 + (c.fitness_coach || 0) * 0.12,
+    uptime: Math.min(1, (0.65 + (c.mechanic || 0) * 0.07) * mgrBoost),
+    safety: Math.min(1, (0.7 + (c.lifeguard || 0) * 0.06 + (c.security || 0) * 0.04) * mgrBoost),
+    cleanliness: Math.min(1, (0.6 + (c.cleaner || 0) * 0.1 + (c.gardener || 0) * 0.05) * mgrBoost),
+    entertainment: (c.entertainer || 0) * 1.5 * mgrBoost,
+    facilityBonus: 1 + (c.fitness_coach || 0) * 0.12 * mgrBoost,
+    wageReduction: Math.min(0.25, (c.manager || 0) * 0.05),
   };
 }
 

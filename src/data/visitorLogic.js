@@ -42,14 +42,15 @@ function scoreDestination(guest, item) {
     if (["dining", "ice_cream", "coffee_bar"].includes(attr.id)) score += guest.hunger * 0.075;
     if (["drinking_fountain", "concessions"].includes(attr.id)) score += guest.thirst * 0.08;
     if (["toilets", "lockers", "cabanas", "sun_lounge"].includes(attr.id)) score += (100 - guest.energy) * 0.045;
+    if (attr.id === "guest_services") score += (100 - guest.mood) * 0.03 + 1.5;
     if (guest.type === "Premium guest" && ["cabanas", "vip_lounge", "spa", "retail"].includes(attr.id)) score += 4;
     score *= 0.8;
   } else {
     if (attr.fun >= 8 && guest.mood > 60) score += 2;
     if (guest.type === "Thrill seeker" && attr.fun >= 8) score += 4;
-    if (guest.type === "Family" && ["kiddie_pool", "play_structure", "family_raft", "splash_pad", "soft_play", "lazy_river"].includes(attr.id)) score += 4;
-    if (guest.type === "Relaxed guest" && ["lazy_river", "sun_lounge", "lap_sports_pool"].includes(attr.id)) score += 3;
-    if (guest.type === "Teen group" && ["multi_racer", "speed_slide", "kamikaze", "aqua_loop", "flowrider"].includes(attr.id)) score += 3;
+    if (guest.type === "Family" && ["kiddie_pool", "play_structure", "family_raft", "splash_pad", "soft_play", "lazy_river", "mini_golf", "carousel"].includes(attr.id)) score += 4;
+    if (guest.type === "Relaxed guest" && ["lazy_river", "sun_lounge", "lap_sports_pool", "mini_golf"].includes(attr.id)) score += 3;
+    if (guest.type === "Teen group" && ["multi_racer", "speed_slide", "kamikaze", "aqua_loop", "flowrider", "go_karts"].includes(attr.id)) score += 3;
   }
   if (item.overcrowded) score *= 0.58;
   return Math.max(0.1, score * (0.45 + guest.mood / 100));
@@ -178,6 +179,14 @@ export function simulateVisits({
         spendingByCategory.premium += price * crowdScale;
         guest.mood += 4;
         guest.energy += 8;
+      } else if (attr.id === "drinking_fountain") {
+        spendingByCategory.other += price * crowdScale;
+        guest.thirst = Math.max(0, guest.thirst - 35);
+        guest.mood += 2;
+      } else if (attr.id === "guest_services") {
+        spendingByCategory.other += price * crowdScale;
+        guest.mood += 5;
+        guest.energy += 2;
       } else {
         spendingByCategory.other += price * crowdScale;
         guest.mood += 1.5;

@@ -228,7 +228,8 @@ const [selectedZone, setSelectedZone] = useState(null);
     const fx = staffEffects(effectiveStaff);
     const uptime = fx.uptime;
     const safety = fx.safety;
-    const cleanliness = fx.cleanliness;
+    const trashCanCount = environment.filter((p) => p.id === "trash_can").length;
+    const cleanliness = Math.min(1, fx.cleanliness + Math.min(0.15, trashCanCount * 0.02));
     const entertainment = fx.entertainment;
     const facilityBonus = fx.facilityBonus;
     const wages = staffWages(counts);
@@ -302,6 +303,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       else if (avgMood < 40) repDelta -= 1.5;
       else if (avgMood < 55) repDelta -= 0.5;
       if (facilities.some((f) => f.attr.id === "first_aid")) repDelta += 0.5;
+      if (facilities.some((f) => f.attr.id === "guest_services")) repDelta += 0.3;
       if (facilities.some((f) => f.attr.id === "dining")) repDelta += 0.5;
       if (facilities.some((f) => f.attr.id === "lockers" || f.attr.id === "toilets")) repDelta += 0.3;
       if (toilets > 0) repDelta += Math.min(0.4, toilets * 0.08);
@@ -377,13 +379,13 @@ const [selectedZone, setSelectedZone] = useState(null);
     const diffUpkeepMult = getDifficulty(getSettings().difficulty).upkeepMult;
     const expenses =
       (placedItems.reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) * upkeepResearchMult +
-      wages * (eff.wageMult ?? 1) +
+      wages * (eff.wageMult ?? 1) * (1 - (fx.wageReduction || 0)) +
       utilities +
       currentAdBudget +
       (currentPriorityPass ? 120 : 0)) * diffUpkeepMult;
     const grossIncome = Math.round(ticketRevenue + rideIncome);
     const upkeep = Math.round(placedItems.reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) * upkeepResearchMult);
-    const wageCost = Math.round(wages * (eff.wageMult ?? 1));
+    const wageCost = Math.round(wages * (eff.wageMult ?? 1) * (1 - (fx.wageReduction || 0)));
     const marketingCost = currentAdBudget;
     const utilityCost = utilities;
     const premiumCost = currentPriorityPass ? 120 : 0;
