@@ -57,6 +57,7 @@ export const sound = {
   achievement() { [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.12, "triangle", 0.1, i * 0.07)); },
   incident() { tone(140, 0.25, "sawtooth", 0.1); },
   dayStart() { tone(440, 0.08, "sine", 0.07); tone(554, 0.08, "sine", 0.07, 0.06); tone(659, 0.12, "sine", 0.07, 0.12); },
+  levelUp() { [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, 0.14, "triangle", 0.11, i * 0.08)); },
   toggle() { muted = !muted; localStorage.setItem("splash-sound-muted", String(muted)); return muted; },
   isMuted() { return muted; },
 };

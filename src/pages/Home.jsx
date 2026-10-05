@@ -4,6 +4,7 @@ import { getParkItem } from "@/data/gameData";
 import { Link } from "react-router-dom";
 import { useGameState } from "@/hooks/useGameState";
 import { ACHIEVEMENTS } from "@/data/achievements";
+import { MISSIONS, missionProgress } from "@/data/missions";
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import StatsBar from "@/components/game/StatsBar";
@@ -27,6 +28,7 @@ import DailySummary from "@/components/game/DailySummary";
 import DayTransition from "@/components/game/DayTransition";
 import FloatingRewards from "@/components/game/FloatingRewards";
 import SoundToggle from "@/components/game/SoundToggle";
+import LevelUpCelebration from "@/components/game/LevelUpCelebration";
 import { sound } from "@/lib/soundManager";
 import confetti from "canvas-confetti";
 
@@ -37,12 +39,14 @@ export default function Home() {
   const selectedItem = selectedAttrId ? getParkItem(selectedAttrId) : null;
   const prevUnlocked = useRef(null);
   const prevDay = useRef(game.day);
+  const prevLevel = useRef(game.level);
   const [dailyReport, setDailyReport] = useState(null);
   const [sidebarTab, setSidebarTab] = useState("build");
   const [infoTab, setInfoTab] = useState("activity");
   const [dayTrigger, setDayTrigger] = useState(null);
   const [rewardTrigger, setRewardTrigger] = useState(null);
   const [shake, setShake] = useState(false);
+  const [levelUpTrigger, setLevelUpTrigger] = useState(null);
   const prevIncidentCount = useRef(0);
 
   useEffect(() => {
@@ -116,6 +120,15 @@ export default function Home() {
     prevIncidentCount.current = count;
   }, [game.incidents.length]);
 
+  // Level-up celebration
+  useEffect(() => {
+    if (game.level > prevLevel.current) {
+      setLevelUpTrigger(Date.now());
+      confetti({ particleCount: 120, spread: 90, startVelocity: 45, origin: { y: 0.4 }, colors: ["#a78bfa", "#fbbf24", "#22d3ee", "#f472b6", "#34d399"] });
+    }
+    prevLevel.current = game.level;
+  }, [game.level]);
+
   // Jump to the build tab when a tile is selected so the detail panel is visible
   useEffect(() => {
     if (game.selectedTile != null) setSidebarTab("build");
@@ -138,9 +151,14 @@ export default function Home() {
     label: String(id).replace(/[-_]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()),
   }));
 
+  const claimableMissions = MISSIONS.filter((m) => game.level >= m.level && !game.claimedMissions.includes(m.id) && missionProgress(m, game.missionState) >= m.target).length;
+  const incidentCount = game.incidents.length;
+  const Badge = ({ count }) => count > 0 ? <span className="absolute -right-0.5 -top-0.5 z-10 grid h-4 min-w-4 place-items-center rounded-full bg-rose-500 px-1 text-[8px] font-black text-white shadow ring-2 ring-white">{count}</span> : null;
+
   return (
     <div className={"min-h-screen bg-[radial-gradient(circle_at_10%_0%,rgba(34,211,238,.35),transparent_28%),radial-gradient(circle_at_90%_12%,rgba(250,204,21,.16),transparent_24%),linear-gradient(180deg,#bdefff_0%,#e8f8ed_42%,#c8e1c0_100%)]" + (shake ? " screen-shake" : "")}>
       <DayTransition day={game.day} weather={game.weather} seasonEvent={game.seasonEvent} trigger={dayTrigger} />
+      <LevelUpCelebration level={game.level} trigger={levelUpTrigger} />
       <FloatingRewards amount={game.lastNet} trigger={rewardTrigger} />
       <header className="sticky top-0 z-40 border-b border-white/70 bg-white/85 shadow-sm backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 sm:py-3.5">
@@ -179,7 +197,7 @@ export default function Home() {
               <TabsList className="w-full justify-between">
                 <TabsTrigger value="activity" className="flex-1 gap-1.5 text-xs"><Activity className="h-3.5 w-3.5" /> Activity</TabsTrigger>
                 <TabsTrigger value="insights" className="flex-1 gap-1.5 text-xs"><BarChart3 className="h-3.5 w-3.5" /> Insights</TabsTrigger>
-                <TabsTrigger value="missions" className="flex-1 gap-1.5 text-xs"><Target className="h-3.5 w-3.5" /> Missions</TabsTrigger>
+                <TabsTrigger value="missions" className="relative flex-1 gap-1.5 text-xs"><Target className="h-3.5 w-3.5" /> Missions<Badge count={claimableMissions} /></TabsTrigger>
               </TabsList>
               <TabsContent value="activity"><ActivityLog feedback={game.feedback} log={game.log} issueCount={game.incidents.length} guestExperience={game.visitorStats?.guestExperience} /></TabsContent>
               <TabsContent value="insights"><VisitorInsight visitorStats={game.visitorStats} /></TabsContent>
@@ -218,7 +236,7 @@ export default function Home() {
             <Tabs value={sidebarTab} onValueChange={setSidebarTab} className="waterpark-panel bg-white/85 p-3 sm:p-4">
               <TabsList className="w-full justify-between">
                 <TabsTrigger value="build" className="flex-1 gap-1 text-xs"><Hammer className="h-3.5 w-3.5" /> Build</TabsTrigger>
-                <TabsTrigger value="manage" className="flex-1 gap-1 text-xs"><Settings className="h-3.5 w-3.5" /> Manage</TabsTrigger>
+                <TabsTrigger value="manage" className="relative flex-1 gap-1 text-xs"><Settings className="h-3.5 w-3.5" /> Manage<Badge count={incidentCount} /></TabsTrigger>
                 <TabsTrigger value="staff" className="flex-1 gap-1 text-xs"><Users className="h-3.5 w-3.5" /> Staff</TabsTrigger>
                 <TabsTrigger value="save" className="flex-1 gap-1 text-xs"><Save className="h-3.5 w-3.5" /> Save</TabsTrigger>
               </TabsList>
