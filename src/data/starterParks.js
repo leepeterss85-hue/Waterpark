@@ -27,6 +27,9 @@ export const STARTER_PARKS = [
     level: 1,
     money: 50000,
     xp: 0,
+    reputation: 50,
+    ticketPrice: 28,
+    adBudget: 250,
     grid: [...EMPTY_GRID],
   },
   {
@@ -39,6 +42,9 @@ export const STARTER_PARKS = [
     level: 2,
     money: 35000,
     xp: 100,
+    reputation: 62,
+    ticketPrice: 25,
+    adBudget: 300,
     grid: buildGrid({
       0: "kiddie_pool",
       2: "splash_pad",
@@ -61,6 +67,9 @@ export const STARTER_PARKS = [
     level: 3,
     money: 40000,
     xp: 250,
+    reputation: 58,
+    ticketPrice: 31,
+    adBudget: 350,
     grid: buildGrid({
       0: "speed_slide",
       2: "kamikaze_slide",
@@ -83,6 +92,9 @@ export const STARTER_PARKS = [
     level: 4,
     money: 60000,
     xp: 450,
+    reputation: 70,
+    ticketPrice: 34,
+    adBudget: 300,
     grid: buildGrid({
       0: "hot_tub",
       2: "spa",
@@ -106,6 +118,9 @@ export const STARTER_PARKS = [
     level: 5,
     money: 80000,
     xp: 700,
+    reputation: 76,
+    ticketPrice: 38,
+    adBudget: 500,
     grid: buildGrid({
       0: "wave_pool",
       2: "mega_slide_complex",
