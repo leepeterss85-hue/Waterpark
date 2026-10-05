@@ -34,8 +34,8 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
         <div className="relative flex-1 min-h-0 overflow-auto rounded-[20px] border-[5px] border-[#315f47] bg-[#7aa966] p-2 shadow-[inset_0_0_0_2px_rgba(255,255,255,.15),inset_0_12px_35px_rgba(19,70,44,.18)] sm:p-3 game-map-surface">
           <div className="park-atmosphere" aria-hidden="true"><span className="park-sun" /><span className="park-cloud park-cloud-a" /><span className="park-cloud park-cloud-b" /><span className="park-rain" /></div>
           
-          <div className="relative overflow-visible game-map-stage"><div className="relative park-playfield" style={{ transform: "scale(" + zoom + ")", transformOrigin: "top left", width: (100 / zoom) + "%", marginBottom: ((zoom - 1) * 100 / zoom * 0.8) + "%" }}>
-            <div className="relative grid grid-cols-8 gap-1 sm:gap-1.5 game-map-grid">
+          <div className="relative h-full overflow-visible game-map-stage"><div className="relative h-full park-playfield" style={{ transform: "scale(" + zoom + ")", transformOrigin: "top left", width: (100 / zoom) + "%", marginBottom: ((zoom - 1) * 100 / zoom * 0.8) + "%" }}>
+            <div className="relative grid h-full grid-rows-[repeat(var(--map-rows),1fr)] grid-cols-8 gap-1 sm:gap-1.5 game-map-grid" style={{ "--map-rows": Math.ceil(grid.length / 8) }}>
               {grid.map((value, index) => {
                 const item = value ? getParkItem(value) : null;
                 const isWater = item?.category === "attraction";
