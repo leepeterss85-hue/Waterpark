@@ -11,6 +11,7 @@ import { RESEARCH, dailyResearchPoints, researchReqFor } from "@/data/research";
 import { simulateVisits } from "@/data/visitorLogic";
 import { generateFeedback } from "@/data/guestFeedback";
 import { trackEvent } from "@/lib/gameAnalytics";
+import { getSettings, getDifficulty } from "@/lib/settings";
 
 const STORAGE_KEY = "waterpark-tycoon-save-v1";
 const SLOTS_KEY = "waterpark-tycoon-slots";
@@ -372,12 +373,13 @@ const [selectedZone, setSelectedZone] = useState(null);
       (150 + attractions.length * 45 + facilities.length * 18 + newGuests * 2.2) *
       (dayWeather.utilityMult ?? 1)
     );
+    const diffUpkeepMult = getDifficulty(getSettings().difficulty).upkeepMult;
     const expenses =
-      placedItems.reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) * upkeepResearchMult +
+      (placedItems.reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) * upkeepResearchMult +
       wages * (eff.wageMult ?? 1) +
       utilities +
       currentAdBudget +
-      (currentPriorityPass ? 120 : 0);
+      (currentPriorityPass ? 120 : 0)) * diffUpkeepMult;
     const grossIncome = Math.round(ticketRevenue + rideIncome);
     const upkeep = Math.round(placedItems.reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) * upkeepResearchMult);
     const wageCost = Math.round(wages * (eff.wageMult ?? 1));
@@ -825,7 +827,8 @@ const [selectedZone, setSelectedZone] = useState(null);
   }, []);
 
   const resetGame = useCallback(() => {
-    setMoney(INITIAL_MONEY);
+    const diff = getDifficulty(getSettings().difficulty);
+    setMoney(Math.round(INITIAL_MONEY * diff.moneyMult));
     setDay(1);
     setReputation(50);
     setGuests(0);

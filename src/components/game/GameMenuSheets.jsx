@@ -1,19 +1,19 @@
 import React from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Hammer, Settings, Users, Save, Activity, BarChart3, Target, CloudSun, FlaskConical } from "lucide-react";
+import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal } from "lucide-react";
 import { MISSIONS, missionProgress } from "@/data/missions";
 import BuildPanel from "@/components/game/BuildPanel";
 import ExpansionPanel from "@/components/game/ExpansionPanel";
 import ParkManagementPanel from "@/components/game/ParkManagementPanel";
 import StaffPanel from "@/components/game/StaffPanel";
-import SaveLoadPanel from "@/components/game/SaveLoadPanel";
 import ActivityLog from "@/components/game/ActivityLog";
 import VisitorInsight from "@/components/game/VisitorInsights";
 import MissionsPanel from "@/components/game/MissionsPanel";
 import PlayerProgressPanel from "@/components/game/PlayerProgressPanel";
 import ParkToolbar from "@/components/game/ParkToolbar";
 import ResearchPanel from "@/components/game/ResearchPanel";
+import SettingsPanel from "@/components/game/SettingsPanel";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
   return (
@@ -86,8 +86,15 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
         />
       </SheetShell>
 
-      <SheetShell open={openSheet === "save"} onOpenChange={(v) => !v && close()} title="Save / Load" icon={Save} width="sm:max-w-sm">
-        <SaveLoadPanel saves={game.saves} onSave={game.savePark} onLoad={game.loadPark} onDelete={game.deleteSave} />
+      <SheetShell open={openSheet === "settings"} onOpenChange={(v) => !v && close()} title="Settings" icon={SlidersHorizontal} width="sm:max-w-md">
+        <SettingsPanel
+          saves={game.saves}
+          onSave={game.savePark}
+          onLoad={game.loadPark}
+          onDelete={game.deleteSave}
+          onNewGame={game.resetGame}
+          onContinue={close}
+        />
       </SheetShell>
 
       <SheetShell open={openSheet === "info"} onOpenChange={(v) => !v && close()} title="Park Activity" icon={Activity} width="sm:max-w-lg">

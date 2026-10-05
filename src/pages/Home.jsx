@@ -24,6 +24,7 @@ import UndoButton from "@/components/game/UndoButton";
 import VipBanner from "@/components/game/VipBanner";
 import { trackEvent } from "@/lib/gameAnalytics";
 import { sound } from "@/lib/soundManager";
+import { haptics } from "@/lib/settings";
 import confetti from "canvas-confetti";
 
 const StatPill = ({ icon: Icon, value, tone }) => (
@@ -53,6 +54,7 @@ export default function Home() {
     if (prevDay.current !== game.day) {
       setDayTrigger(game.day);
       sound.dayStart();
+      haptics.buzz(20);
       if (game.day > 1 && game.day % 30 === 0) {
         const monthHistory = (game.history || []).filter(
           (entry) => entry.day > game.day - 30 && entry.day <= game.day
@@ -94,6 +96,7 @@ export default function Home() {
         const a = ACHIEVEMENTS.find((x) => x.id === id);
         toast({ title: "🏆 Achievement Unlocked!", description: a.title + " — " + a.desc });
         sound.achievement();
+        haptics.buzz([20, 40, 20]);
         confetti({ particleCount: 80, spread: 70, origin: { y: 0.3 }, colors: ["#22d3ee", "#fbbf24", "#a78bfa", "#34d399"] });
       }
     }
@@ -103,7 +106,7 @@ export default function Home() {
   useEffect(() => {
     if (game.lastNet && game.lastNet !== 0) {
       setRewardTrigger(Date.now());
-      if (game.lastNet > 0) sound.cash();
+      if (game.lastNet > 0) { sound.cash(); haptics.buzz(15); }
     }
   }, [game.lastNet]);
 
@@ -111,6 +114,7 @@ export default function Home() {
     const count = game.incidents.length;
     if (count > prevIncidentCount.current) {
       sound.incident();
+      haptics.buzz([30, 20, 30]);
       setShake(true);
       const t = setTimeout(() => setShake(false), 400);
       return () => clearTimeout(t);
@@ -121,6 +125,7 @@ export default function Home() {
   useEffect(() => {
     if (game.level > prevLevel.current) {
       setLevelUpTrigger(Date.now());
+      haptics.buzz([20, 40, 20, 40]);
       confetti({ particleCount: 120, spread: 90, startVelocity: 45, origin: { y: 0.4 }, colors: ["#a78bfa", "#fbbf24", "#22d3ee", "#f472b6", "#34d399"] });
     }
     prevLevel.current = game.level;
@@ -136,9 +141,11 @@ export default function Home() {
     game.handleTileClick(index);
     if (wasEmpty && hadBuild) {
       sound.build();
+      haptics.buzz(25);
       setTimeout(() => sound.splash(), 200);
     } else {
       sound.click();
+      haptics.buzz(10);
     }
   };
 
