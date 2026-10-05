@@ -791,7 +791,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       trackEvent("park_saved", { name: trimmed });
       return true;
     },
-    [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, researchPoints, completedResearch]
+    [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, researchPoints, completedResearch, parkAppeal]
   );
 
   const loadPark = useCallback((name) => {
@@ -952,6 +952,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     feedback,
     researchPoints,
     completedResearch,
+    parkAppeal,
     unlockResearch,
     builtCount: builtAttractionIds.length,
     achievementState: {
@@ -979,6 +980,9 @@ const [selectedZone, setSelectedZone] = useState(null);
       totalUpgrades,
       expansionsDone,
       maxedUpgrades: upgrades.filter((lv) => lv >= MAX_UPGRADE).length,
+      parkAppeal: parkAppeal.score,
+      zonedTiles: (parkZones || []).filter(Boolean).length,
+      themedZones: (parkAppeal.zones || []).filter((z) => z.quality >= 60).length,
     },
     ...staffEffects(staff),
     staffWages: staffWages(staff),
