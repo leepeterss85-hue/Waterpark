@@ -1,6 +1,7 @@
 import { getAttraction } from "./gameData";
 import { getThemeGuestAffinity } from "./parkThemes";
 import { adjustedVisitSpend, pricingMoodPenalty } from "./pricing";
+import { popularityDestinationWeight, popularityRevenueMult } from "./popularity";
 
 const MAX_AGENTS = 200;
 const FACILITY_CAPACITY = 60;
@@ -258,6 +259,10 @@ function scoreDestination(guest, item) {
     const queuePenalty = (item.queueWait / Math.max(1, guest.patience)) * 3;
     score *= Math.max(0.2, 1 - queuePenalty);
   }
+  // Popular rides attract more guests.
+  if (attr.category === "attraction" && item.popularity != null) {
+    score *= popularityDestinationWeight(item.popularity);
+  }
   score *= zoneAffinity;
   return Math.max(0.1, score * (0.45 + guest.mood / 100));
 }
@@ -303,6 +308,7 @@ export function simulateVisits({
   pricing = null,
   weather = null,
   seasonEvent = null,
+  popularity = null,
 }) {
   const empty = {
     income: 0, avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0,
@@ -339,6 +345,7 @@ export function simulateVisits({
         overcrowded: false,
         queueWait: 0,
         queueSupport: queueSupportByTile.get(item.idx) || 0,
+        popularity: popularity?.[item.idx] ?? null,
       };
     });
   if (!options.length) return { ...empty, avgMood: 30, guestExperience: { happy: 0, content: 0, unhappy: demand } };
@@ -377,6 +384,10 @@ export function simulateVisits({
       const attr = pick.attr;
       let price = perVisitSpend(pick, pick.level) *
         (attr.category === "facility" ? facilityBonus : 1);
+      // Popular rides earn more per visit.
+      if (attr.category === "attraction" && pick.popularity != null) {
+        price *= popularityRevenueMult(pick.popularity);
+      }
       price = adjustedVisitSpend(price, attr.category, guest.type, pricing, weather, seasonEvent);
 
       // Pricing reaction: price-sensitive guests are more likely to skip expensive activities.

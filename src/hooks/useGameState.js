@@ -18,6 +18,7 @@ import { getHotelDef, simulateHotelDay, calculateResortRating } from "@/data/hot
 import { getStarterPark } from "@/data/starterParks";
 import { calculateParkAppeal } from "@/data/parkThemes";
 import { DEFAULT_PRICING } from "@/data/pricing";
+import { tickPopularity, DEFAULT_POPULARITY, NEW_RIDE_TREND_BOOST } from "@/data/popularity";
 
 const STORAGE_KEY = "waterpark-tycoon-save-v1";
 const SLOTS_KEY = "waterpark-tycoon-slots";
@@ -120,13 +121,16 @@ const [selectedZone, setSelectedZone] = useState(null);
   const [hotelStats, setHotelStats] = useState({ roomRevenue: 0, hotelExpenses: 0, parkSpend: 0, occupancy: 0, avgHappiness: 0, totalGuests: 0, totalRooms: 0, guestsByHotel: {} });
   const [resortRating, setResortRating] = useState(0);
   const [pricing, setPricing] = useState(DEFAULT_PRICING);
+  const [popularity, setPopularity] = useState(() => Array(GRID_SIZE).fill(0));
+  const [popularityTrend, setPopularityTrend] = useState(() => Array(GRID_SIZE).fill(0));
+  const [prevPopularity, setPrevPopularity] = useState(() => Array(GRID_SIZE).fill(0));
 
   const level = levelFromXp(xp);
   const gridSize = grid.length;
 
   /** @type {import("react").MutableRefObject<Record<string, any>>} */
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, completedResearch, parkAppeal, disaster, sandbox, activeCampaigns, hotelGuests, resortRating, pricing };
+  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, completedResearch, parkAppeal, disaster, sandbox, activeCampaigns, hotelGuests, resortRating, pricing, popularity, popularityTrend };
 
   // Load saved game
   useEffect(() => {
@@ -172,6 +176,9 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (data.hotelStats) setHotelStats(data.hotelStats);
         if (data.resortRating != null) setResortRating(data.resortRating);
         if (data.pricing) setPricing({ ...DEFAULT_PRICING, ...data.pricing });
+        if (data.popularity) setPopularity(data.popularity);
+        if (data.popularityTrend) setPopularityTrend(data.popularityTrend);
+        if (data.prevPopularity) setPrevPopularity(data.prevPopularity);
       }
     } catch {
       /* ignore */
@@ -184,14 +191,14 @@ const [selectedZone, setSelectedZone] = useState(null);
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing })
+          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity })
         );
       } catch {
         /* ignore */
       }
     }, 300);
     return () => clearTimeout(t);
-  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating]);
+  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, popularity, popularityTrend, prevPopularity]);
 
   // Load save slots list on mount
   useEffect(() => {
@@ -335,6 +342,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         pricing: currentPricing,
         weather: dayWeather,
         seasonEvent: currentSeasonEvent,
+        popularity: stateRef.current.popularity,
       });
       income = sim.income;
       visitorStats = sim;
@@ -429,6 +437,23 @@ const [selectedZone, setSelectedZone] = useState(null);
       }
     }
     setAttractionCondition(nextCondition);
+
+    // --- Ride popularity & trends tick ---
+    setPrevPopularity([...(stateRef.current.popularity || [])]);
+    const popResult = tickPopularity({
+      attractions,
+      popularity: stateRef.current.popularity,
+      trendBoost: stateRef.current.popularityTrend,
+      movements: visitorStats?.movements || {},
+      totalVisits: visitorStats?.totalVisits || 0,
+      condition: nextCondition,
+      reputation: Math.round(newReputation),
+      pricing: stateRef.current.pricing || DEFAULT_PRICING,
+      guestTypes: visitorStats?.guestTypes || {},
+      weather: dayWeather,
+    });
+    setPopularity(popResult.popularity);
+    setPopularityTrend(popResult.trendBoost);
 
     // --- Hotel / Resort simulation ---
     const placedHotels = prevGrid.map((id, idx) => {
@@ -712,6 +737,24 @@ const [selectedZone, setSelectedZone] = useState(null);
         setParkAppeal(calculateParkAppeal({ grid: ng, zones: parkZones, getItem: getParkItem }));
         return ng;
       });
+      setPopularity((p) => {
+        const n = [...p];
+        while (n.length <= index) n.push(0);
+        n[index] = attr.category === "attraction" ? DEFAULT_POPULARITY : 0;
+        return n;
+      });
+      setPopularityTrend((t) => {
+        const n = [...t];
+        while (n.length <= index) n.push(0);
+        n[index] = attr.category === "attraction" ? NEW_RIDE_TREND_BOOST : 0;
+        return n;
+      });
+      setPrevPopularity((p) => {
+        const n = [...p];
+        while (n.length <= index) n.push(0);
+        n[index] = 0;
+        return n;
+      });
       if (!sandbox) setMoney((m) => m - attr.cost);
       if (attr.category === "attraction") {
         setBuiltAttractionIds((ids) => (ids.includes(selectedBuild) ? ids : [...ids, selectedBuild]));
@@ -762,6 +805,9 @@ const [selectedZone, setSelectedZone] = useState(null);
         next[index] = null;
         return next;
       });
+      setPopularity((p) => { const n = [...p]; if (n[index] != null) n[index] = 0; return n; });
+      setPopularityTrend((t) => { const n = [...t]; if (n[index] != null) n[index] = 0; return n; });
+      setPrevPopularity((p) => { const n = [...p]; if (n[index] != null) n[index] = 0; return n; });
       const ng = [...g];
       ng[index] = null;
       return ng;
@@ -837,6 +883,9 @@ const [selectedZone, setSelectedZone] = useState(null);
     setParkZones((z) => [...z, ...Array(EXPAND_ROW).fill(null)]);
     setUpgrades((u) => [...u, ...Array(EXPAND_ROW).fill(0)]);
     setAttractionCondition((conditions) => [...conditions, ...Array(EXPAND_ROW).fill(100)]);
+    setPopularity((p) => [...p, ...Array(EXPAND_ROW).fill(0)]);
+    setPopularityTrend((t) => [...t, ...Array(EXPAND_ROW).fill(0)]);
+    setPrevPopularity((p) => [...p, ...Array(EXPAND_ROW).fill(0)]);
     if (!sandbox) setMoney((m) => m - cost);
     setExpansionsDone((e) => e + 1);
     trackEvent("park_expanded", { expansions: expansionsDone + 1, cost });
@@ -1098,6 +1147,18 @@ const [selectedZone, setSelectedZone] = useState(null);
     setHotelStats({ roomRevenue: 0, hotelExpenses: 0, parkSpend: 0, occupancy: 0, avgHappiness: 0, totalGuests: 0, totalRooms: 0, guestsByHotel: {} });
     setResortRating(0);
     setPricing(DEFAULT_PRICING);
+    const startPopularity = Array(startGrid.length).fill(0);
+    const startPopTrend = Array(startGrid.length).fill(0);
+    for (let i = 0; i < startGrid.length; i += 1) {
+      const item = startGrid[i] ? getParkItem(startGrid[i]) : null;
+      if (item && item.category === "attraction") {
+        startPopularity[i] = DEFAULT_POPULARITY;
+        startPopTrend[i] = NEW_RIDE_TREND_BOOST * 0.5;
+      }
+    }
+    setPopularity(startPopularity);
+    setPopularityTrend(startPopTrend);
+    setPrevPopularity(Array(startGrid.length).fill(0));
     trackEvent("park_reset", { starterPark: park.id, level: park.level, money: baseMoney });
   }, []);
 
