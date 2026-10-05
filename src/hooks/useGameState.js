@@ -1018,6 +1018,9 @@ const [selectedZone, setSelectedZone] = useState(null);
         hotelStats,
         resortRating,
         pricing,
+        popularity,
+        popularityTrend,
+        prevPopularity,
         savedAt: new Date().toISOString(),
       };
       writeSlots(slots);
@@ -1025,7 +1028,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       trackEvent("park_saved", { name: trimmed });
       return true;
     },
-    [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating]
+    [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, popularity, popularityTrend, prevPopularity]
   );
 
   const loadPark = useCallback((name) => {
@@ -1070,6 +1073,9 @@ const [selectedZone, setSelectedZone] = useState(null);
     if (data.hotelStats) setHotelStats(data.hotelStats);
     if (data.resortRating != null) setResortRating(data.resortRating);
     if (data.pricing) setPricing({ ...DEFAULT_PRICING, ...data.pricing });
+    if (data.popularity) setPopularity(data.popularity);
+    if (data.popularityTrend) setPopularityTrend(data.popularityTrend);
+    if (data.prevPopularity) setPrevPopularity(data.prevPopularity);
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
     setLastNet(data.lastNet ?? 0);
     setPlaying(false);
@@ -1221,6 +1227,9 @@ const [selectedZone, setSelectedZone] = useState(null);
     launchCampaign,
     pricing,
     setPricing,
+    popularity,
+    popularityTrend,
+    prevPopularity,
     hotels: grid.map((id, idx) => { const def = getHotelDef(id); return def ? { def, tileIndex: idx } : null; }).filter(Boolean),
     hotelGuests,
     hotelStats,

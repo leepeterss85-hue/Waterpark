@@ -1,6 +1,7 @@
 import React from "react";
-import { X, ArrowUpCircle, Wrench, CheckCircle2, AlertTriangle, Users, Clock } from "lucide-react";
+import { X, ArrowUpCircle, Wrench, CheckCircle2, AlertTriangle, Users, Clock, Flame, Sparkles, TrendingUp } from "lucide-react";
 import { getAttraction, getAttractionProfile, MAX_UPGRADE, upgradeCost } from "@/data/gameData";
+import { popularityLabel } from "@/data/popularity";
 import { getIcon } from "./icons";
 
 function Row({ label, value }) {
@@ -12,7 +13,7 @@ function Row({ label, value }) {
   );
 }
 
-export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0, incident = null, condition = 100, guests = 0, queueWait = 0, lifeguards = 0, movementCount = 0, totalVisits = 0, onUpgrade, onSell, onClose }) {
+export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0, incident = null, condition = 100, guests = 0, queueWait = 0, lifeguards = 0, movementCount = 0, totalVisits = 0, popularityScore = null, trendBoost = 0, onUpgrade, onSell, onClose }) {
   if (gridIndex == null || !attractionId) return null;
   const attr = getAttraction(attractionId);
   const profile = getAttractionProfile(attractionId);
@@ -26,7 +27,11 @@ export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0,
   const statusIcon = incident ? <AlertTriangle className="h-3.5 w-3.5" /> : <CheckCircle2 className="h-3.5 w-3.5" />;
   const effectiveCapacity = Math.round((attr.capacity || 0) * (1 + level * 0.2));
   const estimatedLoad = attr.capacity ? Math.min(100, Math.round((guests / Math.max(1, effectiveCapacity)) * 100)) : 0;
-  const popularity = totalVisits ? Math.min(100, Math.round((movementCount / totalVisits) * 100)) : 0;
+  const visitShare = totalVisits ? Math.min(100, Math.round((movementCount / totalVisits) * 100)) : 0;
+  const popScore = popularityScore != null ? popularityScore : null;
+  const popMeta = popScore != null ? popularityLabel(popScore) : null;
+  const isTrendy = trendBoost > 18;
+  const isHot = trendBoost > 6 && !isTrendy;
   const guardGap = Math.max(0, (profile?.lifeguards || 0) - lifeguards);
   const conditionValue = Math.max(0, Math.min(100, Math.round(condition)));
   const conditionLabel = conditionValue >= 75 ? "Excellent" : conditionValue >= 50 ? "Good" : conditionValue >= 30 ? "Worn" : "Critical";
@@ -59,7 +64,25 @@ export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0,
         {attr.capacity > 0 && <Row label="Capacity" value={`${effectiveCapacity} riders/day`} />}
         {attr.capacity > 0 && <Row label="Current park load" value={<span className="inline-flex items-center gap-1"><Users className="h-3 w-3" />{estimatedLoad}%</span>} />}
         {attr.capacity > 0 && <Row label="Estimated queue" value={<span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" />{queueWait ? `${queueWait} min` : "Low / none"}</span>} />}
-        {attr.capacity > 0 && <Row label="Popularity" value={`${popularity}% of visits`} />}
+        {attr.capacity > 0 && <Row label="Today's visits" value={`${Math.round(movementCount)} (${visitShare}% of all)`} />}
+        {attr.capacity > 0 && popScore != null && (
+          <div className="flex items-center justify-between py-1.5 text-sm">
+            <span className="flex items-center gap-1 text-slate-400"><Flame className="h-3 w-3" />Popularity</span>
+            <span className="flex items-center gap-1.5">
+              {isTrendy && <span className="inline-flex items-center gap-0.5 rounded-full bg-fuchsia-100 px-1.5 py-0.5 text-[9px] font-black text-fuchsia-700"><Sparkles className="h-2.5 w-2.5" />NEW</span>}
+              {isHot && <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-black text-amber-700"><TrendingUp className="h-2.5 w-2.5" />HOT</span>}
+              <span className={"font-semibold " + (popMeta?.tone || "text-slate-700")}>{Math.round(popScore)}%</span>
+            </span>
+          </div>
+        )}
+        {attr.capacity > 0 && popScore != null && (
+          <div className="-mt-1 mb-1 pl-1">
+            <div className="h-1.5 overflow-hidden rounded-full bg-slate-200">
+              <div className={"h-full rounded-full " + (popMeta?.dot || "bg-slate-400")} style={{ width: popScore + "%" }} />
+            </div>
+            {popMeta && <div className="mt-1 text-[9px] font-semibold text-slate-400">{popMeta.label} · popular rides earn more and draw more guests</div>}
+          </div>
+        )}
         {attr.capacity > 0 && <Row label="Safety" value={`${profile?.safety || "Medium"} · ${lifeguards}/${profile?.lifeguards || 1} guards`} />}
         {attr.fun > 0 && <Row label="Fun rating" value={`${attr.fun}/10`} />}
         <Row label="Upgrade level" value={maxed ? `Lv ${level} (max)` : `Lv ${level} / ${MAX_UPGRADE}`} />

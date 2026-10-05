@@ -285,6 +285,8 @@ export default function Home() {
                   lifeguards={game.staff?.lifeguard || 0}
                   movementCount={game.visitorStats?.movements?.[selectedAttrId] || 0}
                   totalVisits={game.visitorStats?.totalVisits || 0}
+                  popularityScore={game.popularity?.[game.selectedTile] ?? null}
+                  trendBoost={game.popularityTrend?.[game.selectedTile] ?? 0}
                   onUpgrade={() => game.upgradeAttraction(game.selectedTile)}
                   onSell={() => game.sellAttraction(game.selectedTile)}
                   onClose={() => game.setSelectedTile(null)}
