@@ -14,6 +14,7 @@ import PlayerProgressPanel from "@/components/game/PlayerProgressPanel";
 import ParkToolbar from "@/components/game/ParkToolbar";
 import ResearchPanel from "@/components/game/ResearchPanel";
 import SettingsPanel from "@/components/game/SettingsPanel";
+import ParkAppealPanel from "@/components/game/ParkAppealPanel";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
   return (
@@ -113,7 +114,8 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
         </Tabs>
       </SheetShell>
 
-      <SheetShell open={openSheet === "conditions"} onOpenChange={(v) => !v && close()} title="Conditions & Zoning" icon={CloudSun} width="sm:max-w-md">
+      <SheetShell open={openSheet === "conditions"} onOpenChange={(v) => !v && close()} title="Park Conditions & Zoning" icon={CloudSun} width="sm:max-w-md">
+        <ParkAppealPanel appeal={game.parkAppeal} reputation={game.reputation} visitorStats={game.visitorStats} />
         <ParkToolbar weather={game.weather} forecast={game.forecast} season={game.season} seasonEvent={game.seasonEvent} guests={game.guests} selectedZone={game.selectedZone} onZoneSelect={game.setSelectedZone} />
       </SheetShell>
     </>
