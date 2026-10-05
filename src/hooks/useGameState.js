@@ -299,10 +299,14 @@ const [selectedZone, setSelectedZone] = useState(null);
         incomeMult: eff.incomeMult ?? 1,
         entertainment,
         facilityBonus,
+        appealBonus: (calculatedAppeal.score - 50) * 0.025,
       });
       income = sim.income;
       visitorStats = sim;
       dayFeedback = generateFeedback(sim, { day: d + 1, weather: dayWeather, incidents: remaining, cleanliness, safety, entertainment });
+      const signatureRides = attractions.filter((p) => ["water_coaster", "mega_slide_complex", "freefall_drop", "cliff_jump", "tornado_bowl", "aqua_loop"].includes(p.id));
+      const bigMoment = signatureRides.find((p) => (visitorStats.movements?.[p.id] || 0) >= Math.max(10, p.attr.capacity * 0.08));
+      if (bigMoment) dayFeedback = [{ day: d + 1, text: `🔥 MASSIVE SPLASH! ${bigMoment.attr.name} is the star of the park today.` }, ...dayFeedback];
 
       const avgMood = sim.avgMood;
       let repDelta = 0;
