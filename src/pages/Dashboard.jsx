@@ -15,6 +15,7 @@ import RidePopularityCard from "@/components/dashboard/RidePopularityCard";
 import MembershipsCard from "@/components/dashboard/MembershipsCard";
 import AwardsCard from "@/components/dashboard/AwardsCard";
 import SocialMediaCard from "@/components/dashboard/SocialMediaCard";
+import EmergenciesCard from "@/components/dashboard/EmergenciesCard";
 
 export default function Dashboard() {
   const game = useGameState();
@@ -43,6 +44,7 @@ export default function Dashboard() {
         <div className="mt-5"><MembershipsCard counts={game.membershipCounts} stats={game.membershipStats} level={game.level} /></div>
         <div className="mt-5"><AwardsCard awards={game.awards} awardStats={game.awardStats} /></div>
         <div className="mt-5"><SocialMediaCard socialPosts={game.socialPosts} socialReputation={game.socialReputation} /></div>
+        <div className="mt-5"><EmergenciesCard emergencies={game.emergencies} emergencyStats={game.emergencyStats} /></div>
         <div className="mt-5"><LayoutAnalytics grid={game.grid} history={game.history} peakGuests={game.peakGuests} lifetimeEarnings={game.lifetimeEarnings} reputation={game.reputation} guests={game.guests} day={game.day} /></div>
         <div className="mt-5"><PlayerActivityFeed /></div>
         <div className="mt-5"><AchievementsGallery achievementState={game.achievementState} /></div>

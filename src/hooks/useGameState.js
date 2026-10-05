@@ -23,6 +23,7 @@ import { getEvent, isEventAvailable, aggregateEventEffects } from "@/data/parkEv
 import { MEMBERSHIP_TIERS, simulateMemberships, totalMemberCount } from "@/data/memberships";
 import { AWARD_CATEGORIES, AWARD_CEREMONY_CYCLE, evaluateAwards, totalAwardGuestMult } from "@/data/awards";
 import { generateSocialPosts, computeSocialReputation, socialDemandMult, socialPriceTolerance } from "@/data/socialMedia";
+import { simulateEmergencies, EMERGENCY_TYPES } from "@/data/emergencies";
 
 const STORAGE_KEY = "waterpark-tycoon-save-v1";
 const SLOTS_KEY = "waterpark-tycoon-slots";
@@ -137,13 +138,15 @@ const [selectedZone, setSelectedZone] = useState(null);
   const [awardStats, setAwardStats] = useState({ totalWon: 0, ceremoniesHeld: 0, currentGuestMult: 1 });
   const [socialPosts, setSocialPosts] = useState([]);
   const [socialReputation, setSocialReputation] = useState(50);
+  const [emergencies, setEmergencies] = useState([]);
+  const [emergencyStats, setEmergencyStats] = useState({ totalEmergencies: 0, totalCost: 0, resolvedCount: 0 });
 
   const level = levelFromXp(xp);
   const gridSize = grid.length;
 
   /** @type {import("react").MutableRefObject<Record<string, any>>} */
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, completedResearch, parkAppeal, disaster, sandbox, activeCampaigns, hotelGuests, resortRating, pricing, popularity, popularityTrend, activeEvents, xp, membershipCounts, membershipTimers, membershipStats, peakGuests, totalUpgrades, awards, awardCeremonyTimer, awardStats, awardGuestMult: totalAwardGuestMult(awards), socialPosts, socialReputation };
+  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, completedResearch, parkAppeal, disaster, sandbox, activeCampaigns, hotelGuests, resortRating, pricing, popularity, popularityTrend, activeEvents, xp, membershipCounts, membershipTimers, membershipStats, peakGuests, totalUpgrades, awards, awardCeremonyTimer, awardStats, awardGuestMult: totalAwardGuestMult(awards), socialPosts, socialReputation, emergencies };
 
   // Load saved game
   useEffect(() => {
@@ -201,6 +204,8 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (data.awardStats) setAwardStats(data.awardStats);
         if (data.socialPosts) setSocialPosts(data.socialPosts);
         if (data.socialReputation != null) setSocialReputation(data.socialReputation);
+        if (data.emergencies) setEmergencies(data.emergencies);
+        if (data.emergencyStats) setEmergencyStats(data.emergencyStats);
       }
     } catch {
       /* ignore */
@@ -213,7 +218,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation })
+          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats })
         );
       } catch {
         /* ignore */
@@ -587,6 +592,39 @@ const [selectedZone, setSelectedZone] = useState(null);
       totalChurned: (prev?.totalChurned || 0) + membershipResult.totalChurned,
     }));
 
+    // --- Emergency simulation ---
+    const emergencyResult = simulateEmergencies({
+      day: d + 1,
+      emergencies: stateRef.current.emergencies,
+      staff: counts,
+      staffAssignments: currentAssignments,
+      parkZones: currentZones,
+      attractionCondition: nextCondition,
+      weather: dayWeather,
+      cleanliness,
+      safety,
+      guests: newGuests,
+      attractions,
+      sandbox: isSandbox,
+    });
+    setEmergencies(emergencyResult.allActive);
+    if (emergencyResult.resolvedEmergencies.length > 0 || emergencyResult.newEmergencies.length > 0) {
+      setEmergencyStats((prev) => ({
+        totalEmergencies: (prev?.totalEmergencies || 0) + emergencyResult.newEmergencies.length,
+        totalCost: (prev?.totalCost || 0) + emergencyResult.totalCost,
+        resolvedCount: (prev?.resolvedCount || 0) + emergencyResult.resolvedEmergencies.length,
+      }));
+    }
+    if (emergencyResult.repImpact !== 0) {
+      setReputation((rv) => Math.max(0, Math.min(100, rv - emergencyResult.repImpact)));
+    }
+    if (emergencyResult.moodImpact !== 0) {
+      setVisitorStats((vs) => ({ ...vs, avgMood: Math.max(0, (vs?.avgMood || 0) + emergencyResult.moodImpact) }));
+    }
+    if (emergencyResult.logEntries.length) {
+      setLog((l) => [...emergencyResult.logEntries, ...l].slice(0, 12));
+    }
+
     const ticketRevenue = newGuests * currentTicketPrice * ticketResearchMult;
     const conditionIncomeMult = workingAttractions.length ? workingAttractions.reduce((sum, p) => sum + (0.72 + (nextCondition[p.idx] || 0) * 0.0028), 0) / workingAttractions.length : 0;
     const rideIncome = income * conditionIncomeMult *
@@ -606,13 +644,14 @@ const [selectedZone, setSelectedZone] = useState(null);
       (currentPriorityPass ? 120 : 0)) * diffUpkeepMult +
       hotelExpensesAmount;
     const eventRevenuePerDay = currentActiveEvents.reduce((s, e) => s + (e.revenuePerDay || 0), 0);
+    const emergencyCost = emergencyResult.totalCost;
     const grossIncome = Math.round(ticketRevenue + rideIncome + hotelRoomRevenue + hotelParkSpend + eventRevenuePerDay + membershipResult.totalRevenue + membershipResult.memberSpend);
     const upkeep = Math.round(placedItems.filter((p) => p.attr.category !== "hotel").reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) * upkeepResearchMult);
     const wageCost = Math.round(wages * (eff.wageMult ?? 1) * (1 - (fx.wageReduction || 0)));
     const marketingCost = currentAdBudget;
     const utilityCost = utilities;
     const premiumCost = currentPriorityPass ? 120 : 0;
-    const net = isSandbox ? Math.round(grossIncome) : Math.round(grossIncome - expenses);
+    const net = isSandbox ? Math.round(grossIncome - emergencyCost) : Math.round(grossIncome - expenses - emergencyCost);
 
     // --- Build log entries (newest first) ---
     const entries = [];
@@ -1214,6 +1253,8 @@ const [selectedZone, setSelectedZone] = useState(null);
         awardStats,
         socialPosts,
         socialReputation,
+        emergencies,
+        emergencyStats,
         savedAt: new Date().toISOString(),
       };
       writeSlots(slots);
@@ -1278,6 +1319,8 @@ const [selectedZone, setSelectedZone] = useState(null);
     if (data.awardStats) setAwardStats(data.awardStats);
     if (data.socialPosts) setSocialPosts(data.socialPosts);
     if (data.socialReputation != null) setSocialReputation(data.socialReputation);
+    if (data.emergencies) setEmergencies(data.emergencies);
+    if (data.emergencyStats) setEmergencyStats(data.emergencyStats);
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
     setLastNet(data.lastNet ?? 0);
     setPlaying(false);
@@ -1360,6 +1403,8 @@ const [selectedZone, setSelectedZone] = useState(null);
     setAwardStats({ totalWon: 0, ceremoniesHeld: 0, currentGuestMult: 1 });
     setSocialPosts([]);
     setSocialReputation(50);
+    setEmergencies([]);
+    setEmergencyStats({ totalEmergencies: 0, totalCost: 0, resolvedCount: 0 });
     setHotelGuests([]);
     setHotelStats({ roomRevenue: 0, hotelExpenses: 0, parkSpend: 0, occupancy: 0, avgHappiness: 0, totalGuests: 0, totalRooms: 0, guestsByHotel: {} });
     setResortRating(0);
@@ -1453,6 +1498,9 @@ const [selectedZone, setSelectedZone] = useState(null);
     awardCategories: AWARD_CATEGORIES,
     socialPosts,
     socialReputation,
+    emergencies,
+    emergencyStats,
+    emergencyTypes: EMERGENCY_TYPES,
     awardEvaluation: evaluateAwards({
       grid, upgrades, attractionCondition, staff, visitorStats,
       parkAppeal, reputation, incidents, hotelStats, membershipCounts,
