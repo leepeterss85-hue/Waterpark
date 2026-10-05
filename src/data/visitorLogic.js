@@ -3,19 +3,175 @@ import { getThemeGuestAffinity } from "./parkThemes";
 
 const MAX_AGENTS = 200;
 const FACILITY_CAPACITY = 60;
+
+// === Individual Guest Groups ===
+// Each group has distinct spending habits, ride preferences, queue tolerance,
+// food/shopping preferences and pricing reactions.
 const GUEST_PROFILES = [
-  { type: "Family", group: "Family group", mood: [50, 78], hunger: [20, 50], thirst: [15, 45], energy: [55, 90], budget: [70, 150], patience: 62 },
-  { type: "Thrill seeker", group: "Friends group", mood: [58, 88], hunger: [10, 40], thirst: [15, 40], energy: [65, 100], budget: [60, 130], patience: 48 },
-  { type: "Relaxed guest", group: "Couple", mood: [45, 75], hunger: [15, 45], thirst: [20, 50], energy: [45, 80], budget: [80, 170], patience: 75 },
-  { type: "Premium guest", group: "VIP group", mood: [55, 82], hunger: [15, 40], thirst: [10, 35], energy: [60, 90], budget: [120, 220], patience: 68 },
-  { type: "Teen group", group: "Friends group", mood: [55, 85], hunger: [15, 45], thirst: [20, 55], energy: [70, 100], budget: [45, 100], patience: 42 },
+  {
+    type: "Family",
+    group: "Family group",
+    mood: [50, 78],
+    hunger: [20, 50],
+    thirst: [15, 45],
+    energy: [55, 90],
+    budget: [70, 160],
+    patience: 62,
+    priceSensitivity: 1.6, // watch the wallet
+    shoppingPref: 0.6,
+    rideClass: "family",
+    foodClass: "casual",
+  },
+  {
+    type: "Couple",
+    group: "Couple",
+    mood: [48, 78],
+    hunger: [15, 40],
+    thirst: [18, 48],
+    energy: [50, 85],
+    budget: [100, 200],
+    patience: 74,
+    priceSensitivity: 0.9,
+    shoppingPref: 1.3,
+    rideClass: "relax",
+    foodClass: "premium",
+  },
+  {
+    type: "Teen group",
+    group: "Friends group",
+    mood: [55, 85],
+    hunger: [15, 45],
+    thirst: [20, 55],
+    energy: [70, 100],
+    budget: [45, 110],
+    patience: 42,
+    priceSensitivity: 2.0, // very price sensitive
+    shoppingPref: 0.5,
+    rideClass: "thrill",
+    foodClass: "casual",
+  },
+  {
+    type: "Thrill seeker",
+    group: "Friends group",
+    mood: [58, 88],
+    hunger: [10, 40],
+    thirst: [15, 40],
+    energy: [65, 100],
+    budget: [65, 140],
+    patience: 48,
+    priceSensitivity: 1.2,
+    shoppingPref: 0.4,
+    rideClass: "thrill",
+    foodClass: "casual",
+  },
+  {
+    type: "Tourist",
+    group: "Tourist group",
+    mood: [52, 82],
+    hunger: [18, 48],
+    thirst: [18, 50],
+    energy: [50, 85],
+    budget: [110, 220],
+    patience: 58,
+    priceSensitivity: 0.7, // here for the experience
+    shoppingPref: 1.6,
+    rideClass: "variety",
+    foodClass: "variety",
+  },
+  {
+    type: "VIP guest",
+    group: "VIP group",
+    mood: [55, 82],
+    hunger: [15, 40],
+    thirst: [10, 35],
+    energy: [60, 90],
+    budget: [180, 320],
+    patience: 68,
+    priceSensitivity: 0.3, // barely price sensitive
+    shoppingPref: 2.2,
+    rideClass: "premium",
+    foodClass: "premium",
+  },
 ];
+
+// Typical mix of guest groups arriving at the park (used for demand weighting).
+export const GUEST_MIX = {
+  Family: 0.28,
+  Couple: 0.18,
+  "Teen group": 0.17,
+  "Thrill seeker": 0.15,
+  Tourist: 0.12,
+  "VIP guest": 0.10,
+};
+
+// Ride class classification — each attraction belongs to one or more classes.
+const RIDE_CLASSES = {
+  family: new Set([
+    "kiddie_pool", "play_structure", "family_raft", "splash_pad", "soft_play",
+    "lazy_river", "mini_golf", "carousel", "water_volleyball", "water_playground",
+    "splash_battle", "bumper_boats", "wave_pool", "adventure_river", "water_zipline",
+  ]),
+  thrill: new Set([
+    "speed_slide", "kamikaze", "aqua_loop", "cliff_jump", "freefall_drop",
+    "mega_slide_complex", "water_coaster", "tornado_bowl", "boomerang_halfpipe",
+    "surf_wave_pool", "dive_pool", "multi_racer", "flowrider", "go_karts",
+    "ninja_course", "aqua_spin", "halfpipe", "aqua_ninja_course",
+  ]),
+  relax: new Set([
+    "lazy_river", "sun_lounge", "lap_sports_pool", "mini_golf", "adventure_river",
+    "dive_pool", "hot_tub", "sauna", "beach_lounging", "spa", "wave_pool",
+    "float_therapy", "massage_pavilion",
+  ]),
+  premium: new Set([
+    "surf_wave_pool", "dive_pool", "vip_lounge", "spa", "sushi_bar", "cabanas",
+    "float_therapy", "massage_pavilion", "hot_tub", "sauna",
+  ]),
+};
+
+// Food facility classification.
+const FOOD_CLASSES = {
+  casual: new Set(["dining", "burger_shack", "pizza_stand", "concessions", "beach_bar", "ice_cream"]),
+  healthy: new Set(["juice_bar", "smoothie_bar", "coffee_bar", "drinking_fountain"]),
+  premium: new Set(["sushi_bar", "beach_bar", "coffee_bar"]),
+};
+
+const RETAIL_IDS = new Set(["retail", "gift_shop", "photo_kiosk"]);
+const REST_IDS = new Set(["toilets", "lockers", "cabanas", "sun_lounge", "towel_rental", "wifi_lounge", "beach_lounging", "hot_tub", "sauna"]);
+
+// Per-group ride class affinity bonus (added to destination score).
+const RIDE_CLASS_AFFINITY = {
+  Family: { family: 5, thrill: -2, relax: 2, premium: -1, variety: 1 },
+  Couple: { family: 0, thrill: 1, relax: 5, premium: 3, variety: 2 },
+  "Teen group": { family: -1, thrill: 5, relax: -2, premium: 0, variety: 2 },
+  "Thrill seeker": { family: -2, thrill: 6, relax: -3, premium: 1, variety: 1 },
+  Tourist: { family: 1, thrill: 2, relax: 2, premium: 2, variety: 4 },
+  "VIP guest": { family: 0, thrill: 1, relax: 3, premium: 5, variety: 2 },
+};
+
+// Per-group food class affinity bonus.
+const FOOD_CLASS_AFFINITY = {
+  Family: { casual: 4, healthy: 1, premium: -1, variety: 1 },
+  Couple: { casual: 1, healthy: 2, premium: 4, variety: 2 },
+  "Teen group": { casual: 5, healthy: 0, premium: -1, variety: 1 },
+  "Thrill seeker": { casual: 3, healthy: 0, premium: 0, variety: 1 },
+  Tourist: { casual: 2, healthy: 1, premium: 2, variety: 4 },
+  "VIP guest": { casual: -1, healthy: 2, premium: 5, variety: 1 },
+};
 
 const clamp = (value, min = 0, max = 100) => Math.max(min, Math.min(max, value));
 const rand = (min, max) => Math.random() * (max - min) + min;
 
 function createGuest() {
-  const profile = GUEST_PROFILES[Math.floor(Math.random() * GUEST_PROFILES.length)];
+  // Weighted random selection based on typical guest mix.
+  const types = Object.keys(GUEST_MIX);
+  const totalWeight = types.reduce((sum, t) => sum + GUEST_MIX[t], 0);
+  let roll = Math.random() * totalWeight;
+  let chosenType = types[0];
+  for (const t of types) {
+    roll -= GUEST_MIX[t];
+    if (roll <= 0) { chosenType = t; break; }
+  }
+  const profile = GUEST_PROFILES.find((p) => p.type === chosenType) || GUEST_PROFILES[0];
   return {
     type: profile.type,
     group: profile.group,
@@ -24,6 +180,10 @@ function createGuest() {
     thirst: rand(...profile.thirst),
     energy: rand(...profile.energy),
     patience: profile.patience,
+    priceSensitivity: profile.priceSensitivity,
+    shoppingPref: profile.shoppingPref,
+    rideClass: profile.rideClass,
+    foodClass: profile.foodClass,
     budget: rand(...profile.budget),
     spend: 0,
     visited: new Set(),
@@ -36,28 +196,67 @@ function perVisitSpend(item, level) {
   return income / (attr.capacity > 0 ? attr.capacity : FACILITY_CAPACITY);
 }
 
+function rideClassFor(attr) {
+  for (const [cls, set] of Object.entries(RIDE_CLASSES)) {
+    if (set.has(attr.id)) return cls;
+  }
+  return null;
+}
+
+function foodClassFor(attr) {
+  for (const [cls, set] of Object.entries(FOOD_CLASSES)) {
+    if (set.has(attr.id)) return cls;
+  }
+  return null;
+}
+
 function scoreDestination(guest, item) {
   const zoneAffinity = item.zone ? getThemeGuestAffinity(item.zone, guest.type) : 1;
   const attr = item.attr;
   let score = Math.max(0.5, attr.fun * 0.4 + 1);
+
   if (attr.category === "facility") {
+    // Food preference
+    const fClass = foodClassFor(attr);
+    if (fClass && FOOD_CLASS_AFFINITY[guest.type]) {
+      score += (FOOD_CLASS_AFFINITY[guest.type][fClass] || 0) * 0.8;
+    }
+    // Hunger / thirst driven scoring
     if (["dining", "ice_cream", "coffee_bar", "sushi_bar", "juice_bar", "burger_shack", "pizza_stand", "smoothie_bar", "beach_bar"].includes(attr.id)) score += guest.hunger * 0.075;
     if (["drinking_fountain", "concessions", "juice_bar", "smoothie_bar"].includes(attr.id)) score += guest.thirst * 0.08;
-    if (["toilets", "lockers", "cabanas", "sun_lounge", "towel_rental", "wifi_lounge", "beach_lounging"].includes(attr.id)) score += (100 - guest.energy) * 0.045;
+    // Rest / energy
+    if (REST_IDS.has(attr.id)) score += (100 - guest.energy) * 0.045;
+    // Services
     if (["lost_found", "atm", "guest_services"].includes(attr.id)) score += 1.5;
     if (attr.id === "guest_services") score += (100 - guest.mood) * 0.03 + 1.5;
-    if (guest.type === "Premium guest" && ["cabanas", "vip_lounge", "spa", "retail"].includes(attr.id)) score += 4;
+    // Shopping preference
+    if (RETAIL_IDS.has(attr.id)) score += guest.shoppingPref * 2.5;
+    // VIP premium facilities
+    if (guest.type === "VIP guest" && ["cabanas", "vip_lounge", "spa", "retail"].includes(attr.id)) score += 4;
     score *= 0.8;
   } else {
+    // Ride class affinity
+    const rClass = rideClassFor(attr);
+    if (rClass && RIDE_CLASS_AFFINITY[guest.type]) {
+      score += RIDE_CLASS_AFFINITY[guest.type][rClass] || 0;
+    }
+    // General mood/fun modifiers
     if (attr.fun >= 8 && guest.mood > 60) score += 2;
-    if (guest.type === "Thrill seeker" && attr.fun >= 8) score += 4;
-    if (guest.type === "Family" && ["kiddie_pool", "play_structure", "family_raft", "splash_pad", "soft_play", "lazy_river", "mini_golf", "carousel", "water_volleyball", "water_playground"].includes(attr.id)) score += 4;
-    if (guest.type === "Relaxed guest" && ["lazy_river", "sun_lounge", "lap_sports_pool", "mini_golf", "adventure_river", "dive_pool"].includes(attr.id)) score += 3;
-    if (guest.type === "Teen group" && ["multi_racer", "speed_slide", "kamikaze", "aqua_loop", "flowrider", "go_karts", "bumper_boats", "surf_wave_pool"].includes(attr.id)) score += 3;
-    if (guest.type === "Thrill seeker" && ["surf_wave_pool", "adventure_river", "dive_pool", "cliff_jump", "freefall_drop"].includes(attr.id)) score += 3;
-    if (guest.type === "Premium guest" && ["surf_wave_pool", "dive_pool", "vip_lounge", "spa", "sushi_bar"].includes(attr.id)) score += 3;
+    // Backwards-compatible explicit preferences
+    if (guest.type === "Family" && RIDE_CLASSES.family.has(attr.id)) score += 2;
+    if (guest.type === "Couple" && RIDE_CLASSES.relax.has(attr.id)) score += 2;
+    if (guest.type === "Teen group" && RIDE_CLASSES.thrill.has(attr.id)) score += 2;
+    if (guest.type === "Thrill seeker" && attr.fun >= 8) score += 3;
+    if (guest.type === "VIP guest" && RIDE_CLASSES.premium.has(attr.id)) score += 2;
+    if (guest.type === "Tourist") score += 1.5; // tourists like variety
   }
+
   if (item.overcrowded) score *= 0.58;
+  // Queue tolerance: impatient guests penalise crowded spots more
+  if (item.queueWait > 0) {
+    const queuePenalty = (item.queueWait / Math.max(1, guest.patience)) * 3;
+    score *= Math.max(0.2, 1 - queuePenalty);
+  }
   score *= zoneAffinity;
   return Math.max(0.1, score * (0.45 + guest.mood / 100));
 }
@@ -71,6 +270,21 @@ function chooseDestination(guest, options) {
     if (roll <= 0) return options[index];
   }
   return options[options.length - 1];
+}
+
+// Aggregate price reaction across all guest groups, weighted by their typical mix.
+// Returns a 0.6–1.25 multiplier applied to daily demand based on ticket price.
+export function aggregatePriceReaction(ticketPrice) {
+  const base = 20;
+  let weighted = 0;
+  let totalWeight = 0;
+  for (const profile of GUEST_PROFILES) {
+    const weight = GUEST_MIX[profile.type] || 0.1;
+    const reaction = Math.max(0.5, Math.min(1.2, 1.12 - (ticketPrice - base) * 0.012 * profile.priceSensitivity));
+    weighted += reaction * weight;
+    totalWeight += weight;
+  }
+  return totalWeight > 0 ? Math.max(0.6, Math.min(1.25, weighted / totalWeight)) : 1;
 }
 
 export function simulateVisits({
@@ -157,9 +371,21 @@ export function simulateVisits({
 
       const pick = chooseDestination(guest, available);
       const attr = pick.attr;
-      const price = perVisitSpend(pick, pick.level) *
+      let price = perVisitSpend(pick, pick.level) *
         (attr.category === "facility" ? facilityBonus : 1);
+
+      // Pricing reaction: price-sensitive guests are more likely to skip expensive activities.
+      const budgetFraction = price / Math.max(1, guest.budget);
+      if (budgetFraction > 0.15 * guest.priceSensitivity) {
+        // Too expensive for this guest — likely skip
+        if (Math.random() < 0.5 * guest.priceSensitivity) break;
+      }
       if (guest.spend + price > guest.budget) break;
+
+      // Shopping preference scales retail spending
+      if (RETAIL_IDS.has(attr.id)) {
+        price *= guest.shoppingPref;
+      }
 
       guest.spend += price;
       guest.visited.add(pick.idx);
@@ -180,7 +406,7 @@ export function simulateVisits({
         guest.thirst = Math.max(0, guest.thirst - (["concessions", "juice_bar", "smoothie_bar"].includes(attr.id) ? 22 : 8));
         guest.mood += attr.id === "sushi_bar" ? 4 : 3;
         guest.energy += 3;
-      } else if (["retail", "gift_shop", "photo_kiosk"].includes(attr.id)) {
+      } else if (RETAIL_IDS.has(attr.id)) {
         spendingByCategory.retail += price * crowdScale;
         guest.mood += 2;
       } else if (["cabanas", "vip_lounge", "spa"].includes(attr.id)) {
@@ -206,7 +432,8 @@ export function simulateVisits({
       guest.energy = clamp(guest.energy, 0, 100);
       guest.mood += (safety - 0.7) * 6 + (cleanliness - 0.6) * 5 + entertainment + appealBonus;
       if (pick.overcrowded) guest.mood -= 2;
-      if (pick.queueWait > guest.patience / 5) guest.mood -= 3;
+      // Queue reaction: impatient guests lose more mood in long queues
+      if (pick.queueWait > guest.patience / 5) guest.mood -= 2 + (guest.patience < 50 ? 2 : 0);
       if (guest.hunger > 80) guest.mood -= 4;
       if (guest.thirst > 80) guest.mood -= 5;
       if (guest.energy < 25) guest.mood -= 3;

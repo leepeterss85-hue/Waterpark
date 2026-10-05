@@ -8,7 +8,7 @@ import { WEATHER, getSeason, rollWeather, rollSeasonEvent } from "@/data/parkSys
 import { MISSIONS, missionProgress } from "@/data/missions";
 import { rollChallenge } from "@/data/challenges";
 import { RESEARCH, dailyResearchPoints, researchReqFor } from "@/data/research";
-import { simulateVisits } from "@/data/visitorLogic";
+import { simulateVisits, aggregatePriceReaction } from "@/data/visitorLogic";
 import { generateFeedback } from "@/data/guestFeedback";
 import { trackEvent } from "@/lib/gameAnalytics";
 import { getSettings, getDifficulty, saveSettings } from "@/lib/settings";
@@ -310,7 +310,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         campaignGuestMult *
         appealDemandMult *
         (hasEntrance ? 1 : 0.9) *
-        Math.max(0.65, Math.min(1.25, 1.12 - (currentTicketPrice - 20) * 0.012))
+        aggregatePriceReaction(currentTicketPrice)
       );
       const safetyCoverage = Math.min(1, (effectiveStaff.lifeguard || 0) / Math.max(1, Math.ceil(attractions.length / 3)) + lifeguardStations * 0.12);
       const guestSafetyMult = safetyCoverage < 0.45 ? 0.88 : safetyCoverage < 0.7 ? 0.96 : 1;

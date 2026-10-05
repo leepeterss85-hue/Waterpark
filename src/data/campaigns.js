@@ -59,9 +59,9 @@ export const CAMPAIGNS = [
     duration: 4,
     guestBoost: 0.14,
     repBoost: 0.7,
-    target: "Premium guest",
+    target: "VIP guest",
     color: "from-yellow-400 to-amber-600",
-    description: "Luxury-focused campaign attracts high-spending premium guests.",
+    description: "Luxury-focused campaign attracts high-spending VIP guests.",
   },
   {
     id: "tv_ad",
@@ -87,6 +87,18 @@ export const CAMPAIGNS = [
     color: "from-emerald-400 to-teal-600",
     description: "A prominent billboard keeps the park top-of-mind for weeks.",
   },
+  {
+    id: "tourist_package",
+    name: "Tourist Travel Deal",
+    icon: "Plane",
+    cost: 1800,
+    duration: 6,
+    guestBoost: 0.18,
+    repBoost: 0.4,
+    target: "Tourist",
+    color: "from-teal-400 to-cyan-600",
+    description: "Travel-agency partnership bundles park entry with transport and hotels.",
+  },
 ];
 
 // Attractions that strongly appeal to each guest demographic.
@@ -94,8 +106,9 @@ export const DEMOGRAPHIC_ATTRACTIONS = {
   Family: ["kiddie_pool", "play_structure", "family_raft", "splash_pad", "soft_play", "lazy_river", "mini_golf", "carousel", "water_volleyball", "water_playground", "splash_battle", "bumper_boats"],
   "Teen group": ["multi_racer", "speed_slide", "kamikaze", "aqua_loop", "flowrider", "go_karts", "bumper_boats", "surf_wave_pool", "ninja_course", "water_zipline"],
   "Thrill seeker": ["speed_slide", "kamikaze", "aqua_loop", "cliff_jump", "freefall_drop", "mega_slide_complex", "water_coaster", "tornado_bowl", "halfpipe", "surf_wave_pool", "adventure_river", "dive_pool"],
-  "Premium guest": ["surf_wave_pool", "dive_pool", "vip_lounge", "spa", "sushi_bar", "cabanas", "float_therapy", "massage_pavilion", "hot_tub", "sauna"],
-  "Relaxed guest": ["lazy_river", "sun_lounge", "lap_sports_pool", "mini_golf", "adventure_river", "dive_pool", "hot_tub", "sauna", "beach_lounging", "spa"],
+  "VIP guest": ["surf_wave_pool", "dive_pool", "vip_lounge", "spa", "sushi_bar", "cabanas", "float_therapy", "massage_pavilion", "hot_tub", "sauna"],
+  Couple: ["lazy_river", "sun_lounge", "lap_sports_pool", "mini_golf", "adventure_river", "dive_pool", "hot_tub", "sauna", "beach_lounging", "spa"],
+  Tourist: ["wave_pool", "lazy_river", "water_coaster", "surf_wave_pool", "flowrider", "ninja_course", "water_zipline", "gem_mining", "splash_battle", "mini_golf", "carousel", "dining", "retail"],
 };
 
 // Returns 0–1 effectiveness multiplier for a targeted campaign based on park attractions.

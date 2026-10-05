@@ -69,7 +69,7 @@ export default function VisitorInsights({ visitorStats }) {
           const entries = Object.entries(types).sort((a, b) => b[1] - a[1]);
           if (!entries.length) return <div className="text-sm text-slate-400">Open the park to see who visits.</div>;
           const total = entries.reduce((sum, [, n]) => sum + n, 0) || 1;
-          const colors = { Family: "bg-amber-400", "Thrill seeker": "bg-rose-400", "Relaxed guest": "bg-cyan-400", "Premium guest": "bg-violet-400", "Teen group": "bg-fuchsia-400" };
+          const colors = { Family: "bg-amber-400", "Thrill seeker": "bg-rose-400", Couple: "bg-cyan-400", "VIP guest": "bg-violet-400", "Teen group": "bg-fuchsia-400", Tourist: "bg-emerald-400" };
           return (
             <div className="space-y-2">
               {entries.map(([type, count]) => {
