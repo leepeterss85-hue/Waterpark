@@ -20,6 +20,8 @@ import FloatingRewards from "@/components/game/FloatingRewards";
 import SoundToggle from "@/components/game/SoundToggle";
 import LevelUpCelebration from "@/components/game/LevelUpCelebration";
 import Tutorial from "@/components/game/Tutorial";
+import UndoButton from "@/components/game/UndoButton";
+import VipBanner from "@/components/game/VipBanner";
 import { trackEvent } from "@/lib/gameAnalytics";
 import { sound } from "@/lib/soundManager";
 import confetti from "canvas-confetti";
@@ -184,6 +186,7 @@ export default function Home() {
       </header>
 
       <main className="relative flex-1 min-h-0 overflow-hidden p-1.5 sm:p-2">
+        <UndoButton onUndo={game.lastBuildAction ? game.undoLastBuild : null} />
         <ParkGrid
           grid={game.grid}
           parkZones={game.parkZones}
@@ -214,6 +217,7 @@ export default function Home() {
                 onReset={game.resetGame}
               />
               {game.challenge && <div className="park-game-notice"><ChallengeBanner challenge={game.challenge} /></div>}
+              {game.vipVisit && <VipBanner vipVisit={game.vipVisit} />}
             </>
           }
           bottomMenu={<MapMenuBar openSheet={openSheet} onOpen={handleOpenMenu} missionsBadge={claimableMissions} incidentBadge={incidentCount} />}

@@ -78,6 +78,8 @@ const [selectedZone, setSelectedZone] = useState(null);
   const [priorityPass, setPriorityPass] = useState(false);
   const [selectedBuild, setSelectedBuild] = useState(null);
   const [selectedTile, setSelectedTile] = useState(null);
+  const [lastBuildAction, setLastBuildAction] = useState(null);
+  const [vipVisit, setVipVisit] = useState(null);
   const [lastNet, setLastNet] = useState(0);
   const [log, setLog] = useState([
     { day: 0, text: "Welcome to your new water park! Place an attraction to get started." },
@@ -105,7 +107,7 @@ const [selectedZone, setSelectedZone] = useState(null);
 
   /** @type {import("react").MutableRefObject<Record<string, any>>} */
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass };
+  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit };
 
   // Load saved game
   useEffect(() => {
@@ -140,6 +142,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (data.builtAttractionIds) setBuiltAttractionIds(data.builtAttractionIds);
         if (data.visitorStats) setVisitorStats(data.visitorStats);
         if (data.feedback) setFeedback(data.feedback);
+        if (data.vipVisit) setVipVisit(data.vipVisit);
       }
     } catch {
       /* ignore */
@@ -152,7 +155,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass })
+          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit })
         );
       } catch {
         /* ignore */
@@ -168,7 +171,7 @@ const [selectedZone, setSelectedZone] = useState(null);
   }, []);
 
   const advanceDay = useCallback(() => {
-    const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, staffAssignments: currentAssignments, incidents: currentIncidents, upgrades: currentUpgrades, attractionCondition: currentCondition, challenge: currentChallenge, parkZones: currentZones, forecast: currentForecast, seasonEvent: currentSeasonEvent, ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass } = stateRef.current;
+    const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, staffAssignments: currentAssignments, incidents: currentIncidents, upgrades: currentUpgrades, attractionCondition: currentCondition, challenge: currentChallenge, parkZones: currentZones, forecast: currentForecast, seasonEvent: currentSeasonEvent,     ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass, vipVisit: currentVipVisit } = stateRef.current;
     const dayWeather = currentForecast || rollWeather(d + 1);
     const dayForecast = rollWeather(d + 2);
     const eff = currentChallenge?.effects || {};
@@ -484,6 +487,33 @@ const [selectedZone, setSelectedZone] = useState(null);
     if (challengeEntries.length) {
       setLog((l) => [...challengeEntries, ...l].slice(0, 12));
     }
+
+    // --- VIP guest visit: resolve an active visit, or occasionally spawn one ---
+    const vipEntries = [];
+    if (currentVipVisit) {
+      const mood = visitorStats?.avgMood || 0;
+      const score = mood * 0.5 + cleanliness * 25 + safety * 25;
+      if (score >= 65) {
+        const reward = Math.round(2000 + score * 30);
+        setMoney((m) => m + reward);
+        setReputation((rv) => Math.max(0, Math.min(100, rv + 3)));
+        vipEntries.push({ day: d + 1, text: `Day ${d + 1}: ⭐ VIP ${currentVipVisit.name} was impressed! +$${reward.toLocaleString()} and +3 reputation.` });
+      } else if (score >= 40) {
+        vipEntries.push({ day: d + 1, text: `Day ${d + 1}: ⭐ VIP ${currentVipVisit.name} had a decent visit.` });
+      } else {
+        setReputation((rv) => Math.max(0, Math.min(100, rv - 2)));
+        vipEntries.push({ day: d + 1, text: `Day ${d + 1}: ⭐ VIP ${currentVipVisit.name} left disappointed. -2 reputation.` });
+      }
+      setVipVisit(null);
+    } else if (attractions.length > 0 && d + 1 >= 5 && Math.random() < 0.08) {
+      const vipNames = ["Ambassador Rivera", "Celebrity Chen", "Mayor Okafor", "Travel Blogger Sam", "Influencer Priya"];
+      const name = vipNames[Math.floor(Math.random() * vipNames.length)];
+      setVipVisit({ name, day: d + 1 });
+      vipEntries.push({ day: d + 1, text: `Day ${d + 1}: ⭐ A VIP guest arrived — ${name}! Impress them for a big reward.` });
+    }
+    if (vipEntries.length) {
+      setLog((l) => [...vipEntries, ...l].slice(0, 12));
+    }
   }, []);
 
   // Game loop
@@ -509,6 +539,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       if (attr.category === "attraction") {
         setBuiltAttractionIds((ids) => (ids.includes(selectedBuild) ? ids : [...ids, selectedBuild]));
       }
+      setLastBuildAction({ index, id: selectedBuild, cost: attr.cost });
       trackEvent("attraction_built", { id: selectedBuild, category: attr.category, cost: attr.cost });
     },
     [selectedBuild, money]
@@ -560,6 +591,25 @@ const [selectedZone, setSelectedZone] = useState(null);
     trackEvent("attraction_sold", { id: grid[index] });
     setSelectedTile(null);
   }, []);
+
+  const undoLastBuild = useCallback(() => {
+    if (!lastBuildAction) return;
+    const { index, id, cost } = lastBuildAction;
+    setGrid((g) => {
+      if (g[index] !== id) return g;
+      const ng = [...g];
+      ng[index] = null;
+      return ng;
+    });
+    setMoney((m) => m + cost);
+    setUpgrades((u) => { const nu = [...u]; nu[index] = 0; return nu; });
+    setIncidents((items) => items.filter((item) => item.tileIndex !== index));
+    setAttractionCondition((c) => { const next = [...c]; next[index] = 100; return next; });
+    setParkZones((z) => { const next = [...z]; next[index] = null; return next; });
+    setLastBuildAction(null);
+    setSelectedTile(null);
+    trackEvent("build_undone", { id });
+  }, [lastBuildAction]);
 
   const upgradeAttraction = useCallback(
     (index) => {
@@ -832,6 +882,9 @@ const [selectedZone, setSelectedZone] = useState(null);
     claimedMissions,
     claimMission,
     challenge,
+    vipVisit,
+    lastBuildAction,
+    undoLastBuild,
     lifetimeEarnings,
     visitorStats,
     feedback,
