@@ -772,6 +772,8 @@ const [selectedZone, setSelectedZone] = useState(null);
         ticketPrice,
         adBudget,
         priorityPass,
+        researchPoints,
+        completedResearch,
         savedAt: new Date().toISOString(),
       };
       writeSlots(slots);
@@ -779,7 +781,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       trackEvent("park_saved", { name: trimmed });
       return true;
     },
-    [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass]
+    [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, researchPoints, completedResearch]
   );
 
   const loadPark = useCallback((name) => {
@@ -814,6 +816,8 @@ const [selectedZone, setSelectedZone] = useState(null);
     setBuiltAttractionIds(data.builtAttractionIds ?? []);
     setVisitorStats(data.visitorStats ?? { avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {}, guestTypes: {} });
     setFeedback(data.feedback ?? []);
+    setResearchPoints(data.researchPoints ?? 0);
+    setCompletedResearch(data.completedResearch ?? []);
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
     setLastNet(data.lastNet ?? 0);
     setPlaying(false);
