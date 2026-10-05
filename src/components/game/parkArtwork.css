@@ -64,3 +64,8 @@
 .scene-service-beach_bar .scene-service-roof,.scene-service-burger_shack .scene-service-roof,.scene-service-pizza_stand .scene-service-roof,.scene-service-sauna .scene-service-roof { fill:hsl(var(--park-slide)); }
 .scene-service-swimwear_shop .scene-service-roof,.scene-service-float_therapy .scene-service-roof,.scene-service-atm .scene-service-roof { fill:hsl(var(--park-deep)); }
 .scene-service-smoothie_bar .scene-service-roof,.scene-service-massage_pavilion .scene-service-roof { fill:hsl(var(--park-green)); }
+/* === Enhanced thrill-ride artwork === */
+.scene-cliff-texture { fill:none;stroke:hsl(var(--park-ink)/.22);stroke-width:1;stroke-linecap:round; }
+.scene-zip-support { fill:none;stroke:hsl(var(--park-ink)/.5);stroke-width:1.5;stroke-linecap:round; }
+.scene-boat-detail { fill:none;stroke:hsl(var(--park-rim));stroke-width:1.5;stroke-linecap:round;opacity:.7; }
+.scene-spin-flow { fill:none;stroke:hsl(var(--park-rim));stroke-width:2.5;stroke-dasharray:3 2;opacity:.7; }

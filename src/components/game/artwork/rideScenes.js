@@ -12,8 +12,8 @@ const slides = {
   water_coaster: ["M19 31Q28 8 37 39T57 40T78 71"],
   multi_racer: ["M16 24L29 75", "M29 24L43 75", "M42 24L57 75", "M55 24L71 75"],
   halfpipe: ["M21 23C11 56 54 85 81 38C70 72 50 79 43 69"],
-  mega_slide_complex: ["M18 22C8 42 64 30 60 48S30 60 40 76", "M30 22C58 12 86 34 72 48S58 62 68 76", "M44 22C82 26 92 50 76 58S48 68 56 76"],
-  freefall_drop: ["M40 16L43 78", "M55 16L58 78"],
+  mega_slide_complex: ["M14 18C0 38 60 26 56 48S24 58 34 80", "M28 18C58 6 90 30 74 48S52 64 62 80", "M42 18C86 20 96 50 80 60S44 72 52 80", "M22 18C12 32 48 32 48 48S32 58 40 80"],
+  freefall_drop: ["M38 12Q41 45 44 80", "M55 12Q52 45 49 80"],
 };
 export function getRideScene(id) {
   if (slides[id]) return { kind: "slide", paths: slides[id] };
