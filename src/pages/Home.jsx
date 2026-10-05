@@ -204,7 +204,7 @@ export default function Home() {
           onTileClick={handleTileClickWithSound}
         />
 
-        <div className="absolute bottom-2 left-2 z-30 sm:bottom-3 sm:left-3">
+        <div className="absolute left-1/2 top-1.5 z-30 -translate-x-1/2 sm:top-2">
           <GameControls
             playing={game.playing}
             speed={game.speed}
@@ -216,7 +216,7 @@ export default function Home() {
         </div>
 
         {game.challenge && (
-          <div className="absolute left-2 top-2 z-20 max-w-[55%] sm:left-3 sm:top-3">
+          <div className="absolute left-2 top-16 z-20 max-w-[55%] sm:left-3 sm:top-20">
             <ChallengeBanner challenge={game.challenge} />
           </div>
         )}
