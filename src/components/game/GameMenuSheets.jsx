@@ -1,7 +1,7 @@
 import React from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet } from "lucide-react";
+import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown } from "lucide-react";
 import { MISSIONS, missionProgress } from "@/data/missions";
 import BuildPanel from "@/components/game/BuildPanel";
 import ExpansionPanel from "@/components/game/ExpansionPanel";
@@ -26,6 +26,7 @@ import SocialMediaPanel from "@/components/game/SocialMediaPanel";
 import EmergenciesPanel from "@/components/game/EmergenciesPanel";
 import ConstructionPanel from "@/components/game/ConstructionPanel";
 import EconomyPanel from "@/components/game/EconomyPanel";
+import EmpirePanel from "@/components/game/EmpirePanel";
 import { getHotelDef, hotelRooms, isHotelItem } from "@/data/hotels";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
@@ -191,6 +192,18 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
           onTakeLoan={game.takeLoan}
           onRepayLoan={game.repayLoan}
           sandbox={game.sandbox}
+        />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "empire"} onOpenChange={(v) => !v && close()} title="Waterpark Empire" icon={Crown} width="sm:max-w-lg">
+        <EmpirePanel
+          empirePoints={game.empirePoints}
+          resortBonuses={game.resortBonuses}
+          missionState={game.missionState}
+          claimedMissions={game.claimedMissions}
+          level={game.level}
+          resortRating={game.resortRating}
+          grid={game.grid}
         />
       </SheetShell>
     </>
