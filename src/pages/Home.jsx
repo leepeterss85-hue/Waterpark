@@ -232,6 +232,7 @@ export default function Home() {
           weather={game.weather}
           seasonEvent={game.seasonEvent}
           hotelGuests={game.hotelGuests}
+          activeEvents={game.activeEvents}
           onTileClick={handleTileClickWithSound}
           topControls={
             <>
