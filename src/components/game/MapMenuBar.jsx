@@ -1,10 +1,11 @@
 import React from "react";
-import { Hammer, Settings, Users, Activity, CloudSun, FlaskConical, SlidersHorizontal } from "lucide-react";
+import { Hammer, Settings, Users, Activity, CloudSun, FlaskConical, SlidersHorizontal, Hotel } from "lucide-react";
 
 const MENUS = [
   { key: "build", icon: Hammer, label: "Build" },
   { key: "research", icon: FlaskConical, label: "Research" },
   { key: "manage", icon: Settings, label: "Manage" },
+  { key: "resort", icon: Hotel, label: "Resort" },
   { key: "staff", icon: Users, label: "Staff" },
   { key: "info", icon: Activity, label: "Activity" },
   { key: "conditions", icon: CloudSun, label: "Weather" },

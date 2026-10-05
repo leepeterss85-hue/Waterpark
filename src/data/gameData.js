@@ -993,6 +993,11 @@ export function getAttractionProfile(id) {
 export function unlockLevelFor(item) {
   if (!item) return 99;
   if (item.category === "environment") return 1;
+  if (item.category === "hotel") {
+    if (item.tier === "budget") return 3;
+    if (item.tier === "family") return 6;
+    return 10;
+  }
   if (item.cost <= 7000) return 1;
   if (item.cost <= 12000) return 2;
   if (item.cost <= 18000) return 3;
@@ -1000,8 +1005,10 @@ export function unlockLevelFor(item) {
   return 5;
 }
 
+import { HOTEL_TIERS } from "@/data/hotels";
+export const HOTELS = HOTEL_TIERS;
 export const getAttraction = (id) => ATTRACTIONS.find((a) => a.id === id);
-export const getParkItem = (id) => ATTRACTIONS.find((a) => a.id === id) || PARK_OBJECTS.find((a) => a.id === id);
+export const getParkItem = (id) => ATTRACTIONS.find((a) => a.id === id) || HOTEL_TIERS.find((a) => a.id === id) || PARK_OBJECTS.find((a) => a.id === id);
 
 export const STAFF = {
   lifeguard: {
@@ -1106,6 +1113,7 @@ export function staffEffects(staff) {
 export const CATEGORIES = [
   { id: "attraction", label: "Core Water Attractions" },
   { id: "facility", label: "Facilities & Services" },
+  { id: "hotel", label: "Hotels & Resort" },
   { id: "environment", label: "Paths, Landscaping & Essentials" },
 ];
 

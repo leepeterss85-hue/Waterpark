@@ -1,7 +1,7 @@
 import React from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal } from "lucide-react";
+import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel } from "lucide-react";
 import { MISSIONS, missionProgress } from "@/data/missions";
 import BuildPanel from "@/components/game/BuildPanel";
 import ExpansionPanel from "@/components/game/ExpansionPanel";
@@ -16,6 +16,8 @@ import ResearchPanel from "@/components/game/ResearchPanel";
 import SettingsPanel from "@/components/game/SettingsPanel";
 import ParkAppealPanel from "@/components/game/ParkAppealPanel";
 import CampaignPanel from "@/components/game/CampaignPanel";
+import ResortPanel from "@/components/game/ResortPanel";
+import { getHotelDef, hotelRooms, isHotelItem } from "@/data/hotels";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
   return (
@@ -70,6 +72,10 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
           onExpressLane={game.setPriorityPass}
         />
         <CampaignPanel money={game.money} activeCampaigns={game.activeCampaigns} grid={game.grid} onLaunch={game.launchCampaign} />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "resort"} onOpenChange={(v) => !v && close()} title="Resort" icon={Hotel} width="sm:max-w-md">
+        <ResortPanel resortRating={game.resortRating} hotelStats={game.hotelStats} hotels={game.hotels} upgrades={game.upgrades} />
       </SheetShell>
 
       <SheetShell open={openSheet === "staff"} onOpenChange={(v) => !v && close()} title="Staff" icon={Users} width="sm:max-w-md">

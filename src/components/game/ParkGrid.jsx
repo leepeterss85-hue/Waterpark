@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Footprints, Users, Map as MapIcon, Sparkles } from "lucide-react";
 import { getParkItem } from "@/data/gameData";
+import { getHotelDef, hotelRooms } from "@/data/hotels";
 import Tile from "@/components/game/Tile";
 import GuestLayer from "@/components/game/GuestLayer";
 import "@/components/game/parkMap.css";
@@ -8,7 +9,7 @@ import "@/components/game/parkArtwork.css";
 import "@/components/game/parkPeople.css";
 import "@/components/game/parkChrome.css";
 
-export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, visitorMovements, queueStats = {}, attractionCondition = [], staff = {}, staffAssignments = {}, lifeguardTotal = 0, day = 1, weather, seasonEvent, onTileClick, topControls, bottomMenu, statsBar }) {
+export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, visitorMovements, queueStats = {}, attractionCondition = [], staff = {}, staffAssignments = {}, lifeguardTotal = 0, day = 1, weather, seasonEvent, hotelGuests = [], onTileClick, topControls, bottomMenu, statsBar }) {
   const [zoom, setZoom] = useState(1);
   const incidentMap = new Map((incidents || []).map((incident) => [incident.tileIndex, incident]));
   const phase = ((day - 1) % 8);
@@ -48,7 +49,10 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
                 const expansionTheme = expansionThemes[Math.max(0, Math.min(expansionThemes.length - 1, row - 5))];
                 const neighbors = [row > 0 ? index - 8 : -1, row < Math.ceil(grid.length / 8) - 1 ? index + 8 : -1, col > 0 ? index - 1 : -1, col < 7 ? index + 1 : -1].filter((n) => n >= 0);
                 const queueConnected = !isWater || neighbors.some((n) => grid[n] === "queue_path" || grid[n] === "main_path");
-                return <Tile key={index} index={index} grid={grid} zone={parkZones?.[index]} upgradeLevel={upgrades?.[index] || 0} value={value} selectedBuild={selectedBuild} expansionTheme={expansionTheme} isSelected={selectedTile === index} incident={incidentMap.get(index)} condition={attractionCondition?.[index]} queueWait={queueWait} queueConnected={queueConnected} movement={movement} guests={guests} facilityStatus={facilityStatus} timeOfDay={timeOfDay} nightSwim={seasonEvent?.id === "night_swim"} onClick={() => onTileClick(index)} />;
+                const hotelDef = value ? getHotelDef(value) : null;
+                const hotelOcc = hotelDef ? hotelGuests.filter((g) => g.hotelTile === index).length : 0;
+                const hotelRm = hotelDef ? hotelRooms(hotelDef, upgrades?.[index] || 0) : 0;
+                return <Tile key={index} index={index} grid={grid} zone={parkZones?.[index]} upgradeLevel={upgrades?.[index] || 0} value={value} selectedBuild={selectedBuild} expansionTheme={expansionTheme} isSelected={selectedTile === index} incident={incidentMap.get(index)} condition={attractionCondition?.[index]} queueWait={queueWait} queueConnected={queueConnected} movement={movement} guests={guests} facilityStatus={facilityStatus} timeOfDay={timeOfDay} nightSwim={seasonEvent?.id === "night_swim"} hotelOccupancy={hotelOcc} hotelRoomsTotal={hotelRm} onClick={() => onTileClick(index)} />;
               })}
             </div>
             <GuestLayer grid={grid} parkZones={parkZones} guests={guests} movements={visitorMovements} queueStats={queueStats} staff={staff} staffAssignments={staffAssignments} incidents={incidents || []} />

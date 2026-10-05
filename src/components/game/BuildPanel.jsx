@@ -1,15 +1,15 @@
 import React, { useMemo, useState } from "react";
 import { Search, Waves, Utensils } from "lucide-react";
-import { ATTRACTIONS, PARK_OBJECTS, CATEGORIES, unlockLevelFor } from "@/data/gameData";
+import { ATTRACTIONS, PARK_OBJECTS, HOTELS, CATEGORIES, unlockLevelFor } from "@/data/gameData";
 import { researchReqFor } from "@/data/research";
 import BuildCard from "@/components/game/BuildCard";
 
 export default function BuildPanel({ money, level = 1, selectedBuild, onSelect, completedResearch = [] }) {
   const [query, setQuery] = useState("");
-  const [expanded, setExpanded] = useState({ attraction: true, facility: false, environment: false });
+  const [expanded, setExpanded] = useState({ attraction: true, facility: false, hotel: false, environment: false });
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const allItems = [...ATTRACTIONS, ...PARK_OBJECTS];
+    const allItems = [...ATTRACTIONS, ...HOTELS, ...PARK_OBJECTS];
     if (!q) return allItems;
     return allItems.filter((item) => item.name.toLowerCase().includes(q) || item.description.toLowerCase().includes(q) || item.category.toLowerCase().includes(q));
   }, [query]);

@@ -23,6 +23,8 @@ import Tutorial from "@/components/game/Tutorial";
 import UndoButton from "@/components/game/UndoButton";
 import VipBanner from "@/components/game/VipBanner";
 import DisasterBanner from "@/components/game/DisasterBanner";
+import HotelDetail from "@/components/game/HotelDetail";
+import { getHotelDef, hotelRooms, isHotelItem } from "@/data/hotels";
 import { trackEvent } from "@/lib/gameAnalytics";
 import { sound } from "@/lib/soundManager";
 import { haptics } from "@/lib/settings";
@@ -229,6 +231,7 @@ export default function Home() {
           day={game.day}
           weather={game.weather}
           seasonEvent={game.seasonEvent}
+          hotelGuests={game.hotelGuests}
           onTileClick={handleTileClickWithSound}
           topControls={
             <>
@@ -257,6 +260,18 @@ export default function Home() {
             <div className="flex-1 overflow-y-auto bg-slate-50 p-3 sm:p-4">
               {selectedItem && (selectedItem.category === "environment" ? (
                 <ParkObjectDetail itemId={selectedAttrId} onSell={() => game.sellAttraction(game.selectedTile)} onClose={() => game.setSelectedTile(null)} />
+              ) : selectedItem.category === "hotel" ? (
+                <HotelDetail
+                  hotelDef={selectedItem}
+                  level={game.upgrades[game.selectedTile] || 0}
+                  occupancy={game.hotelStats?.occupancy || 0}
+                  guestsInHotel={game.hotelGuests.filter((g) => g.hotelTile === game.selectedTile).length}
+                  totalRooms={hotelRooms(selectedItem, game.upgrades[game.selectedTile] || 0)}
+                  money={game.money}
+                  onUpgrade={() => game.upgradeAttraction(game.selectedTile)}
+                  onSell={() => game.sellAttraction(game.selectedTile)}
+                  onClose={() => game.setSelectedTile(null)}
+                />
               ) : (
                 <TileDetailPanel
                   gridIndex={game.selectedTile}
