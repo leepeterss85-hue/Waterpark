@@ -1,4 +1,5 @@
 import { getAttraction } from "./gameData";
+import { getThemeGuestAffinity } from "./parkThemes";
 
 const MAX_AGENTS = 200;
 const FACILITY_CAPACITY = 60;
@@ -36,6 +37,7 @@ function perVisitSpend(item, level) {
 }
 
 function scoreDestination(guest, item) {
+  const zoneAffinity = item.zone ? getThemeGuestAffinity(item.zone, guest.type) : 1;
   const attr = item.attr;
   let score = Math.max(0.5, attr.fun * 0.4 + 1);
   if (attr.category === "facility") {
@@ -53,6 +55,7 @@ function scoreDestination(guest, item) {
     if (guest.type === "Teen group" && ["multi_racer", "speed_slide", "kamikaze", "aqua_loop", "flowrider", "go_karts"].includes(attr.id)) score += 3;
   }
   if (item.overcrowded) score *= 0.58;
+  score *= zoneAffinity;
   return Math.max(0.1, score * (0.45 + guest.mood / 100));
 }
 
@@ -108,6 +111,7 @@ export function simulateVisits({
         : FACILITY_CAPACITY;
       return {
         ...item,
+        zone: item.zone || null,
         cap: capacity * (incident?.type === "maintenance" ? 0.5 : 1),
         load: 0,
         overcrowded: false,
