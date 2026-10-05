@@ -183,6 +183,7 @@ export default function Home() {
           <StatPill icon={CalendarDays} value={game.day} tone="text-sky-300" />
           <StatPill icon={Users} value={game.guests.toLocaleString()} tone="text-cyan-300" />
           <div className="hidden sm:block"><StatPill icon={Star} value={`${game.reputation}%`} tone="text-amber-300" /></div>
+          <div className="hidden sm:block"><StatPill icon={Waves} value={`Appeal ${game.parkAppeal?.score ?? 50}`} tone="text-fuchsia-300" /></div>
           <LevelPill level={game.level} />
         </div>
         <div className="flex shrink-0 items-center gap-1.5">
