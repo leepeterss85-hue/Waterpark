@@ -8,6 +8,7 @@ import { WEATHER, getSeason, rollWeather, rollSeasonEvent } from "@/data/parkSys
 import { MISSIONS, missionProgress } from "@/data/missions";
 import { rollChallenge } from "@/data/challenges";
 import { simulateVisits } from "@/data/visitorLogic";
+import { generateFeedback } from "@/data/guestFeedback";
 import { trackEvent } from "@/lib/gameAnalytics";
 
 const STORAGE_KEY = "waterpark-tycoon-save-v1";
@@ -97,6 +98,7 @@ const [selectedZone, setSelectedZone] = useState(null);
   const [lifetimeEarnings, setLifetimeEarnings] = useState(0);
   const [builtAttractionIds, setBuiltAttractionIds] = useState([]);
   const [visitorStats, setVisitorStats] = useState({ avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {}, guestTypes: {} });
+  const [feedback, setFeedback] = useState([]);
 
   const level = levelFromXp(xp);
   const gridSize = grid.length;
@@ -137,6 +139,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (data.lifetimeEarnings != null) setLifetimeEarnings(data.lifetimeEarnings);
         if (data.builtAttractionIds) setBuiltAttractionIds(data.builtAttractionIds);
         if (data.visitorStats) setVisitorStats(data.visitorStats);
+        if (data.feedback) setFeedback(data.feedback);
       }
     } catch {
       /* ignore */
@@ -149,7 +152,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass })
+          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass })
         );
       } catch {
         /* ignore */
@@ -248,6 +251,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     let income = 0;
     let newReputation = rep;
     let visitorStats = { avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {}, guestTypes: {} };
+    let dayFeedback = [];
 
     if (attractions.length > 0) {
       const demand = Math.floor(
@@ -277,6 +281,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       });
       income = sim.income;
       visitorStats = sim;
+      dayFeedback = generateFeedback(sim, { day: d + 1, weather: dayWeather, incidents: remaining, cleanliness, safety, entertainment });
 
       const avgMood = sim.avgMood;
       let repDelta = 0;
@@ -408,6 +413,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setGuests(newGuests);
     setPeakGuests((p) => Math.max(p, newGuests));
     setVisitorStats(visitorStats);
+    if (dayFeedback.length) setFeedback((prev) => [...dayFeedback, ...prev].slice(0, 40));
     setLifetimeEarnings((e) => e + grossIncome);
     setReputation(Math.round(newReputation));
     setLastNet(net);
@@ -682,6 +688,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         lifetimeEarnings,
         builtAttractionIds,
         visitorStats,
+        feedback,
         weather,
         forecast,
         seasonEvent,
@@ -729,6 +736,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setLifetimeEarnings(data.lifetimeEarnings ?? 0);
     setBuiltAttractionIds(data.builtAttractionIds ?? []);
     setVisitorStats(data.visitorStats ?? { avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {}, guestTypes: {} });
+    setFeedback(data.feedback ?? []);
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
     setLastNet(data.lastNet ?? 0);
     setPlaying(false);
@@ -778,6 +786,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setLifetimeEarnings(0);
     setBuiltAttractionIds([]);
     setVisitorStats({ avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {}, guestTypes: {} });
+    setFeedback([]);
     trackEvent("park_reset");
   }, []);
 
@@ -825,6 +834,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     challenge,
     lifetimeEarnings,
     visitorStats,
+    feedback,
     builtCount: builtAttractionIds.length,
     achievementState: {
       peakGuests,

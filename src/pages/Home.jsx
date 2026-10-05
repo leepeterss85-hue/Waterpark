@@ -9,7 +9,7 @@ import StatsBar from "@/components/game/StatsBar";
 import ParkGrid from "@/components/game/ParkGrid";
 import BuildPanel from "@/components/game/BuildPanel";
 import GameControls from "@/components/game/GameControls";
-import EventLog from "@/components/game/EventLog";
+import ActivityLog from "@/components/game/ActivityLog";
 import StaffPanel from "@/components/game/StaffPanel";
 import SaveLoadPanel from "@/components/game/SaveLoadPanel";
 import ExpansionPanel from "@/components/game/ExpansionPanel";
@@ -127,7 +127,7 @@ export default function Home() {
             <ChallengeBanner challenge={game.challenge} />
             <ExpansionPanel gridSize={game.gridSize} expansionsDone={game.expansionsDone} level={game.level} money={game.money} onExpand={game.expandPark} />
             <ParkGrid grid={game.grid} parkZones={game.parkZones} upgrades={game.upgrades} selectedBuild={game.selectedBuild} selectedTile={game.selectedTile} selectedZone={game.selectedZone} incidents={game.incidents} guests={game.guests} visitorMovements={game.visitorStats?.movements} queueStats={game.visitorStats?.queueStats} attractionCondition={game.attractionCondition} staff={game.staff} staffAssignments={game.staffAssignments} lifeguardTotal={game.staff?.lifeguard || 0} day={game.day} weather={game.weather} seasonEvent={game.seasonEvent} onTileClick={game.handleTileClick} />
-            <EventLog log={game.log} issueCount={game.incidents.length} />
+            <ActivityLog feedback={game.feedback} log={game.log} issueCount={game.incidents.length} guestExperience={game.visitorStats?.guestExperience} />
             <VisitorInsights visitorStats={game.visitorStats} />
             <MissionsPanel level={game.level} xp={game.xp} xpForNext={game.xpForNext} missionState={game.missionState} claimedMissions={game.claimedMissions} onClaim={game.claimMission} />
           </div>
