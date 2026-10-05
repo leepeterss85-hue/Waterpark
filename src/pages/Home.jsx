@@ -24,6 +24,11 @@ import ParkManagementPanel from "@/components/game/ParkManagementPanel";
 import ParkObjectDetail from "@/components/game/ParkObjectDetail";
 import PlayerProgressPanel from "@/components/game/PlayerProgressPanel";
 import DailySummary from "@/components/game/DailySummary";
+import DayTransition from "@/components/game/DayTransition";
+import FloatingRewards from "@/components/game/FloatingRewards";
+import SoundToggle from "@/components/game/SoundToggle";
+import { sound } from "@/lib/soundManager";
+import confetti from "canvas-confetti";
 
 export default function Home() {
   const game = useGameState();
@@ -35,9 +40,15 @@ export default function Home() {
   const [dailyReport, setDailyReport] = useState(null);
   const [sidebarTab, setSidebarTab] = useState("build");
   const [infoTab, setInfoTab] = useState("activity");
+  const [dayTrigger, setDayTrigger] = useState(null);
+  const [rewardTrigger, setRewardTrigger] = useState(null);
+  const [shake, setShake] = useState(false);
+  const prevIncidentCount = useRef(0);
 
   useEffect(() => {
     if (prevDay.current !== game.day) {
+      setDayTrigger(game.day);
+      sound.dayStart();
       if (game.day > 1 && game.day % 30 === 0) {
         const monthHistory = (game.history || []).filter(
           (entry) => entry.day > game.day - 30 && entry.day <= game.day
@@ -78,15 +89,49 @@ export default function Home() {
       if (!prevUnlocked.current.includes(id)) {
         const a = ACHIEVEMENTS.find((x) => x.id === id);
         toast({ title: "🏆 Achievement Unlocked!", description: a.title + " — " + a.desc });
+        sound.achievement();
+        confetti({ particleCount: 80, spread: 70, origin: { y: 0.3 }, colors: ["#22d3ee", "#fbbf24", "#a78bfa", "#34d399"] });
       }
     }
     prevUnlocked.current = unlocked;
   }, [game.achievementState, toast]);
 
+  // Floating money on income
+  useEffect(() => {
+    if (game.lastNet && game.lastNet !== 0) {
+      setRewardTrigger(Date.now());
+      if (game.lastNet > 0) sound.cash();
+    }
+  }, [game.lastNet]);
+
+  // Incident alert + screen shake
+  useEffect(() => {
+    const count = game.incidents.length;
+    if (count > prevIncidentCount.current) {
+      sound.incident();
+      setShake(true);
+      const t = setTimeout(() => setShake(false), 400);
+      return () => clearTimeout(t);
+    }
+    prevIncidentCount.current = count;
+  }, [game.incidents.length]);
+
   // Jump to the build tab when a tile is selected so the detail panel is visible
   useEffect(() => {
     if (game.selectedTile != null) setSidebarTab("build");
   }, [game.selectedTile]);
+
+  const handleTileClickWithSound = (index) => {
+    const wasEmpty = !game.grid[index];
+    const hadBuild = game.selectedBuild;
+    game.handleTileClick(index);
+    if (wasEmpty && hadBuild) {
+      sound.build();
+      setTimeout(() => sound.splash(), 200);
+    } else {
+      sound.click();
+    }
+  };
 
   const zones = [...new Set((game.parkZones || []).filter(Boolean))].map((id) => ({
     id,
@@ -94,7 +139,9 @@ export default function Home() {
   }));
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_10%_0%,rgba(34,211,238,.35),transparent_28%),radial-gradient(circle_at_90%_12%,rgba(250,204,21,.16),transparent_24%),linear-gradient(180deg,#bdefff_0%,#e8f8ed_42%,#c8e1c0_100%)]">
+    <div className={"min-h-screen bg-[radial-gradient(circle_at_10%_0%,rgba(34,211,238,.35),transparent_28%),radial-gradient(circle_at_90%_12%,rgba(250,204,21,.16),transparent_24%),linear-gradient(180deg,#bdefff_0%,#e8f8ed_42%,#c8e1c0_100%)]" + (shake ? " screen-shake" : "")}>
+      <DayTransition day={game.day} weather={game.weather} seasonEvent={game.seasonEvent} trigger={dayTrigger} />
+      <FloatingRewards amount={game.lastNet} trigger={rewardTrigger} />
       <header className="sticky top-0 z-40 border-b border-white/70 bg-white/85 shadow-sm backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 sm:py-3.5">
           <div className="relative grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-2xl bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-700 shadow-lg">
@@ -105,6 +152,7 @@ export default function Home() {
             <h1 className="font-display text-lg font-extrabold tracking-tight text-slate-900 sm:text-xl">Splash Tycoon</h1>
           </div>
           <div className="ml-auto flex items-center gap-2">
+            <SoundToggle />
             <Link to="/load" className="flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-bold text-slate-700 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:bg-sky-50">
               <Save className="h-4 w-4 text-cyan-600" /><span className="hidden sm:inline">Saves</span>
             </Link>
@@ -125,7 +173,7 @@ export default function Home() {
         <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
           <div className="flex min-w-0 flex-col gap-4">
             <ChallengeBanner challenge={game.challenge} />
-            <ParkGrid grid={game.grid} parkZones={game.parkZones} upgrades={game.upgrades} selectedBuild={game.selectedBuild} selectedTile={game.selectedTile} selectedZone={game.selectedZone} incidents={game.incidents} guests={game.guests} visitorMovements={game.visitorStats?.movements} queueStats={game.visitorStats?.queueStats} attractionCondition={game.attractionCondition} staff={game.staff} staffAssignments={game.staffAssignments} lifeguardTotal={game.staff?.lifeguard || 0} day={game.day} weather={game.weather} seasonEvent={game.seasonEvent} onTileClick={game.handleTileClick} />
+            <ParkGrid grid={game.grid} parkZones={game.parkZones} upgrades={game.upgrades} selectedBuild={game.selectedBuild} selectedTile={game.selectedTile} selectedZone={game.selectedZone} incidents={game.incidents} guests={game.guests} visitorMovements={game.visitorStats?.movements} queueStats={game.visitorStats?.queueStats} attractionCondition={game.attractionCondition} staff={game.staff} staffAssignments={game.staffAssignments} lifeguardTotal={game.staff?.lifeguard || 0} day={game.day} weather={game.weather} seasonEvent={game.seasonEvent} onTileClick={handleTileClickWithSound} />
 
             <Tabs value={infoTab} onValueChange={setInfoTab} className="waterpark-panel bg-white/85 p-3 sm:p-4">
               <TabsList className="w-full justify-between">
