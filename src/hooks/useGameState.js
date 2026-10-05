@@ -7,6 +7,7 @@ import {
 import { WEATHER, getSeason, rollWeather, rollSeasonEvent } from "@/data/parkSystems";
 import { MISSIONS, missionProgress } from "@/data/missions";
 import { rollChallenge } from "@/data/challenges";
+import { RESEARCH, dailyResearchPoints, researchReqFor } from "@/data/research";
 import { simulateVisits } from "@/data/visitorLogic";
 import { generateFeedback } from "@/data/guestFeedback";
 import { trackEvent } from "@/lib/gameAnalytics";
@@ -101,13 +102,15 @@ const [selectedZone, setSelectedZone] = useState(null);
   const [builtAttractionIds, setBuiltAttractionIds] = useState([]);
   const [visitorStats, setVisitorStats] = useState({ avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {}, guestTypes: {} });
   const [feedback, setFeedback] = useState([]);
+  const [researchPoints, setResearchPoints] = useState(0);
+  const [completedResearch, setCompletedResearch] = useState([]);
 
   const level = levelFromXp(xp);
   const gridSize = grid.length;
 
   /** @type {import("react").MutableRefObject<Record<string, any>>} */
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit };
+  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, completedResearch };
 
   // Load saved game
   useEffect(() => {
@@ -143,6 +146,8 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (data.visitorStats) setVisitorStats(data.visitorStats);
         if (data.feedback) setFeedback(data.feedback);
         if (data.vipVisit) setVipVisit(data.vipVisit);
+        if (data.researchPoints != null) setResearchPoints(data.researchPoints);
+        if (data.completedResearch) setCompletedResearch(data.completedResearch);
       }
     } catch {
       /* ignore */
@@ -155,14 +160,14 @@ const [selectedZone, setSelectedZone] = useState(null);
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit })
+          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch })
         );
       } catch {
         /* ignore */
       }
     }, 300);
     return () => clearTimeout(t);
-  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit]);
+  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch]);
 
   // Load save slots list on mount
   useEffect(() => {
@@ -171,7 +176,10 @@ const [selectedZone, setSelectedZone] = useState(null);
   }, []);
 
   const advanceDay = useCallback(() => {
-    const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, staffAssignments: currentAssignments, incidents: currentIncidents, upgrades: currentUpgrades, attractionCondition: currentCondition, challenge: currentChallenge, parkZones: currentZones, forecast: currentForecast, seasonEvent: currentSeasonEvent,     ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass, vipVisit: currentVipVisit } = stateRef.current;
+    const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, staffAssignments: currentAssignments, incidents: currentIncidents, upgrades: currentUpgrades, attractionCondition: currentCondition, challenge: currentChallenge, parkZones: currentZones, forecast: currentForecast, seasonEvent: currentSeasonEvent,     ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass, vipVisit: currentVipVisit, completedResearch: currentResearch } = stateRef.current;
+    const hasResearch = (id) => (currentResearch || []).includes(id);
+    const upkeepResearchMult = hasResearch("efficiency") ? 0.85 : 1;
+    const ticketResearchMult = hasResearch("marketing") ? 1.10 : 1;
     const dayWeather = currentForecast || rollWeather(d + 1);
     const dayForecast = rollWeather(d + 2);
     const eff = currentChallenge?.effects || {};
@@ -311,6 +319,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       if (environment.filter((p) => currentZones?.[p.idx]).length >= 5) repDelta += 0.25;
       if (currentSeasonEvent) repDelta += currentSeasonEvent.repDelta || 0;
       newReputation = Math.max(0, Math.min(100, rep + repDelta));
+      if (hasResearch("filtration")) newReputation = Math.min(100, newReputation + 1);
     } else {
       newReputation = Math.max(0, rep - 1);
     }
@@ -353,7 +362,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setIncidents([...remaining, ...newIncidents]);
     setAttractionCondition(nextCondition);
 
-    const ticketRevenue = newGuests * currentTicketPrice;
+    const ticketRevenue = newGuests * currentTicketPrice * ticketResearchMult;
     const conditionIncomeMult = workingAttractions.length ? workingAttractions.reduce((sum, p) => sum + (0.72 + (nextCondition[p.idx] || 0) * 0.0028), 0) / workingAttractions.length : 0;
     const rideIncome = income * conditionIncomeMult *
       (dayWeather.incomeMult ?? 1) *
@@ -364,13 +373,13 @@ const [selectedZone, setSelectedZone] = useState(null);
       (dayWeather.utilityMult ?? 1)
     );
     const expenses =
-      placedItems.reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) +
+      placedItems.reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) * upkeepResearchMult +
       wages * (eff.wageMult ?? 1) +
       utilities +
       currentAdBudget +
       (currentPriorityPass ? 120 : 0);
     const grossIncome = Math.round(ticketRevenue + rideIncome);
-    const upkeep = Math.round(placedItems.reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1));
+    const upkeep = Math.round(placedItems.reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) * upkeepResearchMult);
     const wageCost = Math.round(wages * (eff.wageMult ?? 1));
     const marketingCost = currentAdBudget;
     const utilityCost = utilities;
@@ -420,6 +429,9 @@ const [selectedZone, setSelectedZone] = useState(null);
     setLifetimeEarnings((e) => e + grossIncome);
     setReputation(Math.round(newReputation));
     setLastNet(net);
+    const staffTotal = Object.values(counts).reduce((s, n) => s + (n || 0), 0);
+    const rpEarned = dailyResearchPoints(attractions.length, staffTotal);
+    if (rpEarned > 0) setResearchPoints((rp) => rp + rpEarned);
     setHistory((h) =>
       [...h, {
         day: d + 1,
@@ -674,6 +686,16 @@ const [selectedZone, setSelectedZone] = useState(null);
     setSelectedTile(null);
   }, []);
 
+  const unlockResearch = useCallback((id) => {
+    const node = RESEARCH.find((r) => r.id === id);
+    if (!node || completedResearch.includes(id)) return;
+    if (node.requires && !node.requires.every((r) => completedResearch.includes(r))) return;
+    if (researchPoints < node.cost) return;
+    setResearchPoints((rp) => rp - node.cost);
+    setCompletedResearch((c) => [...c, id]);
+    trackEvent("research_unlocked", { id, cost: node.cost });
+  }, [completedResearch, researchPoints]);
+
   const applyCheat = useCallback((kind) => {
     if (kind === "cash") setMoney((m) => m + 50000);
     if (kind === "xp") setXp((x) => x + 500);
@@ -837,6 +859,8 @@ const [selectedZone, setSelectedZone] = useState(null);
     setBuiltAttractionIds([]);
     setVisitorStats({ avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {}, guestTypes: {} });
     setFeedback([]);
+    setResearchPoints(0);
+    setCompletedResearch([]);
     trackEvent("park_reset");
   }, []);
 
