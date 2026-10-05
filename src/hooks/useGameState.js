@@ -735,6 +735,10 @@ const [selectedZone, setSelectedZone] = useState(null);
         totalUpgrades,
         expansionsDone,
         maxedUpgrades: upgrades.filter((lv) => lv >= MAX_UPGRADE).length,
+        parkAppeal: parkAppeal.score,
+        themedZones: (parkAppeal.zones || []).filter((z) => z.quality >= 60).length,
+        avgMood: visitorStats?.avgMood || 0,
+        lifetimeEarnings,
       };
       if (missionProgress(mission, ms) < mission.target) return;
       setMoney((m) => m + mission.reward.money);
@@ -742,7 +746,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       setClaimedMissions((c) => [...c, id]);
       trackEvent("mission_claimed", { id, money: mission.reward.money, xp: mission.reward.xp });
     },
-    [claimedMissions, level, grid, upgrades, peakGuests, money, reputation, day, staff, totalUpgrades, expansionsDone]
+    [claimedMissions, level, grid, upgrades, peakGuests, money, reputation, day, staff, totalUpgrades, expansionsDone, parkAppeal, visitorStats, lifetimeEarnings]
   );
 
   const savePark = useCallback(
