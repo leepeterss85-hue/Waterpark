@@ -1,14 +1,14 @@
 import React from "react";
-import { Hammer, Settings, Users, Save, Activity, CloudSun, FlaskConical } from "lucide-react";
+import { Hammer, Settings, Users, Activity, CloudSun, FlaskConical, SlidersHorizontal } from "lucide-react";
 
 const MENUS = [
   { key: "build", icon: Hammer, label: "Build" },
   { key: "research", icon: FlaskConical, label: "Research" },
   { key: "manage", icon: Settings, label: "Manage" },
   { key: "staff", icon: Users, label: "Staff" },
-  { key: "save", icon: Save, label: "Save" },
   { key: "info", icon: Activity, label: "Activity" },
   { key: "conditions", icon: CloudSun, label: "Weather" },
+  { key: "settings", icon: SlidersHorizontal, label: "Settings" },
 ];
 
 export default function MapMenuBar({ openSheet, onOpen, missionsBadge = 0, incidentBadge = 0 }) {
