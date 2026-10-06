@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Hammer, Settings, Users, Activity, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2, MapPin, Star, Clock, Wrench, Grid3x3, ChevronUp } from "lucide-react";
+import { Hammer, Settings, Users, Activity, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2, MapPin, Star, Clock, Wrench, Grid3x3, ChevronUp, Target, Zap, Palette, RotateCcw } from "lucide-react";
 
 const PRIMARY = [
   { key: "build", icon: Hammer, label: "Build", tutorialTarget: "build" },
@@ -29,6 +29,10 @@ const SECONDARY = [
   { key: "seasonalCalendar", icon: Clock, label: "Calendar" },
   { key: "emergencies", icon: Siren, label: "SOS" },
   { key: "info", icon: Activity, label: "Activity" },
+  { key: "challenges", icon: Target, label: "Challenges" },
+  { key: "synergies", icon: Zap, label: "Synergies" },
+  { key: "themes", icon: Palette, label: "Themes" },
+  { key: "prestige", icon: RotateCcw, label: "Prestige" },
   { key: "settings", icon: SlidersHorizontal, label: "Settings" },
 ];
 

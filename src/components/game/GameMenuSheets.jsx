@@ -1,7 +1,7 @@
 import React from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2, MapPin, Star, Clock, Wrench } from "lucide-react";
+import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2, MapPin, Star, Clock, Wrench, Zap, Palette, RotateCcw } from "lucide-react";
 import { MISSIONS, missionProgress } from "@/data/missions";
 import BuildPanel from "@/components/game/BuildPanel";
 import ExpansionPanel from "@/components/game/ExpansionPanel";
@@ -35,6 +35,10 @@ import DistrictsPanel from "@/components/game/DistrictsPanel";
 import VipGuestsPanel from "@/components/game/VipGuestsPanel";
 import SeasonalCalendarPanel from "@/components/game/SeasonalCalendarPanel";
 import RideAgingPanel from "@/components/game/RideAgingPanel";
+import DailyChallengesPanel from "@/components/game/DailyChallengesPanel";
+import SynergyPanel from "@/components/game/SynergyPanel";
+import VisualThemesPanel from "@/components/game/VisualThemesPanel";
+import PrestigePanel from "@/components/game/PrestigePanel";
 import { isWaterAttraction } from "@/data/waterQuality";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
@@ -282,6 +286,28 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
           level={game.level}
           onShare={game.sharePark}
           onViewShared={game.viewSharedPark}
+        />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "challenges"} onOpenChange={(v) => !v && close()} title="Daily Challenges" icon={Target} width="sm:max-w-md">
+        <DailyChallengesPanel challenges={game.dailyChallenges} onClaim={game.claimDailyChallenge} daysUntilRefresh={game.challengeDaysLeft} />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "synergies"} onOpenChange={(v) => !v && close()} title="Ride Synergies" icon={Zap} width="sm:max-w-md">
+        <SynergyPanel activeSynergies={game.synergyBonuses?.activeSynergies || []} />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "themes"} onOpenChange={(v) => !v && close()} title="Park Themes" icon={Palette} width="sm:max-w-md">
+        <VisualThemesPanel level={game.level} activeTheme={game.activeTheme} onSelect={game.selectTheme} />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "prestige"} onOpenChange={(v) => !v && close()} title="Prestige" icon={RotateCcw} width="sm:max-w-md">
+        <PrestigePanel
+          level={game.level}
+          empirePoints={game.empirePoints}
+          lifetimeEarnings={game.lifetimeEarnings}
+          prestigeCount={game.prestigeCount}
+          onPrestige={game.prestigePark}
         />
       </SheetShell>
     </>

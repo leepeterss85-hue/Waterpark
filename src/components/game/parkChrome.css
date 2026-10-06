@@ -63,6 +63,24 @@
   .park-menu-label { font-size: .6875rem; }
 }
 
+/* === Visual Park Themes === */
+.theme-tropical .game-map-surface { background: radial-gradient(ellipse at 14% 12%,rgba(255,255,255,.40) 0 6%,transparent 15%),radial-gradient(ellipse at 86% 88%,rgba(13,148,136,.22) 0 9%,transparent 20%),linear-gradient(135deg,#9ac77c 0%,#78b064 42%,#6aa35b 100%) !important; }
+.theme-pirate .game-map-surface { background: radial-gradient(ellipse at 20% 15%,rgba(255,255,255,.30) 0 5%,transparent 14%),linear-gradient(135deg,#a87c4a 0%,#8b6914 40%,#6b4e0a 100%) !important; }
+.theme-pirate .game-board-shell { border-color: #6b4e0a !important; }
+.theme-pirate .game-board-titlebar { background: linear-gradient(110deg,#5a3e0a,#8b6914 52%,#5a3e0a) !important; }
+.theme-scifi .game-map-surface { background: radial-gradient(ellipse at 30% 20%,rgba(99,102,241,.25) 0 8%,transparent 20%),radial-gradient(ellipse at 75% 75%,rgba(34,211,238,.20) 0 10%,transparent 22%),linear-gradient(135deg,#1e1b4b 0%,#312e81 40%,#1e3a5f 100%) !important; }
+.theme-scifi .game-board-shell { border-color: #312e81 !important; box-shadow: 0 0 30px rgba(99,102,241,.3), 0 16px 36px rgba(32,68,45,.24) !important; }
+.theme-scifi .game-board-titlebar { background: linear-gradient(110deg,#1e1b4b,#4338ca 52%,#1e3a5f) !important; }
+.theme-sunset .game-map-surface { background: radial-gradient(ellipse at 15% 10%,rgba(255,200,100,.35) 0 6%,transparent 18%),radial-gradient(ellipse at 85% 85%,rgba(244,63,94,.20) 0 8%,transparent 20%),linear-gradient(135deg,#fbbf24 0%,#f97316 35%,#ec4899 70%,#9333ea 100%) !important; }
+.theme-sunset .game-board-shell { border-color: #c2410c !important; }
+.theme-sunset .game-board-titlebar { background: linear-gradient(110deg,#9a3412,#ea580c 52%,#be185d) !important; }
+.theme-frozen .game-map-surface { background: radial-gradient(ellipse at 25% 15%,rgba(255,255,255,.45) 0 6%,transparent 16%),radial-gradient(ellipse at 75% 80%,rgba(186,230,253,.30) 0 8%,transparent 20%),linear-gradient(135deg,#e0f2fe 0%,#bae6fd 35%,#7dd3fc 70%,#38bdf8 100%) !important; }
+.theme-frozen .game-board-shell { border-color: #0284c7 !important; }
+.theme-frozen .game-board-titlebar { background: linear-gradient(110deg,#075985,#0ea5e9 52%,#0369a1) !important; }
+.theme-golden .game-map-surface { background: radial-gradient(ellipse at 20% 15%,rgba(255,235,150,.35) 0 5%,transparent 15%),linear-gradient(135deg,#fde68a 0%,#fbbf24 35%,#d97706 70%,#92400e 100%) !important; }
+.theme-golden .game-board-shell { border-color: #92400e !important; box-shadow: 0 0 25px rgba(251,191,36,.3), 0 16px 36px rgba(32,68,45,.24) !important; }
+.theme-golden .game-board-titlebar { background: linear-gradient(110deg,#78350f,#d97706 52%,#78350f) !important; }
+
 /* Tutorial highlight ring */
 .tutorial-highlight-target {
   position: relative;

@@ -11,7 +11,7 @@ import "@/components/game/parkArtwork.css";
 import "@/components/game/parkPeople.css";
 import "@/components/game/parkChrome.css";
 
-export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, visitorMovements, queueStats = {}, attractionCondition = [], staff = {}, staffAssignments = {}, lifeguardTotal = 0, day = 1, weather, seasonEvent, hotelGuests = [], activeEvents = [], onTileClick, topControls, bottomMenu, statsBar }) {
+export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, visitorMovements, queueStats = {}, attractionCondition = [], staff = {}, staffAssignments = {}, lifeguardTotal = 0, day = 1, weather, seasonEvent, hotelGuests = [], activeEvents = [], onTileClick, topControls, bottomMenu, statsBar, themeClass = "" }) {
   const { zoom, setZoom, panX, panY, resetView, containerRef } = useTouchZoom(1);
   const incidentMap = new Map((incidents || []).map((incident) => [incident.tileIndex, incident]));
   const phase = ((day - 1) % 8);

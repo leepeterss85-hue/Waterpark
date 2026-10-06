@@ -33,6 +33,10 @@ import { DISTRICTS, unlockedDistricts, checkDistrictLegendary, aggregateDistrict
 import { VIP_TYPES, rollVipVisit, evaluateVipVisit, generateVipSocialPost, getVipType } from "@/data/vipGuests";
 import { SEASONAL_EVENTS, getTriggeredCalendarEvent, getUpcomingEvents, calendarDay, getCalendarSeason } from "@/data/seasonalCalendar";
 import { initRideAges, tickRideAges, refurbishRide as refurbishRideAge, refurbishCost, getAgeTier, aggregateAgingUpkeepMult, aggregateAgingAppealMult, MAX_AGE } from "@/data/rideAging";
+import { rollDailyChallenges, isChallengeComplete, CHALLENGE_REFRESH_DAYS } from "@/data/dailyChallenges";
+import { calculateSynergies } from "@/data/synergies";
+import { calculatePrestigePoints, prestigeMultiplier, PRESTIGE_LEVEL_REQ } from "@/data/prestige";
+import { getTheme as getVisualTheme } from "@/data/visualThemes";
 import { base44 } from "@/api/base44Client";
 import { sound } from "@/lib/soundManager";
 
@@ -165,13 +169,21 @@ const [selectedZone, setSelectedZone] = useState(null);
   const [vipHistory, setVipHistory] = useState([]);
   const [claimedLegendary, setClaimedLegendary] = useState([]);
   const [activeCalendarEvent, setActiveCalendarEvent] = useState(null);
+  const [dailyChallenges, setDailyChallenges] = useState([]);
+  const [challengeDayCounter, setChallengeDayCounter] = useState(0);
+  const [autoPricing, setAutoPricing] = useState(false);
+  const [activeTheme, setActiveTheme] = useState("tropical");
+  const [prestigeCount, setPrestigeCount] = useState(0);
+  const [synergyBonuses, setSynergyBonuses] = useState({ totalIncomeMult: 0, totalAppealBonus: 0, activeSynergies: [] });
+  const [builtToday, setBuiltToday] = useState(0);
+  const [upgradedToday, setUpgradedToday] = useState(0);
 
   const level = levelFromXp(xp);
   const gridSize = grid.length;
 
   /** @type {import("react").MutableRefObject<Record<string, any>>} */
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, completedResearch, parkAppeal, disaster, sandbox, activeCampaigns, hotelGuests, resortRating, pricing, popularity, popularityTrend, activeEvents, xp, membershipCounts, membershipTimers, membershipStats, peakGuests, totalUpgrades, awards, awardCeremonyTimer, awardStats, awardGuestMult: totalAwardGuestMult(awards), socialPosts, socialReputation, emergencies, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent };
+  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, completedResearch, parkAppeal, disaster, sandbox, activeCampaigns, hotelGuests, resortRating, pricing, popularity, popularityTrend, activeEvents, xp, membershipCounts, membershipTimers, membershipStats, peakGuests, totalUpgrades, awards, awardCeremonyTimer, awardStats, awardGuestMult: totalAwardGuestMult(awards), socialPosts, socialReputation, emergencies, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, builtToday, upgradedToday };
 
   // Load saved game
   useEffect(() => {
@@ -242,6 +254,12 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (data.vipHistory) setVipHistory(data.vipHistory);
         if (data.claimedLegendary) setClaimedLegendary(data.claimedLegendary);
         if (data.activeCalendarEvent) setActiveCalendarEvent(data.activeCalendarEvent);
+        if (data.dailyChallenges) setDailyChallenges(data.dailyChallenges);
+        if (data.challengeDayCounter != null) setChallengeDayCounter(data.challengeDayCounter);
+        if (data.autoPricing != null) setAutoPricing(data.autoPricing);
+        if (data.activeTheme) setActiveTheme(data.activeTheme);
+        if (data.prestigeCount != null) setPrestigeCount(data.prestigeCount);
+        if (data.synergyBonuses) setSynergyBonuses(data.synergyBonuses);
       }
     } catch {
       /* ignore */
@@ -254,7 +272,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, rideAges, vipHistory, claimedLegendary, activeCalendarEvent })
+          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses })
         );
       } catch {
         /* ignore */
@@ -303,6 +321,14 @@ const [selectedZone, setSelectedZone] = useState(null);
     // Apply district bonuses
     eff.guestMult = (eff.guestMult ?? 1) * districtBonuses.guestMult;
     eff.incomeMult = (eff.incomeMult ?? 1) * districtBonuses.incomeMult;
+    // Ride synergy bonuses from adjacent complementary rides
+    const synergies = calculateSynergies(prevGrid);
+    setSynergyBonuses(synergies);
+    eff.incomeMult = (eff.incomeMult ?? 1) * (1 + synergies.totalIncomeMult);
+    // Prestige multipliers
+    const pMult = prestigeMultiplier(stateRef.current.prestigeCount || 0);
+    eff.incomeMult = (eff.incomeMult ?? 1) * pMult.incomeMult;
+    eff.guestMult = (eff.guestMult ?? 1) * pMult.demandMult;
     // Compute aging modifiers before they affect appeal and visitor demand.
     const currentRideAges = stateRef.current.rideAges || initRideAges(prevGrid.length);
     const nextRideAges = tickRideAges(currentRideAges, prevGrid);
@@ -1151,6 +1177,50 @@ const [selectedZone, setSelectedZone] = useState(null);
     if (constructionResult.logEntries.length) {
       setLog((l) => [...constructionResult.logEntries, ...l].slice(0, 12));
     }
+
+    // --- Daily Challenges: track progress & refresh ---
+    {
+      const challengeState = {
+        dailyNet: net,
+        dailyGuests: newGuests,
+        avgMood: visitorStats?.avgMood || 0,
+        reputation: Math.round(newReputation),
+        noIncidents: (remaining.length + newIncidents.length) === 0 ? 1 : 0,
+        buildToday: stateRef.current.builtToday || 0,
+        upgradeToday: stateRef.current.upgradedToday || 0,
+        staffTotal: Object.values(counts).reduce((s, n) => s + (n || 0), 0),
+        cleanliness: Math.round(cleanliness * 100),
+        safety: Math.round(safety * 100),
+      };
+      const currentChallenges = stateRef.current.dailyChallenges || [];
+      const updatedChallenges = currentChallenges.map((c) => {
+        if (c.claimed) return c;
+        const complete = isChallengeComplete(c, challengeState);
+        const progress = challengeState[c.type] ?? 0;
+        return { ...c, progress, completed: complete || c.completed };
+      });
+      const newCounter = (stateRef.current.challengeDayCounter || 0) + 1;
+      if (newCounter >= CHALLENGE_REFRESH_DAYS || updatedChallenges.length === 0) {
+        setDailyChallenges(rollDailyChallenges());
+        setChallengeDayCounter(0);
+      } else {
+        setDailyChallenges(updatedChallenges);
+        setChallengeDayCounter(newCounter);
+      }
+      setBuiltToday(0);
+      setUpgradedToday(0);
+    }
+
+    // --- Dynamic pricing AI: auto-adjust ticket price ---
+    if (stateRef.current.autoPricing) {
+      const repFactor = (newReputation - 50) / 50;
+      const weatherFactor = dayWeather.id === "sunny" ? 0.1 : dayWeather.id === "rain" ? -0.15 : dayWeather.id === "storm" ? -0.25 : 0;
+      const crowdFactor = totalCapacity > 0 ? Math.min(0.2, (newGuests / totalCapacity - 0.7) * 0.5) : 0;
+      const idealPrice = Math.max(15, Math.min(60, Math.round(DEFAULT_TICKET_PRICE * (1 + repFactor * 0.3 + weatherFactor + crowdFactor))));
+      if (Math.abs(idealPrice - stateRef.current.ticketPrice) >= 2) {
+        setTicketPrice(idealPrice);
+      }
+    }
   }, []);
 
   // Game loop
@@ -1201,6 +1271,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         }
       }
       setLastBuildAction({ index, id: selectedBuild, cost: attr.cost });
+      setBuiltToday((b) => b + 1);
       trackEvent("attraction_built", { id: selectedBuild, category: attr.category, cost: attr.cost });
     },
     [selectedBuild, money, parkZones, sandbox, builtAttractionIds, day]
@@ -1295,6 +1366,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       if (!sandbox) setMoney((m) => m - cost);
       setTotalUpgrades((t) => t + 1);
       setXp((x) => x + 15);
+      setUpgradedToday((u) => u + 1);
       sound.upgrade();
       trackEvent("attraction_upgraded", { id, level: level + 1, cost });
     },
@@ -1595,6 +1667,12 @@ const [selectedZone, setSelectedZone] = useState(null);
         vipHistory,
         claimedLegendary,
         activeCalendarEvent,
+        dailyChallenges,
+        challengeDayCounter,
+        autoPricing,
+        activeTheme,
+        prestigeCount,
+        synergyBonuses,
         savedAt: new Date().toISOString(),
       };
       writeSlots(slots);
@@ -1602,7 +1680,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       trackEvent("park_saved", { name: trimmed });
       return true;
     },
-    [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, popularity, popularityTrend, prevPopularity, activeEvents, rideAges, vipHistory, claimedLegendary, activeCalendarEvent]
+    [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, popularity, popularityTrend, prevPopularity, activeEvents, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses]
   );
 
   const saveToCloud = useCallback(
@@ -1621,6 +1699,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         awardStats, socialPosts, socialReputation, emergencies, emergencyStats,
         constructionProjects, loans, returnVisitorMult, empirePoints, competitors,
         marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent,
+        dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses,
       };
       try {
         await base44.functions.invoke("cloudSaves", {
@@ -1699,6 +1778,14 @@ const [selectedZone, setSelectedZone] = useState(null);
     if (data.vipHistory) setVipHistory(data.vipHistory);
     if (data.claimedLegendary) setClaimedLegendary(data.claimedLegendary);
     if (data.activeCalendarEvent) setActiveCalendarEvent(data.activeCalendarEvent);
+    if (data.dailyChallenges) setDailyChallenges(data.dailyChallenges);
+    if (data.challengeDayCounter != null) setChallengeDayCounter(data.challengeDayCounter);
+    if (data.autoPricing != null) setAutoPricing(data.autoPricing);
+    if (data.activeTheme) setActiveTheme(data.activeTheme);
+    if (data.prestigeCount != null) setPrestigeCount(data.prestigeCount);
+    if (data.synergyBonuses) setSynergyBonuses(data.synergyBonuses);
+    setBuiltToday(0);
+    setUpgradedToday(0);
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
     setLastNet(data.lastNet ?? 0);
   }, []);
@@ -1806,6 +1893,55 @@ const [selectedZone, setSelectedZone] = useState(null);
     return () => window.removeEventListener("load-shared-park", handler);
   }, [applyGameData]);
 
+  const claimDailyChallenge = useCallback((challengeId) => {
+    const challenge = (stateRef.current.dailyChallenges || []).find((c) => c.id === challengeId);
+    if (!challenge || challenge.claimed || !challenge.completed) return;
+    setMoney((m) => m + challenge.reward.money);
+    setXp((x) => x + challenge.reward.xp);
+    setDailyChallenges((prev) => prev.map((c) => c.id === challengeId ? { ...c, claimed: true } : c));
+    sound.mission();
+    trackEvent("daily_challenge_claimed", { id: challenge.baseId });
+  }, []);
+
+  const toggleAutoPricing = useCallback(() => {
+    setAutoPricing((prev) => !prev);
+  }, []);
+
+  const selectTheme = useCallback((themeId) => {
+    const theme = getVisualTheme(themeId);
+    if (level < theme.unlockLevel) return;
+    setActiveTheme(themeId);
+    trackEvent("theme_selected", { theme: themeId });
+  }, [level]);
+
+  const prestigePark = useCallback(() => {
+    if (level < PRESTIGE_LEVEL_REQ) return;
+    const points = calculatePrestigePoints({ level, empirePoints, lifetimeEarnings });
+    if (points <= 0) return;
+    setPrestigeCount((p) => p + points);
+    setXp(0);
+    setDay(1);
+    setReputation(50);
+    setGuests(0);
+    setGrid(makeStartingGrid());
+    setParkZones(makeEmptyZones(GRID_SIZE));
+    setUpgrades(Array(GRID_SIZE).fill(0));
+    setAttractionCondition(Array(GRID_SIZE).fill(100));
+    setIncidents([]);
+    setStaff(DEFAULT_STAFF);
+    setStaffAssignments({});
+    setExpansionsDone(0);
+    setPeakGuests(0);
+    setBuiltAttractionIds([]);
+    setMoney(INITIAL_MONEY);
+    setPlaying(false);
+    setDailyChallenges(rollDailyChallenges());
+    setChallengeDayCounter(0);
+    setLog([{ day: 0, text: `👑 PRESTIGE! Reset with ${points} permanent bonus points. All income, demand & XP boosted forever.` }]);
+    sound.milestone();
+    trackEvent("park_prestiged", { points, total: prestigeCount + points });
+  }, [level, empirePoints, lifetimeEarnings, prestigeCount]);
+
   const resetGame = useCallback((starterParkId = "empty_lot") => {
     const diff = getDifficulty(getSettings().difficulty);
     const park = getStarterPark(starterParkId);
@@ -1887,6 +2023,13 @@ const [selectedZone, setSelectedZone] = useState(null);
     setVipHistory([]);
     setClaimedLegendary([]);
     setActiveCalendarEvent(null);
+    setDailyChallenges(rollDailyChallenges());
+    setChallengeDayCounter(0);
+    setAutoPricing(false);
+    setActiveTheme("tropical");
+    setSynergyBonuses({ totalIncomeMult: 0, totalAppealBonus: 0, activeSynergies: [] });
+    setBuiltToday(0);
+    setUpgradedToday(0);
     setHotelGuests([]);
     setHotelStats({ roomRevenue: 0, hotelExpenses: 0, parkSpend: 0, occupancy: 0, avgHappiness: 0, totalGuests: 0, totalRooms: 0, guestsByHotel: {} });
     setResortRating(0);
@@ -2110,5 +2253,16 @@ const [selectedZone, setSelectedZone] = useState(null);
     submitLeaderboard,
     sharePark,
     viewSharedPark,
+    dailyChallenges,
+    claimDailyChallenge,
+    challengeDaysLeft: CHALLENGE_REFRESH_DAYS - (challengeDayCounter % CHALLENGE_REFRESH_DAYS),
+    autoPricing,
+    toggleAutoPricing,
+    activeTheme,
+    selectTheme,
+    prestigeCount,
+    prestigePark,
+    prestigeMultipliers: prestigeMultiplier(prestigeCount),
+    synergyBonuses,
   };
 }
