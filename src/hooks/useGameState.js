@@ -1258,6 +1258,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         setGrid((g) => { const ng = [...g]; ng[action.tileIndex] = action.itemId; return ng; });
         setPopularity((p) => { const n = [...p]; while (n.length <= action.tileIndex) n.push(0); n[action.tileIndex] = DEFAULT_POPULARITY; return n; });
         setPopularityTrend((t) => { const n = [...t]; while (n.length <= action.tileIndex) n.push(0); n[action.tileIndex] = NEW_RIDE_TREND_BOOST; return n; });
+        setRideAges((ages) => { const n = [...ages]; while (n.length <= action.tileIndex) n.push(0); n[action.tileIndex] = 0; return n; });
         setBuiltAttractionIds((ids) => ids.includes(action.itemId) ? ids : [...ids, action.itemId]);
       } else if (action.type === "expand") {
         setGrid((g) => [...g, ...Array(action.lots).fill(null)]);
@@ -1268,6 +1269,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         setPopularityTrend((t) => [...t, ...Array(action.lots).fill(0)]);
         setPrevPopularity((p) => [...p, ...Array(action.lots).fill(0)]);
         setWaterQuality((wq) => [...wq, ...Array(action.lots).fill(100)]);
+        setRideAges((ages) => [...ages, ...Array(action.lots).fill(0)]);
         setExpansionsDone((e) => e + 1);
       } else if (action.type === "renovate") {
         setUpgrades((u) => { const n = [...u]; n[action.tileIndex] = MAX_UPGRADE; return n; });
@@ -1421,6 +1423,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       });
       setIncidents((items) => items.filter((item) => item.tileIndex !== index));
       setAttractionCondition((conditions) => { const next = [...conditions]; next[index] = 100; return next; });
+      setRideAges((ages) => { const next = [...ages]; next[index] = 0; return next; });
       setParkZones((zones) => {
         const next = [...zones];
         next[index] = null;
@@ -1524,6 +1527,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setPopularityTrend((t) => [...t, ...Array(EXPAND_ROW).fill(0)]);
     setPrevPopularity((p) => [...p, ...Array(EXPAND_ROW).fill(0)]);
     setWaterQuality((wq) => [...wq, ...Array(EXPAND_ROW).fill(100)]);
+    setRideAges((ages) => [...ages, ...Array(EXPAND_ROW).fill(0)]);
     if (!sandbox) setMoney((m) => m - cost);
     setExpansionsDone((e) => e + 1);
     sound.expand();
