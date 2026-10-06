@@ -234,6 +234,7 @@ export default function Home() {
           seasonEvent={game.seasonEvent}
           hotelGuests={game.hotelGuests}
           activeEvents={game.activeEvents}
+          mascot={game.mascotDef}
           onTileClick={handleTileClickWithSound}
           topControls={
             <>
