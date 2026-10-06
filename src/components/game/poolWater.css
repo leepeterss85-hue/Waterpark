@@ -16,6 +16,58 @@
 .water-reflections { animation:water-reflection-shimmer 6s ease-in-out infinite; }
 .aquatic-ride-art .ride-wave-line { stroke:hsl(var(--park-rim)/.58); stroke-width:1.1; }
 .aquatic-ride-art .ride-river-glint { stroke:hsl(var(--park-rim)/.65); stroke-width:.65; stroke-dasharray:3 8; }
+
+/* === Tier III: Enhanced water vibrancy and depth === */
+.pool-water-surface {
+  filter: saturate(1.25) brightness(1.05) drop-shadow(0 0 8px rgba(103,232,249,.25));
+}
+.water-caustic-soft { stroke-width: 3; opacity: .9; }
+.water-caustic-fine { opacity: .7; }
+.water-reflection-bright { stroke-width: 1.2; filter: drop-shadow(0 0 2px rgba(255,255,255,.6)); }
+.water-surface-ripples { stroke-width: .8; opacity: .6; animation: water-ripple-pulse 4s ease-in-out infinite; }
+.water-pool-wall { stroke-width: 4; filter: drop-shadow(0 2px 3px rgba(8,47,73,.3)); }
+
+/* Enhanced caustic drift with secondary motion */
+.water-caustic-drift { animation: water-caustic-drift 14s linear infinite, water-caustic-pulse 3s ease-in-out infinite; }
+
+/* Slide water glow enhancement */
+.aquatic-ride-art .ride-water-slide {
+  filter: drop-shadow(0 0 4px rgba(244,114,182,.4)) drop-shadow(0 2px 3px rgba(15,23,42,.2));
+}
+.aquatic-ride-art .ride-slide-highlight {
+  filter: drop-shadow(0 0 3px rgba(255,255,255,.5));
+  animation: slide-highlight-pulse 2.5s ease-in-out infinite;
+}
+.aquatic-ride-art .ride-water-glint {
+  animation: water-glint-flow 2s ease-in-out infinite;
+}
+
+/* Bowl water glow */
+.aquatic-ride-art .scene-bowl-water {
+  filter: drop-shadow(0 0 6px rgba(103,232,249,.3));
+  animation: bowl-water-swirl 3s ease-in-out infinite;
+}
+
+/* River island glow */
+.aquatic-ride-art .ride-river-island {
+  filter: drop-shadow(0 2px 3px rgba(15,23,42,.25));
+}
+
+/* Pool rim enhanced */
+.aquatic-ride-art .pool-rim {
+  filter: drop-shadow(0 3px 4px rgba(15,23,42,.2));
+}
+
+@keyframes water-caustic-pulse { 0%,100% { opacity:.7; } 50% { opacity:1; } }
+@keyframes water-ripple-pulse { 0%,100% { opacity:.3; } 50% { opacity:.7; } }
+@keyframes slide-highlight-pulse { 0%,100% { opacity:.6; } 50% { opacity:1; } }
+@keyframes water-glint-flow { 0%,100% { opacity:.4; } 50% { opacity:.9; } }
+@keyframes bowl-water-swirl { 0%,100% { opacity:.7; } 50% { opacity:1; } }
+
 @keyframes water-caustic-drift { to { transform:translate(22px,18px); } }
 @keyframes water-reflection-shimmer { 0%,100% { opacity:.65; } 50% { opacity:1; } }
-@media (prefers-reduced-motion:reduce) { .water-caustic-drift,.water-reflections { animation:none; } }
+@media (prefers-reduced-motion:reduce) {
+  .water-caustic-drift,.water-reflections,.water-surface-ripples,
+  .aquatic-ride-art .ride-slide-highlight,.aquatic-ride-art .ride-water-glint,
+  .aquatic-ride-art .scene-bowl-water { animation:none; }
+}
