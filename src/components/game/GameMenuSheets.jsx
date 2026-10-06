@@ -126,6 +126,8 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
           assignments={game.staffAssignments}
           zones={zones}
           onAssign={game.assignStaff}
+          staffXp={game.staffXp}
+          onTrainStaff={game.trainStaff}
         />
       </SheetShell>
 

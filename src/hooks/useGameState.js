@@ -1776,7 +1776,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         constructionProjects, loans, returnVisitorMult, empirePoints, competitors,
         marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent,
         dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses,
-        mascot, lastRewardDay, rewardStreak,
+        mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp,
       };
       try {
         await base44.functions.invoke("cloudSaves", {
@@ -1788,7 +1788,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         return false;
       }
     },
-    [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, pricing]
+    [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, pricing, visitorReviews, staffXp]
   );
 
   const applyGameData = useCallback((data) => {
@@ -1945,7 +1945,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer,
       awardStats, socialPosts, socialReputation, emergencies, emergencyStats,
       constructionProjects, loans, returnVisitorMult, empirePoints, competitors,
-      marketShare, waterQuality,
+      marketShare, waterQuality, visitorReviews, staffXp,
     };
     try {
       const res = await base44.functions.invoke("sharePark", {
@@ -1957,7 +1957,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     } catch (e) {
       return null;
     }
-  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, log, lastNet, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, level]);
+  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, log, lastNet, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, level, visitorReviews, staffXp]);
 
   const viewSharedPark = useCallback(async (shareCode) => {
     try {

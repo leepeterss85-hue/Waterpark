@@ -2,6 +2,7 @@ import React from "react";
 import { Plus, Minus, Users } from "lucide-react";
 import { STAFF } from "@/data/gameData";
 import { getIcon } from "./icons";
+import StaffTrainingSection from "./StaffTrainingSection";
 
 function EffectMeter({ label, value, color }) {
   return (
@@ -33,6 +34,8 @@ export default function StaffPanel({
   assignments = {},
   zones = [],
   onAssign,
+  staffXp = {},
+  onTrainStaff,
 }) {
   const types = Object.values(STAFF);
   return (
@@ -126,6 +129,8 @@ export default function StaffPanel({
           );
         })}
       </div>
+
+      <StaffTrainingSection staff={staff} staffXp={staffXp} money={money} onTrain={onTrainStaff} />
     </div>
   );
 }
