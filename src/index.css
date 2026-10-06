@@ -721,7 +721,6 @@
 /* === Premium map terrain pass === */
 @layer components {
   .game-map-surface {
-    min-height: 360px;
     background:
       radial-gradient(ellipse at 9% 8%,rgba(255,255,255,.30) 0 5%,transparent 12%),
       radial-gradient(ellipse at 93% 92%,rgba(30,88,46,.22) 0 7%,transparent 17%),
@@ -791,7 +790,7 @@
   @keyframes map-water-glint { 0%,100%{transform:translateX(-4px);opacity:.35}50%{transform:translateX(8px);opacity:.9} }
 }
 @media (max-width:640px) {
-  .game-map-surface{min-height:310px;padding:7px!important}
+  .game-map-surface{padding:7px!important}
   .map-scenery-water-a{width:70px;height:42px}.map-scenery-water-b{width:74px;height:43px}
   .map-scenery-palm{font-size:24px}.map-map-label{font-size:6px;padding:4px 6px}
 }

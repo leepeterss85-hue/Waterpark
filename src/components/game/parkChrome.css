@@ -37,7 +37,13 @@
 .park-menu-more.is-active { background: hsl(var(--park-rim) / .25); color: hsl(var(--park-rim)); }
 .park-menu-badge { position: absolute; right: .25rem; top: 0; display: grid; place-items: center; min-width: 1rem; height: 1rem; padding: 0 .25rem; border-radius: 999px; background: hsl(var(--park-sun)); color: hsl(var(--park-ink)); box-shadow: 0 0 0 2px hsl(var(--park-ink)); font-size: .5625rem; font-weight: 900; }
 .park-menu-expanded { border-top: 1px solid hsl(var(--park-rim) / .15); padding: .5rem; padding-bottom: max(.5rem, env(safe-area-inset-bottom)); animation: park-menu-slide .2s ease-out; }
-.park-menu-expanded-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .25rem; max-height: 240px; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.park-menu-expanded-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .25rem; max-height: 200px; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+@media (max-width: 640px) {
+  .park-menu-expanded-grid { max-height: 160px; gap: .125rem; }
+  .park-menu-expanded-grid .park-menu-button { min-height: 42px; }
+  .park-menu-expanded-grid .park-menu-icon { width: 1.125rem; height: 1.125rem; }
+  .park-menu-expanded-grid .park-menu-label { font-size: .5625rem; }
+}
 .park-menu-expanded-grid .park-menu-button { min-height: 48px; }
 .park-menu-expanded-grid .park-menu-icon { width: 1.25rem; height: 1.25rem; }
 .park-menu-expanded-grid .park-menu-label { font-size: .625rem; }
