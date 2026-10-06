@@ -1,5 +1,5 @@
 import React from "react";
-import { Hammer, Settings, Users, Activity, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown } from "lucide-react";
+import { Hammer, Settings, Users, Activity, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets } from "lucide-react";
 
 const MENUS = [
   { key: "build", icon: Hammer, label: "Build" },
@@ -8,6 +8,8 @@ const MENUS = [
   { key: "manage", icon: Settings, label: "Manage" },
   { key: "economy", icon: Wallet, label: "Economy" },
   { key: "empire", icon: Crown, label: "Empire" },
+  { key: "competitors", icon: Swords, label: "Rivals" },
+  { key: "waterQuality", icon: Droplets, label: "Quality" },
   { key: "resort", icon: Hotel, label: "Resort" },
   { key: "staff", icon: Users, label: "Staff" },
   { key: "events", icon: CalendarDays, label: "Events" },

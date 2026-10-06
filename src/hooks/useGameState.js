@@ -27,6 +27,8 @@ import { simulateEmergencies, EMERGENCY_TYPES } from "@/data/emergencies";
 import { PROJECT_TYPES, getConstructionDisruption, simulateConstruction } from "@/data/construction";
 import { LOAN_TERMS, createLoan, simulateLoans } from "@/data/loans";
 import { EMPIRE_TIERS, getEmpireTier, calculateResortBonuses, calculateEmpirePoints } from "@/data/empire";
+import { createCompetitors, simulateCompetitors } from "@/data/competitors";
+import { createInitialWaterQuality, simulateWaterQuality, isWaterAttraction } from "@/data/waterQuality";
 
 const STORAGE_KEY = "waterpark-tycoon-save-v1";
 const SLOTS_KEY = "waterpark-tycoon-slots";
@@ -147,13 +149,16 @@ const [selectedZone, setSelectedZone] = useState(null);
   const [loans, setLoans] = useState([]);
   const [returnVisitorMult, setReturnVisitorMult] = useState(1.0);
   const [empirePoints, setEmpirePoints] = useState(0);
+  const [competitors, setCompetitors] = useState(() => createCompetitors(1));
+  const [marketShare, setMarketShare] = useState(100);
+  const [waterQuality, setWaterQuality] = useState(() => createInitialWaterQuality(GRID_SIZE));
 
   const level = levelFromXp(xp);
   const gridSize = grid.length;
 
   /** @type {import("react").MutableRefObject<Record<string, any>>} */
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, completedResearch, parkAppeal, disaster, sandbox, activeCampaigns, hotelGuests, resortRating, pricing, popularity, popularityTrend, activeEvents, xp, membershipCounts, membershipTimers, membershipStats, peakGuests, totalUpgrades, awards, awardCeremonyTimer, awardStats, awardGuestMult: totalAwardGuestMult(awards), socialPosts, socialReputation, emergencies, constructionProjects, loans, returnVisitorMult, empirePoints };
+  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, completedResearch, parkAppeal, disaster, sandbox, activeCampaigns, hotelGuests, resortRating, pricing, popularity, popularityTrend, activeEvents, xp, membershipCounts, membershipTimers, membershipStats, peakGuests, totalUpgrades, awards, awardCeremonyTimer, awardStats, awardGuestMult: totalAwardGuestMult(awards), socialPosts, socialReputation, emergencies, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality };
 
   // Load saved game
   useEffect(() => {
@@ -217,6 +222,9 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (data.loans) setLoans(data.loans);
         if (data.returnVisitorMult != null) setReturnVisitorMult(data.returnVisitorMult);
         if (data.empirePoints != null) setEmpirePoints(data.empirePoints);
+        if (data.competitors) setCompetitors(data.competitors);
+        if (data.marketShare != null) setMarketShare(data.marketShare);
+        if (data.waterQuality) setWaterQuality(data.waterQuality);
       }
     } catch {
       /* ignore */
@@ -236,7 +244,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       }
     }, 300);
     return () => clearTimeout(t);
-  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, popularity, popularityTrend, prevPopularity, activeEvents, constructionProjects, loans, returnVisitorMult, empirePoints]);
+  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, popularity, popularityTrend, prevPopularity, activeEvents, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality]);
 
   // Load save slots list on mount
   useEffect(() => {
@@ -500,6 +508,26 @@ const [selectedZone, setSelectedZone] = useState(null);
       }
     }
     setAttractionCondition(nextCondition);
+
+    // --- Water quality simulation ---
+    const hasWaterTreatment = prevGrid.some((id) => id === "water_treatment");
+    const hasFiltration = hasResearch("filtration");
+    const wqResult = simulateWaterQuality({
+      grid: prevGrid,
+      waterQuality: stateRef.current.waterQuality || Array(prevGrid.length).fill(100),
+      guests: newGuests,
+      staff: counts,
+      weather: dayWeather,
+      hasFiltration,
+      hasWaterTreatment,
+    });
+    setWaterQuality(wqResult.nextQuality);
+    if (wqResult.moodPenalty !== 0 && visitorStats) {
+      visitorStats = { ...visitorStats, avgMood: Math.max(0, (visitorStats.avgMood || 0) - wqResult.moodPenalty) };
+    }
+    if (wqResult.reputationRisk > 0) {
+      newReputation = Math.max(0, newReputation - wqResult.reputationRisk);
+    }
 
     // --- Social media posts & viral ride boosts ---
     const newSocialPosts = generateSocialPosts({
@@ -785,6 +813,22 @@ const [selectedZone, setSelectedZone] = useState(null);
     });
     if (epEarned > 0) setEmpirePoints((ep) => ep + epEarned);
     setReputation(Math.round(newReputation));
+
+    // --- Competitor parks simulation ---
+    const compResult = simulateCompetitors({
+      competitors: stateRef.current.competitors || createCompetitors(d + 1),
+      playerReputation: Math.round(newReputation),
+      playerAppeal: calculatedAppeal.score,
+      playerGuests: newGuests,
+      day: d + 1,
+      playerLevel: levelFromXp(stateRef.current.xp || 0),
+    });
+    setCompetitors(compResult.updated);
+    setMarketShare(compResult.marketShare);
+    if (compResult.playerGuestLoss > 0) {
+      setLog((l) => [{ day: d + 1, text: `Day ${d + 1}: 🏊 Rivals stole ${compResult.playerGuestLoss} guests! Improve your park to win them back.` }, ...l].slice(0, 12));
+    }
+
     setLastNet(net);
     const staffTotal = Object.values(counts).reduce((s, n) => s + (n || 0), 0);
     const rpEarned = dailyResearchPoints(attractions.length, staffTotal);
@@ -1016,6 +1060,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         setPopularity((p) => [...p, ...Array(action.lots).fill(0)]);
         setPopularityTrend((t) => [...t, ...Array(action.lots).fill(0)]);
         setPrevPopularity((p) => [...p, ...Array(action.lots).fill(0)]);
+        setWaterQuality((wq) => [...wq, ...Array(action.lots).fill(100)]);
         setExpansionsDone((e) => e + 1);
       } else if (action.type === "renovate") {
         setUpgrades((u) => { const n = [...u]; n[action.tileIndex] = MAX_UPGRADE; return n; });
@@ -1205,6 +1250,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setPopularity((p) => [...p, ...Array(EXPAND_ROW).fill(0)]);
     setPopularityTrend((t) => [...t, ...Array(EXPAND_ROW).fill(0)]);
     setPrevPopularity((p) => [...p, ...Array(EXPAND_ROW).fill(0)]);
+    setWaterQuality((wq) => [...wq, ...Array(EXPAND_ROW).fill(100)]);
     if (!sandbox) setMoney((m) => m - cost);
     setExpansionsDone((e) => e + 1);
     trackEvent("park_expanded", { expansions: expansionsDone + 1, cost });
@@ -1420,6 +1466,9 @@ const [selectedZone, setSelectedZone] = useState(null);
         loans,
         returnVisitorMult,
         empirePoints,
+        competitors,
+        marketShare,
+        waterQuality,
         savedAt: new Date().toISOString(),
       };
       writeSlots(slots);
@@ -1490,6 +1539,9 @@ const [selectedZone, setSelectedZone] = useState(null);
     if (data.loans) setLoans(data.loans);
     if (data.returnVisitorMult != null) setReturnVisitorMult(data.returnVisitorMult);
     if (data.empirePoints != null) setEmpirePoints(data.empirePoints);
+    if (data.competitors) setCompetitors(data.competitors);
+    if (data.marketShare != null) setMarketShare(data.marketShare);
+    if (data.waterQuality) setWaterQuality(data.waterQuality);
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
     setLastNet(data.lastNet ?? 0);
     setPlaying(false);
@@ -1578,6 +1630,9 @@ const [selectedZone, setSelectedZone] = useState(null);
     setLoans([]);
     setReturnVisitorMult(1.0);
     setEmpirePoints(0);
+    setCompetitors(createCompetitors(1));
+    setMarketShare(100);
+    setWaterQuality(createInitialWaterQuality(startGrid.length));
     setHotelGuests([]);
     setHotelStats({ roomRevenue: 0, hotelExpenses: 0, parkSpend: 0, occupancy: 0, avgHappiness: 0, totalGuests: 0, totalRooms: 0, guestsByHotel: {} });
     setResortRating(0);
@@ -1685,6 +1740,27 @@ const [selectedZone, setSelectedZone] = useState(null);
     empirePoints,
     empireTier: getEmpireTier(empirePoints),
     resortBonuses: calculateResortBonuses(grid),
+    competitors,
+    marketShare,
+    waterQuality,
+    waterQualityAvg: (() => {
+      const wq = waterQuality || [];
+      let sum = 0, count = 0;
+      for (let i = 0; i < grid.length; i++) {
+        const id = grid[i];
+        if (id && isWaterAttraction(id) && wq[i] != null) { sum += wq[i]; count++; }
+      }
+      return count > 0 ? Math.round(sum / count) : 100;
+    })(),
+    waterQualityCriticalCount: (() => {
+      const wq = waterQuality || [];
+      let count = 0;
+      for (let i = 0; i < grid.length; i++) {
+        const id = grid[i];
+        if (id && isWaterAttraction(id) && wq[i] != null && wq[i] < 20) count++;
+      }
+      return count;
+    })(),
     awardEvaluation: evaluateAwards({
       grid, upgrades, attractionCondition, staff, visitorStats,
       parkAppeal, reputation, incidents, hotelStats, membershipCounts,

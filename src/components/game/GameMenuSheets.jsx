@@ -1,7 +1,7 @@
 import React from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown } from "lucide-react";
+import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets } from "lucide-react";
 import { MISSIONS, missionProgress } from "@/data/missions";
 import BuildPanel from "@/components/game/BuildPanel";
 import ExpansionPanel from "@/components/game/ExpansionPanel";
@@ -27,6 +27,9 @@ import EmergenciesPanel from "@/components/game/EmergenciesPanel";
 import ConstructionPanel from "@/components/game/ConstructionPanel";
 import EconomyPanel from "@/components/game/EconomyPanel";
 import EmpirePanel from "@/components/game/EmpirePanel";
+import CompetitorsPanel from "@/components/game/CompetitorsPanel";
+import WaterQualityPanel from "@/components/game/WaterQualityPanel";
+import { isWaterAttraction } from "@/data/waterQuality";
 import { getHotelDef, hotelRooms, isHotelItem } from "@/data/hotels";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
@@ -204,6 +207,27 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
           level={game.level}
           resortRating={game.resortRating}
           grid={game.grid}
+        />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "competitors"} onOpenChange={(v) => !v && close()} title="Rival Parks" icon={Swords} width="sm:max-w-lg">
+        <CompetitorsPanel
+          competitors={game.competitors}
+          playerReputation={game.reputation}
+          playerAppeal={game.parkAppeal?.score || 50}
+          playerGuests={game.guests}
+          playerLevel={game.level}
+          marketShare={game.marketShare}
+        />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "waterQuality"} onOpenChange={(v) => !v && close()} title="Water Quality" icon={Droplets} width="sm:max-w-md">
+        <WaterQualityPanel
+          grid={game.grid}
+          waterQuality={game.waterQuality}
+          avgQuality={game.waterQualityAvg}
+          criticalCount={game.waterQualityCriticalCount}
+          waterAttractionCount={game.grid.filter((id) => id && isWaterAttraction(id)).length}
         />
       </SheetShell>
     </>
