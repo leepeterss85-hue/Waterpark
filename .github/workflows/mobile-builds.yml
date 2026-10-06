@@ -16,6 +16,7 @@ env:
   CAPACITOR_VERSION: 8.5.2
   APP_ID: com.waterpark.empire
   APP_NAME: Waterpark Empire
+  VITE_BASE44_APP_ID: 6ac25dbb5ee14d464392354b
 
 jobs:
   android:
