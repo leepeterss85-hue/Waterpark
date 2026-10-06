@@ -64,6 +64,19 @@ function normalizeArrayLength(value, length, fillValue) {
   return next;
 }
 
+function isFiniteNumber(value) {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function safeNumber(value, fallback, { min = -Infinity, max = Infinity } = {}) {
+  if (!isFiniteNumber(value)) return fallback;
+  return Math.min(max, Math.max(min, value));
+}
+
+function isValidSavedGrid(value) {
+  return Array.isArray(value) && value.length >= GRID_SIZE && value.length <= MAX_GRID_SIZE;
+}
+
 const DEFAULT_TICKET_PRICE = 28;
 const DEFAULT_AD_BUDGET = 250;
 const DEFAULT_STAFF = Object.fromEntries(Object.keys(STAFF).map((id) => [id, 0]));
@@ -212,11 +225,16 @@ const [selectedZone, setSelectedZone] = useState(null);
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const data = JSON.parse(saved);
-        if (data.money != null) setMoney(data.money);
-        if (data.day != null) setDay(data.day);
-        if (data.reputation != null) setReputation(data.reputation);
-        setGuests(data.guests ?? data.history?.[data.history.length - 1]?.guests ?? 0);
-        if (data.grid) {
+        if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("Invalid save payload");
+        if (data.money != null) setMoney(safeNumber(data.money, INITIAL_MONEY, { min: 0 }));
+        if (data.day != null) setDay(Math.floor(safeNumber(data.day, 1, { min: 1 })));
+        if (data.reputation != null) setReputation(safeNumber(data.reputation, 50, { min: 0, max: 100 }));
+        setGuests(Math.floor(safeNumber(
+          data.guests ?? data.history?.[data.history.length - 1]?.guests,
+          0,
+          { min: 0 }
+        )));
+        if (isValidSavedGrid(data.grid)) {
           const loadedGrid = [...data.grid];
           setGrid(loadedGrid);
           setParkZones(normalizeArrayLength(data.parkZones, loadedGrid.length, null));
@@ -228,6 +246,7 @@ const [selectedZone, setSelectedZone] = useState(null);
           setWaterQuality(normalizeArrayLength(data.waterQuality, loadedGrid.length, 100));
           setRideAges(normalizeArrayLength(data.rideAges, loadedGrid.length, 0));
         } else {
+          // Only fall back for missing/invalid legacy save geometry. Valid parks never enter this path.
           const fallbackGrid = makeStartingGrid();
           setGrid(fallbackGrid);
           setParkZones(makeEmptyZones(fallbackGrid.length));
@@ -250,10 +269,10 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (data.staff) setStaff({ ...DEFAULT_STAFF, ...data.staff });
         if (data.staffAssignments) setStaffAssignments(data.staffAssignments);
         if (data.incidents) setIncidents(data.incidents);
-                if (data.xp != null) setXp(data.xp);
-        if (data.expansionsDone != null) setExpansionsDone(data.expansionsDone);
-        if (data.peakGuests != null) setPeakGuests(data.peakGuests);
-        if (data.totalUpgrades != null) setTotalUpgrades(data.totalUpgrades);
+                if (data.xp != null) setXp(safeNumber(data.xp, 0, { min: 0 }));
+        if (data.expansionsDone != null) setExpansionsDone(Math.floor(safeNumber(data.expansionsDone, 0, { min: 0, max: MAX_EXPANSIONS })));
+        if (data.peakGuests != null) setPeakGuests(Math.floor(safeNumber(data.peakGuests, 0, { min: 0 })));
+        if (data.totalUpgrades != null) setTotalUpgrades(Math.floor(safeNumber(data.totalUpgrades, 0, { min: 0 })));
         if (data.claimedMissions) setClaimedMissions(data.claimedMissions);
         if (data.challenge) setChallenge(data.challenge);
         if (data.lifetimeEarnings != null) setLifetimeEarnings(data.lifetimeEarnings);
@@ -302,8 +321,6 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (data.rewardStreak !== undefined) setRewardStreak(data.rewardStreak);
         setVisitorReviews(data.visitorReviews ?? []);
         setStaffXp(data.staffXp ?? {});
-    setBuiltToday(data.builtToday ?? 0);
-    setUpgradedToday(data.upgradedToday ?? 0);
         setBuiltToday(data.builtToday ?? 0);
         setUpgradedToday(data.upgradedToday ?? 0);
       }
