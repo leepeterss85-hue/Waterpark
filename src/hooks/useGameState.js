@@ -1832,7 +1832,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         attractionCondition, log, lastNet, incidents, upgrades, xp, expansionsDone,
         peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings,
         builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent,
-        ticketPrice, adBudget, priorityPass, researchPoints, completedResearch,
+        ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch,
         parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats,
         resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents,
         membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer,
@@ -1840,7 +1840,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         constructionProjects, loans, returnVisitorMult, empirePoints, competitors,
         marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent,
         dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses,
-        mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp,
+        builtToday, upgradedToday, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp,
       };
       try {
         await base44.functions.invoke("cloudSaves", {
