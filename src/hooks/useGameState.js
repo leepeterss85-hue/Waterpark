@@ -2001,17 +2001,8 @@ const [selectedZone, setSelectedZone] = useState(null);
 
   const sharePark = useCallback(async (parkName, playerName) => {
     const gameData = {
-      money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments,
-      attractionCondition, log, lastNet, incidents, upgrades, xp, expansionsDone,
-      peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings,
-      builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent,
-      ticketPrice, adBudget, priorityPass, researchPoints, completedResearch,
-      parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats,
-      resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents,
-      membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer,
-      awardStats, socialPosts, socialReputation, emergencies, emergencyStats,
-      constructionProjects, loans, returnVisitorMult, empirePoints, competitors,
-      marketShare, waterQuality, visitorReviews, staffXp,
+      ...stateRef.current,
+      level,
     };
     try {
       const res = await base44.functions.invoke("sharePark", {
@@ -2023,7 +2014,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     } catch (e) {
       return null;
     }
-  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, log, lastNet, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, level, visitorReviews, staffXp]);
+  }, [day, reputation, guests, level]);
 
   const viewSharedPark = useCallback(async (shareCode) => {
     try {
