@@ -29,6 +29,10 @@ import { LOAN_TERMS, createLoan, simulateLoans } from "@/data/loans";
 import { EMPIRE_TIERS, getEmpireTier, calculateResortBonuses, calculateEmpirePoints } from "@/data/empire";
 import { createCompetitors, simulateCompetitors } from "@/data/competitors";
 import { createInitialWaterQuality, simulateWaterQuality, isWaterAttraction } from "@/data/waterQuality";
+import { DISTRICTS, unlockedDistricts, checkDistrictLegendary, aggregateDistrictBonuses } from "@/data/districts";
+import { VIP_TYPES, rollVipVisit, evaluateVipVisit, generateVipSocialPost, getVipType } from "@/data/vipGuests";
+import { SEASONAL_EVENTS, getTriggeredCalendarEvent, getUpcomingEvents, calendarDay, getCalendarSeason } from "@/data/seasonalCalendar";
+import { initRideAges, tickRideAges, refurbishRide as refurbishRideAge, refurbishCost, getAgeTier, aggregateAgingUpkeepMult, aggregateAgingAppealMult, MAX_AGE } from "@/data/rideAging";
 import { base44 } from "@/api/base44Client";
 
 const STORAGE_KEY = "waterpark-tycoon-save-v1";
@@ -153,13 +157,17 @@ const [selectedZone, setSelectedZone] = useState(null);
   const [competitors, setCompetitors] = useState(() => createCompetitors(1));
   const [marketShare, setMarketShare] = useState(100);
   const [waterQuality, setWaterQuality] = useState(() => createInitialWaterQuality(GRID_SIZE));
+  const [rideAges, setRideAges] = useState(() => initRideAges(GRID_SIZE));
+  const [vipHistory, setVipHistory] = useState([]);
+  const [claimedLegendary, setClaimedLegendary] = useState([]);
+  const [activeCalendarEvent, setActiveCalendarEvent] = useState(null);
 
   const level = levelFromXp(xp);
   const gridSize = grid.length;
 
   /** @type {import("react").MutableRefObject<Record<string, any>>} */
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, completedResearch, parkAppeal, disaster, sandbox, activeCampaigns, hotelGuests, resortRating, pricing, popularity, popularityTrend, activeEvents, xp, membershipCounts, membershipTimers, membershipStats, peakGuests, totalUpgrades, awards, awardCeremonyTimer, awardStats, awardGuestMult: totalAwardGuestMult(awards), socialPosts, socialReputation, emergencies, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality };
+  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, completedResearch, parkAppeal, disaster, sandbox, activeCampaigns, hotelGuests, resortRating, pricing, popularity, popularityTrend, activeEvents, xp, membershipCounts, membershipTimers, membershipStats, peakGuests, totalUpgrades, awards, awardCeremonyTimer, awardStats, awardGuestMult: totalAwardGuestMult(awards), socialPosts, socialReputation, emergencies, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent };
 
   // Load saved game
   useEffect(() => {
@@ -226,6 +234,10 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (data.competitors) setCompetitors(data.competitors);
         if (data.marketShare != null) setMarketShare(data.marketShare);
         if (data.waterQuality) setWaterQuality(data.waterQuality);
+        if (data.rideAges) setRideAges(data.rideAges);
+        if (data.vipHistory) setVipHistory(data.vipHistory);
+        if (data.claimedLegendary) setClaimedLegendary(data.claimedLegendary);
+        if (data.activeCalendarEvent) setActiveCalendarEvent(data.activeCalendarEvent);
       }
     } catch {
       /* ignore */
@@ -238,14 +250,14 @@ const [selectedZone, setSelectedZone] = useState(null);
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints })
+          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, rideAges, vipHistory, claimedLegendary, activeCalendarEvent })
         );
       } catch {
         /* ignore */
       }
     }, 300);
     return () => clearTimeout(t);
-  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, popularity, popularityTrend, prevPopularity, activeEvents, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality]);
+  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, popularity, popularityTrend, prevPopularity, activeEvents, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent]);
 
   // Load save slots list on mount
   useEffect(() => {
@@ -280,7 +292,11 @@ const [selectedZone, setSelectedZone] = useState(null);
     const constructionDisruption = getConstructionDisruption(stateRef.current.constructionProjects);
     eff.guestMult = (eff.guestMult ?? 1) * constructionDisruption.guestMult;
     eff.repDelta = (eff.repDelta ?? 0) + constructionDisruption.repPerDay;
+    // Apply district bonuses
+    eff.guestMult = (eff.guestMult ?? 1) * districtBonuses.guestMult;
+    eff.incomeMult = (eff.incomeMult ?? 1) * districtBonuses.incomeMult;
     const calculatedAppeal = calculateParkAppeal({ grid: prevGrid, zones: currentZones, getItem: getParkItem });
+    calculatedAppeal.score = Math.round(calculatedAppeal.score * agingAppealMult);
     setParkAppeal(calculatedAppeal);
     const appealDemandMult = 0.85 + (calculatedAppeal.score / 100) * 0.30;
     const campaignGuestMult = currentCampaigns.reduce((sum, c) => sum + (c.effectiveBoost || 0), 1);
@@ -337,6 +353,16 @@ const [selectedZone, setSelectedZone] = useState(null);
     // Empire tier and resort-wide bonuses
     const empireTier = getEmpireTier(stateRef.current.empirePoints || 0);
     const resortBonuses = calculateResortBonuses(prevGrid);
+
+    // District bonuses from themed zones
+    const activeDistrictIds = [...new Set((currentZones || []).filter((z) => z && DISTRICTS.some((d) => d.id === z)))];
+    const districtBonuses = aggregateDistrictBonuses(activeDistrictIds, prevGrid, currentZones);
+
+    // Ride aging: tick ages and compute upkeep/appeal multipliers
+    const currentRideAges = stateRef.current.rideAges || initRideAges(prevGrid.length);
+    const nextRideAges = tickRideAges(currentRideAges, prevGrid);
+    const agingUpkeepMult = aggregateAgingUpkeepMult(currentRideAges, prevGrid);
+    const agingAppealMult = aggregateAgingAppealMult(currentRideAges, prevGrid);
 
     // --- Resolve active incidents: staff improve the odds of a fix ---
     const mechPower = Math.min(0.9, 0.3 + (counts.mechanic || 0) * 0.2);
@@ -614,7 +640,7 @@ const [selectedZone, setSelectedZone] = useState(null);
           incomeMult: eff.incomeMult ?? 1,
           entertainment,
           facilityBonus,
-          appealBonus: (calculatedAppeal.score - 50) * 0.025 + empireTier.bonuses.satisfaction * 10 + resortBonuses.moodBoost,
+          appealBonus: (calculatedAppeal.score - 50) * 0.025 + empireTier.bonuses.satisfaction * 10 + resortBonuses.moodBoost + districtBonuses.moodBoost,
           pricing: stateRef.current.pricing || DEFAULT_PRICING,
           weather: dayWeather,
           seasonEvent: currentSeasonEvent,
@@ -726,7 +752,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     );
     const diffUpkeepMult = getDifficulty(getSettings().difficulty).upkeepMult;
     const expenses =
-      (placedItems.filter((p) => p.attr.category !== "hotel").reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) * upkeepResearchMult +
+      (placedItems.filter((p) => p.attr.category !== "hotel").reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) * upkeepResearchMult * agingUpkeepMult +
       wages * (eff.wageMult ?? 1) * (1 - (fx.wageReduction || 0)) +
       utilities +
       currentAdBudget +
@@ -799,6 +825,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setDay((x) => x + 1);
     setWeather(dayWeather);
     setForecast(dayForecast);
+    setRideAges(nextRideAges);
     const totalGuestsToday = newGuests + (membershipResult?.memberVisits || 0);
     setGuests(totalGuestsToday);
     setPeakGuests((p) => Math.max(p, totalGuestsToday));
@@ -911,31 +938,43 @@ const [selectedZone, setSelectedZone] = useState(null);
       setLog((l) => [...challengeEntries, ...l].slice(0, 12));
     }
 
-    // --- VIP guest visit: resolve an active visit, or occasionally spawn one ---
+    // --- VIP celebrity visit: resolve an active visit, or occasionally spawn one ---
     const vipEntries = [];
     if (currentVipVisit) {
-      const mood = visitorStats?.avgMood || 0;
-      const score = mood * 0.5 + cleanliness * 25 + safety * 25;
-      if (score >= 65) {
-        const reward = Math.round(2000 + score * 30);
-        setMoney((m) => m + reward);
-        setReputation((rv) => Math.max(0, Math.min(100, rv + 3)));
-        vipEntries.push({ day: d + 1, text: `Day ${d + 1}: ⭐ VIP ${currentVipVisit.name} was impressed! +$${reward.toLocaleString()} and +3 reputation.` });
-      } else if (score >= 40) {
-        vipEntries.push({ day: d + 1, text: `Day ${d + 1}: ⭐ VIP ${currentVipVisit.name} had a decent visit.` });
-      } else {
-        setReputation((rv) => Math.max(0, Math.min(100, rv - 2)));
-        vipEntries.push({ day: d + 1, text: `Day ${d + 1}: ⭐ VIP ${currentVipVisit.name} left disappointed. -2 reputation.` });
+      const outcome = evaluateVipVisit(currentVipVisit, {
+        avgMood: visitorStats?.avgMood || 0,
+        cleanliness,
+        safety,
+        reputation: Math.round(newReputation),
+      });
+      if (outcome.money > 0) setMoney((m) => m + outcome.money);
+      if (outcome.reputation !== 0) setReputation((rv) => Math.max(0, Math.min(100, rv + outcome.reputation)));
+      vipEntries.push({ day: d + 1, text: `Day ${d + 1}: ⭐ ${currentVipVisit.typeName} ${currentVipVisit.name} visited. ${outcome.message}` });
+      // Track history
+      setVipHistory((h) => [{ name: currentVipVisit.name, typeId: currentVipVisit.typeId, typeName: currentVipVisit.typeName, day: d + 1, outcome: outcome.outcome }, ...h].slice(0, 20));
+      // Generate VIP social post
+      if (outcome.socialBoost || outcome.outcome === "disappointed") {
+        const vipPost = generateVipSocialPost(currentVipVisit, outcome, d + 1);
+        setSocialPosts((sp) => [vipPost, ...sp].slice(0, 30));
       }
       setVipVisit(null);
-    } else if (attractions.length > 0 && d + 1 >= 5 && Math.random() < 0.08) {
-      const vipNames = ["Ambassador Rivera", "Celebrity Chen", "Mayor Okafor", "Travel Blogger Sam", "Influencer Priya"];
-      const name = vipNames[Math.floor(Math.random() * vipNames.length)];
-      setVipVisit({ name, day: d + 1 });
-      vipEntries.push({ day: d + 1, text: `Day ${d + 1}: ⭐ A VIP guest arrived — ${name}! Impress them for a big reward.` });
+    } else if (attractions.length > 0 && d + 1 >= 5 && Math.random() < 0.10) {
+      const newVip = rollVipVisit(levelFromXp(stateRef.current.xp || 0));
+      if (newVip) {
+        newVip.day = d + 1;
+        setVipVisit(newVip);
+        vipEntries.push({ day: d + 1, text: `Day ${d + 1}: ⭐ A ${newVip.typeName} arrived — ${newVip.name}! Impress them for a big reward.` });
+      }
     }
     if (vipEntries.length) {
       setLog((l) => [...vipEntries, ...l].slice(0, 12));
+    }
+
+    // --- Seasonal calendar events: auto-trigger on specific days ---
+    const calendarEvent = getTriggeredCalendarEvent(d + 1);
+    if (calendarEvent) {
+      setActiveCalendarEvent({ ...calendarEvent, daysLeft: calendarEvent.duration });
+      setLog((l) => [{ day: d + 1, text: `Day ${d + 1}: 📅 ${calendarEvent.decoration} ${calendarEvent.name}! ${calendarEvent.desc}` }, ...l].slice(0, 12));
     }
 
     // --- Tick active marketing campaigns ---
