@@ -1,0 +1,302 @@
+/* === Comprehensive Graphics Enhancement === */
+/* Upgrades: water realism, ride depth, scenery richness, guest prominence, atmosphere */
+
+/* --- 1. Enhanced water surfaces: deeper gradients, richer caustics, better reflections --- */
+.pool-water-surface [fill^="url"] {
+  filter: saturate(1.15) brightness(1.03);
+}
+.water-caustic-soft { stroke-width: 3; opacity: .85; }
+.water-caustic-fine { stroke-width: .8; opacity: .55; }
+.water-caustic-drift { animation: water-caustic-drift 10s linear infinite; }
+.water-reflection-soft { stroke-width: 5; opacity: .8; }
+.water-reflection-bright { stroke-width: 1.2; opacity: .9; }
+.water-reflections { animation: water-reflection-shimmer 4s ease-in-out infinite; }
+.water-surface-ripples { stroke-width: .8; opacity: .55; }
+.water-pool-wall { stroke-width: 4; opacity: .65; }
+
+/* --- 2. Enhanced ride structures: deeper shadows, brighter highlights, 3D depth --- */
+.ride-slide-shadow { stroke-width: 13; opacity: .35; filter: blur(.5px); }
+.ride-water-slide { stroke-width: 9; filter: saturate(1.12); }
+.ride-slide-highlight { stroke-width: 2; opacity: .8; }
+.ride-tower-leg { stroke-width: 3.5; filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.3)); }
+.pool-tower { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)); }
+.scene-bowl-rim { stroke-width: 4; filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.25)); }
+.scene-bowl-water { filter: saturate(1.2) brightness(1.05); }
+.scene-halfpipe { stroke-width: 4; filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.25)); }
+.scene-slide-stairs { stroke-width: 2.5; opacity: .8; }
+.scene-slide-support { stroke-width: 2.5; opacity: .75; }
+.ride-loop-ring { stroke-width: 8; filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.25)); }
+.ride-bowl-ring { stroke-width: 6; filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)); }
+.ride-river-rim { stroke-width: 20; filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.15)); }
+.ride-river-water { stroke-width: 13; filter: saturate(1.15); }
+.ride-river-glint { stroke-width: 1.2; opacity: .7; }
+.ride-river-island { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)); }
+
+/* --- 3. Enhanced scenery: richer palms, better shadows, more detail --- */
+.scene-leaves { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.18)) saturate(1.1); }
+.scene-trunk { stroke-width: 5; opacity: .9; }
+.scenery-shadow { fill: hsl(var(--park-ink)/.18); filter: blur(.5px); }
+.pool-palm-leaf { filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.15)) saturate(1.12); }
+.pool-palm-trunk { stroke-width: 9; opacity: .95; }
+.pool-chair { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.18)); }
+.pool-parasol { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.18)) saturate(1.1); }
+.scene-wood { filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.15)); }
+.scene-metal { opacity: .85; }
+
+/* --- 4. Enhanced facility buildings: better depth, shadows, roof detail --- */
+.scene-wall, .scene-porcelain { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.15)); }
+.scene-side-wall { filter: brightness(.92); }
+.scene-building-shadow { fill: hsl(var(--park-ink)/.25); }
+.scene-service-roof, .scene-roof-gold, .scene-canopy { filter: drop-shadow(0 2px 1px hsl(var(--park-ink)/.2)) saturate(1.1); }
+.scene-roof-blue, .scene-sign-board-blue, .scene-play-mat { filter: saturate(1.1); }
+.scene-roof-coral { filter: saturate(1.15) drop-shadow(0 2px 1px hsl(var(--park-ink)/.2)); }
+.scene-awning { stroke-dasharray: 8 5; filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.15)); }
+.scene-bunting { filter: saturate(1.15); }
+.scene-sign { font-weight: 800; }
+.scene-dark-sign { font-weight: 900; }
+.scene-toilet-bowl, .scene-glass, .scene-water, .scene-photo { filter: saturate(1.12); }
+.scene-locker { filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.15)); }
+
+/* --- 5. Enhanced water features: fountains, jets, sprays --- */
+.scene-water-jet { stroke-width: 3.5; opacity: .85; filter: drop-shadow(0 0 2px hsl(var(--park-water)/.5)); }
+.scene-spray-base { filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.2)); }
+.scene-splash-arch { stroke-width: 6; opacity: .9; filter: drop-shadow(0 1px 2px hsl(var(--park-water)/.3)); }
+.ride-fountain { stroke-width: 2.5; opacity: .85; }
+.scene-wave-machine { filter: drop-shadow(0 2px 1px hsl(var(--park-ink)/.2)); }
+.ride-wave-line { stroke-width: 2.5; opacity: .85; }
+.ride-water-glint { stroke-width: 1.5; opacity: .75; }
+.ride-surf-wave { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)) saturate(1.1); }
+.scene-surfboard { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)); }
+.scene-mushroom { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)) saturate(1.12); }
+.scene-mushroom-stem { stroke-width: 6; opacity: .9; }
+.scene-tipping-bucket { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)); }
+.scene-scoop { filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.2)); }
+
+/* --- 6. Enhanced thrill ride features --- */
+.scene-cliff-rock { filter: drop-shadow(0 3px 3px hsl(var(--park-ink)/.25)) saturate(1.05); }
+.scene-cliff-top { filter: brightness(1.08); }
+.scene-cliff-texture { stroke-width: 1.2; opacity: .8; }
+.scene-zip-cable { stroke-width: 2; opacity: .85; }
+.scene-zip-pulley { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)); }
+.scene-zip-support { stroke-width: 2; opacity: .8; }
+.scene-battle-boat { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)) saturate(1.1); }
+.scene-cannon { stroke-width: 3; opacity: .85; }
+.scene-cannon-base { filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.2)); }
+.scene-boat-detail { opacity: .8; }
+.scene-spin-flow { stroke-width: 3; opacity: .75; }
+.scene-spin-raft { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)) saturate(1.1); }
+
+/* --- 7. Enhanced food & retail detail --- */
+.scene-bar-counter { filter: drop-shadow(0 2px 1px hsl(var(--park-ink)/.18)); }
+.scene-bar-stool { filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.15)); }
+.scene-bottle { filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.15)) saturate(1.1); }
+.scene-grill { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)); }
+.scene-flame { filter: drop-shadow(0 0 3px hsl(var(--park-slide)/.5)) saturate(1.2); }
+.scene-burger-bun { filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.15)) saturate(1.08); }
+.scene-burger-patty { filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.15)); }
+.scene-blender { filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.15)); }
+.scene-smoothie-cup { filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.15)) saturate(1.12); }
+.scene-pizza-oven { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)); }
+.scene-pizza { filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.15)) saturate(1.1); }
+.scene-pepperoni { filter: saturate(1.15); }
+.scene-clothing-rack { opacity: .8; }
+.scene-swimsuit { filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.12)) saturate(1.1); }
+.scene-atm-body { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)); }
+.scene-atm-screen { filter: saturate(1.15) brightness(1.1); }
+.scene-cash { filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.15)) saturate(1.1); }
+
+/* --- 8. Enhanced wellness features --- */
+.scene-massage-table { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.15)); }
+.scene-towel-fold { filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.12)) saturate(1.08); }
+.scene-sauna-rock { filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.15)); }
+.scene-sand { opacity: .55; }
+.scene-lounger { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.15)); }
+.scene-lounger-leg { opacity: .85; }
+.scene-float-pod { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)); }
+.scene-float-lid { opacity: .85; }
+.scene-steam { stroke-width: 2.5; opacity: .7; }
+.scene-jet { stroke-width: 2.5; opacity: .8; }
+
+/* --- 9. Enhanced guest sprites: more prominent, better shadows, richer color --- */
+.park-pedestrian > .park-person { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.35)) saturate(1.15); }
+.ride-visitors .park-person { filter: drop-shadow(0 1.5px 1.5px hsl(var(--park-ink)/.4)) saturate(1.2); }
+.person-shirt, .person-cap { filter: saturate(1.12); }
+.person-shorts { filter: saturate(1.1); }
+.person-float { stroke-width: 8; opacity: .95; }
+.person-float-highlight { stroke-width: 1.5; opacity: .9; }
+.person-shadow { fill: hsl(var(--park-ink)/.28); filter: blur(.3px); }
+.person-ripple { stroke-width: 1.5; opacity: .95; }
+.ride-visitor-splash { stroke-width: 2; opacity: .8; filter: drop-shadow(0 0 2px hsl(var(--park-rim)/.4)); }
+.ride-swimmer { animation: person-swim 3s ease-in-out infinite alternate; }
+.person-swim-stroke { animation: person-stroke 1s ease-in-out infinite alternate; }
+
+/* --- 10. Enhanced map terrain: richer ground, better grid tiles --- */
+.aquatic-map .game-map-surface {
+  background:
+    radial-gradient(ellipse at 10% 8%, hsl(var(--park-rim)/.65) 0 1.5%, transparent 3%),
+    radial-gradient(ellipse at 90% 92%, hsl(var(--park-rim)/.6) 0 1.5%, transparent 3%),
+    radial-gradient(ellipse at 50% 50%, hsl(var(--park-water)/.08) 0 15%, transparent 30%),
+    repeating-linear-gradient(0deg, transparent 0 28px, hsl(var(--park-edge)/.14) 28px 29px),
+    repeating-linear-gradient(90deg, transparent 0 28px, hsl(var(--park-edge)/.14) 28px 29px),
+    linear-gradient(145deg, hsl(var(--park-deck)) 0%, hsl(42 58% 85%) 55%, hsl(38 52% 81%) 100%) !important;
+  box-shadow: inset 0 0 0 2px hsl(var(--park-rim)/.75), inset 0 0 30px hsl(var(--park-water)/.2), 0 8px 24px hsl(var(--park-ink)/.16) !important;
+}
+.aquatic-map .game-map-surface::before {
+  background:
+    radial-gradient(circle at 18% 28%, hsl(var(--park-water)/.28) 0 6%, transparent 7%),
+    radial-gradient(circle at 78% 68%, hsl(var(--park-water)/.25) 0 5%, transparent 6%),
+    radial-gradient(circle at 48% 88%, hsl(var(--park-water)/.22) 0 4%, transparent 5%),
+    radial-gradient(circle at 35% 55%, hsl(var(--park-green)/.12) 0 3%, transparent 4%);
+  opacity: .85;
+}
+.aquatic-map .game-map-grid > button[data-kind="empty"]:not(:has(.ride-art)):not(:has(.facility-art)):not(:has(.park-entrance-art)):not(:has(.service-road)):not(:has(.queue-rail)) {
+  background: linear-gradient(145deg, hsl(var(--park-deck)/.9), hsl(42 50% 82%/.75)) !important;
+  box-shadow: inset 0 1px 0 hsl(var(--park-rim)/.6), inset 0 -2px 5px hsl(var(--park-edge)/.22), 0 1px 2px hsl(var(--park-ink)/.08) !important;
+}
+.aquatic-map .game-map-grid > button[data-kind="attraction"] {
+  box-shadow: 0 4px 7px hsl(var(--park-ink)/.2), inset 0 1px 0 hsl(var(--park-rim)/.4) !important;
+}
+.aquatic-map .aquatic-ride-art {
+  filter: drop-shadow(0 3px 3px hsl(var(--park-ink)/.22)) saturate(1.08) !important;
+}
+.aquatic-map .park-facility-art {
+  filter: drop-shadow(0 3px 3px hsl(var(--park-ink)/.2)) saturate(1.06) !important;
+}
+
+/* --- 11. Enhanced entrance arch --- */
+.scene-entrance-arch { filter: drop-shadow(0 3px 3px hsl(var(--park-ink)/.25)) saturate(1.1); }
+.scene-entrance-opening { filter: brightness(.85); }
+.scene-ticket-gate { stroke-width: 4; opacity: .9; }
+
+/* --- 12. Enhanced paths and queues --- */
+.scene-path-rim { stroke-width: 38; opacity: .95; }
+.scene-guest-path { stroke-width: 31; opacity: .9; }
+.scene-path-pavers { stroke-width: 30; opacity: .5; }
+.scene-service-road { stroke-width: 35; opacity: .9; }
+.scene-road-marking { stroke-width: 2.5; opacity: .85; }
+.scene-queue-rope { stroke-width: 3; opacity: .9; }
+.scene-queue-post { filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.2)); }
+
+/* --- 13. Enhanced play structure & kiddie features --- */
+.scene-play-tower { filter: drop-shadow(0 3px 2px hsl(var(--park-ink)/.2)) saturate(1.1); }
+.scene-play-ladder { stroke-width: 2.5; opacity: .85; }
+.scene-obstacle { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)) saturate(1.05); }
+.scene-obstacle-rail { stroke-width: 2.5; opacity: .8; }
+.scene-balance-rope { stroke-width: 2.5; opacity: .75; }
+.scene-play-ball { filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.15)) saturate(1.15); }
+.scene-balloon { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.15)) saturate(1.2); }
+.scene-balloon-string { opacity: .7; }
+.scene-cake { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.15)) saturate(1.1); }
+
+/* --- 14. Enhanced gym & arcade details --- */
+.scene-gym-weight { stroke-width: 3.5; opacity: .85; }
+.scene-treadmill { stroke-width: 3.5; opacity: .85; }
+.scene-arcade-controls { opacity: .8; }
+.scene-arcade-cabinet { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)); }
+.scene-arcade-screen { filter: saturate(1.2) brightness(1.1); }
+.scene-camera { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)); }
+.scene-camera-lens { filter: saturate(1.15); }
+
+/* --- 15. Enhanced safety features --- */
+.scene-life-ring { stroke-width: 6; opacity: .95; filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.15)); }
+.scene-safety-flag { filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.15)) saturate(1.1); }
+.scene-lifeguard-seat { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)); }
+.scene-lifeguard-legs { stroke-width: 5; opacity: .85; }
+.scene-cabana-post { stroke-width: 5; opacity: .85; }
+.scene-sofa { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.15)) saturate(1.08); }
+.scene-towel-rack { stroke-width: 5; opacity: .85; }
+.scene-gem { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.15)) saturate(1.15); }
+.scene-gem-pan { filter: drop-shadow(0 2px 1px hsl(var(--park-ink)/.15)); }
+
+/* --- 16. Enhanced pool deck & ladder detail --- */
+.pool-deck-fill { filter: saturate(1.05); }
+.pool-paver { stroke-width: .8; opacity: .8; }
+.pool-ladder { stroke-width: 3; opacity: .9; }
+.pool-swim-lane { stroke-width: 2.5; opacity: .85; }
+.pool-tower-rail { stroke-width: 2.5; opacity: .85; }
+.pool-slide-shadow { stroke-width: 22; opacity: .4; filter: blur(.8px); }
+.pool-scenic-slide { stroke-width: 17; filter: saturate(1.12); }
+.pool-slide-highlight { stroke-width: 4; opacity: .85; }
+.pool-float-coral, .pool-float-gold { filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.15)) saturate(1.12); }
+.pool-splash-wave { stroke-width: 4; opacity: .9; }
+.pool-splash-drop { filter: drop-shadow(0 0 2px hsl(var(--park-rim)/.5)); }
+.pool-splash { animation: pool-spray 1.5s ease-in-out infinite; }
+.pool-chair-stripe { stroke-width: 3.5; opacity: .85; }
+.pool-parasol-rib { stroke-width: 2.5; opacity: .8; }
+
+/* --- 17. Enhanced tile base & plot deck --- */
+.scene-plot-deck { filter: saturate(1.04); }
+.park-item-artwork { filter: saturate(1.05); }
+
+/* --- 18. Faster, more lively animations --- */
+@keyframes water-caustic-drift { to { transform: translate(28px, 22px); } }
+@keyframes water-reflection-shimmer { 0%,100% { opacity: .7; } 50% { opacity: 1; } }
+@keyframes pool-spray { 0%,100% { transform: translateY(1px); opacity: .6; } 50% { transform: translateY(-5px); opacity: 1; } }
+@keyframes person-swim { from { transform: translateX(-4px); } to { transform: translateX(5px); } }
+@keyframes person-stroke { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
+@keyframes ride-splash-ring { 0%,100% { opacity: .35; transform: scale(.85); } 50% { opacity: .9; transform: scale(1.15); } }
+
+/* --- 19. Enhanced hotel artwork: richer depth, glowing windows, better shadows --- */
+.hotel-art-luxury { filter: drop-shadow(0 4px 5px hsl(var(--park-ink)/.22)) saturate(1.1); }
+.hotel-tower-body { filter: saturate(1.12) brightness(1.03); box-shadow: inset 0 2px 0 hsl(var(--park-rim)/.4), 0 5px 7px hsl(var(--park-ink)/.22) !important; }
+.hotel-tower-spire { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)); }
+.hotel-window-luxury { box-shadow: 0 0 4px hsl(255 247 190 / .6), inset 0 0 2px hsl(255 247 190 / .8) !important; filter: saturate(1.15); }
+.hotel-canopy { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)) saturate(1.1); }
+.hotel-door-luxury { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.25)); }
+.hotel-pool-luxury { box-shadow: inset 0 2px 5px hsl(var(--park-rim)/.5), 0 2px 3px hsl(var(--park-ink)/.15) !important; filter: saturate(1.15); }
+.hotel-spa-wing { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.15)) saturate(1.1); }
+
+.hotel-art-family { filter: drop-shadow(0 4px 5px hsl(var(--park-ink)/.2)) saturate(1.08); }
+.hotel-roof-family { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)) saturate(1.12); }
+.hotel-body-family { filter: saturate(1.1) brightness(1.03); box-shadow: 0 4px 6px hsl(var(--park-ink)/.18) !important; }
+.hotel-window-family { box-shadow: 0 0 3px hsl(255 247 190 / .5) !important; filter: saturate(1.1); }
+.hotel-door-family { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)); }
+.hotel-pool-family { box-shadow: inset 0 2px 4px hsl(var(--park-rim)/.45), 0 2px 3px hsl(var(--park-ink)/.12) !important; filter: saturate(1.12); }
+.hotel-kids-club { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.15)) saturate(1.12); }
+
+.hotel-art-budget { filter: drop-shadow(0 3px 4px hsl(var(--park-ink)/.18)) saturate(1.05); }
+.hotel-roof-budget { filter: drop-shadow(0 2px 1px hsl(var(--park-ink)/.18)) saturate(1.08); }
+.hotel-body-budget { filter: saturate(1.06) brightness(1.02); box-shadow: 0 3px 5px hsl(var(--park-ink)/.15) !important; }
+.hotel-window-budget { box-shadow: 0 0 2px hsl(255 247 190 / .4) !important; }
+.hotel-door-budget { filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.15)); }
+.hotel-sign-budget { filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.12)); }
+.hotel-pool-budget { box-shadow: inset 0 1px 3px hsl(var(--park-rim)/.4), 0 1px 2px hsl(var(--park-ink)/.1) !important; filter: saturate(1.1); }
+.hotel-occupancy-badge { filter: drop-shadow(0 1px 2px hsl(var(--park-ink)/.3)); }
+
+/* --- 20. Enhanced park atmosphere: richer ambient lighting, deeper sky tints --- */
+.park-atmosphere { transition: background .5s ease; }
+.park-sun { box-shadow: 0 0 0 8px hsl(255 236 120 / .18), 0 0 35px hsl(255 225 90 / .6) !important; }
+.park-time-sunset .park-sun { box-shadow: 0 0 0 8px hsl(255 150 60 / .18), 0 0 35px hsl(255 120 50 / .55) !important; }
+.park-time-night .park-atmosphere { background: linear-gradient(180deg, hsl(12 27 55 / .48), hsl(4 18 36 / .18)) !important; }
+.park-time-night .park-sun { box-shadow: 0 0 0 6px hsl(200 220 255 / .1), 0 0 22px hsl(190 215 255 / .35) !important; }
+.park-cloud { filter: blur(.3px); opacity: .4; }
+
+/* --- 21. Enhanced expansion themes: richer district tints --- */
+.park-expansion-theme-family:not(:has(.facility-art)):not(:has(.ride-art)) { background: linear-gradient(135deg, hsl(254 240 138 / .35), hsl(187 247 208 / .28)) !important; }
+.park-expansion-theme-thrill:not(:has(.facility-art)):not(:has(.ride-art)) { background: linear-gradient(135deg, hsl(254 205 211 / .32), hsl(254 215 170 / .28)) !important; }
+.park-expansion-theme-resort:not(:has(.facility-art)):not(:has(.ride-art)) { background: linear-gradient(135deg, hsl(221 214 254 / .35), hsl(167 243 208 / .25)) !important; }
+.park-expansion-theme-extreme:not(:has(.facility-art)):not(:has(.ride-art)) { background: linear-gradient(135deg, hsl(254 215 170 / .35), hsl(254 202 202 / .28)) !important; }
+.park-expansion-theme-vip:not(:has(.facility-art)):not(:has(.ride-art)) { background: linear-gradient(135deg, hsl(233 213 255 / .38), hsl(219 234 254 / .32)) !important; }
+.park-expansion-theme-grand:not(:has(.facility-art)):not(:has(.ride-art)) { background: linear-gradient(135deg, hsl(207 250 254 / .38), hsl(224 231 255 / .34)) !important; }
+
+/* --- 22. Enhanced night swim lights: brighter, more visible glow --- */
+.night-swim-lights i { box-shadow: 0 0 12px 4px hsl(103 232 249 / .85) !important; }
+.expansion-decor { opacity: .85; }
+.expansion-decor > span { text-shadow: 0 2px 6px hsl(15 23 42 / .25), 0 0 2px hsl(255 255 255 / .6) !important; }
+
+/* --- 23. Enhanced crowd indicators --- */
+.ride-crowd-heavy { box-shadow: 0 0 0 2px hsl(251 146 60 / .6), 0 0 14px hsl(251 146 60 / .4) !important; }
+.ride-crowd-dots i { filter: drop-shadow(0 0 2px hsl(251 146 60 / .5)); }
+
+/* --- 24. Enhanced ride splash overlay --- */
+.ride-splash-overlay i { box-shadow: 0 0 4px hsl(255 255 255 / .7) !important; }
+
+/* --- 25. Enhanced board frame & titlebar depth --- */
+.game-board-shell { box-shadow: 0 24px 65px hsl(21 61 42 / .3), 0 6px 16px hsl(15 23 42 / .12), inset 0 1px 0 hsl(255 255 255 / .18) !important; }
+.game-board-titlebar { box-shadow: inset 0 -2px 0 hsl(255 255 255 / .1), 0 2px 8px hsl(15 23 42 / .15) !important; }
+.game-board-frame { box-shadow: inset 0 0 0 1px hsl(255 255 255 / .25), inset 0 2px 8px hsl(15 23 42 / .08) !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .water-caustic-drift, .water-reflections, .pool-splash, .ride-swimmer,
+  .person-swim-stroke, .ride-visitor-splash { animation: none !important; }
+}

@@ -3,6 +3,7 @@ import WaterRideArtwork from "@/components/game/WaterRideArtwork";
 import FacilityArtwork from "@/components/game/FacilityArtwork";
 import ParkObjectArtwork from "@/components/game/ParkObjectArtwork";
 import HotelArtwork from "@/components/game/HotelArtwork";
+import "@/components/game/graphicsEnhance.css";
 
 export default function ParkItemArtwork({ attr, grid, index, upgradeLevel = 0 }) {
   return <div className="park-item-artwork" role="img" aria-label={attr.name} data-artwork={attr.id}>
