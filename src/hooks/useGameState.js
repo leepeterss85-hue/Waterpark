@@ -245,6 +245,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (data.ticketPrice != null) setTicketPrice(data.ticketPrice);
         if (data.adBudget != null) setAdBudget(data.adBudget);
         if (data.priorityPass != null) setPriorityPass(data.priorityPass);
+        if (data.vipVisit !== undefined) setVipVisit(data.vipVisit);
         if (data.history) setHistory(data.history);
         if (data.staff) setStaff({ ...DEFAULT_STAFF, ...data.staff });
         if (data.staffAssignments) setStaffAssignments(data.staffAssignments);
@@ -301,6 +302,10 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (data.rewardStreak !== undefined) setRewardStreak(data.rewardStreak);
         setVisitorReviews(data.visitorReviews ?? []);
         setStaffXp(data.staffXp ?? {});
+    setBuiltToday(data.builtToday ?? 0);
+    setUpgradedToday(data.upgradedToday ?? 0);
+        setBuiltToday(data.builtToday ?? 0);
+        setUpgradedToday(data.upgradedToday ?? 0);
       }
     } catch {
       /* ignore */
@@ -1694,8 +1699,9 @@ const [selectedZone, setSelectedZone] = useState(null);
       if (money < cost) return;
       setMoney((m) => m - cost);
       setRideAges((ra) => {
-        const next = { ...ra };
-        delete next[tileIndex];
+        const next = Array.isArray(ra) ? [...ra] : [];
+        while (next.length < grid.length) next.push(0);
+        next[tileIndex] = 0;
         return next;
       });
       setLog((l) => [{ day, text: `Day ${day}: 🔧 Refurbished ${def.name} for $${cost.toLocaleString()}.` }, ...l].slice(0, 12));
@@ -1758,6 +1764,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         ticketPrice,
         adBudget,
         priorityPass,
+        vipVisit,
         researchPoints,
         completedResearch,
         parkAppeal,
@@ -1799,6 +1806,8 @@ const [selectedZone, setSelectedZone] = useState(null);
         activeTheme,
         prestigeCount,
         synergyBonuses,
+        builtToday,
+        upgradedToday,
         mascot,
         lastRewardDay,
         rewardStreak,
@@ -1851,8 +1860,9 @@ const [selectedZone, setSelectedZone] = useState(null);
     setDay(data.day ?? 1);
     setReputation(data.reputation ?? 50);
     setGuests(data.guests ?? 0);
-    setGrid(data.grid ?? makeStartingGrid());
-    setParkZones(data.parkZones ?? makeEmptyZones((data.grid ?? makeStartingGrid()).length));
+    const loadedGrid = Array.isArray(data.grid) && data.grid.length ? data.grid : makeStartingGrid();
+    setGrid(loadedGrid);
+    setParkZones(normalizeArrayLength(data.parkZones, loadedGrid.length, null));
     if (data.weather) setWeather(data.weather);
     if (data.forecast) setForecast(data.forecast);
     if (data.seasonEvent) setSeasonEvent(data.seasonEvent);
@@ -1863,8 +1873,8 @@ const [selectedZone, setSelectedZone] = useState(null);
     setStaff({ ...DEFAULT_STAFF, ...(data.staff || {}) });
     setStaffAssignments(data.staffAssignments || {});
     setIncidents(data.incidents ?? []);
-    setAttractionCondition(data.attractionCondition ?? Array((data.grid ?? makeStartingGrid()).length).fill(100));
-    setUpgrades(data.upgrades ?? Array(GRID_SIZE).fill(0));
+    setAttractionCondition(normalizeArrayLength(data.attractionCondition, loadedGrid.length, 100));
+    setUpgrades(normalizeArrayLength(data.upgrades, loadedGrid.length, 0));
     setXp(data.xp ?? 0);
     setExpansionsDone(data.expansionsDone ?? 0);
     setPeakGuests(data.peakGuests ?? 0);
@@ -1875,6 +1885,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setBuiltAttractionIds(data.builtAttractionIds ?? []);
     setVisitorStats(data.visitorStats ?? { avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {}, guestTypes: {} });
     setFeedback(data.feedback ?? []);
+    setVipVisit(data.vipVisit ?? null);
     setResearchPoints(data.researchPoints ?? 0);
     setCompletedResearch(data.completedResearch ?? []);
     setParkAppeal(data.parkAppeal ?? calculateParkAppeal({ grid: data.grid ?? makeStartingGrid(), zones: data.parkZones ?? [], getItem: getParkItem }));
@@ -1885,9 +1896,11 @@ const [selectedZone, setSelectedZone] = useState(null);
     setHotelStats(data.hotelStats ?? { roomRevenue: 0, hotelExpenses: 0, parkSpend: 0, occupancy: 0, avgHappiness: 0, totalGuests: 0, totalRooms: 0, guestsByHotel: {} });
     setResortRating(data.resortRating ?? 0);
     if (data.pricing) setPricing({ ...DEFAULT_PRICING, ...data.pricing });
-    if (data.popularity) setPopularity(data.popularity);
-    if (data.popularityTrend) setPopularityTrend(data.popularityTrend);
-    if (data.prevPopularity) setPrevPopularity(data.prevPopularity);
+    setPopularity(normalizeArrayLength(data.popularity, loadedGrid.length, 0));
+    setPopularityTrend(normalizeArrayLength(data.popularityTrend, loadedGrid.length, 0));
+    setPrevPopularity(normalizeArrayLength(data.prevPopularity, loadedGrid.length, 0));
+    setWaterQuality(normalizeArrayLength(data.waterQuality, loadedGrid.length, 100));
+    setRideAges(normalizeArrayLength(data.rideAges, loadedGrid.length, 0));
     setActiveEvents(data.activeEvents ?? []);
     setMembershipCounts(data.membershipCounts ?? { season_pass: 0, family_membership: 0, vip_membership: 0 });
     setMembershipTimers(data.membershipTimers ?? { season_pass: 30, family_membership: 30, vip_membership: 30 });
