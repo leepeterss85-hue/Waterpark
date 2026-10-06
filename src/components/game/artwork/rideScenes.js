@@ -17,6 +17,11 @@ const slides = {
   tidal_coaster: ["M16 30Q24 6 36 36T56 38T78 70", "M30 30Q42 18 50 40T72 70"],
   skybox_plunge: ["M40 12L42 50L60 80", "M58 12L56 50L38 80"],
   aqua_rocket: ["M20 70Q30 20 50 40Q80 20 75 70"],
+  twister_slide: ["M18 22C5 42 45 28 38 48C30 70 72 55 75 78"],
+  spiral_plunge: ["M50 14C72 14 78 38 50 40C22 40 28 62 50 62C72 62 72 80 56 80"],
+  halfpipe_slide: ["M14 32C4 58 42 82 50 50C58 82 96 58 86 32"],
+  conveyor_slide: ["M14 78Q30 30 50 46Q70 62 86 18"],
+  cross_bowl: ["M25 22C14 48 76 48 75 78C76 48 24 48 25 22"],
 };
 export function getRideScene(id) {
   if (slides[id]) return { kind: "slide", paths: slides[id] };
