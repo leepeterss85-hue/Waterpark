@@ -203,9 +203,26 @@ export function simulateConstruction(context) {
       } else if (def.category === "expansion") {
         completionActions.push({ type: "expand", lots: def.rewards.lots || 8 });
       } else if (def.category === "renovation") {
+        // A renovation is tied to a specific ride. If that ride disappeared while the
+        // project was in progress (for example after loading an old save), do not grant
+        // completion rewards for work that could not be applied.
         if (project.targetTile != null && grid[project.targetTile]) {
           completionActions.push({ type: "renovate", tileIndex: project.targetTile });
+          totalRepReward += def.rewards.reputation || 0;
+          totalXpReward += def.rewards.xp || 0;
+          updatedProjects.push({ ...project, status: "completed", progress: 100, completedDay: day });
+          logEntries.push({
+            day,
+            text: `Day ${day}: 🏗️ ${def.name} completed! +${def.rewards.reputation} reputation, +${def.rewards.xp} XP.`,
+          });
+        } else {
+          updatedProjects.push({ ...project, status: "cancelled", progress: 100, cancelledDay: day, cancelReason: "target_missing" });
+          logEntries.push({
+            day,
+            text: `Day ${day}: ⚠️ ${def.name} could not complete because its target ride no longer exists. No completion reward was granted.`,
+          });
         }
+        continue;
       }
       totalRepReward += def.rewards.reputation || 0;
       totalXpReward += def.rewards.xp || 0;
