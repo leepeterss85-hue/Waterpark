@@ -109,7 +109,7 @@ export const GUEST_MIX = {
 // Ride class classification — each attraction belongs to one or more classes.
 const RIDE_CLASSES = {
   family: new Set([
-    "kiddie_pool", "play_structure", "family_raft", "splash_pad", "soft_play",
+    "kiddie_pool", "play_structure", "family_raft", "rapid_rafting", "splash_pad", "soft_play",
     "lazy_river", "mini_golf", "carousel", "water_volleyball", "water_playground",
     "splash_battle", "bumper_boats", "wave_pool", "adventure_river", "water_zipline",
   ]),
