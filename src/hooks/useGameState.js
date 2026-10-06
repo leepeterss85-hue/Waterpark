@@ -275,6 +275,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     const currentDisaster = stateRef.current.disaster;
     const isSandbox = stateRef.current.sandbox;
     const currentCampaigns = stateRef.current.activeCampaigns || [];
+    const currentCalendarEvent = stateRef.current.activeCalendarEvent || null;
     const eff = { ...(currentChallenge?.effects || {}) };
     if (currentDisaster) {
       eff.guestMult = (eff.guestMult ?? 1) * (currentDisaster.effects?.guestMult ?? 1);
@@ -907,6 +908,17 @@ const [selectedZone, setSelectedZone] = useState(null);
       }
     }
 
+    // --- Resolve active seasonal calendar event ---
+    if (currentCalendarEvent) {
+      const daysLeft = currentCalendarEvent.daysLeft - 1;
+      if (daysLeft <= 0) {
+        setActiveCalendarEvent(null);
+        setLog((l) => [{ day: d + 1, text: `Day ${d + 1}: 📅 ${currentCalendarEvent.name} has ended.` }, ...l].slice(0, 12));
+      } else {
+        setActiveCalendarEvent({ ...currentCalendarEvent, daysLeft });
+      }
+    }
+
     // --- Resolve / advance / roll a random challenge ---
     const challengeEntries = [];
     if (currentChallenge) {
@@ -1442,6 +1454,46 @@ const [selectedZone, setSelectedZone] = useState(null);
     [claimedMissions, level, grid, upgrades, peakGuests, money, reputation, day, staff, totalUpgrades, expansionsDone, parkAppeal, visitorStats, lifetimeEarnings]
   );
 
+  const refurbishRide = useCallback(
+    (tileIndex) => {
+      const itemId = grid[tileIndex];
+      if (!itemId) return;
+      const def = getParkItem(itemId);
+      if (!def || def.category !== "attraction") return;
+      const age = rideAges[tileIndex] || 0;
+      if (age < 20) return;
+      const cost = refurbishCost(def.cost || 5000, age);
+      if (money < cost) return;
+      setMoney((m) => m - cost);
+      setRideAges((ra) => {
+        const next = { ...ra };
+        delete next[tileIndex];
+        return next;
+      });
+      setLog((l) => [{ day, text: `Day ${day}: 🔧 Refurbished ${def.name} for $${cost.toLocaleString()}.` }, ...l].slice(0, 12));
+      trackEvent("ride_refurbished", { item: itemId, cost });
+    },
+    [grid, rideAges, money, day]
+  );
+
+  const claimLegendary = useCallback(
+    (objectiveId) => {
+      if (claimedLegendary.includes(objectiveId)) return;
+      const district = DISTRICTS.find((d) => d.legendary && d.legendary.id === objectiveId);
+      if (!district) return;
+      const result = checkDistrictLegendary(district, grid, parkZones, getParkItem);
+      if (!result.met) return;
+      const reward = district.legendary.reward || {};
+      setMoney((m) => m + (reward.money || 0));
+      setXp((x) => x + (reward.xp || 0));
+      setEmpirePoints((ep) => ep + (reward.empirePoints || 0));
+      setClaimedLegendary((c) => [...c, objectiveId]);
+      setLog((l) => [{ day, text: `Day ${day}: 👑 Legendary objective complete — ${district.legendary.name}!` }, ...l].slice(0, 12));
+      trackEvent("legendary_claimed", { id: objectiveId });
+    },
+    [claimedLegendary, grid, parkZones, day]
+  );
+
   const savePark = useCallback(
     (name) => {
       const trimmed = (name || "").trim();
@@ -1509,6 +1561,10 @@ const [selectedZone, setSelectedZone] = useState(null);
         competitors,
         marketShare,
         waterQuality,
+        rideAges,
+        vipHistory,
+        claimedLegendary,
+        activeCalendarEvent,
         savedAt: new Date().toISOString(),
       };
       writeSlots(slots);
@@ -1516,7 +1572,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       trackEvent("park_saved", { name: trimmed });
       return true;
     },
-    [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, popularity, popularityTrend, prevPopularity, activeEvents]
+    [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, popularity, popularityTrend, prevPopularity, activeEvents, rideAges, vipHistory, claimedLegendary, activeCalendarEvent]
   );
 
   const saveToCloud = useCallback(
@@ -1534,7 +1590,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer,
         awardStats, socialPosts, socialReputation, emergencies, emergencyStats,
         constructionProjects, loans, returnVisitorMult, empirePoints, competitors,
-        marketShare, waterQuality,
+        marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent,
       };
       try {
         await base44.functions.invoke("cloudSaves", {
@@ -1609,6 +1665,10 @@ const [selectedZone, setSelectedZone] = useState(null);
     if (data.competitors) setCompetitors(data.competitors);
     if (data.marketShare != null) setMarketShare(data.marketShare);
     if (data.waterQuality) setWaterQuality(data.waterQuality);
+    if (data.rideAges) setRideAges(data.rideAges);
+    if (data.vipHistory) setVipHistory(data.vipHistory);
+    if (data.claimedLegendary) setClaimedLegendary(data.claimedLegendary);
+    if (data.activeCalendarEvent) setActiveCalendarEvent(data.activeCalendarEvent);
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
     setLastNet(data.lastNet ?? 0);
   }, []);
@@ -1792,6 +1852,11 @@ const [selectedZone, setSelectedZone] = useState(null);
     setCompetitors(createCompetitors(1));
     setMarketShare(100);
     setWaterQuality(createInitialWaterQuality(startGrid.length));
+    setRideAges({});
+    setVipVisit(null);
+    setVipHistory([]);
+    setClaimedLegendary([]);
+    setActiveCalendarEvent(null);
     setHotelGuests([]);
     setHotelStats({ roomRevenue: 0, hotelExpenses: 0, parkSpend: 0, occupancy: 0, avgHappiness: 0, totalGuests: 0, totalRooms: 0, guestsByHotel: {} });
     setResortRating(0);
@@ -1854,6 +1919,12 @@ const [selectedZone, setSelectedZone] = useState(null);
     claimMission,
     challenge,
     vipVisit,
+    vipHistory,
+    claimedLegendary,
+    activeCalendarEvent,
+    rideAges,
+    refurbishRide,
+    claimLegendary,
     lastBuildAction,
     undoLastBuild,
     lifetimeEarnings,

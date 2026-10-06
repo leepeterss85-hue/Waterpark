@@ -1,7 +1,7 @@
 import React from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2 } from "lucide-react";
+import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2, MapPin, Star, Clock, Wrench } from "lucide-react";
 import { MISSIONS, missionProgress } from "@/data/missions";
 import BuildPanel from "@/components/game/BuildPanel";
 import ExpansionPanel from "@/components/game/ExpansionPanel";
@@ -31,8 +31,11 @@ import CompetitorsPanel from "@/components/game/CompetitorsPanel";
 import WaterQualityPanel from "@/components/game/WaterQualityPanel";
 import LeaderboardPanel from "@/components/game/LeaderboardPanel";
 import ShareParkPanel from "@/components/game/ShareParkPanel";
+import DistrictsPanel from "@/components/game/DistrictsPanel";
+import VipGuestsPanel from "@/components/game/VipGuestsPanel";
+import SeasonalCalendarPanel from "@/components/game/SeasonalCalendarPanel";
+import RideAgingPanel from "@/components/game/RideAgingPanel";
 import { isWaterAttraction } from "@/data/waterQuality";
-import { getHotelDef, hotelRooms, isHotelItem } from "@/data/hotels";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
   return (
@@ -233,6 +236,28 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
           criticalCount={game.waterQualityCriticalCount}
           waterAttractionCount={game.grid.filter((id) => id && isWaterAttraction(id)).length}
         />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "districts"} onOpenChange={(v) => !v && close()} title="Districts" icon={MapPin} width="sm:max-w-lg">
+        <DistrictsPanel
+          expansionsDone={game.expansionsDone}
+          parkZones={game.parkZones}
+          grid={game.grid}
+          claimedLegendary={game.claimedLegendary}
+          onClaimLegendary={game.claimLegendary}
+        />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "vipGuests"} onOpenChange={(v) => !v && close()} title="VIP Guests" icon={Star} width="sm:max-w-md">
+        <VipGuestsPanel vipVisit={game.vipVisit} vipHistory={game.vipHistory} reputation={game.reputation} />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "seasonalCalendar"} onOpenChange={(v) => !v && close()} title="Seasonal Calendar" icon={Clock} width="sm:max-w-lg">
+        <SeasonalCalendarPanel day={game.day} activeCalendarEvent={game.activeCalendarEvent} />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "rideAging"} onOpenChange={(v) => !v && close()} title="Ride Aging" icon={Wrench} width="sm:max-w-md">
+        <RideAgingPanel grid={game.grid} rideAges={game.rideAges} money={game.money} onRefurbish={game.refurbishRide} selectedTile={game.selectedTile} />
       </SheetShell>
 
       <SheetShell open={openSheet === "leaderboard"} onOpenChange={(v) => !v && close()} title="Leaderboard" icon={Medal} width="sm:max-w-md">

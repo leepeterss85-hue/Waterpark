@@ -1,5 +1,5 @@
 import React from "react";
-import { Hammer, Settings, Users, Activity, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2 } from "lucide-react";
+import { Hammer, Settings, Users, Activity, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2, MapPin, Star, Clock, Wrench } from "lucide-react";
 
 const MENUS = [
   { key: "build", icon: Hammer, label: "Build" },
@@ -20,6 +20,10 @@ const MENUS = [
   { key: "social", icon: Share2, label: "Social" },
   { key: "emergencies", icon: Siren, label: "SOS" },
   { key: "trends", icon: Flame, label: "Trends" },
+  { key: "districts", icon: MapPin, label: "Districts" },
+  { key: "vipGuests", icon: Star, label: "VIPs" },
+  { key: "seasonalCalendar", icon: Clock, label: "Calendar" },
+  { key: "rideAging", icon: Wrench, label: "Aging" },
   { key: "info", icon: Activity, label: "Activity" },
   { key: "conditions", icon: CloudSun, label: "Weather" },
   { key: "settings", icon: SlidersHorizontal, label: "Settings" },
