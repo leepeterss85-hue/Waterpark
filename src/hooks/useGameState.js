@@ -52,6 +52,17 @@ const FIRST_ATTRACTION_BONUS = 5000;
 const SLOTS_KEY = "waterpark-tycoon-slots";
 const GRID_SIZE = INITIAL_GRID_SIZE;
 const INITIAL_MONEY = 50000;
+const SAVE_SCHEMA_VERSION = 2;
+
+function normalizeArrayLength(value, length, fillValue) {
+  const source = Array.isArray(value) ? value : [];
+  if (source.length === length) return source;
+  const next = Array(length);
+  for (let i = 0; i < length; i += 1) {
+    next[i] = source[i] !== undefined ? source[i] : (typeof fillValue === "function" ? fillValue(i) : fillValue);
+  }
+  return next;
+}
 
 const DEFAULT_TICKET_PRICE = 28;
 const DEFAULT_AD_BUDGET = 250;
@@ -193,7 +204,7 @@ const [selectedZone, setSelectedZone] = useState(null);
 
   /** @type {import("react").MutableRefObject<Record<string, any>>} */
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, completedResearch, parkAppeal, disaster, sandbox, activeCampaigns, hotelGuests, resortRating, pricing, popularity, popularityTrend, activeEvents, xp, membershipCounts, membershipTimers, membershipStats, peakGuests, totalUpgrades, awards, awardCeremonyTimer, awardStats, awardGuestMult: totalAwardGuestMult(awards), socialPosts, socialReputation, emergencies, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, builtToday, upgradedToday, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp };
+  stateRef.current = { money, day, reputation, guests, grid, parkZones, history, log, lastNet, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, sandbox, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, awardGuestMult: totalAwardGuestMult(awards), socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, builtToday, upgradedToday, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp };
 
   // Load saved game
   useEffect(() => {
@@ -205,8 +216,29 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (data.day != null) setDay(data.day);
         if (data.reputation != null) setReputation(data.reputation);
         setGuests(data.guests ?? data.history?.[data.history.length - 1]?.guests ?? 0);
-        if (data.grid) setGrid(data.grid);
-        if (data.parkZones) setParkZones(data.parkZones);
+        if (data.grid) {
+          const loadedGrid = [...data.grid];
+          setGrid(loadedGrid);
+          setParkZones(normalizeArrayLength(data.parkZones, loadedGrid.length, null));
+          setAttractionCondition(normalizeArrayLength(data.attractionCondition, loadedGrid.length, 100));
+          setUpgrades(normalizeArrayLength(data.upgrades, loadedGrid.length, 0));
+          setPopularity(normalizeArrayLength(data.popularity, loadedGrid.length, 0));
+          setPopularityTrend(normalizeArrayLength(data.popularityTrend, loadedGrid.length, 0));
+          setPrevPopularity(normalizeArrayLength(data.prevPopularity, loadedGrid.length, 0));
+          setWaterQuality(normalizeArrayLength(data.waterQuality, loadedGrid.length, 100));
+          setRideAges(normalizeArrayLength(data.rideAges, loadedGrid.length, 0));
+        } else {
+          const fallbackGrid = makeStartingGrid();
+          setGrid(fallbackGrid);
+          setParkZones(makeEmptyZones(fallbackGrid.length));
+          setAttractionCondition(Array(fallbackGrid.length).fill(100));
+          setUpgrades(Array(fallbackGrid.length).fill(0));
+          setPopularity(Array(fallbackGrid.length).fill(0));
+          setPopularityTrend(Array(fallbackGrid.length).fill(0));
+          setPrevPopularity(Array(fallbackGrid.length).fill(0));
+          setWaterQuality(Array(fallbackGrid.length).fill(100));
+          setRideAges(Array(fallbackGrid.length).fill(0));
+        }
         if (data.weather) setWeather(data.weather);
         if (data.forecast) setForecast(data.forecast);
         if (data.seasonEvent) setSeasonEvent(data.seasonEvent);
@@ -217,8 +249,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (data.staff) setStaff({ ...DEFAULT_STAFF, ...data.staff });
         if (data.staffAssignments) setStaffAssignments(data.staffAssignments);
         if (data.incidents) setIncidents(data.incidents);
-        if (data.attractionCondition) setAttractionCondition(data.attractionCondition);
-        if (data.xp != null) setXp(data.xp);
+                if (data.xp != null) setXp(data.xp);
         if (data.expansionsDone != null) setExpansionsDone(data.expansionsDone);
         if (data.peakGuests != null) setPeakGuests(data.peakGuests);
         if (data.totalUpgrades != null) setTotalUpgrades(data.totalUpgrades);
@@ -239,10 +270,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         setHotelStats(data.hotelStats ?? { roomRevenue: 0, hotelExpenses: 0, parkSpend: 0, occupancy: 0, avgHappiness: 0, totalGuests: 0, totalRooms: 0, guestsByHotel: {} });
         setResortRating(data.resortRating ?? 0);
         if (data.pricing) setPricing({ ...DEFAULT_PRICING, ...data.pricing });
-        if (data.popularity) setPopularity(data.popularity);
-        if (data.popularityTrend) setPopularityTrend(data.popularityTrend);
-        if (data.prevPopularity) setPrevPopularity(data.prevPopularity);
-        setActiveEvents(data.activeEvents ?? []);
+                                setActiveEvents(data.activeEvents ?? []);
         setMembershipCounts(data.membershipCounts ?? { season_pass: 0, family_membership: 0, vip_membership: 0 });
         setMembershipTimers(data.membershipTimers ?? { season_pass: 30, family_membership: 30, vip_membership: 30 });
         setMembershipStats(data.membershipStats ?? { totalMembers: 0, dailyRevenue: 0, totalRevenue: 0, memberVisits: 0, memberSpend: 0, totalRenewed: 0, totalChurned: 0 });
@@ -259,9 +287,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (data.empirePoints != null) setEmpirePoints(data.empirePoints);
         setCompetitors(data.competitors ?? createCompetitors(data.day ?? 1));
         setMarketShare(data.marketShare ?? 100);
-        setWaterQuality(data.waterQuality ?? createInitialWaterQuality((data.grid ?? makeStartingGrid()).length));
-        setRideAges(data.rideAges ?? initRideAges((data.grid ?? makeStartingGrid()).length));
-        setVipHistory(data.vipHistory ?? []);
+                setVipHistory(data.vipHistory ?? []);
         setClaimedLegendary(data.claimedLegendary ?? []);
         setActiveCalendarEvent(data.activeCalendarEvent ?? null);
         setDailyChallenges(data.dailyChallenges ?? []);
@@ -287,7 +313,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp })
+          JSON.stringify({ saveVersion: SAVE_SCHEMA_VERSION, savedAt: Date.now(), ...stateRef.current })
         );
       } catch {
         /* ignore */
@@ -295,6 +321,31 @@ const [selectedZone, setSelectedZone] = useState(null);
     }, 300);
     return () => clearTimeout(t);
   }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp]);
+
+  // Flush the latest complete state when the browser/app is backgrounded or closed.
+  // This complements the 300ms debounced save and prevents the last few seconds of progress
+  // being lost on phones, tablets and native wrappers.
+  useEffect(() => {
+    const flushSave = () => {
+      try {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({ saveVersion: SAVE_SCHEMA_VERSION, savedAt: Date.now(), ...stateRef.current })
+        );
+      } catch {
+        /* ignore */
+      }
+    };
+    const handleVisibility = () => {
+      if (document.visibilityState === "hidden") flushSave();
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    window.addEventListener("pagehide", flushSave);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("pagehide", flushSave);
+    };
+  }, []);
 
   // Load save slots list on mount
   useEffect(() => {
