@@ -1,7 +1,7 @@
 import React from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2, MapPin, Star, Clock, Wrench, Zap, Palette, RotateCcw } from "lucide-react";
+import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2, MapPin, Star, Clock, Wrench, Zap, Palette, RotateCcw, Gift, PawPrint } from "lucide-react";
 import { MISSIONS, missionProgress } from "@/data/missions";
 import BuildPanel from "@/components/game/BuildPanel";
 import ExpansionPanel from "@/components/game/ExpansionPanel";
@@ -39,6 +39,8 @@ import DailyChallengesPanel from "@/components/game/DailyChallengesPanel";
 import SynergyPanel from "@/components/game/SynergyPanel";
 import VisualThemesPanel from "@/components/game/VisualThemesPanel";
 import PrestigePanel from "@/components/game/PrestigePanel";
+import DailyRewardWheel from "@/components/game/DailyRewardWheel";
+import MascotPanel from "@/components/game/MascotPanel";
 import { isWaterAttraction } from "@/data/waterQuality";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
@@ -309,6 +311,14 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
           prestigeCount={game.prestigeCount}
           onPrestige={game.prestigePark}
         />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "rewards"} onOpenChange={(v) => !v && close()} title="Daily Reward" icon={Gift} width="sm:max-w-md">
+        <DailyRewardWheel day={game.day} lastRewardDay={game.lastRewardDay} streak={game.rewardStreak} onClaim={game.claimDailyReward} />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "mascot"} onOpenChange={(v) => !v && close()} title="Park Mascot" icon={PawPrint} width="sm:max-w-md">
+        <MascotPanel level={game.level} activeMascot={game.mascot} onSelect={game.selectMascot} />
       </SheetShell>
     </>
   );

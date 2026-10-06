@@ -5,13 +5,14 @@ import { getHotelDef, hotelRooms } from "@/data/hotels";
 import Tile from "@/components/game/Tile";
 import GuestLayer from "@/components/game/GuestLayer";
 import MapAmbience from "@/components/game/MapAmbience";
+import MascotSprite from "@/components/game/MascotSprite";
 import { useTouchZoom } from "@/hooks/useTouchZoom";
 import "@/components/game/parkMap.css";
 import "@/components/game/parkArtwork.css";
 import "@/components/game/parkPeople.css";
 import "@/components/game/parkChrome.css";
 
-export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, visitorMovements, queueStats = {}, attractionCondition = [], staff = {}, staffAssignments = {}, lifeguardTotal = 0, day = 1, weather, seasonEvent, hotelGuests = [], activeEvents = [], onTileClick, topControls, bottomMenu, statsBar, themeClass = "" }) {
+export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, visitorMovements, queueStats = {}, attractionCondition = [], staff = {}, staffAssignments = {}, lifeguardTotal = 0, day = 1, weather, seasonEvent, hotelGuests = [], activeEvents = [], onTileClick, topControls, bottomMenu, statsBar, themeClass = "", mascot = null }) {
   const { zoom, setZoom, panX, panY, resetView, containerRef } = useTouchZoom(1);
   const incidentMap = new Map((incidents || []).map((incident) => [incident.tileIndex, incident]));
   const phase = ((day - 1) % 8);
@@ -60,6 +61,7 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
               })}
             </div>
             <GuestLayer grid={grid} parkZones={parkZones} guests={guests} movements={visitorMovements} queueStats={queueStats} staff={staff} staffAssignments={staffAssignments} incidents={incidents || []} />
+            {mascot && <MascotSprite mascot={mascot} grid={grid} />}
           </div></div>
         </div>
       </div>

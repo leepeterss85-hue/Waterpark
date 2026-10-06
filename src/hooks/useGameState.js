@@ -37,6 +37,9 @@ import { rollDailyChallenges, isChallengeComplete, CHALLENGE_REFRESH_DAYS } from
 import { calculateSynergies } from "@/data/synergies";
 import { calculatePrestigePoints, prestigeMultiplier, PRESTIGE_LEVEL_REQ } from "@/data/prestige";
 import { getTheme as getVisualTheme } from "@/data/visualThemes";
+import { calculateEcoBonuses } from "@/data/ecoItems";
+import { getMascot } from "@/data/mascots";
+import { canClaimReward, getStreakBonus } from "@/data/dailyRewards";
 import { base44 } from "@/api/base44Client";
 import { sound } from "@/lib/soundManager";
 
@@ -177,13 +180,16 @@ const [selectedZone, setSelectedZone] = useState(null);
   const [synergyBonuses, setSynergyBonuses] = useState({ totalIncomeMult: 0, totalAppealBonus: 0, activeSynergies: [] });
   const [builtToday, setBuiltToday] = useState(0);
   const [upgradedToday, setUpgradedToday] = useState(0);
+  const [mascot, setMascot] = useState(null);
+  const [lastRewardDay, setLastRewardDay] = useState(null);
+  const [rewardStreak, setRewardStreak] = useState(0);
 
   const level = levelFromXp(xp);
   const gridSize = grid.length;
 
   /** @type {import("react").MutableRefObject<Record<string, any>>} */
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, completedResearch, parkAppeal, disaster, sandbox, activeCampaigns, hotelGuests, resortRating, pricing, popularity, popularityTrend, activeEvents, xp, membershipCounts, membershipTimers, membershipStats, peakGuests, totalUpgrades, awards, awardCeremonyTimer, awardStats, awardGuestMult: totalAwardGuestMult(awards), socialPosts, socialReputation, emergencies, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, builtToday, upgradedToday };
+  stateRef.current = { money, day, reputation, grid, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, parkZones, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, completedResearch, parkAppeal, disaster, sandbox, activeCampaigns, hotelGuests, resortRating, pricing, popularity, popularityTrend, activeEvents, xp, membershipCounts, membershipTimers, membershipStats, peakGuests, totalUpgrades, awards, awardCeremonyTimer, awardStats, awardGuestMult: totalAwardGuestMult(awards), socialPosts, socialReputation, emergencies, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, builtToday, upgradedToday, mascot, lastRewardDay, rewardStreak };
 
   // Load saved game
   useEffect(() => {
@@ -260,6 +266,9 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (data.activeTheme) setActiveTheme(data.activeTheme);
         if (data.prestigeCount != null) setPrestigeCount(data.prestigeCount);
         if (data.synergyBonuses) setSynergyBonuses(data.synergyBonuses);
+        if (data.mascot !== undefined) setMascot(data.mascot);
+        if (data.lastRewardDay !== undefined) setLastRewardDay(data.lastRewardDay);
+        if (data.rewardStreak !== undefined) setRewardStreak(data.rewardStreak);
       }
     } catch {
       /* ignore */
@@ -272,7 +281,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       try {
         localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses })
+          JSON.stringify({ money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, mascot, lastRewardDay, rewardStreak })
         );
       } catch {
         /* ignore */
@@ -393,6 +402,13 @@ const [selectedZone, setSelectedZone] = useState(null);
     const facilityBonus = fx.facilityBonus;
     const wages = staffWages(counts);
 
+    // --- Eco-sustainability bonuses from green facilities ---
+    const ecoBonuses = calculateEcoBonuses(prevGrid);
+    // --- Park mascot mood & income bonus ---
+    const mascotDef = getMascot(stateRef.current.mascot);
+    const mascotMoodBoost = mascotDef ? mascotDef.moodBoost : 0;
+    const mascotIncomeMult = mascotDef ? (1 + mascotDef.incomeBoost) : 1;
+
     // Empire tier and resort-wide bonuses
     const empireTier = getEmpireTier(stateRef.current.empirePoints || 0);
     const resortBonuses = calculateResortBonuses(prevGrid);
@@ -470,6 +486,10 @@ const [selectedZone, setSelectedZone] = useState(null);
       });
       income = sim.income;
       visitorStats = sim;
+      // Apply mascot mood boost
+      if (mascotMoodBoost > 0 && visitorStats.avgMood != null) {
+        visitorStats = { ...visitorStats, avgMood: Math.min(100, visitorStats.avgMood + mascotMoodBoost) };
+      }
       // Return visitor system: satisfied guests boost future demand
       {
         const totalExp = (sim.guestExperience?.happy || 0) + (sim.guestExperience?.content || 0) + (sim.guestExperience?.unhappy || 0);
@@ -519,6 +539,8 @@ const [selectedZone, setSelectedZone] = useState(null);
       if (hasEntrance) repDelta += 0.2;
       if (environment.filter((p) => currentZones?.[p.idx]).length >= 5) repDelta += 0.25;
       if (currentSeasonEvent) repDelta += currentSeasonEvent.repDelta || 0;
+      repDelta += ecoBonuses.repBoost;
+      if (mascotDef) repDelta += 0.2;
       newReputation = Math.max(0, Math.min(100, rep + repDelta));
       if (hasResearch("filtration")) newReputation = Math.min(100, newReputation + 1);
     } else {
@@ -778,10 +800,12 @@ const [selectedZone, setSelectedZone] = useState(null);
       (currentSeasonEvent?.incomeMult ?? 1) *
       (currentPriorityPass ? 1.08 : 1) *
       (1 + empireTier.bonuses.income) *
-      (1 + resortBonuses.spending);
+      (1 + resortBonuses.spending) *
+      mascotIncomeMult;
     const utilities = Math.round(
       (150 + attractions.length * 45 + facilities.length * 18 + newGuests * 2.2) *
-      (dayWeather.utilityMult ?? 1)
+      (dayWeather.utilityMult ?? 1) *
+      (1 - (ecoBonuses.utilityReduction || 0))
     );
     const diffUpkeepMult = getDifficulty(getSettings().difficulty).upkeepMult;
     const expenses =
@@ -1673,6 +1697,9 @@ const [selectedZone, setSelectedZone] = useState(null);
         activeTheme,
         prestigeCount,
         synergyBonuses,
+        mascot,
+        lastRewardDay,
+        rewardStreak,
         savedAt: new Date().toISOString(),
       };
       writeSlots(slots);
@@ -1700,6 +1727,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         constructionProjects, loans, returnVisitorMult, empirePoints, competitors,
         marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent,
         dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses,
+        mascot, lastRewardDay, rewardStreak,
       };
       try {
         await base44.functions.invoke("cloudSaves", {
@@ -1784,6 +1812,9 @@ const [selectedZone, setSelectedZone] = useState(null);
     if (data.activeTheme) setActiveTheme(data.activeTheme);
     if (data.prestigeCount != null) setPrestigeCount(data.prestigeCount);
     if (data.synergyBonuses) setSynergyBonuses(data.synergyBonuses);
+    if (data.mascot !== undefined) setMascot(data.mascot);
+    if (data.lastRewardDay !== undefined) setLastRewardDay(data.lastRewardDay);
+    if (data.rewardStreak !== undefined) setRewardStreak(data.rewardStreak);
     setBuiltToday(0);
     setUpgradedToday(0);
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
@@ -1905,6 +1936,31 @@ const [selectedZone, setSelectedZone] = useState(null);
 
   const toggleAutoPricing = useCallback(() => {
     setAutoPricing((prev) => !prev);
+  }, []);
+
+  const selectMascot = useCallback((mascotId) => {
+    setMascot(mascotId);
+    trackEvent("mascot_selected", { mascot: mascotId });
+  }, []);
+
+  const claimDailyReward = useCallback((reward) => {
+    const currentDay = stateRef.current.day;
+    const lastDay = stateRef.current.lastRewardDay;
+    if (!canClaimReward(lastDay, currentDay)) return;
+    const newStreak = (lastDay != null && currentDay === lastDay + 1) ? (stateRef.current.rewardStreak || 0) + 1 : 1;
+    if (reward.id === "cash_small" || reward.id === "cash_big" || (reward.id === "mystery" && reward.mysteryContent?.id?.startsWith("cash"))) {
+      setMoney((m) => m + reward.amount);
+    } else if (reward.id === "xp" || (reward.id === "mystery" && reward.mysteryContent?.id === "xp")) {
+      setXp((x) => x + reward.amount);
+    } else if (reward.id === "rep" || (reward.id === "mystery" && reward.mysteryContent?.id === "rep")) {
+      setReputation((r) => Math.min(100, r + reward.amount));
+    } else if (reward.id === "research" || (reward.id === "mystery" && reward.mysteryContent?.id === "research")) {
+      setResearchPoints((rp) => rp + reward.amount);
+    }
+    setLastRewardDay(currentDay);
+    setRewardStreak(newStreak);
+    sound.mission();
+    trackEvent("daily_reward_claimed", { type: reward.id, amount: reward.amount, streak: newStreak });
   }, []);
 
   const selectTheme = useCallback((themeId) => {
@@ -2034,6 +2090,9 @@ const [selectedZone, setSelectedZone] = useState(null);
     setHotelStats({ roomRevenue: 0, hotelExpenses: 0, parkSpend: 0, occupancy: 0, avgHappiness: 0, totalGuests: 0, totalRooms: 0, guestsByHotel: {} });
     setResortRating(0);
     setPricing(DEFAULT_PRICING);
+    setMascot(null);
+    setLastRewardDay(null);
+    setRewardStreak(0);
     const startPopularity = Array(startGrid.length).fill(0);
     const startPopTrend = Array(startGrid.length).fill(0);
     for (let i = 0; i < startGrid.length; i += 1) {
@@ -2264,5 +2323,13 @@ const [selectedZone, setSelectedZone] = useState(null);
     prestigePark,
     prestigeMultipliers: prestigeMultiplier(prestigeCount),
     synergyBonuses,
+    mascot,
+    mascotDef: getMascot(mascot),
+    selectMascot,
+    lastRewardDay,
+    rewardStreak,
+    canClaimDailyReward: canClaimReward(lastRewardDay, day),
+    claimDailyReward,
+    ecoBonuses: calculateEcoBonuses(grid),
   };
 }

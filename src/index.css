@@ -1143,6 +1143,11 @@
 }
 .screen-shake { animation: screen-shake 0.4s ease-in-out; }
 
+@keyframes mascot-bounce {
+  from { transform: translateY(0) scale(1); }
+  to { transform: translateY(-4px) scale(1.05); }
+}
+
 /* === Hotel / Resort artwork === */
 @layer components {
   .hotel-art { position:absolute; inset:8%; border-radius:14%; pointer-events:none; }
