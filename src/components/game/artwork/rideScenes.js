@@ -22,11 +22,13 @@ const slides = {
   halfpipe_slide: ["M14 32C4 58 42 82 50 50C58 82 96 58 86 32"],
   conveyor_slide: ["M14 78Q30 30 50 46Q70 62 86 18"],
   cross_bowl: ["M25 22C14 48 76 48 75 78C76 48 24 48 25 22"],
+  wave_rider_pro: ["M10 50Q25 30 40 50T70 50T90 50", "M10 60Q25 40 40 60T70 60T90 60"],
 };
 export function getRideScene(id) {
   if (slides[id]) return { kind: "slide", paths: slides[id] };
   if (id === "lazy_river" || id === "adventure_river" || id === "rapid_rafting") return { kind: "river", paths: [RIVER_PATH] };
   if (["soft_play", "gem_mining", "mini_golf", "carousel", "go_karts", "sky_walk", "ferris_wheel", "roller_coaster", "pendulum_ride", "drop_tower", "pirate_ship", "tea_cups", "bumper_cars", "swing_ride", "haunted_house", "funhouse", "observation_tower", "park_monorail", "ring_toss", "strongman_hammer", "fortune_teller", "duck_pond", "basketball_toss"].includes(id)) return { kind: "dry", paths: [] };
   if (id === "splash_pad") return { kind: "splash", paths: [] };
+  if (id === "wave_rider_pro" || id === "flowrider") return { kind: "wave", paths: slides[id] || [] };
   return { kind: "pool", paths: [] };
 }

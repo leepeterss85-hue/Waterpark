@@ -1,9 +1,9 @@
 import React from "react";
-import { Baby, Zap, Hotel, Waves, Flame, Crown, Lock, CheckCircle2, Star } from "lucide-react";
+import { Baby, Zap, Hotel, Waves, Flame, Crown, Lock, CheckCircle2, Star, Palmtree, Sailboat, Compass, Sparkles } from "lucide-react";
 import { DISTRICTS, unlockedDistricts, nextLockedDistrict, checkDistrictLegendary, getDistrict } from "@/data/districts";
 import { getParkItem } from "@/data/gameData";
 
-const ICONS = { Baby, Zap, Hotel, Waves, Flame, Crown };
+const ICONS = { Baby, Zap, Hotel, Waves, Flame, Crown, Palmtree, Sailboat, Compass, Sparkles, Star };
 
 export default function DistrictsPanel({ expansionsDone, grid, parkZones, money, claimedLegendary, onClaimLegendary }) {
   const unlocked = unlockedDistricts(expansionsDone);

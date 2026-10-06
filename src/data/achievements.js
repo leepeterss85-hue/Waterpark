@@ -55,6 +55,14 @@ export const ACHIEVEMENTS = [
   { id: "mega_staff", title: "Mega Staff", desc: "Hire 50 staff members in total.", icon: "Users", color: "from-cyan-400 to-blue-600", check: (s) => (s.staffTotal || 0) >= 50 },
   { id: "full_team", title: "Full Team", desc: "Hire at least one of every staff type.", icon: "Users", color: "from-violet-400 to-fuchsia-600", check: (s) => (s.staffTypesHired || 0) >= 14 },
   { id: "master_builder", title: "Master Builder", desc: "Build 20 different attractions.", icon: "Castle", color: "from-amber-400 to-orange-600", check: (s) => (s.builtCount || 0) >= 20 },
+  // --- Endgame empire achievements with rewards ---
+  { id: "district_baron", title: "District Baron", desc: "Activate 4 districts simultaneously.", icon: "MapPin", color: "from-violet-400 to-purple-600", check: (s) => (s.activeDistricts || 0) >= 4, reward: { money: 50000, empirePoints: 500 } },
+  { id: "tropical_tycoon", title: "Tropical Tycoon", desc: "Unlock the Tropical Paradise district.", icon: "Palmtree", color: "from-lime-400 to-emerald-500", check: (s) => (s.expansionsDone || 0) >= 6, reward: { money: 75000, empirePoints: 600 } },
+  { id: "extreme_pioneer", title: "Extreme Pioneer", desc: "Unlock the Extreme Sports Zone district.", icon: "Flame", color: "from-red-500 to-orange-600", check: (s) => (s.expansionsDone || 0) >= 7, reward: { money: 100000, empirePoints: 800 } },
+  { id: "celestial_sovereign", title: "Celestial Sovereign", desc: "Unlock the Celestial Heights district (expansion 11).", icon: "Star", color: "from-sky-400 to-blue-500", check: (s) => (s.expansionsDone || 0) >= 11, reward: { money: 500000, empirePoints: 5000 } },
+  { id: "all_districts", title: "World Builder", desc: "Unlock all 12 districts.", icon: "Crown", color: "from-yellow-300 via-amber-400 to-rose-500", check: (s) => (s.expansionsDone || 0) >= 11, reward: { money: 1000000, empirePoints: 10000 } },
+  { id: "mascot_master", title: "Mascot Master", desc: "Unlock all 6 park mascots.", icon: "PawPrint", color: "from-pink-400 to-rose-500", check: (s) => (s.unlockedMascots || 0) >= 6, reward: { money: 30000, empirePoints: 300 } },
+  { id: "eco_warrior", title: "Eco Warrior", desc: "Build all 5 eco-sustainability facilities.", icon: "Leaf", color: "from-emerald-400 to-green-600", check: (s) => (s.ecoFacilitiesBuilt || 0) >= 5, reward: { money: 40000, empirePoints: 400 } },
 ];
 
 export function unlockedAchievements(state) {

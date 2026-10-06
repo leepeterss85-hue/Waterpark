@@ -24,7 +24,7 @@ export default function EmpirePanel({ empirePoints, resortBonuses, missionState,
   const nextTier = getNextEmpireTier(empirePoints);
   const progress = nextTier ? Math.min(100, ((empirePoints - tier.threshold) / (nextTier.threshold - tier.threshold)) * 100) : 100;
   const endgameMissions = MISSIONS.filter((m) => m.level >= 15);
-  const endgameAchievements = ACHIEVEMENTS.filter((a) => ["empire_founder", "resort_magnate_ach", "mega_resort_ach", "billionaire", "empire_legend_ach", "full_empire", "century_park", "legendary_reputation"].includes(a.id));
+  const endgameAchievements = ACHIEVEMENTS.filter((a) => ["empire_founder", "resort_magnate_ach", "mega_resort_ach", "billionaire", "empire_legend_ach", "full_empire", "century_park", "legendary_reputation", "district_baron", "tropical_tycoon", "extreme_pioneer", "celestial_sovereign", "all_districts", "mascot_master", "eco_warrior"].includes(a.id));
 
   return (
     <div className="flex flex-col gap-3">
