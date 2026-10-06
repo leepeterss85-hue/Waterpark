@@ -47,6 +47,14 @@ export const ACHIEVEMENTS = [
   { id: "milestone_200", title: "Immortal Tycoon", desc: "Reach Day 200.", icon: "Medal", color: "from-rose-400 via-fuchsia-500 to-purple-600", check: (s) => s.day >= 200 },
   { id: "water_quality_master", title: "Water Quality Master", desc: "Keep water quality above 90% for all attractions.", icon: "Droplets", color: "from-cyan-400 to-blue-500", check: (s) => (s.waterQualityAvg || 0) >= 90 && (s.peakGuests || 0) >= 100 },
   { id: "crowd_control", title: "Crowd Control", desc: "Welcome 5,000 guests in a single day.", icon: "Users", color: "from-violet-400 to-indigo-600", check: (s) => s.peakGuests >= 5000 },
+  // --- Extended progression achievements ---
+  { id: "decamillionaire", title: "Decamillionaire", desc: "Earn $50,000,000 in total revenue.", icon: "TrendingUp", color: "from-emerald-500 to-teal-700", check: (s) => s.lifetimeEarnings >= 50000000 },
+  { id: "day_250", title: "Dedicated Tycoon", desc: "Reach Day 250.", icon: "CalendarDays", color: "from-indigo-400 to-purple-600", check: (s) => s.day >= 250 },
+  { id: "year_round", title: "Year-Round Operation", desc: "Reach Day 365.", icon: "CalendarDays", color: "from-emerald-400 to-cyan-600", check: (s) => s.day >= 365 },
+  { id: "ten_k_guests", title: "Ocean of Guests", desc: "Welcome 10,000 guests in a single day.", icon: "Users", color: "from-blue-500 to-indigo-700", check: (s) => s.peakGuests >= 10000 },
+  { id: "mega_staff", title: "Mega Staff", desc: "Hire 50 staff members in total.", icon: "Users", color: "from-cyan-400 to-blue-600", check: (s) => (s.staffTotal || 0) >= 50 },
+  { id: "full_team", title: "Full Team", desc: "Hire at least one of every staff type.", icon: "Users", color: "from-violet-400 to-fuchsia-600", check: (s) => (s.staffTypesHired || 0) >= 14 },
+  { id: "master_builder", title: "Master Builder", desc: "Build 20 different attractions.", icon: "Castle", color: "from-amber-400 to-orange-600", check: (s) => (s.builtCount || 0) >= 20 },
 ];
 
 export function unlockedAchievements(state) {

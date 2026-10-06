@@ -180,6 +180,70 @@ export const MISSIONS = [
     level: 28,
     reward: { money: 250000, xp: 2000 },
   },
+  // --- Mythic missions (levels 30+) ---
+  {
+    id: "peak_performance",
+    title: "Peak Performance",
+    desc: "Welcome 5,000 guests in a single day.",
+    type: "guests",
+    target: 5000,
+    level: 30,
+    reward: { money: 300000, xp: 2000 },
+  },
+  {
+    id: "wealth_beyond_measure",
+    title: "Wealth Beyond Measure",
+    desc: "Earn $5,000,000 across the life of your park.",
+    type: "lifetime_earnings",
+    target: 5000000,
+    level: 32,
+    reward: { money: 400000, xp: 2500 },
+  },
+  {
+    id: "master_of_waves",
+    title: "Master of the Waves",
+    desc: "Reach 99% park reputation.",
+    type: "reputation",
+    target: 99,
+    level: 35,
+    reward: { money: 500000, xp: 3000 },
+  },
+  {
+    id: "full_spectrum",
+    title: "Full Spectrum",
+    desc: "Build 20 different attractions.",
+    type: "builtCount",
+    target: 20,
+    level: 38,
+    reward: { money: 600000, xp: 3500 },
+  },
+  {
+    id: "eternal_tycoon",
+    title: "Eternal Tycoon",
+    desc: "Reach Day 200.",
+    type: "day",
+    target: 200,
+    level: 40,
+    reward: { money: 800000, xp: 4000 },
+  },
+  {
+    id: "aquatic_deity",
+    title: "Aquatic Deity",
+    desc: "Welcome 10,000 guests in a single day.",
+    type: "guests",
+    target: 10000,
+    level: 45,
+    reward: { money: 1000000, xp: 5000 },
+  },
+  {
+    id: "ultimate_tycoon",
+    title: "Ultimate Waterpark Tycoon",
+    desc: "Earn $50,000,000 across the life of your park.",
+    type: "lifetime_earnings",
+    target: 50000000,
+    level: 50,
+    reward: { money: 5000000, xp: 10000 },
+  },
 ];
 
 export function missionProgress(mission, state) {
@@ -208,6 +272,8 @@ export function missionProgress(mission, state) {
       return state.avgMood;
     case "lifetime_earnings":
       return state.lifetimeEarnings;
+    case "builtCount":
+      return state.builtCount || 0;
     case "resort_rating":
       return state.resortRating || 0;
     case "tiles_filled":

@@ -1189,6 +1189,38 @@ export const STAFF = {
     color: "from-fuchsia-400 to-purple-500",
     description: "Spins poolside sets — lifts guest mood and evening income.",
   },
+  chef: {
+    id: "chef",
+    name: "Chef",
+    wage: 240,
+    icon: "UtensilsCrossed",
+    color: "from-orange-400 to-red-500",
+    description: "Elevates dining — boosts food court and restaurant income.",
+  },
+  photographer: {
+    id: "photographer",
+    name: "Photographer",
+    wage: 170,
+    icon: "Camera",
+    color: "from-purple-400 to-indigo-500",
+    description: "Captures memories — boosts photo kiosk and retail income.",
+  },
+  event_coordinator: {
+    id: "event_coordinator",
+    name: "Event Coordinator",
+    wage: 260,
+    icon: "PartyPopper",
+    color: "from-pink-500 to-rose-600",
+    description: "Runs special events — lifts guest mood and event bonuses.",
+  },
+  aquatics_director: {
+    id: "aquatics_director",
+    name: "Aquatics Director",
+    wage: 300,
+    icon: "Activity",
+    color: "from-cyan-500 to-blue-600",
+    description: "Optimises water rides — boosts attraction uptime and throughput.",
+  },
 };
 
 export function staffWages(staff) {
@@ -1199,11 +1231,11 @@ export function staffEffects(staff) {
   const c = staff || {};
   const mgrBoost = 1 + (c.manager || 0) * 0.05;
   return {
-    uptime: Math.min(1, (0.65 + (c.mechanic || 0) * 0.07) * mgrBoost),
+    uptime: Math.min(1, (0.65 + (c.mechanic || 0) * 0.07 + (c.aquatics_director || 0) * 0.04) * mgrBoost),
     safety: Math.min(1, (0.7 + (c.lifeguard || 0) * 0.06 + (c.security || 0) * 0.04) * mgrBoost),
     cleanliness: Math.min(1, (0.6 + (c.cleaner || 0) * 0.1 + (c.gardener || 0) * 0.05) * mgrBoost),
-    entertainment: (c.entertainer || 0) * 1.5 * mgrBoost,
-    facilityBonus: 1 + (c.fitness_coach || 0) * 0.12 * mgrBoost,
+    entertainment: ((c.entertainer || 0) * 1.5 + (c.event_coordinator || 0) * 1.2 + (c.dj || 0) * 0.8) * mgrBoost,
+    facilityBonus: 1 + ((c.fitness_coach || 0) * 0.12 + (c.chef || 0) * 0.08 + (c.photographer || 0) * 0.06) * mgrBoost,
     wageReduction: Math.min(0.25, (c.manager || 0) * 0.05),
   };
 }
@@ -1229,6 +1261,9 @@ export const LEVEL_TIERS = [
   { min: 7, label: "Expert", tone: "text-violet-300", ring: "ring-violet-300/50", glow: "from-violet-400 to-purple-600" },
   { min: 10, label: "Master", tone: "text-amber-300", ring: "ring-amber-300/50", glow: "from-amber-400 to-orange-500" },
   { min: 15, label: "Legend", tone: "text-rose-300", ring: "ring-rose-300/50", glow: "from-rose-400 to-fuchsia-600" },
+  { min: 20, label: "Mythic", tone: "text-fuchsia-300", ring: "ring-fuchsia-300/50", glow: "from-fuchsia-400 to-pink-600" },
+  { min: 30, label: "Divine", tone: "text-emerald-300", ring: "ring-emerald-300/50", glow: "from-emerald-400 to-teal-600" },
+  { min: 40, label: "Celestial", tone: "text-sky-300", ring: "ring-sky-300/60", glow: "from-sky-400 via-cyan-400 to-blue-600" },
 ];
 
 export function levelTier(level) {
@@ -1256,7 +1291,7 @@ export function expandLevelReq(expansionsDone) {
 }
 
 // --- Player levels (XP thresholds) ---
-export const LEVEL_XP = [0,100,250,450,700,1000,1350,1750,2200,2700,3300,4000,4800,5700,6700,7800,9000,10300,11700,13200,14800,16500,18300,20200,22200,24300,26500,28800,31200,33700];
+export const LEVEL_XP = [0,100,250,450,700,1000,1350,1750,2200,2700,3300,4000,4800,5700,6700,7800,9000,10300,11700,13200,14800,16500,18300,20200,22200,24300,26500,28800,31200,33700,36300,39000,41800,44700,47700,50800,54000,57300,60700,64200,67800,71500,75300,79200,83200,87300,91500,95800,100200,104700];
 
 export function levelFromXp(xp) {
   let lvl = 1;

@@ -353,6 +353,10 @@ const [selectedZone, setSelectedZone] = useState(null);
       entertainer: (counts.entertainer || 0) * serviceZoneCoverage("entertainer"),
       fitness_coach: (counts.fitness_coach || 0) * serviceZoneCoverage("fitness_coach"),
       gardener: (counts.gardener || 0) * serviceZoneCoverage("gardener"),
+      chef: (counts.chef || 0) * serviceZoneCoverage("chef"),
+      photographer: (counts.photographer || 0) * serviceZoneCoverage("photographer"),
+      event_coordinator: (counts.event_coordinator || 0) * serviceZoneCoverage("event_coordinator"),
+      aquatics_director: (counts.aquatics_director || 0) * attractionZoneCoverage("aquatics_director"),
     };
     const fx = staffEffects(effectiveStaff);
     const uptime = fx.uptime;
@@ -2063,7 +2067,10 @@ const [selectedZone, setSelectedZone] = useState(null);
       money,
       reputation,
       day,
-      staffTotal: (staff.lifeguard || 0) + (staff.mechanic || 0) + (staff.cleaner || 0),
+      staffTotal: Object.values(staff).reduce((sum, n) => sum + (n || 0), 0),
+      staffTypesHired: Object.values(staff).filter((n) => (n || 0) > 0).length,
+      builtCount: (builtAttractionIds || []).length,
+      builtAttractionIds: builtAttractionIds || [],
       totalUpgrades,
       expansionsDone,
       maxedUpgrades: upgrades.filter((lv) => lv >= MAX_UPGRADE).length,
