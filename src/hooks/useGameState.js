@@ -270,7 +270,6 @@ const [selectedZone, setSelectedZone] = useState(null);
   }, []);
 
   const advanceDay = useCallback(() => {
-    console.log("[advanceDay] called, playing=", stateRef.current.grid?.filter(Boolean).length, "attractions");
     const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, staffAssignments: currentAssignments, incidents: currentIncidents, upgrades: currentUpgrades, attractionCondition: currentCondition, challenge: currentChallenge, parkZones: currentZones, forecast: currentForecast, seasonEvent: currentSeasonEvent, parkAppeal: currentParkAppeal,     ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass, vipVisit: currentVipVisit, completedResearch: currentResearch } = stateRef.current;
     const hasResearch = (id) => (currentResearch || []).includes(id);
     const upkeepResearchMult = hasResearch("efficiency") ? 0.85 : 1;
@@ -304,6 +303,11 @@ const [selectedZone, setSelectedZone] = useState(null);
     // Apply district bonuses
     eff.guestMult = (eff.guestMult ?? 1) * districtBonuses.guestMult;
     eff.incomeMult = (eff.incomeMult ?? 1) * districtBonuses.incomeMult;
+    // Compute aging modifiers before they affect appeal and visitor demand.
+    const currentRideAges = stateRef.current.rideAges || initRideAges(prevGrid.length);
+    const nextRideAges = tickRideAges(currentRideAges, prevGrid);
+    const agingUpkeepMult = aggregateAgingUpkeepMult(currentRideAges, prevGrid);
+    const agingAppealMult = aggregateAgingAppealMult(currentRideAges, prevGrid);
     const calculatedAppeal = calculateParkAppeal({ grid: prevGrid, zones: currentZones, getItem: getParkItem });
     calculatedAppeal.score = Math.round(calculatedAppeal.score * agingAppealMult);
     setParkAppeal(calculatedAppeal);
@@ -363,12 +367,6 @@ const [selectedZone, setSelectedZone] = useState(null);
     const empireTier = getEmpireTier(stateRef.current.empirePoints || 0);
     const resortBonuses = calculateResortBonuses(prevGrid);
 
-    // Ride aging: tick ages and compute upkeep/appeal multipliers
-    const currentRideAges = stateRef.current.rideAges || initRideAges(prevGrid.length);
-    const nextRideAges = tickRideAges(currentRideAges, prevGrid);
-    const agingUpkeepMult = aggregateAgingUpkeepMult(currentRideAges, prevGrid);
-    const agingAppealMult = aggregateAgingAppealMult(currentRideAges, prevGrid);
-
     // --- Resolve active incidents: staff improve the odds of a fix ---
     const mechPower = Math.min(0.9, 0.3 + (counts.mechanic || 0) * 0.2);
     const cleanPower = Math.min(0.9, 0.35 + (counts.cleaner || 0) * 0.2);
@@ -421,7 +419,6 @@ const [selectedZone, setSelectedZone] = useState(null);
       const safetyCoverage = Math.min(1, (effectiveStaff.lifeguard || 0) / Math.max(1, Math.ceil(attractions.length / 3)) + lifeguardStations * 0.12);
       const guestSafetyMult = safetyCoverage < 0.45 ? 0.88 : safetyCoverage < 0.7 ? 0.96 : 1;
       newGuests = Math.min(demand, Math.round(totalCapacity * guestSafetyMult));
-      console.log("[advanceDay] demand=", demand, "newGuests=", newGuests, "totalCapacity=", totalCapacity, "rep=", rep, "appeal=", calculatedAppeal.score);
 
       const currentPricing = stateRef.current.pricing || DEFAULT_PRICING;
       const sim = simulateVisits({
@@ -1881,7 +1878,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setCompetitors(createCompetitors(1));
     setMarketShare(100);
     setWaterQuality(createInitialWaterQuality(startGrid.length));
-    setRideAges({});
+    setRideAges(initRideAges(startGrid.length));
     setVipVisit(null);
     setVipHistory([]);
     setClaimedLegendary([]);

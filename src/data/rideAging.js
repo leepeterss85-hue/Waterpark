@@ -28,8 +28,8 @@ export function refurbishCost(itemCost, age) {
 
 // Advance age for all attractions by one day
 export function tickRideAges(rideAges, grid) {
-  if (!rideAges) rideAges = [];
-  const next = [...rideAges];
+  // Older saves stored ages by tile in an object; normalize both formats.
+  const next = Array.from({ length: grid.length }, (_, index) => rideAges?.[index] ?? 0);
   for (let i = 0; i < grid.length; i++) {
     if (grid[i] && next[i] != null) {
       next[i] = Math.min(MAX_AGE, next[i] + AGE_RATE);
