@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Volume2, VolumeX, Vibrate, VibrateOff, Play, RotateCcw, Save, SlidersHorizontal, HardHat, ArrowLeft, Sparkles, Ban } from "lucide-react";
+import { Volume2, VolumeX, Vibrate, VibrateOff, Play, RotateCcw, Save, SlidersHorizontal, HardHat, ArrowLeft, Sparkles, Ban, Cloud, Mail, MailOpen } from "lucide-react";
 import { sound } from "@/lib/soundManager";
 import { getSettings, saveSettings, haptics, DIFFICULTIES } from "@/lib/settings";
 import SaveLoadPanel from "@/components/game/SaveLoadPanel";
+import CloudSavesPanel from "@/components/game/CloudSavesPanel";
 import StarterParkPicker from "@/components/game/StarterParkPicker";
 
 function Row({ icon: Icon, title, desc, children }) {
@@ -33,10 +34,11 @@ function Toggle({ on, onClick, onIcon: OnIcon, offIcon: OffIcon, onTone = "text-
   );
 }
 
-export default function SettingsPanel({ saves, onSave, onLoad, onDelete, onNewGame, onContinue, sandbox, onToggleSandbox }) {
+export default function SettingsPanel({ saves, onSave, onLoad, onDelete, onNewGame, onContinue, sandbox, onToggleSandbox, loadFromCloud }) {
   const [soundOn, setSoundOn] = useState(!sound.isMuted());
   const [vibrationOn, setVibrationOn] = useState(haptics.isEnabled());
   const [difficulty, setDifficulty] = useState(getSettings().difficulty);
+  const [emailAlerts, setEmailAlerts] = useState(getSettings().emailAlerts !== false);
   const [showParkPicker, setShowParkPicker] = useState(false);
 
   const toggleSound = () => {
@@ -57,6 +59,14 @@ export default function SettingsPanel({ saves, onSave, onLoad, onDelete, onNewGa
   const chooseDifficulty = (id) => {
     saveSettings({ difficulty: id });
     setDifficulty(id);
+    haptics.buzz(15);
+    sound.click();
+  };
+
+  const toggleEmailAlerts = () => {
+    const next = !emailAlerts;
+    saveSettings({ emailAlerts: next });
+    setEmailAlerts(next);
     haptics.buzz(15);
     sound.click();
   };
@@ -123,6 +133,13 @@ export default function SettingsPanel({ saves, onSave, onLoad, onDelete, onNewGa
 
       <div>
         <div className="mb-2 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-slate-500">
+          <Cloud className="h-3.5 w-3.5" /> Cloud Saves
+        </div>
+        <CloudSavesPanel onLoadCloud={loadFromCloud} />
+      </div>
+
+      <div>
+        <div className="mb-2 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-slate-500">
           <SlidersHorizontal className="h-3.5 w-3.5" /> Audio & Feedback
         </div>
         <div className="flex flex-col gap-2">
@@ -131,6 +148,9 @@ export default function SettingsPanel({ saves, onSave, onLoad, onDelete, onNewGa
           </Row>
           <Row icon={Vibrate} title="Vibration" desc="Haptic feedback on supported devices">
             <Toggle on={vibrationOn} onClick={toggleVibration} onIcon={Vibrate} offIcon={VibrateOff} />
+          </Row>
+          <Row icon={emailAlerts ? Mail : MailOpen} title="Email Alerts" desc="Get notified about level-ups and milestones">
+            <Toggle on={emailAlerts} onClick={toggleEmailAlerts} onIcon={Mail} offIcon={MailOpen} />
           </Row>
         </div>
       </div>

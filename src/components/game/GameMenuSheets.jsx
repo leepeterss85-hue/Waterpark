@@ -126,6 +126,7 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
           onContinue={close}
           sandbox={game.sandbox}
           onToggleSandbox={game.toggleSandbox}
+          loadFromCloud={game.loadFromCloud}
         />
       </SheetShell>
 

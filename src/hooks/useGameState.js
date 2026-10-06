@@ -29,6 +29,7 @@ import { LOAN_TERMS, createLoan, simulateLoans } from "@/data/loans";
 import { EMPIRE_TIERS, getEmpireTier, calculateResortBonuses, calculateEmpirePoints } from "@/data/empire";
 import { createCompetitors, simulateCompetitors } from "@/data/competitors";
 import { createInitialWaterQuality, simulateWaterQuality, isWaterAttraction } from "@/data/waterQuality";
+import { base44 } from "@/api/base44Client";
 
 const STORAGE_KEY = "waterpark-tycoon-save-v1";
 const SLOTS_KEY = "waterpark-tycoon-slots";
@@ -1479,10 +1480,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, popularity, popularityTrend, prevPopularity, activeEvents]
   );
 
-  const loadPark = useCallback((name) => {
-    const slots = readSlots();
-    const data = slots[name];
-    if (!data) return;
+  const applyGameData = useCallback((data) => {
     setMoney(data.money ?? INITIAL_MONEY);
     setDay(data.day ?? 1);
     setReputation(data.reputation ?? 50);
@@ -1544,11 +1542,26 @@ const [selectedZone, setSelectedZone] = useState(null);
     if (data.waterQuality) setWaterQuality(data.waterQuality);
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
     setLastNet(data.lastNet ?? 0);
+  }, []);
+
+  const loadPark = useCallback((name) => {
+    const slots = readSlots();
+    const data = slots[name];
+    if (!data) return;
+    applyGameData(data);
     setPlaying(false);
     setSelectedBuild(null);
     setSelectedTile(null);
     trackEvent("park_loaded", { name });
-  }, []);
+  }, [applyGameData]);
+
+  const loadFromCloud = useCallback((data) => {
+    applyGameData(data);
+    setPlaying(false);
+    setSelectedBuild(null);
+    setSelectedTile(null);
+    trackEvent("park_loaded_cloud", {});
+  }, [applyGameData]);
 
   const deleteSave = useCallback((name) => {
     const slots = readSlots();
@@ -1556,6 +1569,21 @@ const [selectedZone, setSelectedZone] = useState(null);
     writeSlots(slots);
     setSaves((prev) => prev.filter((s) => s.name !== name));
   }, []);
+
+  const sendGameAlert = useCallback(async (alertType, title, message) => {
+    if (getSettings().emailAlerts === false) return;
+    try {
+      await base44.functions.invoke("sendGameAlert", { alertType, title, message });
+    } catch (e) { /* ignore — alerts are non-critical */ }
+  }, []);
+
+  const prevLevelRef = useRef(level);
+  useEffect(() => {
+    if (level > prevLevelRef.current) {
+      sendGameAlert("level_up", `Level ${level} Reached!`, `Your water park has reached level ${level}. New attractions and expansions may now be available.`);
+    }
+    prevLevelRef.current = level;
+  }, [level, sendGameAlert]);
 
   const resetGame = useCallback((starterParkId = "empty_lot") => {
     const diff = getDifficulty(getSettings().difficulty);
@@ -1833,5 +1861,6 @@ const [selectedZone, setSelectedZone] = useState(null);
     savePark,
     loadPark,
     deleteSave,
+    loadFromCloud,
   };
 }

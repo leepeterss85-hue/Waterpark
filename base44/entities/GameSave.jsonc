@@ -1,0 +1,50 @@
+{
+  "name": "GameSave",
+  "type": "object",
+  "properties": {
+    "save_name": {
+      "type": "string",
+      "title": "Save Name",
+      "description": "The player's chosen name for this save slot"
+    },
+    "game_data": {
+      "type": "object",
+      "title": "Game Data",
+      "description": "Full serialized game state JSON"
+    },
+    "day": {
+      "type": "number",
+      "title": "Day",
+      "description": "Current in-game day for display"
+    },
+    "money": {
+      "type": "number",
+      "title": "Money",
+      "description": "Current balance for display"
+    },
+    "reputation": {
+      "type": "number",
+      "title": "Reputation",
+      "description": "Current reputation for display"
+    },
+    "guests": {
+      "type": "number",
+      "title": "Guests",
+      "description": "Current guest count for display"
+    }
+  },
+  "required": [
+    "save_name"
+  ],
+  "rls": {
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}
