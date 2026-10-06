@@ -14,11 +14,14 @@ const slides = {
   halfpipe: ["M21 23C11 56 54 85 81 38C70 72 50 79 43 69"],
   mega_slide_complex: ["M14 18C0 38 60 26 56 48S24 58 34 80", "M28 18C58 6 90 30 74 48S52 64 62 80", "M42 18C86 20 96 50 80 60S44 72 52 80", "M22 18C12 32 48 32 48 48S32 58 40 80"],
   freefall_drop: ["M38 12Q41 45 44 80", "M55 12Q52 45 49 80"],
+  tidal_coaster: ["M16 30Q24 6 36 36T56 38T78 70", "M30 30Q42 18 50 40T72 70"],
+  skybox_plunge: ["M40 12L42 50L60 80", "M58 12L56 50L38 80"],
+  aqua_rocket: ["M20 70Q30 20 50 40Q80 20 75 70"],
 };
 export function getRideScene(id) {
   if (slides[id]) return { kind: "slide", paths: slides[id] };
-  if (id === "lazy_river" || id === "adventure_river") return { kind: "river", paths: [RIVER_PATH] };
-  if (["soft_play", "gem_mining", "mini_golf", "carousel", "go_karts"].includes(id)) return { kind: "dry", paths: [] };
+  if (id === "lazy_river" || id === "adventure_river" || id === "rapid_rafting") return { kind: "river", paths: [RIVER_PATH] };
+  if (["soft_play", "gem_mining", "mini_golf", "carousel", "go_karts", "sky_walk"].includes(id)) return { kind: "dry", paths: [] };
   if (id === "splash_pad") return { kind: "splash", paths: [] };
   return { kind: "pool", paths: [] };
 }
