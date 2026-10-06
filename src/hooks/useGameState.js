@@ -1918,8 +1918,6 @@ const [selectedZone, setSelectedZone] = useState(null);
     if (data.empirePoints != null) setEmpirePoints(data.empirePoints);
     setCompetitors(data.competitors ?? createCompetitors(data.day ?? 1));
     setMarketShare(data.marketShare ?? 100);
-    setWaterQuality(data.waterQuality ?? createInitialWaterQuality((data.grid ?? makeStartingGrid()).length));
-    setRideAges(data.rideAges ?? initRideAges((data.grid ?? makeStartingGrid()).length));
     setVipHistory(data.vipHistory ?? []);
     setClaimedLegendary(data.claimedLegendary ?? []);
     setActiveCalendarEvent(data.activeCalendarEvent ?? null);
