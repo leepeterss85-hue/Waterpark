@@ -25,6 +25,7 @@ import VipBanner from "@/components/game/VipBanner";
 import DisasterBanner from "@/components/game/DisasterBanner";
 import HotelDetail from "@/components/game/HotelDetail";
 import { getHotelDef, hotelRooms, isHotelItem } from "@/data/hotels";
+import { getTheme } from "@/data/visualThemes";
 import { trackEvent } from "@/lib/gameAnalytics";
 import { sound } from "@/lib/soundManager";
 import { haptics } from "@/lib/settings";
@@ -251,6 +252,7 @@ export default function Home() {
           }
           bottomMenu={<MapMenuBar openSheet={openSheet} onOpen={handleOpenMenu} missionsBadge={claimableMissions} incidentBadge={incidentCount} />}
           statsBar={statsBar}
+          themeClass={getTheme(game.activeTheme).cssClass}
         />
 
         <Sheet open={game.selectedTile != null && !!selectedItem} onOpenChange={(v) => { if (!v) game.setSelectedTile(null); }}>

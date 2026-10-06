@@ -25,7 +25,7 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
   const facilityStatus = { toilets: guests <= Math.max(1, toilets) * 80 ? "COVERED" : "OVERLOADED", lifeguard_station: guardCoverage >= 0.7 ? "COVERED" : "OVERLOADED" };
 
   return (
-    <section className={"game-board-shell aquatic-map park-time-" + timeOfDay + " park-weather-" + weatherId + " flex h-full flex-col"}>
+    <section className={"game-board-shell aquatic-map park-time-" + timeOfDay + " park-weather-" + weatherId + " flex h-full flex-col " + themeClass}>
       <div className="game-board-titlebar">
         <div className="flex min-w-0 items-center gap-3"><div className="game-board-icon"><MapIcon className="h-5 w-5" /></div><div className="min-w-0"><div className="flex items-center gap-2"><h2 className="font-display text-base font-black text-white sm:text-lg">Your Water Park</h2><span className="game-live-pill"><span /> LIVE</span></div><p className="hidden text-[10px] font-bold text-white/60 sm:block">Build, decorate and manage your resort.</p></div></div>
         <div className="flex shrink-0 items-center gap-2 text-[9px] font-black uppercase tracking-wider text-white/75 sm:text-[10px]"><span className="flex items-center gap-1.5"><Users className="h-3.5 w-3.5 text-cyan-200" />{guests.toLocaleString()}</span><span className="hidden h-4 w-px bg-white/20 sm:block" /><span className="hidden items-center gap-1.5 sm:flex"><Footprints className="h-3.5 w-3.5 text-amber-200" />GUESTS MOVING</span></div>
