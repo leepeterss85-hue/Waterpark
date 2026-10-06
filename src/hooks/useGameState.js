@@ -1601,9 +1601,14 @@ const [selectedZone, setSelectedZone] = useState(null);
   }, []);
 
   const sendGameAlert = useCallback(async (alertType, title, message) => {
-    if (getSettings().emailAlerts === false) return;
+    const settings = getSettings();
+    if (settings.emailAlerts === false && settings.pushAlerts === false) return;
     try {
-      await base44.functions.invoke("sendGameAlert", { alertType, title, message });
+      await base44.functions.invoke("sendGameAlert", {
+        alertType, title, message,
+        emailAlerts: settings.emailAlerts !== false,
+        pushAlerts: settings.pushAlerts !== false,
+      });
     } catch (e) { /* ignore — alerts are non-critical */ }
   }, []);
 
@@ -1614,6 +1619,63 @@ const [selectedZone, setSelectedZone] = useState(null);
     }
     prevLevelRef.current = level;
   }, [level, sendGameAlert]);
+
+  const submitLeaderboard = useCallback(async (playerName, parkName) => {
+    try {
+      await base44.functions.invoke("leaderboard", {
+        action: "submit",
+        playerName, parkName,
+        level, day, reputation, guests, money,
+        empirePoints, resortRating, peakGuests,
+      });
+      trackEvent("leaderboard_submitted", { level, day });
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }, [level, day, reputation, guests, money, empirePoints, resortRating, peakGuests]);
+
+  const sharePark = useCallback(async (parkName, playerName) => {
+    const gameData = {
+      money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments,
+      attractionCondition, log, lastNet, incidents, upgrades, xp, expansionsDone,
+      peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings,
+      builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent,
+      ticketPrice, adBudget, priorityPass, researchPoints, completedResearch,
+      parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats,
+      resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents,
+      membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer,
+      awardStats, socialPosts, socialReputation, emergencies, emergencyStats,
+      constructionProjects, loans, returnVisitorMult, empirePoints, competitors,
+      marketShare, waterQuality,
+    };
+    try {
+      const res = await base44.functions.invoke("sharePark", {
+        action: "share", parkName, playerName, gameData,
+        day, reputation, guests, level,
+      });
+      trackEvent("park_shared", { day, level });
+      return res.data?.shareCode || null;
+    } catch (e) {
+      return null;
+    }
+  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, log, lastNet, incidents, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, level]);
+
+  const viewSharedPark = useCallback(async (shareCode) => {
+    try {
+      const res = await base44.functions.invoke("sharePark", { action: "view", shareCode });
+      if (res.data?.ok && res.data?.park) return res.data.park;
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }, []);
+
+  useEffect(() => {
+    const handler = (e) => { if (e.detail) applyGameData(e.detail); };
+    window.addEventListener("load-shared-park", handler);
+    return () => window.removeEventListener("load-shared-park", handler);
+  }, [applyGameData]);
 
   const resetGame = useCallback((starterParkId = "empty_lot") => {
     const diff = getDifficulty(getSettings().difficulty);
@@ -1893,5 +1955,8 @@ const [selectedZone, setSelectedZone] = useState(null);
     loadPark,
     deleteSave,
     loadFromCloud,
+    submitLeaderboard,
+    sharePark,
+    viewSharedPark,
   };
 }

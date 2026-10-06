@@ -1,0 +1,76 @@
+{
+  "name": "LeaderboardEntry",
+  "type": "object",
+  "properties": {
+    "player_name": {
+      "type": "string",
+      "title": "Player Name",
+      "description": "The player's display name on the leaderboard"
+    },
+    "park_name": {
+      "type": "string",
+      "title": "Park Name",
+      "description": "The player's water park name"
+    },
+    "level": {
+      "type": "number",
+      "title": "Level",
+      "description": "Player's current tycoon level"
+    },
+    "day": {
+      "type": "number",
+      "title": "Day",
+      "description": "Current in-game day"
+    },
+    "reputation": {
+      "type": "number",
+      "title": "Reputation",
+      "description": "Current park reputation percentage"
+    },
+    "guests": {
+      "type": "number",
+      "title": "Guests",
+      "description": "Current guest count"
+    },
+    "money": {
+      "type": "number",
+      "title": "Money",
+      "description": "Current bank balance"
+    },
+    "empire_points": {
+      "type": "number",
+      "title": "Empire Points",
+      "description": "Total empire points earned"
+    },
+    "resort_rating": {
+      "type": "number",
+      "title": "Resort Rating",
+      "description": "Overall resort star rating"
+    },
+    "peak_guests": {
+      "type": "number",
+      "title": "Peak Guests",
+      "description": "Highest guest count ever achieved"
+    },
+    "score": {
+      "type": "number",
+      "title": "Score",
+      "description": "Composite ranking score"
+    }
+  },
+  "required": [
+    "player_name",
+    "park_name"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}

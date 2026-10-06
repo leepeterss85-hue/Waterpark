@@ -7,7 +7,7 @@ export default async function(req) {
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json();
-    const { alertType, title, message } = body;
+    const { alertType, title, message, emailAlerts, pushAlerts } = body;
 
     if (!title || !message) return Response.json({ error: 'Title and message required' }, { status: 400 });
 
@@ -19,17 +19,33 @@ export default async function(req) {
     };
     const label = alertLabels[alertType] || 'Park Alert';
 
-    await base44.asServiceRole.integrations.Core.SendEmail({
-      to: user.email,
-      subject: `AquaTycoon — ${label}: ${title}`,
-      template_name: 'GameAlert',
-      variables: {
-        alert_label: label,
-        alert_title: title,
-        alert_message: message,
-        park_name: title,
-      },
-    });
+    // Send email alert
+    if (emailAlerts !== false) {
+      await base44.asServiceRole.integrations.Core.SendEmail({
+        to: user.email,
+        subject: `AquaTycoon — ${label}: ${title}`,
+        template_name: 'GameAlert',
+        variables: {
+          alert_label: label,
+          alert_title: title,
+          alert_message: message,
+          park_name: title,
+        },
+      });
+    }
+
+    // Send push notification (silently fails if no native mobile build with push credentials)
+    if (pushAlerts !== false) {
+      try {
+        await base44.asServiceRole.integrations.Core.SendPushNotification({
+          user_id: user.id,
+          title: `AquaTycoon — ${label}`,
+          content: message,
+        });
+      } catch (e) {
+        // Push requires native mobile build with push credentials configured
+      }
+    }
 
     return Response.json({ ok: true, sent_to: user.email });
   } catch (error) {

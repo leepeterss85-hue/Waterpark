@@ -1,7 +1,7 @@
 import React from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets } from "lucide-react";
+import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2 } from "lucide-react";
 import { MISSIONS, missionProgress } from "@/data/missions";
 import BuildPanel from "@/components/game/BuildPanel";
 import ExpansionPanel from "@/components/game/ExpansionPanel";
@@ -29,6 +29,8 @@ import EconomyPanel from "@/components/game/EconomyPanel";
 import EmpirePanel from "@/components/game/EmpirePanel";
 import CompetitorsPanel from "@/components/game/CompetitorsPanel";
 import WaterQualityPanel from "@/components/game/WaterQualityPanel";
+import LeaderboardPanel from "@/components/game/LeaderboardPanel";
+import ShareParkPanel from "@/components/game/ShareParkPanel";
 import { isWaterAttraction } from "@/data/waterQuality";
 import { getHotelDef, hotelRooms, isHotelItem } from "@/data/hotels";
 
@@ -230,6 +232,31 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
           avgQuality={game.waterQualityAvg}
           criticalCount={game.waterQualityCriticalCount}
           waterAttractionCount={game.grid.filter((id) => id && isWaterAttraction(id)).length}
+        />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "leaderboard"} onOpenChange={(v) => !v && close()} title="Leaderboard" icon={Medal} width="sm:max-w-md">
+        <LeaderboardPanel
+          level={game.level}
+          day={game.day}
+          reputation={game.reputation}
+          guests={game.guests}
+          money={game.money}
+          empirePoints={game.empirePoints}
+          resortRating={game.resortRating}
+          peakGuests={game.peakGuests}
+          onSubmit={game.submitLeaderboard}
+        />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "share"} onOpenChange={(v) => !v && close()} title="Share Park" icon={Link2} width="sm:max-w-md">
+        <ShareParkPanel
+          day={game.day}
+          reputation={game.reputation}
+          guests={game.guests}
+          level={game.level}
+          onShare={game.sharePark}
+          onViewShared={game.viewSharedPark}
         />
       </SheetShell>
     </>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Volume2, VolumeX, Vibrate, VibrateOff, Play, RotateCcw, Save, SlidersHorizontal, HardHat, ArrowLeft, Sparkles, Ban, Cloud, Mail, MailOpen } from "lucide-react";
+import { Volume2, VolumeX, Vibrate, VibrateOff, Play, RotateCcw, Save, SlidersHorizontal, HardHat, ArrowLeft, Sparkles, Ban, Cloud, Mail, MailOpen, Bell, BellOff } from "lucide-react";
 import { sound } from "@/lib/soundManager";
 import { getSettings, saveSettings, haptics, DIFFICULTIES } from "@/lib/settings";
 import SaveLoadPanel from "@/components/game/SaveLoadPanel";
@@ -39,6 +39,7 @@ export default function SettingsPanel({ saves, onSave, onLoad, onDelete, onNewGa
   const [vibrationOn, setVibrationOn] = useState(haptics.isEnabled());
   const [difficulty, setDifficulty] = useState(getSettings().difficulty);
   const [emailAlerts, setEmailAlerts] = useState(getSettings().emailAlerts !== false);
+  const [pushAlerts, setPushAlerts] = useState(getSettings().pushAlerts !== false);
   const [showParkPicker, setShowParkPicker] = useState(false);
 
   const toggleSound = () => {
@@ -67,6 +68,14 @@ export default function SettingsPanel({ saves, onSave, onLoad, onDelete, onNewGa
     const next = !emailAlerts;
     saveSettings({ emailAlerts: next });
     setEmailAlerts(next);
+    haptics.buzz(15);
+    sound.click();
+  };
+
+  const togglePushAlerts = () => {
+    const next = !pushAlerts;
+    saveSettings({ pushAlerts: next });
+    setPushAlerts(next);
     haptics.buzz(15);
     sound.click();
   };
@@ -151,6 +160,9 @@ export default function SettingsPanel({ saves, onSave, onLoad, onDelete, onNewGa
           </Row>
           <Row icon={emailAlerts ? Mail : MailOpen} title="Email Alerts" desc="Get notified about level-ups and milestones">
             <Toggle on={emailAlerts} onClick={toggleEmailAlerts} onIcon={Mail} offIcon={MailOpen} />
+          </Row>
+          <Row icon={pushAlerts ? Bell : BellOff} title="Push Alerts" desc="Mobile push notifications for key events">
+            <Toggle on={pushAlerts} onClick={togglePushAlerts} onIcon={Bell} offIcon={BellOff} />
           </Row>
         </div>
       </div>
