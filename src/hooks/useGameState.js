@@ -1154,7 +1154,7 @@ const [selectedZone, setSelectedZone] = useState(null);
   // Game loop
   useEffect(() => {
     if (!playing) return;
-    const interval = setInterval(advanceDay, 30000 / speed);
+    const interval = setInterval(advanceDay, 8000 / speed);
     return () => clearInterval(interval);
   }, [playing, speed, advanceDay]);
 
