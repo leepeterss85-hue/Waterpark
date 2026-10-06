@@ -38,8 +38,10 @@ jobs:
         run: |
           npm install --no-save \
             @capacitor/core@${CAPACITOR_VERSION} \
-            @capacitor/android@${CAPACITOR_VERSION}
-          npm install --no-save -D @capacitor/cli@${CAPACITOR_VERSION}
+            @capacitor/android@${CAPACITOR_VERSION} \
+            @capacitor/cli@${CAPACITOR_VERSION}
+          node -e "console.log('Capacitor Android:', require.resolve('@capacitor/android/package.json'))"
+          node -e "console.log('Capacitor CLI:', require.resolve('@capacitor/cli/package.json'))"
 
       - name: Build web app
         run: npm run build
@@ -107,8 +109,10 @@ jobs:
         run: |
           npm install --no-save \
             @capacitor/core@${CAPACITOR_VERSION} \
-            @capacitor/ios@${CAPACITOR_VERSION}
-          npm install --no-save -D @capacitor/cli@${CAPACITOR_VERSION}
+            @capacitor/ios@${CAPACITOR_VERSION} \
+            @capacitor/cli@${CAPACITOR_VERSION}
+          node -e "console.log('Capacitor iOS:', require.resolve('@capacitor/ios/package.json'))"
+          node -e "console.log('Capacitor CLI:', require.resolve('@capacitor/cli/package.json'))"
 
       - name: Build web app
         run: npm run build
