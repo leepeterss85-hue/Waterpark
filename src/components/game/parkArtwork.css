@@ -69,3 +69,35 @@
 .scene-zip-support { fill:none;stroke:hsl(var(--park-ink)/.5);stroke-width:1.5;stroke-linecap:round; }
 .scene-boat-detail { fill:none;stroke:hsl(var(--park-rim));stroke-width:1.5;stroke-linecap:round;opacity:.7; }
 .scene-spin-flow { fill:none;stroke:hsl(var(--park-rim));stroke-width:2.5;stroke-dasharray:3 2;opacity:.7; }
+/* === Premium water attractions === */
+.scene-rapid-wave { fill:none;stroke:hsl(var(--park-rim));stroke-width:2.5;stroke-linecap:round;opacity:.8; }
+.scene-rapid-rock { fill:hsl(var(--park-edge));stroke:hsl(var(--park-ink)/.3);stroke-width:1; }
+.scene-cave-arch { fill:none;stroke:hsl(var(--park-ink)/.6);stroke-width:4;stroke-linecap:round; }
+.scene-volleyball-net { fill:none;stroke:hsl(var(--park-rim));stroke-width:1.5;stroke-dasharray:2 2; }
+.scene-volleyball-court { fill:none;stroke:hsl(var(--park-rim)/.5);stroke-width:2;stroke-dasharray:3 3; }
+.scene-volleyball-ball { fill:hsl(var(--park-sun));stroke:hsl(var(--park-ink)/.4);stroke-width:1; }
+.scene-bumper-boat { fill:hsl(var(--park-slide));stroke:hsl(var(--park-rim));stroke-width:1.5; }
+.scene-bumper-ring { fill:none;stroke:hsl(var(--park-sun));stroke-width:2.5;stroke-dasharray:4 2; }
+.scene-bumper-wheel { fill:hsl(var(--park-ink)); }
+/* === Dry-land attractions === */
+.scene-golf-green { fill:hsl(var(--park-green));stroke:hsl(var(--park-ink)/.2);stroke-width:1; }
+.scene-golf-mow { fill:none;stroke:hsl(var(--park-rim)/.25);stroke-width:1; }
+.scene-golf-pond { fill:hsl(var(--park-water));stroke:hsl(var(--park-rim));stroke-width:1; }
+.scene-golf-hole { fill:hsl(var(--park-ink)); }
+.scene-golf-flagpole { fill:hsl(var(--park-ink)/.6); }
+.scene-golf-flag { fill:hsl(var(--park-slide));stroke:hsl(var(--park-ink)/.3);stroke-width:.5; }
+.scene-golf-tee { fill:hsl(var(--park-edge)); }
+.scene-golf-ball { fill:hsl(var(--park-rim));stroke:hsl(var(--park-ink)/.3);stroke-width:.5; }
+.scene-golf-bunker { fill:none;stroke:hsl(var(--park-sun)/.6);stroke-width:3;stroke-linecap:round; }
+.scene-carousel-base { fill:hsl(var(--park-ink)/.2); }
+.scene-carousel-floor { fill:hsl(var(--park-slide));stroke:hsl(var(--park-rim));stroke-width:1.5; }
+.scene-carousel-pole { fill:none;stroke:hsl(var(--park-ink)/.6);stroke-width:2; }
+.scene-carousel-top { fill:hsl(var(--park-sun));stroke:hsl(var(--park-ink)/.3);stroke-width:1; }
+.scene-carousel-stripe { fill:none;stroke:hsl(var(--park-slide));stroke-width:1.5; }
+.scene-carousel-horse { fill:hsl(var(--park-rim));stroke:hsl(var(--park-ink)/.4);stroke-width:1; }
+.scene-kart-track { fill:hsl(var(--park-ink)/.15);stroke:hsl(var(--park-ink)/.4);stroke-width:2; }
+.scene-kart-inner { fill:hsl(var(--park-green)/.3);stroke:hsl(var(--park-rim)/.4);stroke-width:1.5; }
+.scene-kart-finish { fill:hsl(var(--park-rim)); }
+.scene-kart-checker { fill:none;stroke:hsl(var(--park-ink));stroke-width:1; }
+.scene-kart-body { fill:hsl(var(--park-slide));stroke:hsl(var(--park-rim));stroke-width:1; }
+.scene-kart-wheel { fill:hsl(var(--park-ink)); }
