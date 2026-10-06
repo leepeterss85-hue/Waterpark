@@ -173,6 +173,7 @@ export default function Home() {
 
   const claimableMissions = MISSIONS.filter((m) => game.level >= m.level && !game.claimedMissions.includes(m.id) && missionProgress(m, game.missionState) >= m.target).length;
   const incidentCount = game.incidents.length;
+  const themeClass = getTheme(game.activeTheme).cssClass;
 
   const statsBar = (
     <div className="game-board-statsbar">
@@ -205,7 +206,7 @@ export default function Home() {
 
   return (
     <div
-      className={`h-screen flex flex-col overflow-hidden bg-[radial-gradient(circle_at_10%_0%,rgba(34,211,238,.35),transparent_28%),radial-gradient(circle_at_90%_12%,rgba(250,204,21,.16),transparent_24%),linear-gradient(180deg,#bdefff_0%,#e8f8ed_42%,#c8e1c0_100%)]${shake ? " screen-shake" : ""}`}
+      className={`h-screen flex flex-col overflow-hidden bg-[radial-gradient(circle_at_10%_0%,rgba(34,211,238,.35),transparent_28%),radial-gradient(circle_at_90%_12%,rgba(250,204,21,.16),transparent_24%),linear-gradient(180deg,#bdefff_0%,#e8f8ed_42%,#c8e1c0_100%)] ${themeClass}${shake ? " screen-shake" : ""}`}
       style={{ height: "100dvh" }}
     >
       <DayTransition day={game.day} weather={game.weather} seasonEvent={game.seasonEvent} trigger={dayTrigger} />
@@ -253,7 +254,7 @@ export default function Home() {
           }
           bottomMenu={<MapMenuBar openSheet={openSheet} onOpen={handleOpenMenu} missionsBadge={claimableMissions} incidentBadge={incidentCount} />}
           statsBar={statsBar}
-          themeClass={getTheme(game.activeTheme).cssClass}
+          themeClass={themeClass}
         />
 
         <Sheet open={game.selectedTile != null && !!selectedItem} onOpenChange={(v) => { if (!v) game.setSelectedTile(null); }}>
