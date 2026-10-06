@@ -21,7 +21,7 @@ const slides = {
 export function getRideScene(id) {
   if (slides[id]) return { kind: "slide", paths: slides[id] };
   if (id === "lazy_river" || id === "adventure_river" || id === "rapid_rafting") return { kind: "river", paths: [RIVER_PATH] };
-  if (["soft_play", "gem_mining", "mini_golf", "carousel", "go_karts", "sky_walk"].includes(id)) return { kind: "dry", paths: [] };
+  if (["soft_play", "gem_mining", "mini_golf", "carousel", "go_karts", "sky_walk", "ferris_wheel", "roller_coaster", "pendulum_ride", "drop_tower", "pirate_ship", "tea_cups", "bumper_cars", "swing_ride", "haunted_house", "funhouse", "observation_tower", "park_monorail", "ring_toss", "strongman_hammer", "fortune_teller", "duck_pond", "basketball_toss"].includes(id)) return { kind: "dry", paths: [] };
   if (id === "splash_pad") return { kind: "splash", paths: [] };
   return { kind: "pool", paths: [] };
 }

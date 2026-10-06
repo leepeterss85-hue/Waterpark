@@ -430,5 +430,214 @@
   .ride-river-glint, .scene-water-jet, .scene-splash-arch, .ride-fountain, .scene-mushroom,
   .scene-tipping-bucket, .scene-spin-raft, .scene-arcade-screen, .scene-atm-screen, .scene-flame,
   .park-pedestrian > .park-person, .person-ripple, .scene-balloon, .scene-play-ball,
-  .scene-life-ring, .scene-safety-flag, .pool-water-surface::after { animation: none !important; }
+  .scene-life-ring, .scene-safety-flag, .pool-water-surface::after,
+  .scene-ferris-rim, .scene-ferris-spoke, .scene-pendulum-gondola, .scene-swing-chain,
+  .scene-swing-seat, .scene-teacup-cup, .scene-bumper-car, .scene-coaster-train,
+  .scene-drop-gondola, .scene-pirate-flag, .scene-haunt-ghost, .scene-fortune-crystal-ball,
+  .scene-fortune-crystal-glow, .scene-strongman-bell, .scene-duck-body { animation: none !important; }
 }
+
+/* === 27. Theme Park Ride Artwork === */
+
+/* Ferris Wheel */
+.scene-ferris-rim { stroke: hsl(190 91% 45%); stroke-width: 3.5; fill: none; filter: drop-shadow(0 3px 3px hsl(var(--park-ink)/.2)); }
+.scene-ferris-rim-outer { stroke: hsl(190 91% 55%); stroke-width: 1.5; fill: none; opacity: .6; }
+.scene-ferris-spoke { stroke: hsl(200 80% 50%); stroke-width: 1.5; opacity: .75; }
+.scene-ferris-gondola { fill: hsl(var(--park-slide)); filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.25)); }
+.scene-ferris-gondola-window { fill: hsl(190 91% 85%); opacity: .8; }
+.scene-ferris-hub { fill: hsl(200 80% 40%); filter: drop-shadow(0 1px 2px hsl(var(--park-ink)/.3)); }
+.scene-ferris-base { fill: hsl(200 30% 35%); }
+.scene-ferris-base-wide { fill: hsl(200 30% 30%); filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)); }
+.scene-ferris-rim { animation: ferris-rotate 20s linear infinite; transform-origin: 50px 50px; }
+@keyframes ferris-rotate { to { transform: rotate(360deg); } }
+
+/* Roller Coaster */
+.scene-coaster-track { stroke: hsl(0 70% 50%); stroke-width: 4; stroke-linecap: round; }
+.scene-coaster-track-shadow { stroke: hsl(var(--park-ink)/.3); stroke-width: 6; stroke-linecap: round; opacity: .4; transform: translateY(2px); }
+.scene-coaster-rail { stroke: hsl(0 80% 60%); stroke-width: 2; stroke-linecap: round; opacity: .8; filter: drop-shadow(0 0 3px hsl(0 80% 60% / .4)); }
+.scene-coaster-support { stroke: hsl(200 30% 40%); stroke-width: 2.5; opacity: .7; }
+.scene-coaster-train { fill: hsl(var(--park-slide)); filter: drop-shadow(0 2px 3px hsl(var(--park-ink)/.3)); animation: coaster-run 3s ease-in-out infinite; }
+@keyframes coaster-run { 0% { transform: translateX(-20px); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateX(20px); opacity: 0; } }
+
+/* Pendulum Ride */
+.scene-pendulum-arm { fill: hsl(260 50% 45%); filter: drop-shadow(0 2px 3px hsl(var(--park-ink)/.25)); }
+.scene-pendulum-hub { fill: hsl(260 60% 55%); filter: drop-shadow(0 1px 2px hsl(var(--park-ink)/.3)); }
+.scene-pendulum-gondola { fill: hsl(260 50% 50%); filter: drop-shadow(0 3px 3px hsl(var(--park-ink)/.3)); animation: pendulum-swing 3s ease-in-out infinite; transform-origin: 50px 10px; }
+.scene-pendulum-detail { stroke: hsl(260 60% 70%); stroke-width: 1.5; opacity: .7; }
+.scene-pendulum-base { fill: hsl(200 30% 35%); }
+.scene-pendulum-base-wide { fill: hsl(200 30% 30%); filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)); }
+.scene-pendulum-arc { stroke: hsl(var(--park-rim)/.3); stroke-width: 1.5; stroke-dasharray: 3 3; opacity: .5; }
+@keyframes pendulum-swing { 0%, 100% { transform: rotate(-20deg); } 50% { transform: rotate(20deg); } }
+
+/* Drop Tower */
+.scene-drop-tower { fill: hsl(200 30% 45%); filter: drop-shadow(0 2px 3px hsl(var(--park-ink)/.2)); }
+.scene-drop-tower-top { fill: hsl(40 90% 55%); filter: drop-shadow(0 1px 2px hsl(var(--park-ink)/.25)); }
+.scene-drop-tower-detail { stroke: hsl(200 40% 55%); stroke-width: 1; opacity: .6; }
+.scene-drop-gondola { fill: hsl(var(--park-slide)); filter: drop-shadow(0 3px 4px hsl(var(--park-ink)/.3)); animation: drop-fall 2.5s ease-in-out infinite; }
+.scene-drop-gondola-light { fill: hsl(50 100% 70%); filter: drop-shadow(0 0 3px hsl(50 100% 70% / .8)); }
+.scene-drop-base { fill: hsl(200 30% 35%); }
+.scene-drop-base-wide { fill: hsl(200 30% 28%); filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)); }
+@keyframes drop-fall { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(0); } 50% { transform: translateY(25px); } 60% { transform: translateY(0); } }
+
+/* Pirate Ship */
+.scene-pirate-hull { fill: hsl(25 50% 40%); filter: drop-shadow(0 3px 4px hsl(var(--park-ink)/.3)); }
+.scene-pirate-hull-rim { stroke: hsl(25 60% 55%); stroke-width: 2; }
+.scene-pirate-castle { fill: hsl(25 40% 50%); }
+.scene-pirate-castle-rim { fill: hsl(25 50% 45%); }
+.scene-pirate-merlon { fill: hsl(25 50% 45%); }
+.scene-pirate-mast { fill: hsl(30 40% 30%); }
+.scene-pirate-flag { fill: hsl(0 70% 45%); filter: drop-shadow(0 1px 2px hsl(var(--park-ink)/.2)); animation: flag-wave 1.5s ease-in-out infinite; transform-origin: 46px 20px; }
+.scene-pirate-flag-detail { stroke: hsl(0 0% 90%); stroke-width: 1; opacity: .7; }
+.scene-pirate-base { fill: hsl(200 30% 35%); }
+.scene-pirate-arc { stroke: hsl(var(--park-rim)/.3); stroke-width: 1.5; stroke-dasharray: 3 3; opacity: .5; }
+
+/* Tea Cups */
+.scene-teacup-platform { fill: hsl(280 30% 70%); filter: drop-shadow(0 3px 4px hsl(var(--park-ink)/.2)); }
+.scene-teacup-platform-rim { fill: none; stroke: hsl(280 40% 60%); stroke-width: 2; }
+.scene-teacup-saucer { fill: hsl(0 0% 90%); filter: drop-shadow(0 1px 2px hsl(var(--park-ink)/.15)); }
+.scene-teacup-cup { fill: hsl(var(--park-slide)); filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)); }
+.scene-teacup-cup-0 { fill: hsl(330 70% 60%); }
+.scene-teacup-cup-1 { fill: hsl(200 70% 55%); }
+.scene-teacup-cup-2 { fill: hsl(50 80% 55%); }
+.scene-teacup-liquid { fill: hsl(180 60% 70%); opacity: .7; }
+.scene-teacup-handle { stroke: hsl(var(--park-slide)); stroke-width: 2; fill: none; }
+.scene-teacup-handle-loop { stroke: hsl(var(--park-slide)); stroke-width: 1.5; fill: none; }
+.scene-teacup-cup { animation: teacup-spin 4s linear infinite; transform-origin: center; }
+.scene-teacup-cup-0 { animation-duration: 3s; }
+.scene-teacup-cup-1 { animation-duration: 4.5s; animation-direction: reverse; }
+.scene-teacup-cup-2 { animation-duration: 3.5s; }
+@keyframes teacup-spin { to { transform: rotate(360deg); } }
+
+/* Bumper Cars */
+.scene-bumper-floor { fill: hsl(150 30% 55%); filter: drop-shadow(0 2px 3px hsl(var(--park-ink)/.15)); }
+.scene-bumper-rail { stroke: hsl(150 40% 40%); stroke-width: 3; }
+.scene-bumper-divider { stroke: hsl(150 40% 45%); stroke-width: 1.5; opacity: .5; stroke-dasharray: 4 3; }
+.scene-bumper-shadow { fill: hsl(var(--park-ink)/.2); }
+.scene-bumper-car { fill: hsl(var(--park-slide)); filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.25)); }
+.scene-bumper-car-0 { fill: hsl(0 70% 55%); }
+.scene-bumper-car-1 { fill: hsl(200 70% 55%); }
+.scene-bumper-car-2 { fill: hsl(50 80% 50%); }
+.scene-bumper-pole { fill: hsl(0 0% 60%); }
+.scene-bumper-ceiling { fill: hsl(0 0% 80%); }
+.scene-bumper-car { animation: bumper-bounce 1.5s ease-in-out infinite alternate; }
+.scene-bumper-car-0 { animation-delay: 0s; }
+.scene-bumper-car-1 { animation-delay: .3s; }
+.scene-bumper-car-2 { animation-delay: .6s; }
+@keyframes bumper-bounce { from { transform: translate(0, 0); } to { transform: translate(2px, -1px); } }
+
+/* Swing Ride */
+.scene-swing-pole { fill: hsl(200 30% 45%); filter: drop-shadow(0 2px 3px hsl(var(--park-ink)/.2)); }
+.scene-swing-hub { fill: hsl(200 50% 55%); filter: drop-shadow(0 1px 2px hsl(var(--park-ink)/.25)); }
+.scene-swing-canopy { stroke: hsl(190 80% 55%); stroke-width: 3; opacity: .7; }
+.scene-swing-canopy-rim { stroke: hsl(190 90% 65%); stroke-width: 1.5; }
+.scene-swing-chain { stroke: hsl(0 0% 60%); stroke-width: 1; opacity: .8; }
+.scene-swing-seat { fill: hsl(var(--park-slide)); filter: drop-shadow(0 1px 2px hsl(var(--park-ink)/.2)); }
+.scene-swing-seat-0 { fill: hsl(330 70% 60%); }
+.scene-swing-seat-1 { fill: hsl(200 70% 55%); }
+.scene-swing-seat-2 { fill: hsl(50 80% 55%); }
+.scene-swing-person { fill: hsl(30 30% 60%); }
+.scene-swing-seat { animation: swing-ride 2.5s ease-in-out infinite; transform-origin: top center; }
+.scene-swing-seat-0 { animation-delay: 0s; }
+.scene-swing-seat-1 { animation-delay: .4s; }
+.scene-swing-seat-2 { animation-delay: .8s; }
+.scene-swing-base { fill: hsl(200 30% 35%); }
+@keyframes swing-ride { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
+
+/* Haunted House */
+.scene-haunt-body { fill: hsl(260 30% 25%); filter: drop-shadow(0 4px 5px hsl(var(--park-ink)/.35)); }
+.scene-haunt-roof { stroke: hsl(260 40% 35%); stroke-width: 3; }
+.scene-haunt-door { fill: hsl(0 50% 20%); }
+.scene-haunt-window { fill: hsl(50 80% 50% / .3); stroke: hsl(50 80% 60%); stroke-width: 1; }
+.scene-haunt-window-bars { stroke: hsl(50 80% 50%); stroke-width: .8; opacity: .6; }
+.scene-haunt-ghost { fill: hsl(0 0% 90%); opacity: .7; filter: drop-shadow(0 0 4px hsl(0 0% 90% / .6)); animation: ghost-float 2s ease-in-out infinite; }
+.scene-haunt-flagpole { stroke: hsl(0 50% 30%); stroke-width: 1.5; }
+.scene-haunt-flag { fill: hsl(0 60% 40%); }
+.scene-haunt-ground { stroke: hsl(260 20% 20%); stroke-width: 2; }
+@keyframes ghost-float { 0%, 100% { transform: translateY(0); opacity: .5; } 50% { transform: translateY(-3px); opacity: .9; } }
+
+/* Funhouse */
+.scene-funhouse-body { fill: hsl(300 40% 60%); filter: drop-shadow(0 3px 4px hsl(var(--park-ink)/.2)); }
+.scene-funhouse-roof { stroke: hsl(300 50% 50%); stroke-width: 3; }
+.scene-funhouse-roof-stripe { stroke: hsl(300 60% 65%); stroke-width: 1.5; opacity: .6; stroke-dasharray: 4 3; }
+.scene-funhouse-mirror { fill: hsl(180 60% 80% / .35); stroke: hsl(180 60% 50%); stroke-width: 1.5; opacity: .7; }
+.scene-funhouse-floor { stroke: hsl(300 40% 45%); stroke-width: 2.5; opacity: .7; }
+.scene-funhouse-floor-detail { stroke: hsl(300 50% 55%); stroke-width: 1; opacity: .5; }
+.scene-funhouse-ball { fill: hsl(50 80% 55%); filter: drop-shadow(0 1px 2px hsl(var(--park-ink)/.2)); }
+.scene-funhouse-entrance { stroke: hsl(300 40% 40%); stroke-width: 2; }
+
+/* Observation Tower */
+.scene-obs-tower { fill: hsl(200 30% 50%); filter: drop-shadow(0 2px 3px hsl(var(--park-ink)/.2)); }
+.scene-obs-tower-detail { stroke: hsl(200 40% 60%); stroke-width: .8; opacity: .5; }
+.scene-obs-cabin { fill: hsl(190 60% 55%); filter: drop-shadow(0 2px 3px hsl(var(--park-ink)/.25)); }
+.scene-obs-window { fill: hsl(190 80% 80%); opacity: .8; }
+.scene-obs-light { fill: hsl(50 100% 70%); filter: drop-shadow(0 0 5px hsl(50 100% 70% / .8)); animation: jet-pulse 2s ease-in-out infinite; }
+.scene-obs-base { fill: hsl(200 30% 35%); }
+.scene-obs-glint { stroke: hsl(190 80% 80%); stroke-width: 1; opacity: .5; }
+
+/* Park Monorail */
+.scene-monorail-beam { fill: hsl(200 20% 55%); }
+.scene-monorail-pillar { fill: hsl(200 25% 45%); }
+.scene-monorail-car { fill: hsl(180 50% 50%); filter: drop-shadow(0 2px 3px hsl(var(--park-ink)/.25)); }
+.scene-monorail-car-2 { fill: hsl(180 60% 55%); }
+.scene-monorail-window { fill: hsl(190 80% 80%); opacity: .85; }
+.scene-monorail-nose { fill: hsl(180 50% 45%); }
+.scene-monorail-support { stroke: hsl(200 25% 45%); stroke-width: 2; }
+.scene-monorail-car { animation: monorail-glide 4s ease-in-out infinite; }
+@keyframes monorail-glide { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(3px); } }
+
+/* === 28. Carnival Sideshow Artwork === */
+
+/* Sideshow shared */
+.scene-sideshow-table { fill: hsl(30 40% 55%); filter: drop-shadow(0 2px 3px hsl(var(--park-ink)/.2)); }
+.scene-sideshow-table-rim { fill: hsl(30 50% 45%); }
+.scene-sideshow-sign { fill: hsl(0 60% 45%); }
+.scene-sideshow-text { fill: hsl(0 0% 95%); font-size: 4px; font-weight: 900; letter-spacing: .3px; }
+
+/* Ring Toss */
+.scene-ring-bottle { fill: hsl(120 40% 50%); filter: drop-shadow(0 1px 2px hsl(var(--park-ink)/.2)); }
+.scene-ring-bottle-neck { fill: hsl(120 40% 45%); }
+.scene-ring-toss-ring { fill: none; stroke: hsl(var(--park-slide)); stroke-width: 2; filter: drop-shadow(0 0 2px hsl(var(--park-slide) / .5)); }
+.scene-ring-toss-detail { stroke: hsl(30 50% 45%); stroke-width: 1; opacity: .5; }
+
+/* Strongman Hammer */
+.scene-strongman-tower { fill: hsl(0 50% 50%); filter: drop-shadow(0 2px 3px hsl(var(--park-ink)/.25)); }
+.scene-strongman-tower-top { fill: hsl(0 60% 55%); }
+.scene-strongman-tower-mark { stroke: hsl(0 0% 90%); stroke-width: 1; opacity: .6; }
+.scene-strongman-bell { fill: hsl(50 100% 60%); filter: drop-shadow(0 0 6px hsl(50 100% 60% / .8)); animation: jet-pulse 1.5s ease-in-out infinite; }
+.scene-strongman-base { fill: hsl(0 50% 40%); }
+.scene-strongman-hammer-head { fill: hsl(0 0% 30%); filter: drop-shadow(0 1px 2px hsl(var(--park-ink)/.3)); }
+.scene-strongman-hammer-handle { fill: hsl(30 50% 40%); }
+.scene-strongman-spark { stroke: hsl(50 100% 70%); stroke-width: 1; opacity: .6; }
+
+/* Fortune Teller */
+.scene-fortune-tent { fill: hsl(270 40% 45%); filter: drop-shadow(0 3px 4px hsl(var(--park-ink)/.25)); }
+.scene-fortune-tent-rim { stroke: hsl(270 50% 60%); stroke-width: 2; }
+.scene-fortune-tent-stripe { stroke: hsl(270 60% 65%); stroke-width: 1.5; opacity: .6; stroke-dasharray: 4 3; }
+.scene-fortune-crystal-ball { fill: hsl(250 50% 60% / .4); stroke: hsl(250 60% 70%); stroke-width: 1.5; filter: drop-shadow(0 0 8px hsl(250 60% 70% / .5)); animation: crystal-pulse 3s ease-in-out infinite; }
+.scene-fortune-crystal-highlight { fill: hsl(0 0% 100% / .6); }
+.scene-fortune-crystal-glow { stroke: hsl(250 70% 80%); stroke-width: 1; opacity: .4; animation: crystal-pulse 3s ease-in-out infinite; }
+.scene-fortune-table { fill: hsl(30 40% 40%); }
+.scene-fortune-pole { stroke: hsl(30 40% 35%); stroke-width: 1.5; }
+.scene-fortune-flag { fill: hsl(270 50% 55%); }
+@keyframes crystal-pulse { 0%, 100% { opacity: .5; filter: drop-shadow(0 0 6px hsl(250 60% 70% / .4)); } 50% { opacity: .9; filter: drop-shadow(0 0 12px hsl(250 60% 70% / .7)); } }
+
+/* Duck Pond */
+.scene-duck-pond { fill: hsl(190 60% 65%); filter: drop-shadow(0 2px 3px hsl(var(--park-ink)/.15)); }
+.scene-duck-pond-rim { stroke: hsl(190 70% 55%); stroke-width: 2; }
+.scene-duck-ripple { stroke: hsl(190 80% 80%); stroke-width: 1; opacity: .5; }
+.scene-duck-body { fill: hsl(50 80% 55%); filter: drop-shadow(0 1px 2px hsl(var(--park-ink)/.2)); }
+.scene-duck-head { fill: hsl(50 80% 60%); }
+.scene-duck-beak { fill: hsl(20 80% 50%); }
+.scene-duck-eye { fill: hsl(var(--park-ink)); }
+.scene-duck-body { animation: duck-bob 2s ease-in-out infinite; }
+.scene-duck-sign { fill: hsl(30 40% 50%); }
+@keyframes duck-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+
+/* Basketball Toss */
+.scene-hoop-backboard { fill: hsl(0 0% 90%); stroke: hsl(200 30% 40%); stroke-width: 1.5; filter: drop-shadow(0 2px 3px hsl(var(--park-ink)/.2)); }
+.scene-hoop-rim { stroke: hsl(20 80% 50%); stroke-width: 2; }
+.scene-hoop-net { stroke: hsl(0 0% 80%); stroke-width: 1; fill: none; opacity: .7; }
+.scene-hoop-net-detail { stroke: hsl(0 0% 70%); stroke-width: .8; opacity: .6; }
+.scene-basketball { fill: hsl(20 70% 50%); stroke: hsl(20 80% 40%); stroke-width: .8; filter: drop-shadow(0 1px 2px hsl(var(--park-ink)/.2)); }
+.scene-basketball-2 { fill: hsl(20 70% 55%); opacity: .8; }
+.scene-basketball-line { stroke: hsl(20 80% 35%); stroke-width: .6; opacity: .7; }
