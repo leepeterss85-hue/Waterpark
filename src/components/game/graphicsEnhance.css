@@ -296,7 +296,139 @@
 .game-board-titlebar { box-shadow: inset 0 -2px 0 hsl(255 255 255 / .1), 0 2px 8px hsl(15 23 42 / .15) !important; }
 .game-board-frame { box-shadow: inset 0 0 0 1px hsl(255 255 255 / .25), inset 0 2px 8px hsl(15 23 42 / .08) !important; }
 
+/* === 26. Premium Tier II: animated sparkles, glowing edges, swaying scenery === */
+
+/* --- Glowing neon slide edges --- */
+.ride-water-slide { filter: saturate(1.18) drop-shadow(0 0 3px hsl(var(--park-water)/.35)) !important; }
+.ride-slide-highlight { filter: drop-shadow(0 0 2px hsl(var(--park-rim)/.6)) !important; opacity: .92 !important; }
+.pool-slide-coral { filter: drop-shadow(0 0 3px hsl(var(--park-slide)/.3)) saturate(1.15); }
+.pool-slide-gold { filter: drop-shadow(0 0 3px hsl(41 97% 60% / .3)) saturate(1.15); }
+.pool-slide-blue { filter: drop-shadow(0 0 3px hsl(var(--park-water)/.3)) saturate(1.15); }
+.scene-slide-green { filter: drop-shadow(0 0 3px hsl(var(--park-green)/.3)) saturate(1.15); }
+
+/* --- Animated water sparkles --- */
+.water-reflection-bright { animation: water-sparkle 2.5s ease-in-out infinite !important; }
+.water-surface-ripples { animation: ripple-pulse 3s ease-in-out infinite !important; }
+.water-caustic-soft { animation: caustic-glow 4s ease-in-out infinite !important; }
+
+/* --- Shimmering water surface overlay --- */
+.pool-water-surface::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 30%, hsl(var(--park-rim)/.12) 45%, hsl(var(--park-rim)/.22) 50%, hsl(var(--park-rim)/.12) 55%, transparent 70%);
+  animation: water-sheen 5s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+/* --- Swaying palm trees --- */
+.scene-leaves, .pool-palm-leaf { animation: palm-sway 4s ease-in-out infinite !important; transform-origin: bottom center; }
+.scene-leaves { animation-delay: 0s; }
+.pool-palm-leaf:nth-child(odd) { animation-delay: -2s; }
+
+/* --- Animated wave lines in pools --- */
+.ride-wave-line { animation: wave-flow 2s ease-in-out infinite !important; }
+.ride-wave-line:nth-child(2) { animation-delay: -.4s; }
+.ride-wave-line:nth-child(3) { animation-delay: -.8s; }
+
+/* --- Flowing river animation --- */
+.ride-river-water { animation: river-current 3s linear infinite !important; stroke-dasharray: 5 3; }
+.ride-river-glint { animation: river-glint-flow 2.5s linear infinite !important; }
+
+/* --- Deeper 3D structure shadows --- */
+.pool-tower { filter: drop-shadow(0 3px 4px hsl(var(--park-ink)/.3)) drop-shadow(0 1px 1px hsl(var(--park-ink)/.2)) !important; }
+.scene-bowl-rim { filter: drop-shadow(0 3px 4px hsl(var(--park-ink)/.3)) drop-shadow(0 1px 2px hsl(var(--park-ink)/.2)) !important; }
+.scene-halfpipe { filter: drop-shadow(0 3px 4px hsl(var(--park-ink)/.3)) drop-shadow(0 1px 2px hsl(var(--park-ink)/.2)) !important; }
+.scene-cliff-rock { filter: drop-shadow(0 4px 5px hsl(var(--park-ink)/.35)) drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)) saturate(1.08) !important; }
+.scene-play-tower { filter: drop-shadow(0 4px 4px hsl(var(--park-ink)/.28)) drop-shadow(0 1px 2px hsl(var(--park-ink)/.18)) saturate(1.12) !important; }
+
+/* --- Rim lighting on buildings --- */
+.scene-wall { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.15)) drop-shadow(inset 0 0 1px hsl(var(--park-rim)/.3)) !important; }
+.scene-building-shadow { fill: hsl(var(--park-ink)/.3); filter: blur(.8px) !important; }
+
+/* --- Glowing fountain jets --- */
+.scene-water-jet { filter: drop-shadow(0 0 4px hsl(var(--park-water)/.6)) drop-shadow(0 1px 1px hsl(var(--park-ink)/.2)) !important; animation: jet-pulse 1.5s ease-in-out infinite !important; }
+.scene-splash-arch { filter: drop-shadow(0 0 5px hsl(var(--park-water)/.4)) drop-shadow(0 1px 2px hsl(var(--park-ink)/.25)) !important; animation: jet-pulse 2s ease-in-out infinite !important; }
+.ride-fountain { animation: jet-pulse 1.8s ease-in-out infinite !important; }
+
+/* --- Enhanced mushroom & tipping bucket animation --- */
+.scene-mushroom { animation: mushroom-bob 3s ease-in-out infinite !important; }
+.scene-tipping-bucket { animation: bucket-tip 4s ease-in-out infinite !important; transform-origin: top center; }
+
+/* --- Sparkling surfboard and boat details --- */
+.scene-surfboard { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)) drop-shadow(0 0 3px hsl(var(--park-water)/.25)) !important; }
+.scene-battle-boat { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)) drop-shadow(0 0 3px hsl(var(--park-water)/.2)) saturate(1.12) !important; }
+.scene-spin-raft { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.2)) drop-shadow(0 0 3px hsl(var(--park-water)/.2)) saturate(1.12) !important; animation: spin-bob 2.5s ease-in-out infinite !important; }
+
+/* --- Glowing arcade screens & ATM --- */
+.scene-arcade-screen { filter: saturate(1.25) brightness(1.15) drop-shadow(0 0 4px hsl(190 91% 55% / .4)) !important; animation: screen-flicker 3s ease-in-out infinite !important; }
+.scene-atm-screen { filter: saturate(1.2) brightness(1.15) drop-shadow(0 0 3px hsl(190 91% 55% / .35)) !important; }
+
+/* --- Animated flame for grill --- */
+.scene-flame { animation: flame-flicker 0.8s ease-in-out infinite alternate !important; transform-origin: bottom center; }
+
+/* --- Enhanced guest sprite animations --- */
+.ride-swimmer { animation: person-swim 3s ease-in-out infinite alternate, swim-bob 1.5s ease-in-out infinite !important; }
+.park-pedestrian > .park-person { animation: walk-bob 0.8s ease-in-out infinite alternate !important; }
+.person-ripple { animation: ripple-expand 2s ease-out infinite !important; transform-origin: center; }
+.ride-visitor-splash { animation: splash-ring 1.5s ease-in-out infinite !important; transform-origin: center; }
+
+/* --- Enhanced balloon float --- */
+.scene-balloon { animation: balloon-float 3s ease-in-out infinite !important; }
+.scene-play-ball { animation: ball-bounce 1.2s ease-in-out infinite alternate !important; }
+
+/* --- Glowing life ring & safety flag --- */
+.scene-life-ring { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.15)) drop-shadow(0 0 4px hsl(12 89% 63% / .3)) !important; animation: ring-pulse 2s ease-in-out infinite !important; }
+.scene-safety-flag { animation: flag-wave 1.5s ease-in-out infinite !important; transform-origin: left center; }
+
+/* --- Enhanced night swim glow --- */
+.park-time-night .aquatic-ride-art { filter: drop-shadow(0 3px 3px hsl(var(--park-ink)/.22)) saturate(1.12) brightness(.92) !important; }
+.park-time-night .pool-water-surface [fill^="url"] { filter: saturate(1.2) brightness(.82) !important; }
+.park-time-night .ride-water-slide { filter: saturate(1.2) drop-shadow(0 0 5px hsl(var(--park-water)/.5)) brightness(.95) !important; }
+.park-time-night .scene-water-jet { filter: drop-shadow(0 0 6px hsl(var(--park-water)/.7)) !important; }
+.park-time-night .hotel-window-luxury, .park-time-night .hotel-window-family { box-shadow: 0 0 8px hsl(255 247 190 / .8), inset 0 0 3px hsl(255 247 190 / .9) !important; }
+
+/* --- Enhanced sunset warm tint --- */
+.park-time-sunset .aquatic-ride-art { filter: drop-shadow(0 3px 3px hsl(var(--park-ink)/.22)) saturate(1.15) sepia(.08) !important; }
+.park-time-sunset .pool-water-surface [fill^="url"] { filter: saturate(1.18) sepia(.06) !important; }
+.park-time-sunset .scene-wall { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.15)) sepia(.05) !important; }
+
+/* --- Enhanced rain/storm atmosphere --- */
+.park-weather-storm .aquatic-ride-art { filter: drop-shadow(0 3px 3px hsl(var(--park-ink)/.3)) saturate(.92) brightness(.88) !important; }
+.park-weather-rain .pool-water-surface [fill^="url"] { filter: saturate(1.1) brightness(.95) !important; }
+
+/* === Tier II Keyframes === */
+@keyframes water-sparkle { 0%,100% { opacity: .5; } 50% { opacity: 1; } }
+@keyframes ripple-pulse { 0%,100% { opacity: .35; stroke-width: .6; } 50% { opacity: .75; stroke-width: 1; } }
+@keyframes caustic-glow { 0%,100% { opacity: .7; } 50% { opacity: 1; } }
+@keyframes water-sheen { 0% { transform: translateX(-15%); opacity: 0; } 50% { opacity: .6; } 100% { transform: translateX(15%); opacity: 0; } }
+@keyframes palm-sway { 0%,100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
+@keyframes wave-flow { 0%,100% { transform: translateX(-2px); opacity: .75; } 50% { transform: translateX(2px); opacity: 1; } }
+@keyframes river-current { to { stroke-dashoffset: -8; } }
+@keyframes river-glint-flow { to { stroke-dashoffset: -6; } }
+@keyframes jet-pulse { 0%,100% { opacity: .7; } 50% { opacity: 1; } }
+@keyframes mushroom-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+@keyframes bucket-tip { 0%,70%,100% { transform: rotate(0); } 80% { transform: rotate(-15deg); } 90% { transform: rotate(0); } }
+@keyframes spin-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+@keyframes screen-flicker { 0%,100% { opacity: 1; } 48% { opacity: 1; } 50% { opacity: .88; } 52% { opacity: 1; } }
+@keyframes flame-flicker { from { transform: scaleY(1) scaleX(1); opacity: .9; } to { transform: scaleY(1.15) scaleX(.92); opacity: 1; } }
+@keyframes walk-bob { from { transform: translateY(0); } to { transform: translateY(-1.5px); } }
+@keyframes swim-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+@keyframes ripple-expand { 0% { opacity: .9; transform: scale(.8); } 100% { opacity: 0; transform: scale(1.5); } }
+@keyframes splash-ring { 0%,100% { opacity: .4; transform: scale(.85); } 50% { opacity: .9; transform: scale(1.15); } }
+@keyframes balloon-float { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-3px) rotate(1deg); } }
+@keyframes ball-bounce { from { transform: translateY(0); } to { transform: translateY(-4px); } }
+@keyframes ring-pulse { 0%,100% { opacity: .85; } 50% { opacity: 1; } }
+@keyframes flag-wave { 0%,100% { transform: skewX(0); } 50% { transform: skewX(-4deg); } }
+
 @media (prefers-reduced-motion: reduce) {
   .water-caustic-drift, .water-reflections, .pool-splash, .ride-swimmer,
-  .person-swim-stroke, .ride-visitor-splash { animation: none !important; }
+  .person-swim-stroke, .ride-visitor-splash,
+  .ride-water-slide, .ride-slide-highlight, .water-reflection-bright, .water-surface-ripples,
+  .water-caustic-soft, .scene-leaves, .pool-palm-leaf, .ride-wave-line, .ride-river-water,
+  .ride-river-glint, .scene-water-jet, .scene-splash-arch, .ride-fountain, .scene-mushroom,
+  .scene-tipping-bucket, .scene-spin-raft, .scene-arcade-screen, .scene-atm-screen, .scene-flame,
+  .park-pedestrian > .park-person, .person-ripple, .scene-balloon, .scene-play-ball,
+  .scene-life-ring, .scene-safety-flag, .pool-water-surface::after { animation: none !important; }
 }
