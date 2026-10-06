@@ -127,6 +127,7 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
           sandbox={game.sandbox}
           onToggleSandbox={game.toggleSandbox}
           loadFromCloud={game.loadFromCloud}
+          saveToCloud={game.saveToCloud}
         />
       </SheetShell>
 

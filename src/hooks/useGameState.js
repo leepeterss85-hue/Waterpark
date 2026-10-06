@@ -1480,6 +1480,36 @@ const [selectedZone, setSelectedZone] = useState(null);
     [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, popularity, popularityTrend, prevPopularity, activeEvents]
   );
 
+  const saveToCloud = useCallback(
+    async (name) => {
+      const trimmed = (name || "").trim();
+      if (!trimmed) return false;
+      const gameData = {
+        money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments,
+        attractionCondition, log, lastNet, incidents, upgrades, xp, expansionsDone,
+        peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings,
+        builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent,
+        ticketPrice, adBudget, priorityPass, researchPoints, completedResearch,
+        parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats,
+        resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents,
+        membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer,
+        awardStats, socialPosts, socialReputation, emergencies, emergencyStats,
+        constructionProjects, loans, returnVisitorMult, empirePoints, competitors,
+        marketShare, waterQuality,
+      };
+      try {
+        await base44.functions.invoke("cloudSaves", {
+          action: "save", name: trimmed, gameData, day, money, reputation, guests,
+        });
+        trackEvent("park_saved_cloud", { name: trimmed });
+        return true;
+      } catch (e) {
+        return false;
+      }
+    },
+    [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, log, lastNet, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, pricing]
+  );
+
   const applyGameData = useCallback((data) => {
     setMoney(data.money ?? INITIAL_MONEY);
     setDay(data.day ?? 1);
@@ -1859,6 +1889,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     fireStaff,
     saves,
     savePark,
+    saveToCloud,
     loadPark,
     deleteSave,
     loadFromCloud,

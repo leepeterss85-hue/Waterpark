@@ -34,7 +34,7 @@ function Toggle({ on, onClick, onIcon: OnIcon, offIcon: OffIcon, onTone = "text-
   );
 }
 
-export default function SettingsPanel({ saves, onSave, onLoad, onDelete, onNewGame, onContinue, sandbox, onToggleSandbox, loadFromCloud }) {
+export default function SettingsPanel({ saves, onSave, onLoad, onDelete, onNewGame, onContinue, sandbox, onToggleSandbox, loadFromCloud, saveToCloud }) {
   const [soundOn, setSoundOn] = useState(!sound.isMuted());
   const [vibrationOn, setVibrationOn] = useState(haptics.isEnabled());
   const [difficulty, setDifficulty] = useState(getSettings().difficulty);
@@ -135,7 +135,7 @@ export default function SettingsPanel({ saves, onSave, onLoad, onDelete, onNewGa
         <div className="mb-2 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-slate-500">
           <Cloud className="h-3.5 w-3.5" /> Cloud Saves
         </div>
-        <CloudSavesPanel onLoadCloud={loadFromCloud} />
+        <CloudSavesPanel onLoadCloud={loadFromCloud} onSaveCloud={saveToCloud} />
       </div>
 
       <div>

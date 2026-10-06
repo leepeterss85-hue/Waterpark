@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Cloud, Save, FolderOpen, Trash2, Calendar, DollarSign, Star, Users, RefreshCw, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
-export default function CloudSavesPanel({ onLoadCloud }) {
+export default function CloudSavesPanel({ onLoadCloud, onSaveCloud }) {
   const [saves, setSaves] = useState([]);
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(true);
@@ -32,12 +32,12 @@ export default function CloudSavesPanel({ onLoadCloud }) {
     setSaving(true);
     setError(null);
     try {
-      const res = await base44.functions.invoke("cloudSaves", { action: "save", name: trimmed });
-      if (res.data?.ok) {
+      const ok = onSaveCloud ? await onSaveCloud(trimmed) : false;
+      if (ok) {
         setName("");
         await refresh();
       } else {
-        setError(res.data?.error || "Save failed");
+        setError("Save failed. Try again.");
       }
     } catch (e) {
       setError("Could not save to cloud. Try again.");
