@@ -32,6 +32,7 @@ const WATER_ATTRACTION_IDS = new Set([
   "mega_slide_complex", "freefall_drop", "aqua_spin", "surf_wave_pool",
   "adventure_river", "dive_pool", "water_volleyball", "bumper_boats",
   "water_playground", "hot_tub",
+  "tidal_coaster", "skybox_plunge", "rapid_rafting", "aqua_rocket", "wave_rider_pro",
 ]);
 
 export function isWaterAttraction(id) {
@@ -49,6 +50,7 @@ export function simulateWaterQuality({ grid, waterQuality, guests, staff, weathe
   let avgQuality = 0;
   let waterAttractionCount = 0;
   let criticalCount = 0;
+  const occupiedTileCount = Math.max(1, grid.reduce((count, id) => count + (id ? 1 : 0), 0));
 
   for (let i = 0; i < grid.length; i++) {
     const id = grid[i];
@@ -58,7 +60,7 @@ export function simulateWaterQuality({ grid, waterQuality, guests, staff, weathe
     let q = Number.isFinite(waterQuality[i]) ? waterQuality[i] : 100;
 
     // Degradation: based on guest load and weather
-    const loadFactor = Math.min(2, guests / Math.max(50, grid.filter(Boolean).length * 20));
+    const loadFactor = Math.min(2, guests / Math.max(50, occupiedTileCount * 20));
     let degradation = 2 + loadFactor * 3;
     if (weather.id === "storm") degradation += 4;
     else if (weather.id === "rain") degradation += 2;
