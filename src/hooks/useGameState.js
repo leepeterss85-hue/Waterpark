@@ -34,8 +34,12 @@ import { VIP_TYPES, rollVipVisit, evaluateVipVisit, generateVipSocialPost, getVi
 import { SEASONAL_EVENTS, getTriggeredCalendarEvent, getUpcomingEvents, calendarDay, getCalendarSeason } from "@/data/seasonalCalendar";
 import { initRideAges, tickRideAges, refurbishRide as refurbishRideAge, refurbishCost, getAgeTier, aggregateAgingUpkeepMult, aggregateAgingAppealMult, MAX_AGE } from "@/data/rideAging";
 import { base44 } from "@/api/base44Client";
+import { sound } from "@/lib/soundManager";
 
 const STORAGE_KEY = "waterpark-tycoon-save-v1";
+const MILESTONE_DAYS = [25, 50, 75, 100, 150, 200];
+const MILESTONE_REWARDS = { 25: 25000, 50: 75000, 75: 150000, 100: 500000, 150: 750000, 200: 1000000 };
+const FIRST_ATTRACTION_BONUS = 5000;
 const SLOTS_KEY = "waterpark-tycoon-slots";
 const GRID_SIZE = INITIAL_GRID_SIZE;
 const INITIAL_MONEY = 50000;
@@ -889,6 +893,18 @@ const [selectedZone, setSelectedZone] = useState(null);
         loanPayment: loanResult.loanPayment,
       }].slice(-60)
     );
+
+    // --- Milestone rewards at key days ---
+    if (MILESTONE_DAYS.includes(d + 1)) {
+      const reward = MILESTONE_REWARDS[d + 1] || 0;
+      if (reward > 0) {
+        setMoney((m) => m + reward);
+        setXp((x) => x + Math.floor(reward / 100));
+        sound.milestone();
+        entries.push({ day: d + 1, text: `Day ${d + 1}: 🎖️ MILESTONE! Day ${d + 1} reached — bonus $${reward.toLocaleString()}!` });
+      }
+    }
+
     setLog((l) => [...entries, ...l].slice(0, 12));
 
     // --- Resolve seasonal park events ---
@@ -975,6 +991,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       if (newVip) {
         newVip.day = d + 1;
         setVipVisit(newVip);
+        sound.vip();
         vipEntries.push({ day: d + 1, text: `Day ${d + 1}: ⭐ A ${newVip.typeName} arrived — ${newVip.name}! Impress them for a big reward.` });
       }
     }
@@ -1039,6 +1056,7 @@ const [selectedZone, setSelectedZone] = useState(null);
           const mitigation = disasterMitigation(newDisaster, counts, currentResearch);
           const adjustedDuration = Math.max(1, newDisaster.duration - Math.round(mitigation));
           setDisaster({ ...newDisaster, daysLeft: adjustedDuration });
+          sound.disaster();
           disasterEntries.push({ day: d + 1, text: `Day ${d + 1}: 🚨 ${newDisaster.name}! ${newDisaster.description}` });
         }
       }
@@ -1145,7 +1163,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       if (!selectedBuild) return;
       const attr = getParkItem(selectedBuild);
       if (!attr) return;
-      if (!sandbox && money < attr.cost) return;
+      if (!sandbox && money < attr.cost) { sound.reject(); return; }
       setGrid((g) => {
         if (g[index]) return g;
         const ng = [...g];
@@ -1173,12 +1191,17 @@ const [selectedZone, setSelectedZone] = useState(null);
       });
       if (!sandbox) setMoney((m) => m - attr.cost);
       if (attr.category === "attraction") {
+        const isFirst = !builtAttractionIds.length;
         setBuiltAttractionIds((ids) => (ids.includes(selectedBuild) ? ids : [...ids, selectedBuild]));
+        if (isFirst && !sandbox) {
+          setMoney((m) => m + FIRST_ATTRACTION_BONUS);
+          setLog((l) => [{ day, text: `Day ${day}: 🎉 Grand Opening bonus! +$${FIRST_ATTRACTION_BONUS.toLocaleString()} for your first attraction.` }, ...l].slice(0, 12));
+        }
       }
       setLastBuildAction({ index, id: selectedBuild, cost: attr.cost });
       trackEvent("attraction_built", { id: selectedBuild, category: attr.category, cost: attr.cost });
     },
-    [selectedBuild, money, parkZones, sandbox]
+    [selectedBuild, money, parkZones, sandbox, builtAttractionIds, day]
   );
 
   const paintZone = useCallback((index) => {
@@ -1270,6 +1293,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       if (!sandbox) setMoney((m) => m - cost);
       setTotalUpgrades((t) => t + 1);
       setXp((x) => x + 15);
+      sound.upgrade();
       trackEvent("attraction_upgraded", { id, level: level + 1, cost });
     },
     [grid, upgrades, money, sandbox]
@@ -1277,6 +1301,7 @@ const [selectedZone, setSelectedZone] = useState(null);
 
   const hireStaff = useCallback((type) => {
     setStaff((s) => ({ ...s, [type]: (s[type] || 0) + 1 }));
+    sound.hire();
     trackEvent("staff_hired", { type });
   }, []);
 
@@ -1305,6 +1330,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     setWaterQuality((wq) => [...wq, ...Array(EXPAND_ROW).fill(100)]);
     if (!sandbox) setMoney((m) => m - cost);
     setExpansionsDone((e) => e + 1);
+    sound.expand();
     trackEvent("park_expanded", { expansions: expansionsDone + 1, cost });
   }, [expansionsDone, level, money, sandbox]);
 
@@ -1412,6 +1438,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     if (researchPoints < node.cost) return;
     setResearchPoints((rp) => rp - node.cost);
     setCompletedResearch((c) => [...c, id]);
+    sound.research();
     trackEvent("research_unlocked", { id, cost: node.cost });
   }, [completedResearch, researchPoints]);
 
@@ -1449,6 +1476,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       setMoney((m) => m + mission.reward.money);
       setXp((x) => x + mission.reward.xp);
       setClaimedMissions((c) => [...c, id]);
+      sound.mission();
       trackEvent("mission_claimed", { id, money: mission.reward.money, xp: mission.reward.xp });
     },
     [claimedMissions, level, grid, upgrades, peakGuests, money, reputation, day, staff, totalUpgrades, expansionsDone, parkAppeal, visitorStats, lifetimeEarnings]
@@ -2021,6 +2049,15 @@ const [selectedZone, setSelectedZone] = useState(null);
       empirePoints,
       resortRating,
       tilesFilled: grid.filter(Boolean).length,
+      waterQualityAvg: (() => {
+        const wq = waterQuality || [];
+        let sum = 0, count = 0;
+        for (let i = 0; i < grid.length; i++) {
+          const id = grid[i];
+          if (id && isWaterAttraction(id) && wq[i] != null) { sum += wq[i]; count++; }
+        }
+        return count > 0 ? Math.round(sum / count) : 100;
+      })(),
     },
     missionState: {
       attractionCount: grid.filter((id) => id && getParkItem(id)?.category === "attraction").length,

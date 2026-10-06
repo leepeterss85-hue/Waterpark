@@ -4,7 +4,7 @@ import { Play, Pause, SkipForward, RotateCcw, Clock3, FastForward } from "lucide
 export default function GameControls({ playing, speed, onTogglePlay, onSpeed, onAdvance, onReset }) {
   return (
     <section className="park-control-row" aria-label="Park controls">
-      <button type="button" onClick={onTogglePlay} aria-label={playing ? "Pause park" : "Open park"} aria-pressed={playing} className="park-control-button park-control-play" data-playing={playing}>
+      <button type="button" onClick={onTogglePlay} aria-label={playing ? "Pause park" : "Open park"} aria-pressed={playing} className="park-control-button park-control-play" data-playing={playing} data-tutorial-target="open">
         {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 fill-current" />}
         <span>{playing ? "Park Open" : "Open Park"}</span>
       </button>

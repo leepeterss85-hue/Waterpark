@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { Hammer, Settings, Users, Activity, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2, MapPin, Star, Clock, Wrench, Grid3x3, ChevronUp } from "lucide-react";
 
 const PRIMARY = [
-  { key: "build", icon: Hammer, label: "Build" },
+  { key: "build", icon: Hammer, label: "Build", tutorialTarget: "build" },
   { key: "manage", icon: Settings, label: "Manage" },
-  { key: "staff", icon: Users, label: "Staff" },
+  { key: "staff", icon: Users, label: "Staff", tutorialTarget: "staff" },
   { key: "research", icon: FlaskConical, label: "Research" },
   { key: "economy", icon: Wallet, label: "Economy" },
 ];
@@ -53,6 +53,7 @@ export default function MapMenuBar({ openSheet, onOpen, missionsBadge = 0, incid
         aria-label={m.label}
         aria-expanded={active}
         className="park-menu-button"
+        data-tutorial-target={m.tutorialTarget || undefined}
       >
         <Icon className="park-menu-icon" strokeWidth={2.5} />
         <span className="park-menu-label">{m.label}</span>

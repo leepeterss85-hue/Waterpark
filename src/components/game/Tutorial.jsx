@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { X, ChevronRight, Sparkles } from "lucide-react";
 import { TUTORIAL_STEPS, TUTORIAL_KEY } from "@/data/tutorial";
+
+const STEP_TARGETS = { build: "build", open: "open", staff: "staff" };
 
 export default function Tutorial({ game }) {
   const [dismissed, setDismissed] = useState(() => localStorage.getItem(TUTORIAL_KEY) === "1");
@@ -9,10 +11,22 @@ export default function Tutorial({ game }) {
   // Only show for a genuinely new park: day 1, nothing built yet, never dismissed.
   const hasProgress = game.grid.some((id) => id && id !== "park_entrance" && id !== "main_path");
   const shouldShow = !dismissed && game.day <= 1 && !hasProgress && step < TUTORIAL_STEPS.length;
-  if (!shouldShow) return null;
 
   const current = TUTORIAL_STEPS[step];
   const isLast = step === TUTORIAL_STEPS.length - 1;
+  const targetId = STEP_TARGETS[current?.id];
+
+  // Highlight the relevant UI element for the current step
+  useEffect(() => {
+    if (!shouldShow || !targetId) return;
+    const el = document.querySelector(`[data-tutorial-target="${targetId}"]`);
+    if (el) el.classList.add("tutorial-highlight-target");
+    return () => {
+      if (el) el.classList.remove("tutorial-highlight-target");
+    };
+  }, [targetId, step, shouldShow]);
+
+  if (!shouldShow) return null;
 
   const finish = () => {
     localStorage.setItem(TUTORIAL_KEY, "1");
