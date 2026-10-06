@@ -1,7 +1,7 @@
 import React from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2, MapPin, Star, Clock, Wrench, Zap, Palette, RotateCcw, Gift, PawPrint } from "lucide-react";
+import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2, MapPin, Star, Clock, Wrench, Zap, Palette, RotateCcw, Gift, PawPrint, MessageSquare, Camera } from "lucide-react";
 import { MISSIONS, missionProgress } from "@/data/missions";
 import BuildPanel from "@/components/game/BuildPanel";
 import ExpansionPanel from "@/components/game/ExpansionPanel";
@@ -41,6 +41,8 @@ import VisualThemesPanel from "@/components/game/VisualThemesPanel";
 import PrestigePanel from "@/components/game/PrestigePanel";
 import DailyRewardWheel from "@/components/game/DailyRewardWheel";
 import MascotPanel from "@/components/game/MascotPanel";
+import VisitorReviewsPanel from "@/components/game/VisitorReviewsPanel";
+import ParkPhotoMode from "@/components/game/ParkPhotoMode";
 import { isWaterAttraction } from "@/data/waterQuality";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
@@ -319,6 +321,14 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
 
       <SheetShell open={openSheet === "mascot"} onOpenChange={(v) => !v && close()} title="Park Mascot" icon={PawPrint} width="sm:max-w-md">
         <MascotPanel level={game.level} activeMascot={game.mascot} onSelect={game.selectMascot} />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "reviews"} onOpenChange={(v) => !v && close()} title="Visitor Reviews" icon={MessageSquare} width="sm:max-w-md">
+        <VisitorReviewsPanel reviews={game.visitorReviews || []} />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "photo"} onOpenChange={(v) => !v && close()} title="Park Photo" icon={Camera} width="sm:max-w-md">
+        <ParkPhotoMode game={game} />
       </SheetShell>
     </>
   );
