@@ -100,6 +100,22 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
     }).sort((a, b) => b.contribution - a.contribution).slice(0, 5);
   }, [grid, last]);
 
+  const strategy = useMemo(() => {
+    const debtService = last?.loanPayment || 0;
+    const debtRatio = totalIncome > 0 ? (debtService / totalIncome) * 100 : 0;
+    const assetConcentration = assetValue > 0 && assetPerformance.length
+      ? Math.round((assetPerformance[0].cost / assetValue) * 100)
+      : 0;
+    const warnings = [];
+    if (debtRatio >= 25) warnings.push({ tone: "rose", title: "Debt pressure", text: "Loan payments are consuming a large share of daily income. Prioritise cash flow before taking another loan." });
+    else if (debtRatio >= 12) warnings.push({ tone: "amber", title: "Watch leverage", text: "Debt is noticeable. Keep a cash buffer before your next major expansion." });
+    if (operatingMargin < 10 && totalIncome > 0) warnings.push({ tone: "amber", title: "Thin margins", text: "Improve pricing, attendance or staffing efficiency before adding expensive assets." });
+    if (averageDailyProfit > 0 && debtRatio < 12) warnings.push({ tone: "emerald", title: "Expansion window", text: "Cash flow is healthy enough to consider a new attraction or park expansion." });
+    if (assetConcentration >= 35) warnings.push({ tone: "sky", title: "Concentration risk", text: "A large share of your assets is tied to one investment. Diversify attractions and guest spending." });
+    if (!warnings.length) warnings.push({ tone: "slate", title: "Management stable", text: "No major financial warning detected. Keep reinvesting into high-return assets." });
+    return { debtRatio, assetConcentration, warnings };
+  }, [last, totalIncome, assetValue, assetPerformance, operatingMargin, averageDailyProfit]);
+
   const incomeItems = income
     ? [
         { label: "Ticket Sales", value: income.ticketRevenue },
@@ -195,6 +211,31 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
           </div>
         </div>
       )}
+
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <h3 className="mb-1 flex items-center gap-1.5 text-sm font-black text-slate-900">
+          <Target className="h-4 w-4" /> CEO Strategy Desk
+        </h3>
+        <p className="mb-3 text-[10px] font-medium text-slate-500">Use these signals to decide when to borrow, expand or reinvest.</p>
+        <div className="mb-3 grid grid-cols-2 gap-2">
+          <div className="rounded-xl bg-slate-50 p-2.5">
+            <div className="text-[9px] font-bold uppercase text-slate-400">Debt service</div>
+            <div className="text-sm font-black text-slate-800">{strategy.debtRatio.toFixed(1)}%</div>
+          </div>
+          <div className="rounded-xl bg-slate-50 p-2.5">
+            <div className="text-[9px] font-bold uppercase text-slate-400">Top asset share</div>
+            <div className="text-sm font-black text-slate-800">{strategy.assetConcentration}%</div>
+          </div>
+        </div>
+        <div className="space-y-1.5">
+          {strategy.warnings.map((w, i) => (
+            <div key={i} className="rounded-xl border border-slate-100 bg-slate-50 p-2.5">
+              <div className="text-[10px] font-black text-slate-700">{w.title}</div>
+              <div className="mt-0.5 text-[10px] leading-4 text-slate-500">{w.text}</div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Income */}      {incomeItems.length > 0 && (
         <div>
