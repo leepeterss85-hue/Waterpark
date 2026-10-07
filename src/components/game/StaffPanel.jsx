@@ -1,6 +1,6 @@
 import React from "react";
 import { Plus, Minus, Users } from "lucide-react";
-import { STAFF } from "@/data/gameData";
+import { STAFF, staffEffects } from "@/data/gameData";
 import { getIcon } from "./icons";
 import StaffTrainingSection from "./StaffTrainingSection";
 import { staffLevelFromXp, trainingEffectMult, trainingCost, MAX_STAFF_LEVEL } from "@/data/staffTraining";
