@@ -29,7 +29,7 @@ export default function StoryCoach({ game, onOpen, onSkip }) {
           <div className="mt-3 rounded-xl border border-cyan-100 bg-cyan-50 p-3">
             <div className="flex items-center gap-2 text-[10px] font-black uppercase text-cyan-800"><Zap className="h-3.5 w-3.5" /> Your objective</div>
             <div className="mt-1 text-sm font-bold text-slate-800">{step.action}</div>
-            {step.reward && <div className="mt-2 text-[10px] font-semibold text-slate-500">Reward: +$(step.reward.money || 0).toLocaleString() • +{step.reward.xp || 0} XP • +{step.reward.reputation || 0} reputation</div>}
+            {step.reward && <div className="mt-2 text-[10px] font-semibold text-slate-500">Reward: +${(step.reward.money || 0).toLocaleString()} • +{step.reward.xp || 0} XP • +{step.reward.reputation || 0} reputation</div>}
           </div>
           {step.target && (
             <Button className="mt-3 w-full" onClick={() => onOpen(step.target)}>
