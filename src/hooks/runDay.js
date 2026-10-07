@@ -43,7 +43,7 @@ import { activeSponsorIncome, activeSponsorAppealCost, tickSponsors } from "@/da
 import { rollGroupBooking } from "@/data/groupBookings";
 import { getMasterPlanMetrics, getCompletedMasterPlans, calculateMasterPlanBonuses } from "@/data/masterPlans";
 import { sound } from "@/lib/soundManager";
-import { simulateFoodRetail, buildGuestMemory } from "@/data/livingPark";
+import { simulateFoodRetail, buildGuestMemory, guestMemoryDemandBoost, GUEST_PERSONALITIES } from "@/data/livingPark";
 import { evaluateChains } from "@/data/attractionChains";
 import { evaluateCampaigns } from "@/data/campaignChapters";
 import { empireBonuses } from "@/data/parkEmpire";
@@ -139,6 +139,9 @@ export function runDay(stateRef, setters) {
   eff.incomeMult = (eff.incomeMult ?? 1) * pMult.incomeMult;
   eff.guestMult = (eff.guestMult ?? 1) * pMult.demandMult;
   const chainBonuses = evaluateChains(prevGrid, stateRef.current.completedChains || []).bonuses;
+  const memoryBoosts = Object.keys(GUEST_PERSONALITIES).map((id) => guestMemoryDemandBoost(stateRef.current.guestMemory || {}, id, prevGrid));
+  const memoryDemandMult = memoryBoosts.length ? memoryBoosts.reduce((s, v) => s + v, 0) / memoryBoosts.length : 1;
+  eff.guestMult = (eff.guestMult ?? 1) * memoryDemandMult;
   eff.guestMult = (eff.guestMult ?? 1) * (1 + chainBonuses.guestMult);
   eff.incomeMult = (eff.incomeMult ?? 1) * (1 + chainBonuses.incomeMult);
   const empireExpansion = empireBonuses(stateRef.current.acquiredRivals || [], stateRef.current.franchiseMaps || []);
