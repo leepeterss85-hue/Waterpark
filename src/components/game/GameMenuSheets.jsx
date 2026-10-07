@@ -50,6 +50,10 @@ import SponsorshipsPanel from "@/components/game/SponsorshipsPanel";
 import GroupBookingsPanel from "@/components/game/GroupBookingsPanel";
 import StrategyCentre from "@/components/game/StrategyCentre";
 import GuestExperienceCentre from "@/components/game/GuestExperienceCentre";
+import LivingParkPanel from "@/components/game/LivingParkPanel";
+import AttractionChainsPanel from "@/components/game/AttractionChainsPanel";
+import CampaignChaptersPanel from "@/components/game/CampaignChaptersPanel";
+import EmpireExpansionPanel from "@/components/game/EmpireExpansionPanel";
 import { isWaterAttraction } from "@/data/waterQuality";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
@@ -383,6 +387,37 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
 
       <SheetShell open={openSheet === "bookings"} onOpenChange={(v) => !v && close()} title="Group Bookings" icon={UsersRound} width="sm:max-w-md">
         <GroupBookingsPanel bookings={game.groupBookings} onAccept={game.acceptBooking} onDecline={game.declineBooking} guests={game.guests} level={game.level} />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "livingPark"} onOpenChange={(v) => !v && close()} title="Food & Retail" icon={UtensilsCrossed} width="sm:max-w-lg">
+        <LivingParkPanel retailStats={game.retailStats} retailStock={game.retailStock} guestMemory={game.guestMemory} />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "chains"} onOpenChange={(v) => !v && close()} title="Attraction Chains" icon={Trophy} width="sm:max-w-lg">
+        <AttractionChainsPanel grid={game.grid} completed={game.completedChains} />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "campaignChapters"} onOpenChange={(v) => !v && close()} title="Campaign Chapters" icon={BookOpen} width="sm:max-w-lg">
+        <CampaignChaptersPanel
+          completed={game.completedCampaignChapters}
+          level={game.level}
+          state={{ peakGuests: game.peakGuests, avgMood: game.visitorStats?.avgMood, attractionCount: game.grid.filter(Boolean).length, resortRating: game.resortRating, marketShare: game.marketShare, appeal: game.parkAppeal?.score }}
+        />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "empireExpansion"} onOpenChange={(v) => !v && close()} title="Global Empire" icon={Globe2} width="sm:max-w-lg">
+        <EmpireExpansionPanel
+          money={game.money}
+          level={game.level}
+          reputation={game.reputation}
+          marketShare={game.marketShare}
+          acquired={game.acquiredRivals}
+          franchises={game.franchiseMaps}
+          targets={game.acquisitionTargets}
+          options={game.franchiseOptions}
+          onAcquire={game.acquireRival}
+          onFranchise={game.openFranchise}
+        />
       </SheetShell>
 
       <SheetShell open={openSheet === "photo"} onOpenChange={(v) => !v && close()} title="Park Photo" icon={Camera} width="sm:max-w-md">
