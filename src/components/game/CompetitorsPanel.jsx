@@ -1,6 +1,7 @@
 import React from "react";
-import { Swords, TrendingUp, Users, Crown, Eye, Building2 } from "lucide-react";
+import { Swords, TrendingUp, Users, Crown, Eye, Building2, Zap } from "lucide-react";
 import { getCompetitorIntel } from "@/data/competitors";
+import { counterStrikeCost } from "@/data/marketWarfare";
 
 function StatBar({ label, value, max, color }) {
   const pct = Math.min(100, (value / max) * 100);
@@ -17,7 +18,7 @@ function StatBar({ label, value, max, color }) {
   );
 }
 
-export default function CompetitorsPanel({ competitors, playerReputation, playerAppeal, playerGuests, playerLevel, marketShare }) {
+export default function CompetitorsPanel({ competitors, playerReputation, playerAppeal, playerGuests, playerLevel, marketShare, money, activeStrikes, onLaunchStrike }) {
   if (!competitors || competitors.length === 0) {
     return (
       <div className="rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 p-6 text-center">
@@ -95,6 +96,33 @@ export default function CompetitorsPanel({ competitors, playerReputation, player
                 <StatBar label="Aggression" value={intel.aggression} max={1.5} color="bg-gradient-to-r from-rose-400 to-red-500" />
               )}
             </div>
+
+            {onLaunchStrike && (() => {
+              const strike = (activeStrikes || []).find((s) => s.rivalId === c.id);
+              const cost = counterStrikeCost(c, playerLevel);
+              const canAfford = (money || 0) >= cost;
+              if (strike) {
+                return (
+                  <div className="mt-2 rounded-lg bg-rose-100 p-2 ring-1 ring-rose-200">
+                    <div className="flex items-center gap-1.5 text-[10px] font-black text-rose-700">
+                      <Zap className="h-3 w-3" /> Strike active · {strike.daysLeft}d left
+                    </div>
+                    <div className="mt-0.5 text-[9px] font-bold text-rose-500">
+                      Rival appeal -{Math.round(strike.appealReduction)} · your demand +{Math.round(strike.guestBoost * 100)}%
+                    </div>
+                  </div>
+                );
+              }
+              return (
+                <button
+                  onClick={() => onLaunchStrike(c.id)}
+                  disabled={!canAfford}
+                  className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg bg-rose-500 py-1.5 text-[10px] font-black text-white transition hover:bg-rose-600 disabled:opacity-40"
+                >
+                  <Swords className="h-3 w-3" /> Strike Back · ${cost.toLocaleString()}
+                </button>
+              );
+            })()}
           </div>
         );
       })}
@@ -114,10 +142,10 @@ export default function CompetitorsPanel({ competitors, playerReputation, player
           <Swords className="h-3 w-3" /> Competitive Tips
         </div>
         <ul className="mt-1 space-y-0.5 text-[9px] font-medium text-amber-700">
+          <li>• Strike back at a rival to weaken their appeal and steal guests</li>
+          <li>• Dominant parks face fiercer retaliation — rivals poach harder</li>
           <li>• Higher park appeal and reputation win market share</li>
           <li>• Rivals grow over time — keep improving to stay ahead</li>
-          <li>• Launch marketing campaigns to steal guests back</li>
-          <li>• Host events to temporarily boost your appeal above rivals</li>
           <li>• Reach higher levels for deeper competitor intelligence</li>
         </ul>
       </div>

@@ -65,11 +65,14 @@ export function simulateCompetitors({ competitors, playerReputation, playerAppea
   const totalScore = playerScore + rivalScores.reduce((s, v) => s + v, 0);
   const playerShare = (playerScore / totalScore) * 100;
 
-  // Guests stolen from player based on market share loss
-  // If player has <50% market share, they lose guests proportional to the deficit
+  // Guests stolen from player based on market share loss.
+  // If player has <50% market share, they lose guests proportional to the deficit.
+  // Reactive aggression: when the player dominates the market, rivals fight back
+  // harder and poach more guests — staying on top requires active defence.
   const shareDeficit = Math.max(0, 50 - playerShare);
-  const guestLossPercent = shareDeficit / 100; // 0% to 50% guest loss
-  const playerGuestLoss = Math.round(playerGuests * guestLossPercent * 0.3); // 30% of the deficit effect
+  let guestLossPercent = shareDeficit / 100; // 0% to 50% guest loss
+  const dominanceFactor = playerShare > 65 ? 1.45 : playerShare > 55 ? 1.2 : 1;
+  const playerGuestLoss = Math.round(playerGuests * guestLossPercent * 0.3 * dominanceFactor);
 
   // Assign market share to each rival
   updated.forEach((c, i) => {
