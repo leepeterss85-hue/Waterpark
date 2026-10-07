@@ -34,6 +34,27 @@ const POSITIVE_COMMENTS = {
   ],
 };
 
+const EXPERIENCE_COMMENTS = {
+  queues: [
+    "The queues were the biggest issue today. A few rides really need more capacity.",
+    "Loved the park, but the wait times took some of the shine off the day.",
+    "The queue management felt good today — we spent more time riding than waiting.",
+  ],
+  food: [
+    "We never went hungry — there were plenty of places to grab food and drinks.",
+    "Food and drinks were easy to find and made the day much more comfortable.",
+    "The food options felt stretched during the busiest parts of the day.",
+  ],
+  comfort: [
+    "There were plenty of places to rest and recharge between rides.",
+    "By the afternoon we were exhausted and could have used more places to sit and cool down.",
+  ],
+  event: [
+    "The event atmosphere made the park feel completely different today — in a good way!",
+    "The special event added loads of atmosphere and gave us another reason to stay longer.",
+  ],
+};
+
 const NEUTRAL_COMMENTS = {
   attraction: [
     "Fun ride but the queue was a bit long. Still enjoyed it though.",
@@ -105,6 +126,8 @@ function commentsForRating(rating, category) {
  * @param {Object} params.attractionCondition - Per-tile condition (0-100)
  * @param {number} params.cleanliness - 0-1
  * @param {number} params.safety - 0-1
+ * @param {Object} params.visitorStats - guest needs and queue experience from the daily simulation
+ * @param {Array} params.activeEvents - launched park events affecting today
  * @returns {Array} New reviews (newest first)
  */
 export function generateVisitorReviews({
@@ -118,10 +141,19 @@ export function generateVisitorReviews({
   attractionCondition,
   cleanliness,
   safety,
+  visitorStats = {},
+  activeEvents = [],
 }) {
   if (guests < 5) return [];
 
   const reviews = [];
+  const queueStats = Object.values(visitorStats?.queueStats || {});
+  const longestWait = Math.max(0, ...queueStats.map((q) => q?.wait || 0));
+  const needs = visitorStats?.needs || {};
+  const queueIssue = longestWait >= 20;
+  const foodIssue = (needs.hunger || 0) >= 65 || (needs.thirst || 0) >= 70;
+  const comfortIssue = (needs.fatigue || 0) >= 72;
+  const eventActive = (activeEvents || []).length > 0;
   const incidentTiles = new Set((incidents || []).map((i) => i.tileIndex));
   const numReviews = Math.min(4, Math.max(1, Math.ceil(guests / 50)));
 
@@ -139,6 +171,11 @@ export function generateVisitorReviews({
       category = "park";
       target = null;
       const rating = ratingForMood(avgMood);
+      let comment = commentsForRating(rating, "park");
+      if (queueIssue && Math.random() < 0.55) comment = pick(EXPERIENCE_COMMENTS.queues);
+      else if (foodIssue && Math.random() < 0.45) comment = pick(EXPERIENCE_COMMENTS.food);
+      else if (comfortIssue && Math.random() < 0.45) comment = pick(EXPERIENCE_COMMENTS.comfort);
+      else if (eventActive && Math.random() < 0.35) comment = pick(EXPERIENCE_COMMENTS.event);
       reviews.push({
         id: `${day}-park-${i}`,
         day,
@@ -146,7 +183,7 @@ export function generateVisitorReviews({
         targetId: null,
         targetName: null,
         rating,
-        comment: commentsForRating(rating, "park"),
+        comment,
         author: pick(REVIEW_NAMES),
         timestamp: Date.now() + i,
       });
@@ -157,14 +194,19 @@ export function generateVisitorReviews({
       const pop = popularity?.[item.idx] ?? 50;
       const cond = attractionCondition?.[item.idx] ?? 100;
       const hasIncident = incidentTiles.has(item.idx);
+      const itemQueue = item.category === "attraction" ? visitorStats?.queueStats?.[item.idx] : null;
 
       let baseMood = avgMood;
       if (hasIncident) baseMood -= 25;
+      if (itemQueue?.wait >= 20) baseMood -= Math.min(15, itemQueue.wait * 0.25);
       baseMood += (pop - 50) * 0.2;
       baseMood += (cond - 70) * 0.15;
       baseMood = Math.max(0, Math.min(100, baseMood));
 
       const rating = ratingForMood(baseMood);
+      let comment = commentsForRating(rating, category);
+      if (itemQueue?.wait >= 25 && Math.random() < 0.65) comment = pick(EXPERIENCE_COMMENTS.queues);
+      else if (eventActive && Math.random() < 0.25) comment = pick(EXPERIENCE_COMMENTS.event);
       reviews.push({
         id: `${day}-${item.id}-${i}`,
         day,
@@ -173,7 +215,7 @@ export function generateVisitorReviews({
         targetIdx: item.idx,
         targetName: item.attr.name,
         rating,
-        comment: commentsForRating(rating, category),
+        comment,
         author: pick(REVIEW_NAMES),
         timestamp: Date.now() + i,
       });
