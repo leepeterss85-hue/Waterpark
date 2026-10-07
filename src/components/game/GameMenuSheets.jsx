@@ -1,7 +1,7 @@
 import React from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2, MapPin, Star, Clock, Wrench, Zap, Palette, RotateCcw, Gift, PawPrint, MessageSquare, Camera, HeartPulse } from "lucide-react";
+import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2, MapPin, Star, Clock, Wrench, Zap, Palette, RotateCcw, Gift, PawPrint, MessageSquare, Camera, HeartPulse, Handshake, UsersRound } from "lucide-react";
 import { MISSIONS, missionProgress } from "@/data/missions";
 import BuildPanel from "@/components/game/BuildPanel";
 import ExpansionPanel from "@/components/game/ExpansionPanel";
@@ -46,6 +46,8 @@ import MasterPlansPanel from "@/components/game/MasterPlansPanel";
 import ParkPhotoMode from "@/components/game/ParkPhotoMode";
 import GuestNeedsPanel from "@/components/game/GuestNeedsPanel";
 import DemandForecast from "@/components/game/DemandForecast";
+import SponsorshipsPanel from "@/components/game/SponsorshipsPanel";
+import GroupBookingsPanel from "@/components/game/GroupBookingsPanel";
 import StrategyCentre from "@/components/game/StrategyCentre";
 import { isWaterAttraction } from "@/data/waterQuality";
 
@@ -148,6 +150,11 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
           onAssign={game.assignStaff}
           staffXp={game.staffXp}
           onTrainStaff={game.trainStaff}
+          staffMorale={game.staffMorale}
+          wageBoost={game.wageBoost}
+          guests={game.guests}
+          onPayBonus={game.payStaffBonus}
+          onToggleWageBoost={game.toggleWageBoost}
         />
       </SheetShell>
 
@@ -351,6 +358,14 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
 
       <SheetShell open={openSheet === "needs"} onOpenChange={(v) => !v && close()} title="Guest Needs" icon={HeartPulse} width="sm:max-w-md">
         <GuestNeedsPanel visitorStats={game.visitorStats} grid={game.grid} guests={game.guests} />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "sponsorships"} onOpenChange={(v) => !v && close()} title="Sponsorships" icon={Handshake} width="sm:max-w-md">
+        <SponsorshipsPanel money={game.money} level={game.level} sponsorships={game.sponsorships} onAccept={game.acceptSponsor} onEnd={game.endSponsor} />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "bookings"} onOpenChange={(v) => !v && close()} title="Group Bookings" icon={UsersRound} width="sm:max-w-md">
+        <GroupBookingsPanel bookings={game.groupBookings} onAccept={game.acceptBooking} onDecline={game.declineBooking} guests={game.guests} level={game.level} />
       </SheetShell>
 
       <SheetShell open={openSheet === "photo"} onOpenChange={(v) => !v && close()} title="Park Photo" icon={Camera} width="sm:max-w-md">

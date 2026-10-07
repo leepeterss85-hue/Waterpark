@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Hammer, Settings, Users, Activity, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2, MapPin, Star, Clock, Wrench, Grid3x3, ChevronUp, Target, Zap, Palette, RotateCcw, Gift, PawPrint, MessageSquare, Camera, HeartPulse } from "lucide-react";
+import { Hammer, Settings, Users, Activity, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2, MapPin, Star, Clock, Wrench, Grid3x3, ChevronUp, Target, Zap, Palette, RotateCcw, Gift, PawPrint, MessageSquare, Camera, HeartPulse, Handshake, UsersRound } from "lucide-react";
 
 const PRIMARY = [
   { key: "build", icon: Hammer, label: "Build", tutorialTarget: "build" },
@@ -36,6 +36,8 @@ const SECONDARY = [
   { key: "mascot", icon: PawPrint, label: "Mascot" },
   { key: "reviews", icon: MessageSquare, label: "Reviews" },
   { key: "needs", icon: HeartPulse, label: "Needs" },
+  { key: "sponsorships", icon: Handshake, label: "Sponsors" },
+  { key: "bookings", icon: UsersRound, label: "Groups" },
   { key: "photo", icon: Camera, label: "Photo" },
   { key: "prestige", icon: RotateCcw, label: "Prestige" },
   { key: "settings", icon: SlidersHorizontal, label: "Settings" },

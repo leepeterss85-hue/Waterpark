@@ -3,6 +3,7 @@ import { Plus, Minus, Users } from "lucide-react";
 import { STAFF, staffEffects } from "@/data/gameData";
 import { getIcon } from "./icons";
 import StaffTrainingSection from "./StaffTrainingSection";
+import StaffMoraleSection from "./StaffMoraleSection";
 import { staffLevelFromXp, trainingEffectMult, trainingCost, MAX_STAFF_LEVEL } from "@/data/staffTraining";
 
 function EffectMeter({ label, value, color }) {
@@ -37,8 +38,14 @@ export default function StaffPanel({
   onAssign,
   staffXp = {},
   onTrainStaff,
+  staffMorale,
+  wageBoost,
+  guests,
+  onPayBonus,
+  onToggleWageBoost,
 }) {
   const types = Object.values(STAFF);
+  const staffTotal = Object.values(staff).reduce((s, n) => s + (n || 0), 0);
   return (
     <div>
       <div className="mb-3 flex items-center justify-between">
@@ -49,6 +56,16 @@ export default function StaffPanel({
           ${staffWages}/day
         </span>
       </div>
+
+      <StaffMoraleSection
+        morale={staffMorale}
+        guests={guests || 0}
+        staffTotal={staffTotal}
+        wageBoost={wageBoost}
+        money={money}
+        onToggleWageBoost={onToggleWageBoost}
+        onPayBonus={onPayBonus}
+      />
 
       <p className="mb-3 text-[11px] leading-4 text-slate-500">Assign each team to a colour-coded park zone. Unassigned staff continue to cover the whole park. Mechanics and cleaners respond to incidents in their assigned area.</p>
       <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
