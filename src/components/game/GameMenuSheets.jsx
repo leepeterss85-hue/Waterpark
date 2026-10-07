@@ -401,7 +401,7 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
         <CampaignChaptersPanel
           completed={game.completedCampaignChapters}
           level={game.level}
-          state={{ peakGuests: game.peakGuests, avgMood: game.visitorStats?.avgMood, attractionCount: game.grid.filter(Boolean).length, resortRating: game.resortRating, marketShare: game.marketShare, appeal: game.parkAppeal?.score }}
+          state={{ peakGuests: game.peakGuests, avgMood: game.visitorStats?.avgMood, attractionCount: game.grid.filter((id) => id && id !== "main_path" && id !== "queue_path" && id !== "fence").length, resortRating: game.resortRating, marketShare: game.marketShare, appeal: game.parkAppeal?.score }}
         />
       </SheetShell>
 
