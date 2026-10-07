@@ -520,7 +520,7 @@ export function runDay(stateRef, setters) {
   const sponsorIncome = activeSponsorIncome(currentSponsorships);
   const guestStoriesToday = generateGuestStories({ day: d + 1, guests: newGuests, visitorStats, hotelStats: stateRef.current.hotelStats, retailStats, weather: dayWeather, megaProjects: megaState, activeEvents: currentActiveEvents, waterEngineering: engineering });
   if (guestStoriesToday.length) setGuestStories((prev) => [...guestStoriesToday, ...prev].slice(0, 80));
-  const grossIncome = Math.round((ticketRevenue + rideIncome + hotelRoomRevenue + hotelParkSpend + retailRevenue + eventRevenuePerDay + membershipResult.totalRevenue + membershipResult.memberSpend + sponsorIncome) * (1 + mega.incomeMult) * destination.incomeMult);
+  const grossIncome = Math.round((ticketRevenue + rideIncome + hotelRoomRevenue + hotelParkSpend + retailRevenue + eventRevenuePerDay + membershipResult.totalRevenue + membershipResult.memberSpend + sponsorIncome) );
   const upkeep = Math.round(placedItems.filter((p) => p.attr.category !== "hotel").reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) * upkeepResearchMult);
   const wageCost = Math.round(wages * (eff.wageMult ?? 1) * (1 - (fx.wageReduction || 0)) * wageBoostMult);
   const marketingCost = currentAdBudget;
