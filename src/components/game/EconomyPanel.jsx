@@ -211,6 +211,25 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
       </div>
 
       {/* Asset performance / investment decisions */}
+      <div className="rounded-2xl border border-sky-100 bg-gradient-to-br from-sky-50 to-white p-4">
+        <div className="mb-3 flex items-center justify-between"><div><div className="text-[9px] font-black uppercase tracking-widest text-sky-600">CEO Report</div><h3 className="mt-0.5 text-sm font-black text-slate-900">30-Day Management Review</h3></div><TrendingUp className="h-4 w-4 text-sky-500" /></div>
+        {(() => {
+          const current = (history || []).slice(-30), previous = (history || []).slice(-60, -30);
+          const sum = (rows, key) => rows.reduce((s, h) => s + (h[key] || 0), 0);
+          const profit = sum(current, "net"), oldProfit = sum(previous, "net"), guestsNow = sum(current, "guests"), guestsOld = sum(previous, "guests");
+          const profitChange = oldProfit ? Math.round(((profit - oldProfit) / Math.abs(oldProfit)) * 100) : null;
+          const guestChange = guestsOld ? Math.round(((guestsNow - guestsOld) / guestsOld) * 100) : null;
+          const bestDay = current.reduce((best, h) => !best || (h.net || 0) > (best.net || 0) ? h : best, null);
+          const advice = profit < 0 ? "Cash flow is negative. Stabilise operations and pricing before expanding." : profitChange != null && profitChange < -10 ? "Profit is slipping. Review queues, pricing and operating costs before investing." : guestChange != null && guestChange > 10 ? "Guest demand is accelerating. Upgrade your strongest attractions." : "Performance is stable. Keep a cash buffer and prioritise high-return investments.";
+          return <><div className="grid grid-cols-2 gap-2">
+            <div className="rounded-xl bg-white p-2.5 ring-1 ring-slate-100"><div className="text-[8px] font-black uppercase text-slate-400">30-Day Profit</div><div className={"mt-0.5 text-sm font-black " + (profit >= 0 ? "text-emerald-600" : "text-rose-600")}>{profit >= 0 ? "+" : ""}${Math.round(profit).toLocaleString()}</div><div className="text-[8px] text-slate-400">{profitChange == null ? "Building baseline" : (profitChange >= 0 ? "+" : "") + profitChange + "% vs prior"}</div></div>
+            <div className="rounded-xl bg-white p-2.5 ring-1 ring-slate-100"><div className="text-[8px] font-black uppercase text-slate-400">30-Day Guests</div><div className="mt-0.5 text-sm font-black text-slate-800">{Math.round(guestsNow).toLocaleString()}</div><div className="text-[8px] text-slate-400">{guestChange == null ? "Building baseline" : (guestChange >= 0 ? "+" : "") + guestChange + "% vs prior"}</div></div>
+            <div className="rounded-xl bg-white p-2.5 ring-1 ring-slate-100"><div className="text-[8px] font-black uppercase text-slate-400">Best Day</div><div className="mt-0.5 text-sm font-black text-indigo-600">{bestDay ? "Day " + bestDay.day : "—"}</div><div className="text-[8px] text-slate-400">{bestDay ? "$" + Math.round(bestDay.net || 0).toLocaleString() + " profit" : "No history"}</div></div>
+            <div className="rounded-xl bg-white p-2.5 ring-1 ring-slate-100"><div className="text-[8px] font-black uppercase text-slate-400">Period</div><div className="mt-0.5 text-sm font-black text-slate-800">{current.length} days</div><div className="text-[8px] text-slate-400">Current day {day}</div></div>
+          </div><div className="mt-2 rounded-lg bg-sky-100/70 px-2.5 py-2 text-[10px] font-bold leading-4 text-sky-800">{advice}</div></>;
+        })()}
+      </div>
+
       {assetPerformance.length > 0 && (
         <div className="rounded-2xl border border-amber-100 bg-gradient-to-br from-amber-50 to-white p-4">
           <h3 className="mb-1 flex items-center gap-1.5 text-sm font-black text-slate-900">
