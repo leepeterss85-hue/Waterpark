@@ -36,7 +36,8 @@ export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0,
   const conditionValue = Math.max(0, Math.min(100, Math.round(condition)));
   const conditionLabel = conditionValue >= 75 ? "Excellent" : conditionValue >= 50 ? "Good" : conditionValue >= 30 ? "Worn" : "Critical";
   const conditionClass = conditionValue >= 75 ? "bg-emerald-500" : conditionValue >= 50 ? "bg-lime-500" : conditionValue >= 30 ? "bg-amber-500" : "bg-rose-500";
-  const upgradeTier = level >= 10 ? "Legendary" : level >= 7 ? "Elite" : level >= 5 ? "Premium" : level >= 3 ? "Enhanced" : "Standard";\n  const upgradeBonus = { capacity: Math.round(level * 20), income: Math.round(level * 15), maintenance: Math.max(0, Math.round(level * 3)) };
+  const upgradeTier = level >= 10 ? "Legendary" : level >= 7 ? "Elite" : level >= 5 ? "Premium" : level >= 3 ? "Enhanced" : "Standard";
+  const upgradeBonus = { capacity: Math.round(level * 20), income: Math.round(level * 15), maintenance: Math.max(0, Math.round(level * 3)) };
   return (
     <div className="rounded-2xl bg-white/70 p-4 shadow-sm ring-1 ring-slate-100">
       <div className="mb-3 flex items-start justify-between">
