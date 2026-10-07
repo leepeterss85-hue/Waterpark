@@ -43,6 +43,10 @@ import { activeSponsorIncome, activeSponsorAppealCost, tickSponsors } from "@/da
 import { rollGroupBooking } from "@/data/groupBookings";
 import { getMasterPlanMetrics, getCompletedMasterPlans, calculateMasterPlanBonuses } from "@/data/masterPlans";
 import { sound } from "@/lib/soundManager";
+import { simulateFoodRetail, buildGuestMemory } from "@/data/livingPark";
+import { evaluateChains } from "@/data/attractionChains";
+import { evaluateCampaigns } from "@/data/campaignChapters";
+import { empireBonuses } from "@/data/parkEmpire";
 
 const MILESTONE_DAYS = [25, 50, 75, 100, 150, 200];
 const MILESTONE_REWARDS = { 25: 25000, 50: 75000, 75: 150000, 100: 500000, 150: 750000, 200: 1000000 };
@@ -64,6 +68,7 @@ export function runDay(stateRef, setters) {
     setExpansionsDone, setBuiltAttractionIds, setDailyChallenges, setChallengeDayCounter,
     setBuiltToday, setUpgradedToday, setTicketPrice, setLog, setLastNet, setHistory, setPeakGuests,
     setResearchPoints, setXp, setCompletedMasterPlans, setMasterPlanBonuses, setActiveStrikes,
+    setGuestMemory, setRetailStock, setRetailStats, setCompletedChains, setCompletedCampaignChapters,
   } = setters;
 
   const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, staffAssignments: currentAssignments, incidents: currentIncidents, upgrades: currentUpgrades, attractionCondition: currentCondition, challenge: currentChallenge, parkZones: currentZones, forecast: currentForecast, seasonEvent: currentSeasonEvent, parkAppeal: currentParkAppeal, ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass, vipVisit: currentVipVisit, completedResearch: currentResearch } = stateRef.current;
@@ -133,6 +138,9 @@ export function runDay(stateRef, setters) {
   const pMult = prestigeMultiplier(stateRef.current.prestigeCount || 0);
   eff.incomeMult = (eff.incomeMult ?? 1) * pMult.incomeMult;
   eff.guestMult = (eff.guestMult ?? 1) * pMult.demandMult;
+  const empireExpansion = empireBonuses(stateRef.current.acquiredRivals || [], stateRef.current.franchiseMaps || []);
+  eff.guestMult = (eff.guestMult ?? 1) * (1 + empireExpansion.guestMult);
+  eff.incomeMult = (eff.incomeMult ?? 1) * (1 + empireExpansion.incomeMult);
   const currentStrikes = stateRef.current.activeStrikes || [];
   const strikeBoost = strikeDemandBoost(currentStrikes);
   eff.guestMult = (eff.guestMult ?? 1) * (1 + strikeBoost);
@@ -274,6 +282,18 @@ export function runDay(stateRef, setters) {
     }
     if (currentDisaster?.effects?.repDelta) {
       visitorStats = { ...visitorStats, avgMood: Math.max(0, visitorStats.avgMood - Math.abs(currentDisaster.effects.repDelta) * 4) };
+    }
+    const retailResult = simulateFoodRetail({
+      grid: prevGrid, guests: newGuests, visitorStats: sim, weather: dayWeather,
+      activeEvents: currentActiveEvents, stock: stateRef.current.retailStock || {},
+      staff: counts, pricing: currentPricing,
+    });
+    setRetailStock(retailResult.nextStock);
+    setRetailStats(retailResult);
+    if (retailResult.unmetFood > 0) {
+      visitorStats = { ...visitorStats, avgMood: Math.max(0, (visitorStats.avgMood || 50) - Math.min(6, Math.ceil(retailResult.unmetFood / Math.max(1, newGuests) * 100))) };
+    } else if (retailResult.satisfactionBonus > 0) {
+      visitorStats = { ...visitorStats, avgMood: Math.min(100, (visitorStats.avgMood || 50) + retailResult.satisfactionBonus) };
     }
     dayFeedback = generateFeedback(sim, { day: d + 1, weather: dayWeather, incidents: remaining, cleanliness, safety, entertainment });
     const signatureRides = attractions.filter((p) => ["water_coaster", "mega_slide_complex", "freefall_drop", "cliff_jump", "tornado_bowl", "aqua_loop"].includes(p.id));
@@ -474,12 +494,14 @@ export function runDay(stateRef, setters) {
   const eventUtilityCost = utilities * eventDownsides.utilityCostMult;
   const expenses =
     (placedItems.filter((p) => p.attr.category !== "hotel").reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) * upkeepResearchMult * agingUpkeepMult +
-    wages * (eff.wageMult ?? 1) * (1 - (fx.wageReduction || 0)) * wageBoostMult + eventUtilityCost + currentAdBudget + (currentPriorityPass ? 120 : 0)) * diffUpkeepMult +
+    wages * (eff.wageMult ?? 1) * (1 - (fx.wageReduction || 0)) * wageBoostMult + eventUtilityCost + currentAdBudget + (currentPriorityPass ? 120 : 0) + retailRestockCost) * diffUpkeepMult +
     hotelExpensesAmount;
   const eventRevenuePerDay = currentActiveEvents.reduce((s, e) => s + (e.revenuePerDay || 0), 0);
+  const retailRevenue = stateRef.current.retailStats?.revenue || 0;
+  const retailRestockCost = stateRef.current.retailStats?.restockCost || 0;
   const emergencyCost = emergencyResult.totalCost;
   const sponsorIncome = activeSponsorIncome(currentSponsorships);
-  const grossIncome = Math.round(ticketRevenue + rideIncome + hotelRoomRevenue + hotelParkSpend + eventRevenuePerDay + membershipResult.totalRevenue + membershipResult.memberSpend + sponsorIncome);
+  const grossIncome = Math.round(ticketRevenue + rideIncome + hotelRoomRevenue + hotelParkSpend + retailRevenue + eventRevenuePerDay + membershipResult.totalRevenue + membershipResult.memberSpend + sponsorIncome);
   const upkeep = Math.round(placedItems.filter((p) => p.attr.category !== "hotel").reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) * upkeepResearchMult);
   const wageCost = Math.round(wages * (eff.wageMult ?? 1) * (1 - (fx.wageReduction || 0)) * wageBoostMult);
   const marketingCost = currentAdBudget;
@@ -547,6 +569,34 @@ export function runDay(stateRef, setters) {
   const epEarned = calculateEmpirePoints({ netIncome: Math.max(0, net), avgMood: visitorStats?.avgMood || 0, peakGuests: newGuests, resortRating: newResortRating });
   if (epEarned > 0) setEmpirePoints((ep) => ep + epEarned);
   setReputation(Math.round(newReputation));
+  {
+    const chainResult = evaluateChains(prevGrid, stateRef.current.completedChains || []);
+    if (chainResult.newlyCompleted.length) {
+      setCompletedChains(chainResult.completed);
+      const rewardMoney = chainResult.newlyCompleted.reduce((s, c) => s + 25000 + Math.round((c.reward.incomeMult || 0) * 100000), 0);
+      if (rewardMoney > 0) setMoney((m) => m + rewardMoney);
+      if (chainResult.bonuses.mood) setVisitorStats((v) => ({ ...v, avgMood: Math.min(100, (v.avgMood || 0) + chainResult.bonuses.mood) }));
+      setLog((l) => [{ day: d + 1, text: `Day ${d + 1}: 🏆 Attraction chain completed: ${chainResult.newlyCompleted.map((x) => x.name).join(", ")} — permanent destination bonus unlocked.` }, ...l].slice(0, 12));
+    }
+  }
+  {
+    const campaignResult = evaluateCampaigns(stateRef.current.completedCampaignChapters || [], levelFromXp(stateRef.current.xp || 0), {
+      peakGuests: Math.max(stateRef.current.peakGuests || 0, newGuests),
+      avgMood: visitorStats?.avgMood || 0,
+      attractionCount: attractions.length,
+      resortRating: newResortRating,
+      marketShare: stateRef.current.marketShare || 0,
+      appeal: calculatedAppeal.score,
+    });
+    if (campaignResult.newlyCompleted.length) {
+      setCompletedCampaignChapters(campaignResult.completed);
+      for (const chapter of campaignResult.newlyCompleted) {
+        setMoney((m) => m + chapter.reward.money); setXp((x) => x + chapter.reward.xp);
+        setReputation((rv) => Math.min(100, rv + chapter.reward.rep));
+      }
+      setLog((l) => [{ day: d + 1, text: `Day ${d + 1}: 📖 Campaign chapter complete: ${campaignResult.newlyCompleted.map((x) => x.name).join(", ")}!` }, ...l].slice(0, 12));
+    }
+  }
 
   const struckRivals = applyStrikesToRivals(stateRef.current.competitors || createCompetitors(d + 1), currentStrikes);
   const compResult = simulateCompetitors({
@@ -572,7 +622,7 @@ export function runDay(stateRef, setters) {
     ticketRevenue: Math.round(ticketRevenue), rideIncome: Math.round(rideIncome), upkeep, wages: wageCost,
     utilities: utilityCost, marketing: marketingCost, premium: premiumCost, weather: dayWeather.name,
     event: currentSeasonEvent?.name || null, parkAppeal: calculatedAppeal.score,
-    hotelRevenue: hotelRoomRevenue + hotelParkSpend, hotelExpenses: hotelExpensesAmount, eventRevenue: eventRevenuePerDay,
+    hotelRevenue: hotelRoomRevenue + hotelParkSpend, hotelExpenses: hotelExpensesAmount, eventRevenue: eventRevenuePerDay, retailRevenue, retailRestockCost,
     membershipRevenue: membershipResult.totalRevenue, memberSpend: membershipResult.memberSpend,
     memberVisits: membershipResult.memberVisits, emergencyCost, loanPayment: loanResult.loanPayment, sponsorIncome,
   }].slice(-60));
