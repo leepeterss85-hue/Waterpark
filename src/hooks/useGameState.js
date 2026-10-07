@@ -2251,6 +2251,8 @@ const [selectedZone, setSelectedZone] = useState(null);
     setRewardStreak(0);
     setVisitorReviews([]);
     setStaffXp({});
+    setCompletedMasterPlans([]);
+    setMasterPlanBonuses(DEFAULT_MASTER_PLAN_BONUSES);
     const startPopularity = Array(startGrid.length).fill(0);
     const startPopTrend = Array(startGrid.length).fill(0);
     for (let i = 0; i < startGrid.length; i += 1) {
@@ -2492,5 +2494,7 @@ const [selectedZone, setSelectedZone] = useState(null);
     visitorReviews,
     staffXp,
     trainStaff,
+    completedMasterPlans,
+    masterPlanBonuses,
   };
 }
