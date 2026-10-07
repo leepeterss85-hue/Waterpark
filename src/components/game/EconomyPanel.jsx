@@ -82,6 +82,24 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
     ),
   }));
 
+  const assetPerformance = useMemo(() => {
+    const candidates = (grid || []).map((id, index) => {
+      if (!id) return null;
+      const item = getParkItem(id);
+      if (!item || item.category === "environment" || !item.cost || !item.income) return null;
+      return { id, index, name: item.name, cost: item.cost, baseIncome: item.income, maintenance: item.maintenance || 0 };
+    }).filter(Boolean);
+    if (!candidates.length) return [];
+    const incomeWeight = candidates.reduce((sum, item) => sum + item.baseIncome, 0) || 1;
+    return candidates.map((item) => {
+      const estimatedRevenue = Math.round((last?.rideIncome || 0) * (item.baseIncome / incomeWeight));
+      const contribution = estimatedRevenue - item.maintenance;
+      const dailyRoi = item.cost > 0 ? (contribution / item.cost) * 100 : 0;
+      const paybackDays = contribution > 0 ? Math.ceil(item.cost / contribution) : null;
+      return { ...item, estimatedRevenue, contribution, dailyRoi, paybackDays };
+    }).sort((a, b) => b.contribution - a.contribution).slice(0, 5);
+  }, [grid, last]);
+
   const incomeItems = income
     ? [
         { label: "Ticket Sales", value: income.ticketRevenue },
@@ -150,6 +168,33 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
           {outstandingDebt > 0 && <span>Debt ${outstandingDebt.toLocaleString()}</span>}
         </div>
       </div>
+
+      {/* Asset performance / investment decisions */}
+      {assetPerformance.length > 0 && (
+        <div className="rounded-2xl border border-amber-100 bg-gradient-to-br from-amber-50 to-white p-4">
+          <h3 className="mb-1 flex items-center gap-1.5 text-sm font-black text-slate-900">
+            <TrendingUp className="h-4 w-4 text-amber-500" /> Investment Performance
+          </h3>
+          <p className="mb-3 text-[10px] font-medium text-slate-500">Estimated daily contribution from your highest-value revenue assets.</p>
+          <div className="space-y-1.5">
+            {assetPerformance.map((item, index) => (
+              <div key={item.index} className="rounded-xl bg-white p-2.5 shadow-sm ring-1 ring-amber-100/70">
+                <div className="flex items-center gap-2">
+                  <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-amber-100 text-[9px] font-black text-amber-700">{index + 1}</span>
+                  <span className="min-w-0 flex-1 truncate text-xs font-black text-slate-700">{item.name}</span>
+                  <span className={item.contribution >= 0 ? "text-[10px] font-black text-emerald-600" : "text-[10px] font-black text-rose-600"}>
+                    {item.contribution >= 0 ? "+" : ""}${item.contribution.toLocaleString()}/day
+                  </span>
+                </div>
+                <div className="mt-1.5 flex items-center justify-between text-[9px] font-bold text-slate-400">
+                  <span>ROI {item.dailyRoi >= 0 ? "+" : ""}{item.dailyRoi.toFixed(1)}%/day</span>
+                  <span>{item.paybackDays ? "Payback ~" + item.paybackDays + "d" : "Not paying back yet"}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Income */}      {incomeItems.length > 0 && (
         <div>
