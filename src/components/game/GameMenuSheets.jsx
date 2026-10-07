@@ -57,6 +57,8 @@ import EmpireExpansionPanel from "@/components/game/EmpireExpansionPanel";
 import AdvancedParkPanel from "@/components/game/AdvancedParkPanel";
 import GameModePanel from "@/components/game/GameModePanel";
 import StoryCoach from "@/components/game/StoryCoach";
+import SandboxLabPanel from "@/components/game/SandboxLabPanel";
+import AnnualReportPanel from "@/components/game/AnnualReportPanel";
 import { isWaterAttraction } from "@/data/waterQuality";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
@@ -424,7 +426,7 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
         />
       </SheetShell>
 
-      <SheetShell open={openSheet === "gameModes"} onOpenChange={(v) => !v && close()} title="Game Modes" icon={BookOpen} width="sm:max-w-lg">
+      <SheetShell open={openSheet === "annualReport"} onOpenChange={(v) => !v && close()} title="Management Report" icon={CalendarDays} width="sm:max-w-lg"><AnnualReportPanel report={game.annualReport} /></SheetShell>\n\n      <SheetShell open={openSheet === "sandboxLab"} onOpenChange={(v) => !v && close()} title="Sandbox Lab" icon={Waves} width="sm:max-w-lg"><SandboxLabPanel game={game} /></SheetShell>\n\n      <SheetShell open={openSheet === "gameModes"} onOpenChange={(v) => !v && close()} title="Game Modes" icon={BookOpen} width="sm:max-w-lg">
         <GameModePanel game={game} onClose={close} />
       </SheetShell>
 
