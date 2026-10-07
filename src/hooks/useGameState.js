@@ -151,7 +151,7 @@ export function useGameState() {
   const [sandbox, setSandbox] = useState(getSettings().sandbox || false);
   const [gameMode, setGameMode] = useState(() => getSettings().gameMode || "freeplay");
   const [storyStep, setStoryStep] = useState(() => getSettings().storyStep || 0);
-  const [storyCompleted, setStoryCompleted] = useState(() => getSettings().storyCompleted || false);
+  const [storyCompleted, setStoryCompleted] = useState(() => getSettings().storyCompleted || false);\n  const [sandboxSettings, setSandboxSettings] = useState(() => ({ unlimitedCash: true, unlockAll: false, guestDemandMult: 1, instantConstruction: false, weatherLock: false, weather: null }));
   const [activeCampaigns, setActiveCampaigns] = useState([]);
   const [hotelGuests, setHotelGuests] = useState([]);
   const [hotelStats, setHotelStats] = useState({ roomRevenue: 0, hotelExpenses: 0, parkSpend: 0, occupancy: 0, avgHappiness: 0, totalGuests: 0, totalRooms: 0, guestsByHotel: {} });
@@ -219,7 +219,7 @@ export function useGameState() {
 
   /** @type {import("react").MutableRefObject<Record<string, any>>} */
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, guests, grid, parkZones, history, log, lastNet, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, sandbox, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, builtToday, upgradedToday, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp, staffMorale, wageBoost, sponsorships, groupBookings, acceptedBookings, activeStrikes, completedMasterPlans, masterPlanBonuses, guestMemory, retailStock, retailStats, completedChains, completedCampaignChapters, acquiredRivals, franchiseMaps, megaProjects, guestStories, currentDestination, gameMode, storyStep, storyCompleted, guestMemory, retailStock, retailStats, completedChains, completedCampaignChapters, acquiredRivals, franchiseMaps };
+  stateRef.current = { sandboxSettings, money, day, reputation, guests, grid, parkZones, history, log, lastNet, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, sandbox, activeCampaigns, sandboxSettings, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, builtToday, upgradedToday, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp, staffMorale, wageBoost, sponsorships, groupBookings, acceptedBookings, activeStrikes, completedMasterPlans, masterPlanBonuses, guestMemory, retailStock, retailStats, completedChains, completedCampaignChapters, acquiredRivals, franchiseMaps, megaProjects, guestStories, currentDestination, gameMode, storyStep, storyCompleted, guestMemory, retailStock, retailStats, completedChains, completedCampaignChapters, acquiredRivals, franchiseMaps };
 
   // Load saved game
   useEffect(() => {
@@ -330,7 +330,7 @@ export function useGameState() {
       setCurrentDestination(data.currentDestination ?? "home_resort");
       if (data.gameMode) setGameMode(data.gameMode);
       if (data.storyStep != null) setStoryStep(data.storyStep);
-      if (data.storyCompleted != null) setStoryCompleted(data.storyCompleted);
+      if (data.storyCompleted != null) setStoryCompleted(data.storyCompleted);\n      if (data.sandboxSettings) setSandboxSettings({ unlimitedCash: true, unlockAll: false, guestDemandMult: 1, instantConstruction: false, weatherLock: false, weather: null, ...data.sandboxSettings });
       setUpgradedToday(data.upgradedToday ?? 0);
     } catch { /* ignore */ }
   }, []);
@@ -966,40 +966,41 @@ export function useGameState() {
     return true;
   }, [level, sandbox, money, day, currentDestination, franchiseMaps]);
   const STORY_STEPS = [
-    { id: "welcome", title: "Welcome to Waterpark Tycoon", text: "Maya, your park manager, will guide you through your first season.", target: "build", action: "Build your first attraction.", reward: { money: 1500, xp: 50, reputation: 1 } },
-    { id: "staff", title: "Build your team", text: "Every successful waterpark needs people keeping guests safe and happy.", target: "staff", action: "Hire your first cleaner or lifeguard.", reward: { money: 1200, xp: 60, reputation: 1 } },
-    { id: "open", title: "Open the gates", text: "Your first attraction is ready. Start a park day and welcome your first guests.", target: null, action: "Start the park day.", reward: { money: 1800, xp: 75, reputation: 2 } },
-    { id: "manage", title: "Learn to manage", text: "Now read the park like a real manager: watch guests, finances and operations.", target: "manage", action: "Run your first day and review Manage.", reward: { money: 1800, xp: 80, reputation: 2 } },
-    { id: "upgrade", title: "Improve a ride", text: "Great parks keep improving. Upgrade one attraction to increase its performance.", target: "build", action: "Upgrade an attraction at least once.", reward: { money: 2200, xp: 100, reputation: 2 } },
-    { id: "expand", title: "Grow the park", text: "Your guests want variety. Add another attraction or expand your park.", target: "build", action: "Build a second attraction.", reward: { money: 3000, xp: 125, reputation: 3 } },
-    { id: "research", title: "Invest in the future", text: "Research gives your park access to stronger long-term options.", target: "research", action: "Complete your first research project.", reward: { money: 3500, xp: 150, reputation: 3 } },
-    { id: "resort", title: "Become a destination", text: "Turn the park into a holiday destination with accommodation and resort services.", target: "resort", action: "Build your first hotel or resort facility.", reward: { money: 5000, xp: 200, reputation: 5 } },
-    { id: "finish", title: "You’re in control", text: "You’ve completed the opening story. Freeplay, Sandbox and the full park systems are now yours.", target: null, action: "Keep building your waterpark.", reward: { money: 10000, xp: 500, reputation: 8 } },
+    { id: "welcome", chapter: 1, title: "Make a Splash", text: "Maya is taking you through your first opening season. Build the park together, one decision at a time.", target: "build", action: "Open Build and place your first attraction.", reward: { money: 1500, xp: 50, reputation: 1 } },
+    { id: "staff", chapter: 1, title: "Build Your Team", text: "A waterpark needs a lifeguard or cleaner before it can operate safely.", target: "staff", action: "Hire your first staff member.", reward: { money: 1200, xp: 60, reputation: 1 } },
+    { id: "open", chapter: 1, title: "Open the Gates", text: "Your first attraction is ready. Start the park day and welcome your first guests.", target: null, action: "Start the park day.", reward: { money: 1800, xp: 75, reputation: 2 } },
+    { id: "manage", chapter: 2, title: "Learn to Manage", text: "Watch the first day closely. Learn how guest demand, money and park operations move together.", target: "manage", action: "Run your first day, then open Manage.", reward: { money: 1800, xp: 80, reputation: 2 } },
+    { id: "upgrade", chapter: 2, title: "Improve a Ride", text: "Invest in a ride and turn a good attraction into a great one.", target: "build", action: "Upgrade one attraction.", reward: { money: 2200, xp: 100, reputation: 2 } },
+    { id: "guests", chapter: 2, title: "Make Them Happy", text: "Your next milestone is 100 guests in a day. Watch queues, cleanliness, safety and prices.", target: "manage", action: "Reach 100 guests in a day.", reward: { money: 3500, xp: 140, reputation: 3 } },
+    { id: "expand", chapter: 3, title: "Grow the Park", text: "Give visitors variety. Add another attraction or expand the park footprint.", target: "build", action: "Build a second attraction or expand the park.", reward: { money: 3000, xp: 125, reputation: 3 } },
+    { id: "research", chapter: 3, title: "Invest in the Future", text: "Research unlocks stronger rides, facilities and long-term strategies.", target: "research", action: "Complete your first research project.", reward: { money: 3500, xp: 150, reputation: 3 } },
+    { id: "emergency", chapter: 4, title: "Stay Calm Under Pressure", text: "Every real park has problems. Survive or resolve your first incident, emergency or disaster.", target: "emergencies", action: "Resolve or survive your first major park incident.", reward: { money: 4000, xp: 175, reputation: 3 } },
+    { id: "resort", chapter: 4, title: "Become a Destination", text: "Turn day visitors into holiday guests with accommodation and resort services.", target: "resort", action: "Build your first hotel or resort facility.", reward: { money: 5000, xp: 200, reputation: 5 } },
+    { id: "rival", chapter: 5, title: "Beat the Rivals", text: "Build a park strong enough to compete for attention and market share.", target: "competitors", action: "Reach 250 peak guests or 60% market share.", reward: { money: 7500, xp: 250, reputation: 5 } },
+    { id: "worldclass", chapter: 6, title: "World-Class Waterpark", text: "Reach a world-class standard: high appeal, strong reputation and a thriving destination.", target: "advancedPark", action: "Reach 80+ park appeal and 80+ reputation.", reward: { money: 15000, xp: 500, reputation: 10 } },
+    { id: "finish", chapter: 6, title: "You’re in Control", text: "The opening campaign is complete. Freeplay, Sandbox and the full park empire are now yours.", target: null, action: "Continue building your own legacy.", reward: { money: 10000, xp: 500, reputation: 8 } },
   ];
 
   useEffect(() => {
     if (gameMode !== "story" || storyCompleted) return;
-    const attractions = grid.filter((id) => {
-      if (!id) return false;
-      const item = getParkItem(id);
-      return item?.category === "attraction";
-    }).length;
+    const attractions = grid.filter((id) => getParkItem(id)?.category === "attraction").length;
     const staffTotal = Object.values(staff || {}).reduce((sum, n) => sum + (Number(n) || 0), 0);
-    const hotelBuilt = grid.some((id) => {
-      if (!id) return false;
-      const item = getParkItem(id);
-      return item?.category === "hotel" || /hotel|resort/i.test(item?.name || id);
-    });
+    const hotelBuilt = grid.some((id) => { const item = getParkItem(id); return item?.category === "hotel" || /hotel|resort/i.test(item?.name || id || ""); });
+    const majorIncident = (incidents || []).length > 0 || (emergencies || []).length > 0 || (disastersSurvived || 0) > 0;
     const completed = {
       welcome: attractions >= 1,
       staff: staffTotal >= 1,
       open: day >= 2 || (history || []).length >= 1,
-      manage: day >= 2,
+      manage: day >= 2 && (history || []).length >= 1,
       upgrade: totalUpgrades >= 1,
+      guests: (peakGuests || 0) >= 100 || (guests || 0) >= 100,
       expand: attractions >= 2 || expansionsDone >= 1,
       research: (completedResearch || []).length >= 1,
+      emergency: majorIncident,
       resort: hotelBuilt || (hotelGuests || []).length > 0 || (resortRating || 0) > 0,
-      finish: false,
+      rival: (peakGuests || 0) >= 250 || (marketShare || 0) >= 60,
+      worldclass: (parkAppeal?.score || 0) >= 80 && reputation >= 80,
+      finish: (parkAppeal?.score || 0) >= 80 && reputation >= 80 && level >= 10,
     };
     const step = STORY_STEPS[storyStep];
     if (!step || !completed[step.id]) return;
@@ -1007,15 +1008,15 @@ export function useGameState() {
     if (reward.money) setMoney((m) => m + reward.money);
     if (reward.xp) setXp((x) => x + reward.xp);
     if (reward.reputation) setReputation((rep) => Math.min(100, rep + reward.reputation));
-    setLog((l) => [{ day, text: "Story complete: " + step.title + ". +$" + (reward.money || 0).toLocaleString() + " • +" + (reward.xp || 0) + " XP." }, ...l].slice(0, 12));
+    setLog((l) => [{ day, text: `Story complete: ${step.title}. +$${(reward.money || 0).toLocaleString()} • +${reward.xp || 0} XP.` }, ...l].slice(0, 12));
     sound.mission();
-    trackEvent("story_step_completed", { id: step.id, step: storyStep + 1 });
+    trackEvent("story_step_completed", { id: step.id, chapter: step.chapter, step: storyStep + 1 });
     const next = Math.min(STORY_STEPS.length - 1, storyStep + 1);
     setStoryStep(next);
     const done = next === STORY_STEPS.length - 1;
     setStoryCompleted(done);
     saveSettings({ gameMode, storyStep: next, storyCompleted: done });
-  }, [gameMode, storyCompleted, storyStep, grid, staff, day, history, totalUpgrades, expansionsDone, completedResearch, hotelGuests, resortRating]);
+  }, [gameMode, storyCompleted, storyStep, grid, staff, day, history, totalUpgrades, expansionsDone, completedResearch, hotelGuests, resortRating, incidents, emergencies, disastersSurvived, peakGuests, guests, marketShare, parkAppeal, reputation, level]);
 
   const setMode = useCallback((mode) => {
     const nextMode = ["story", "freeplay", "sandbox"].includes(mode) ? mode : "freeplay";
@@ -1026,10 +1027,10 @@ export function useGameState() {
     if (nextMode === "story") {
       setStoryStep(0);
       setStoryCompleted(false);
-      setLog((l) => [{ day, text: "📖 Story Mode started. Maya, your park manager, will guide you through the opening season." }, ...l].slice(0, 12));
+      setLog((l) => [{ day, text: "📖 Story Mode started. Maya will guide you through six chapters of your opening season." }, ...l].slice(0, 12));
       saveSettings({ gameMode: nextMode, sandbox: false, storyStep: 0, storyCompleted: false });
     } else if (nextMode === "sandbox") {
-      setLog((l) => [{ day, text: "🛠️ Sandbox Mode enabled — unlimited building and testing." }, ...l].slice(0, 12));
+      setLog((l) => [{ day, text: "🛠️ Sandbox Mode enabled — creative testing controls are available." }, ...l].slice(0, 12));
     }
   }, [day]);
 
@@ -1040,6 +1041,23 @@ export function useGameState() {
     setStoryCompleted(next === STORY_STEPS.length - 1);
     saveSettings({ gameMode, storyStep: next, storyCompleted: next === STORY_STEPS.length - 1 });
   }, [storyStep, gameMode, storyCompleted]);
+
+  const updateSandboxSettings = useCallback((patch) => {
+    if (gameMode !== "sandbox") return;
+    setSandboxSettings((prev) => ({ ...prev, ...patch }));
+  }, [gameMode]);
+
+  const sandboxAction = useCallback((action) => {
+    if (gameMode !== "sandbox") return;
+    if (action === "cash") setMoney(999999999);
+    if (action === "unlock") setCompletedResearch(RESEARCH.map((r) => r.id));
+    if (action === "reputation") setReputation(100);
+    if (action === "level") setXp(xpForLevel(40));
+    if (action === "guests") setPeakGuests((p) => Math.max(p, 1000));
+    if (action === "clearConstruction") setConstructionProjects([]);
+    if (action === "resetTools") setSandboxSettings({ unlimitedCash: true, unlockAll: false, guestDemandMult: 1, instantConstruction: false, weatherLock: false, weather: null });
+    setLog((l) => [{ day, text: `🧪 Sandbox: ${action} applied.` }, ...l].slice(0, 12));
+  }, [gameMode, day]);
 
   const acquireRival = useCallback((id) => {
     const target = ACQUISITION_TARGETS.find((x) => x.id === id);
@@ -1150,7 +1168,7 @@ export function useGameState() {
     parkZones, selectedZone, selectedBuild, selectedTile, lastNet, log, history,
     staff, staffAssignments, assignStaff, incidents, attractionCondition, upgrades, upgradeAttraction,
     level, xp, xpForNext: xpForLevel(level), applyCheat,
-    gameMode, storyStep, storyCompleted, STORY_STEPS, setMode, advanceStory,
+    gameMode, storyStep, storyCompleted, STORY_STEPS, setMode, advanceStory, sandboxSettings, updateSandboxSettings, sandboxAction,
     expansionsDone, gridSize, maxGridSize: MAX_GRID_SIZE, expandPark,
     peakGuests, totalUpgrades, claimedMissions, claimMission,
     challenge, vipVisit, vipHistory, claimedLegendary, activeCalendarEvent,
