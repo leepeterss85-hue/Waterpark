@@ -49,6 +49,7 @@ import DemandForecast from "@/components/game/DemandForecast";
 import SponsorshipsPanel from "@/components/game/SponsorshipsPanel";
 import GroupBookingsPanel from "@/components/game/GroupBookingsPanel";
 import StrategyCentre from "@/components/game/StrategyCentre";
+import GuestExperienceCentre from "@/components/game/GuestExperienceCentre";
 import { isWaterAttraction } from "@/data/waterQuality";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
@@ -361,6 +362,19 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
 
       <SheetShell open={openSheet === "needs"} onOpenChange={(v) => !v && close()} title="Guest Needs" icon={HeartPulse} width="sm:max-w-md">
         <GuestNeedsPanel visitorStats={game.visitorStats} grid={game.grid} guests={game.guests} />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "guestExperience"} onOpenChange={(v) => !v && close()} title="Guest Experience" icon={HeartPulse} width="sm:max-w-md">
+        <GuestExperienceCentre
+          visitorStats={game.visitorStats}
+          guests={game.guests}
+          reputation={game.reputation}
+          parkAppeal={game.parkAppeal}
+          waterQualityAvg={game.waterQualityAvg}
+          hotelStats={game.hotelStats}
+          activeEvents={game.activeEvents}
+          weather={game.weather}
+        />
       </SheetShell>
 
       <SheetShell open={openSheet === "sponsorships"} onOpenChange={(v) => !v && close()} title="Sponsorships" icon={Handshake} width="sm:max-w-md">
