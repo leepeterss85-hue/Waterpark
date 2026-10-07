@@ -47,6 +47,8 @@ const SECONDARY = [
   { key: "photo", icon: Camera, label: "Photo" },
   { key: "prestige", icon: RotateCcw, label: "Prestige" },
   { key: "gameModes", icon: BookOpen, label: "Game Modes" },
+  { key: "annualReport", icon: CalendarDays, label: "Reports" },
+  { key: "sandboxLab", icon: Wrench, label: "Sandbox Lab" },
   { key: "settings", icon: SlidersHorizontal, label: "Settings" },
 ];
 
