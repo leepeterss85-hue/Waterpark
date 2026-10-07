@@ -219,7 +219,7 @@ export function useGameState() {
 
   /** @type {import("react").MutableRefObject<Record<string, any>>} */
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, guests, grid, parkZones, history, log, lastNet, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, sandbox, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, builtToday, upgradedToday, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp, staffMorale, wageBoost, sponsorships, groupBookings, acceptedBookings, activeStrikes, completedMasterPlans, masterPlanBonuses, guestMemory, retailStock, retailStats, completedChains, completedCampaignChapters, acquiredRivals, franchiseMaps, megaProjects, guestStories, currentDestination, guestMemory, retailStock, retailStats, completedChains, completedCampaignChapters, acquiredRivals, franchiseMaps };
+  stateRef.current = { money, day, reputation, guests, grid, parkZones, history, log, lastNet, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, sandbox, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, builtToday, upgradedToday, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp, staffMorale, wageBoost, sponsorships, groupBookings, acceptedBookings, activeStrikes, completedMasterPlans, masterPlanBonuses, guestMemory, retailStock, retailStats, completedChains, completedCampaignChapters, acquiredRivals, franchiseMaps, megaProjects, guestStories, currentDestination, gameMode, storyStep, storyCompleted, guestMemory, retailStock, retailStats, completedChains, completedCampaignChapters, acquiredRivals, franchiseMaps };
 
   // Load saved game
   useEffect(() => {
@@ -328,6 +328,9 @@ export function useGameState() {
       setMegaProjects(data.megaProjects ?? []);
       setGuestStories(data.guestStories ?? []);
       setCurrentDestination(data.currentDestination ?? "home_resort");
+      if (data.gameMode) setGameMode(data.gameMode);
+      if (data.storyStep != null) setStoryStep(data.storyStep);
+      if (data.storyCompleted != null) setStoryCompleted(data.storyCompleted);
       setUpgradedToday(data.upgradedToday ?? 0);
     } catch { /* ignore */ }
   }, []);
@@ -338,7 +341,7 @@ export function useGameState() {
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ saveVersion: SAVE_SCHEMA_VERSION, savedAt: Date.now(), ...stateRef.current })); } catch { /* ignore */ }
     }, 300);
     return () => clearTimeout(t);
-  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp, staffMorale, wageBoost, sponsorships,     groupBookings, acceptedBookings, activeStrikes, completedMasterPlans, masterPlanBonuses, megaProjects, guestStories, currentDestination]);
+  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp, staffMorale, wageBoost, sponsorships,     groupBookings, acceptedBookings, activeStrikes, completedMasterPlans, masterPlanBonuses, megaProjects, guestStories, currentDestination, gameMode, storyStep, storyCompleted]);
 
   // Flush save on background/close
   useEffect(() => {
@@ -837,6 +840,9 @@ export function useGameState() {
       setMegaProjects(data.megaProjects ?? []);
       setGuestStories(data.guestStories ?? []);
       setCurrentDestination(data.currentDestination ?? "home_resort");
+    if (data.gameMode) setGameMode(data.gameMode);
+    if (data.storyStep != null) setStoryStep(data.storyStep);
+    if (data.storyCompleted != null) setStoryCompleted(data.storyCompleted);
     setBuiltToday(0);
     setUpgradedToday(0);
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
