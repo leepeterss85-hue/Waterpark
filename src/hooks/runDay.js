@@ -101,11 +101,24 @@ export function runDay(stateRef, setters) {
     if (currentDisaster.effects?.utilityMult) eff.utilityMult = (eff.utilityMult ?? 1) * currentDisaster.effects.utilityMult;
   }
   const currentActiveEvents = stateRef.current.activeEvents || [];
+  // Aggregate downside effects from active events (ride wear, incident risk, etc.)
+  const eventDownsides = { rideWearMult: 1, incidentRiskMult: 1, utilityCostMult: 1, familyGuestMult: 1, repPenalty: 0, nonVipMoodPenalty: 0, closedFacilities: new Set() };
+  for (const ev of currentActiveEvents) {
+    const ds = ev.downside;
+    if (!ds) continue;
+    if (ds.rideWearMult) eventDownsides.rideWearMult *= ds.rideWearMult;
+    if (ds.incidentRiskMult) eventDownsides.incidentRiskMult *= ds.incidentRiskMult;
+    if (ds.utilityCostMult) eventDownsides.utilityCostMult *= ds.utilityCostMult;
+    if (ds.familyGuestMult) eventDownsides.familyGuestMult *= ds.familyGuestMult;
+    if (ds.repPenalty) eventDownsides.repPenalty += ds.repPenalty;
+    if (ds.nonVipMoodPenalty) eventDownsides.nonVipMoodPenalty += ds.nonVipMoodPenalty;
+    if (ds.closesFacility) eventDownsides.closedFacilities.add(ds.closesFacility);
+  }
   if (currentActiveEvents.length > 0) {
     const eventFx = aggregateEventEffects(currentActiveEvents);
-    eff.guestMult = (eff.guestMult ?? 1) * eventFx.guestMult;
+    eff.guestMult = (eff.guestMult ?? 1) * eventFx.guestMult * eventDownsides.familyGuestMult;
     eff.incomeMult = (eff.incomeMult ?? 1) * eventFx.incomeMult;
-    eff.repDelta = (eff.repDelta ?? 0) + eventFx.repDelta;
+    eff.repDelta = (eff.repDelta ?? 0) + eventFx.repDelta - eventDownsides.repPenalty;
   }
   const constructionDisruption = getConstructionDisruption(stateRef.current.constructionProjects);
   eff.guestMult = (eff.guestMult ?? 1) * constructionDisruption.guestMult;
@@ -314,7 +327,7 @@ export function runDay(stateRef, setters) {
     const activeIncident = incidentByTile.get(p.idx);
     const resolvedIncident = resolved.find((inc) => inc.tileIndex === p.idx);
     const loadPressure = Math.min(1.5, newGuests / Math.max(1, totalCapacity || capOf(p)));
-    const wear = 1.2 + loadPressure * 2.4 + p.level * 0.25 + (dayWeather.id === "storm" ? 1.2 : 0);
+    const wear = (1.2 + loadPressure * 2.4 + p.level * 0.25 + (dayWeather.id === "storm" ? 1.2 : 0)) * eventDownsides.rideWearMult;
     if (resolvedIncident?.type === "breakdown") condition += 32;
     else if (resolvedIncident?.type === "maintenance") condition += 18;
     const zone = currentZones?.[p.idx] || "";
@@ -332,8 +345,8 @@ export function runDay(stateRef, setters) {
   if (eligible.length > 0 && !isSandbox) {
     const pick = eligible[Math.floor(Math.random() * eligible.length)];
     const condition = nextCondition[pick.idx] ?? 100;
-    const breakChance = (Math.max(0, 0.11 - 0.018 * (counts.mechanic || 0) - 0.015 * (counts.security || 0) + (condition < 35 ? 0.16 : condition < 55 ? 0.06 : 0))) * incidentMoraleMult;
-    const maintChance = (Math.max(0, 0.09 - 0.015 * (counts.cleaner || 0) - 0.015 * (counts.gardener || 0) + (condition < 60 ? 0.08 : 0))) * incidentMoraleMult;
+    const breakChance = (Math.max(0, 0.11 - 0.018 * (counts.mechanic || 0) - 0.015 * (counts.security || 0) + (condition < 35 ? 0.16 : condition < 55 ? 0.06 : 0))) * incidentMoraleMult * eventDownsides.incidentRiskMult;
+    const maintChance = (Math.max(0, 0.09 - 0.015 * (counts.cleaner || 0) - 0.015 * (counts.gardener || 0) + (condition < 60 ? 0.08 : 0))) * incidentMoraleMult * eventDownsides.incidentRiskMult;
     const r = Math.random();
     if (condition <= 10 || r < breakChance) newIncidents.push({ tileIndex: pick.idx, type: "breakdown", attractionId: pick.id, since: d + 1 });
     else if (condition <= 32 || r < breakChance + maintChance) newIncidents.push({ tileIndex: pick.idx, type: "maintenance", attractionId: pick.id, since: d + 1 });
@@ -458,9 +471,10 @@ export function runDay(stateRef, setters) {
   const utilities = Math.round((150 + attractions.length * 45 + facilities.length * 18 + newGuests * 2.2) * (dayWeather.utilityMult ?? 1) * (1 - (ecoBonuses.utilityReduction || 0)));
   const diffUpkeepMult = getDifficulty(getSettings().difficulty).upkeepMult;
   const wageBoostMult = stateRef.current.wageBoost ? 1.2 : 1;
+  const eventUtilityCost = utilities * eventDownsides.utilityCostMult;
   const expenses =
     (placedItems.filter((p) => p.attr.category !== "hotel").reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) * upkeepResearchMult * agingUpkeepMult +
-    wages * (eff.wageMult ?? 1) * (1 - (fx.wageReduction || 0)) * wageBoostMult + utilities + currentAdBudget + (currentPriorityPass ? 120 : 0)) * diffUpkeepMult +
+    wages * (eff.wageMult ?? 1) * (1 - (fx.wageReduction || 0)) * wageBoostMult + eventUtilityCost + currentAdBudget + (currentPriorityPass ? 120 : 0)) * diffUpkeepMult +
     hotelExpensesAmount;
   const eventRevenuePerDay = currentActiveEvents.reduce((s, e) => s + (e.revenuePerDay || 0), 0);
   const emergencyCost = emergencyResult.totalCost;

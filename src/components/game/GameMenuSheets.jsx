@@ -199,7 +199,7 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
       </SheetShell>
 
       <SheetShell open={openSheet === "events"} onOpenChange={(v) => !v && close()} title="Park Events" icon={CalendarDays} width="sm:max-w-lg">
-        <EventsPanel money={game.money} level={game.level} day={game.day} activeEvents={game.activeEvents} onLaunch={game.launchEvent} />
+        <EventsPanel money={game.money} level={game.level} day={game.day} activeEvents={game.activeEvents} grid={game.grid} staff={game.staff} onLaunch={game.launchEvent} />
       </SheetShell>
 
       <SheetShell open={openSheet === "memberships"} onOpenChange={(v) => !v && close()} title="Memberships" icon={Ticket} width="sm:max-w-lg">

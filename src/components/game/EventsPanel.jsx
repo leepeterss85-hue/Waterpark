@@ -1,15 +1,20 @@
 import React, { useState, useMemo } from "react";
-import { CalendarDays, DollarSign, Users, TrendingUp, Star, Lock, Check, Clock, Sparkles } from "lucide-react";
-import { MAJOR_EVENTS, EVENT_CATEGORIES, getCategory, isEventAvailable, getEvent } from "@/data/parkEvents";
+import { CalendarDays, DollarSign, Users, TrendingUp, Star, Lock, Check, Clock, Sparkles, AlertTriangle, Ban, Wrench } from "lucide-react";
+import { MAJOR_EVENTS, EVENT_CATEGORIES, getCategory, isEventAvailable, getEvent, checkEventRequirements, checkEventConflict } from "@/data/parkEvents";
 import { getIcon } from "@/components/game/icons";
 import { getSeasonLabel } from "@/data/parkSystems";
+import { getParkItem } from "@/data/gameData";
 
-function EventCard({ event, active, available, season, level, money, onLaunch }) {
+function EventCard({ event, active, available, season, level, money, grid, staff, activeEvents, onLaunch }) {
   const Icon = getIcon(event.icon);
   const cat = getCategory(event.category);
   const canAfford = money >= event.cost;
   const locked = !available;
-  const disabled = locked || active || !canAfford;
+  const reqCheck = useMemo(() => checkEventRequirements(event, grid, staff), [event, grid, staff]);
+  const conflictCheck = useMemo(() => checkEventConflict(event, activeEvents), [event, activeEvents]);
+  const blockedByReq = !active && !locked && !reqCheck.met;
+  const blockedByConflict = !active && !locked && conflictCheck.conflict;
+  const disabled = locked || active || !canAfford || blockedByReq || blockedByConflict;
 
   return (
     <div
@@ -46,6 +51,32 @@ function EventCard({ event, active, available, season, level, money, onLaunch })
         <span className="inline-flex items-center gap-0.5 text-rose-400"><Star className="h-2.5 w-2.5" />+{event.repDelta}</span>
       </div>
 
+      {/* Requirements & trade-offs — make events a real decision, not a button */}
+      {!active && !locked && (
+        <div className="mt-1.5 space-y-1">
+          {reqCheck.missing.map((msg, i) => (
+            <div key={i} className="flex items-center gap-1 text-[8px] font-bold text-rose-500">
+              <AlertTriangle className="h-2.5 w-2.5 shrink-0" /> {msg}
+            </div>
+          ))}
+          {blockedByConflict && (
+            <div className="flex items-center gap-1 text-[8px] font-bold text-rose-500">
+              <Ban className="h-2.5 w-2.5 shrink-0" /> Conflicts with: {conflictCheck.conflictingEvent?.name}
+            </div>
+          )}
+          {event.downside?.label && reqCheck.met && !blockedByConflict && (
+            <div className="flex items-center gap-1 text-[8px] font-bold text-amber-600">
+              <Wrench className="h-2.5 w-2.5 shrink-0" /> {event.downside.label}
+            </div>
+          )}
+        </div>
+      )}
+      {active && event.downside?.label && (
+        <div className="mt-1.5 flex items-center gap-1 text-[8px] font-bold text-amber-600">
+          <Wrench className="h-2.5 w-2.5 shrink-0" /> {event.downside.label}
+        </div>
+      )}
+
       <div className="mt-2 flex items-center justify-between gap-2">
         <span className="text-[8px] font-bold uppercase tracking-wide text-slate-400">
           {event.seasons.map((s) => getSeasonLabel(s)).join(" · ")}
@@ -59,19 +90,21 @@ function EventCard({ event, active, available, season, level, money, onLaunch })
               ? "bg-emerald-100 text-emerald-600"
               : locked
               ? "bg-slate-100 text-slate-400"
+              : blockedByReq || blockedByConflict
+              ? "bg-rose-50 text-rose-400 ring-1 ring-rose-200"
               : canAfford
               ? "bg-gradient-to-b from-emerald-400 to-emerald-600 text-white shadow-sm hover:from-emerald-300 hover:to-emerald-500"
               : "bg-slate-100 text-slate-400"
           }`}
         >
-          {active ? "Running" : locked ? `Lv ${event.minLevel}+` : canAfford ? "Launch" : "Too pricey"}
+          {active ? "Running" : locked ? `Lv ${event.minLevel}+` : blockedByReq ? "Needs facility" : blockedByConflict ? "Conflicts" : canAfford ? "Launch" : "Too pricey"}
         </button>
       </div>
     </div>
   );
 }
 
-export default function EventsPanel({ money, level, day, activeEvents, onLaunch }) {
+export default function EventsPanel({ money, level, day, activeEvents, grid, staff, onLaunch }) {
   const [filter, setFilter] = useState("all");
   const activeIds = useMemo(() => new Set((activeEvents || []).map((e) => e.id)), [activeEvents]);
 
@@ -149,6 +182,9 @@ export default function EventsPanel({ money, level, day, activeEvents, onLaunch 
             season={getSeasonLabel}
             level={level}
             money={money}
+            grid={grid}
+            staff={staff}
+            activeEvents={activeEvents}
             onLaunch={onLaunch}
           />
         ))}

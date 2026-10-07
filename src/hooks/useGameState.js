@@ -15,7 +15,7 @@ import { getStarterPark } from "@/data/starterParks";
 import { calculateParkAppeal } from "@/data/parkThemes";
 import { DEFAULT_PRICING } from "@/data/pricing";
 import { DEFAULT_POPULARITY, NEW_RIDE_TREND_BOOST } from "@/data/popularity";
-import { getEvent, isEventAvailable } from "@/data/parkEvents";
+import { getEvent, isEventAvailable, checkEventRequirements, checkEventConflict } from "@/data/parkEvents";
 import { MEMBERSHIP_TIERS } from "@/data/memberships";
 import { AWARD_CATEGORIES, AWARD_CEREMONY_CYCLE, evaluateAwards, totalAwardGuestMult } from "@/data/awards";
 import { EMERGENCY_TYPES } from "@/data/emergencies";
@@ -577,10 +577,16 @@ export function useGameState() {
     if (!isEventAvailable(def, day, level)) return;
     if ((activeEvents || []).some((e) => e.id === id)) return;
     if (!sandbox && money < def.cost) return;
-    setActiveEvents((prev) => [...prev, { id: def.id, name: def.name, daysLeft: def.duration, guestMult: def.guestMult, incomeMult: def.incomeMult, repDelta: def.repDelta, revenuePerDay: def.revenuePerDay || 0, category: def.category, startedDay: day }]);
+    // Enforce facility requirements
+    const reqCheck = checkEventRequirements(def, grid, staff);
+    if (!reqCheck.met) { sound.reject(); return; }
+    // Enforce conflict groups (e.g. concert + competition both need wave pool)
+    const conflictCheck = checkEventConflict(def, activeEvents);
+    if (conflictCheck.conflict) { sound.reject(); return; }
+    setActiveEvents((prev) => [...prev, { id: def.id, name: def.name, daysLeft: def.duration, guestMult: def.guestMult, incomeMult: def.incomeMult, repDelta: def.repDelta, revenuePerDay: def.revenuePerDay || 0, category: def.category, startedDay: day, downside: def.downside || null, conflictGroup: def.conflictGroup || null }]);
     if (!sandbox) setMoney((m) => m - def.cost);
     trackEvent("event_launched", { id, cost: def.cost });
-  }, [activeEvents, day, level, money, sandbox]);
+  }, [activeEvents, day, level, money, sandbox, grid, staff]);
 
   const startProject = useCallback((projectId, targetTile = null) => {
     const def = PROJECT_TYPES.find((p) => p.id === projectId);
