@@ -42,6 +42,7 @@ import PrestigePanel from "@/components/game/PrestigePanel";
 import DailyRewardWheel from "@/components/game/DailyRewardWheel";
 import MascotPanel from "@/components/game/MascotPanel";
 import VisitorReviewsPanel from "@/components/game/VisitorReviewsPanel";
+import MasterPlansPanel from "@/components/game/MasterPlansPanel";
 import ParkPhotoMode from "@/components/game/ParkPhotoMode";
 import { isWaterAttraction } from "@/data/waterQuality";
 
@@ -158,7 +159,7 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
           </TabsList>
           <TabsContent value="activity"><ActivityLog feedback={game.feedback} log={game.log} issueCount={game.incidents.length} guestExperience={game.visitorStats?.guestExperience} /></TabsContent>
           <TabsContent value="insights"><VisitorInsight visitorStats={game.visitorStats} /></TabsContent>
-          <TabsContent value="missions"><MissionsPanel level={game.level} xp={game.xp} xpForNext={game.xpForNext} missionState={game.missionState} claimedMissions={game.claimedMissions} onClaim={game.claimMission} /></TabsContent>
+          <TabsContent value="missions"><MissionsPanel level={game.level} xp={game.xp} xpForNext={game.xpForNext} missionState={game.missionState} claimedMissions={game.claimedMissions} onClaim={game.claimMission} /></TabsContent>\n          <TabsContent value="plans"><MasterPlansPanel grid={game.grid} reputation={game.reputation} peakGuests={game.peakGuests} totalUpgrades={game.totalUpgrades} resortRating={game.resortRating} appeal={game.parkAppeal?.score || 50} day={game.day} money={game.money} /></TabsContent>
         </Tabs>
       </SheetShell>
 
