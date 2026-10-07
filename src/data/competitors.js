@@ -48,8 +48,9 @@ export function createCompetitors(day = 1) {
 }
 
 // Simulate one day of competitor growth and market share competition.
-export function simulateCompetitors({ competitors, playerReputation, playerAppeal, playerGuests, day, playerLevel }) {
-  if (!competitors || competitors.length === 0) return { updated: createCompetitors(day), playerGuestLoss: 0, marketShare: 100 };
+export function simulateCompetitors({ competitors, playerReputation, playerAppeal, playerGuests, day, playerLevel, acquiredRivals = [] }) {
+  competitors = (competitors || []).filter((c) => !acquiredRivals.includes(c.id));
+  if (competitors.length === 0) return { updated: createCompetitors(day), playerGuestLoss: 0, marketShare: 100 };
 
   const updated = competitors.map((c) => {
     // Rivals grow based on their growth rate, modified by day progression
