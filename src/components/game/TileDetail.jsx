@@ -35,7 +35,7 @@ export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0,
   const guardGap = Math.max(0, (profile?.lifeguards || 0) - lifeguards);
   const conditionValue = Math.max(0, Math.min(100, Math.round(condition)));
   const conditionLabel = conditionValue >= 75 ? "Excellent" : conditionValue >= 50 ? "Good" : conditionValue >= 30 ? "Worn" : "Critical";
-  const conditionClass = conditionValue >= 75 ? "bg-emerald-500" : conditionValue >= 50 ? "bg-lime-500" : conditionValue >= 30 ? "bg-amber-500" : "bg-rose-500";
+  const conditionClass = conditionValue >= 75 ? "bg-emerald-500" : conditionValue >= 50 ? "bg-lime-500" : conditionValue >= 30 ? "bg-amber-500" : "bg-rose-500";\n  const upgradeTier = level >= 10 ? "Legendary" : level >= 7 ? "Elite" : level >= 5 ? "Premium" : level >= 3 ? "Enhanced" : "Standard";\n  const upgradeBonus = { capacity: Math.round(level * 20), income: Math.round(level * 15), maintenance: Math.max(0, Math.round(level * 3)) };
   return (
     <div className="rounded-2xl bg-white/70 p-4 shadow-sm ring-1 ring-slate-100">
       <div className="mb-3 flex items-start justify-between">
@@ -85,7 +85,7 @@ export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0,
         )}
         {attr.capacity > 0 && <Row label="Safety" value={`${profile?.safety || "Medium"} · ${lifeguards}/${profile?.lifeguards || 1} guards`} />}
         {attr.fun > 0 && <Row label="Fun rating" value={`${attr.fun}/10`} />}
-        <Row label="Upgrade level" value={maxed ? `Lv ${level} (max)` : `Lv ${level} / ${MAX_UPGRADE}`} />
+        <Row label="Upgrade level" value={<span className="font-semibold">{upgradeTier} · Lv {level}/{MAX_UPGRADE}</span>} />
       </div>
 {guardGap > 0 && <div className="mb-3 flex items-center gap-2 rounded-xl bg-red-50 px-3 py-2 text-[10px] font-bold text-red-700 ring-1 ring-red-100"><AlertTriangle className="h-3.5 w-3.5" /> Add {guardGap} more lifeguard{guardGap > 1 ? "s" : ""} for full safety coverage.</div>}
             {incident && <div className="mb-3 flex items-center gap-2 rounded-xl bg-slate-950 px-3 py-2 text-[10px] font-bold text-white"><Wrench className="h-3.5 w-3.5 text-amber-300" /> Staff will restore this attraction during the next operating cycle.</div>}
