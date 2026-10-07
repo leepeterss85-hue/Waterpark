@@ -266,7 +266,8 @@ export function runDay(stateRef, setters) {
     );
     const safetyCoverage = Math.min(1, (effectiveStaff.lifeguard || 0) / Math.max(1, Math.ceil(attractions.length / 3)) + lifeguardStations * 0.12);
     const guestSafetyMult = safetyCoverage < 0.45 ? 0.88 : safetyCoverage < 0.7 ? 0.96 : 1;
-    const sandboxDemand = isSandbox ? Math.max(0.1, Number(sandboxTools.guestDemandMult || 1)) : 1;\n    newGuests = Math.min(Math.round(demand * sandboxDemand), Math.round(totalCapacity * guestSafetyMult * sandboxDemand));
+    const sandboxDemand = isSandbox ? Math.max(0.1, Number(sandboxTools.guestDemandMult || 1)) : 1;
+    newGuests = Math.min(Math.round(demand * sandboxDemand), Math.round(totalCapacity * guestSafetyMult * sandboxDemand));
 
     const currentPricing = stateRef.current.pricing || DEFAULT_PRICING;
     const sim = simulateVisits({
@@ -801,7 +802,11 @@ export function runDay(stateRef, setters) {
     if (ceremonyEntries.length) setLog((l) => [...ceremonyEntries, ...l].slice(0, 12));
   } else setAwardCeremonyTimer(ceremonyTimer - 1);
 
-  const constructionProjects = stateRef.current.constructionProjects || [];\n  if (isSandbox && sandboxTools.instantConstruction && constructionProjects.length) {\n    setConstructionProjects(constructionProjects.map((p) => ({ ...p, daysLeft: 0 })));\n  }\n  const constructionResult = simulateConstruction({ day: d + 1, projects: constructionProjects, grid: prevGrid });
+  const constructionProjects = stateRef.current.constructionProjects || [];
+  if (isSandbox && sandboxTools.instantConstruction && constructionProjects.length) {
+    setConstructionProjects(constructionProjects.map((p) => ({ ...p, daysLeft: 0 })));
+  }
+  const constructionResult = simulateConstruction({ day: d + 1, projects: constructionProjects, grid: prevGrid });
   setConstructionProjects(constructionResult.updatedProjects);
   for (const action of constructionResult.completionActions) {
     if (action.type === "place") {
