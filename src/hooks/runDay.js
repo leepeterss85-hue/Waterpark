@@ -138,6 +138,9 @@ export function runDay(stateRef, setters) {
   const pMult = prestigeMultiplier(stateRef.current.prestigeCount || 0);
   eff.incomeMult = (eff.incomeMult ?? 1) * pMult.incomeMult;
   eff.guestMult = (eff.guestMult ?? 1) * pMult.demandMult;
+  const chainBonuses = evaluateChains(prevGrid, stateRef.current.completedChains || []).bonuses;
+  eff.guestMult = (eff.guestMult ?? 1) * (1 + chainBonuses.guestMult);
+  eff.incomeMult = (eff.incomeMult ?? 1) * (1 + chainBonuses.incomeMult);
   const empireExpansion = empireBonuses(stateRef.current.acquiredRivals || [], stateRef.current.franchiseMaps || []);
   eff.guestMult = (eff.guestMult ?? 1) * (1 + empireExpansion.guestMult);
   eff.incomeMult = (eff.incomeMult ?? 1) * (1 + empireExpansion.incomeMult);
@@ -540,6 +543,7 @@ export function runDay(stateRef, setters) {
   setGuests(totalGuestsToday);
   setPeakGuests((p) => Math.max(p, totalGuestsToday));
   setVisitorStats(visitorStats);
+  setGuestMemory(buildGuestMemory(stateRef.current.guestMemory || {}, { day: d + 1, visitorStats, activeEvents: currentActiveEvents }));
   if (dayFeedback.length) setFeedback((prev) => [...dayFeedback, ...prev].slice(0, 40));
   setLifetimeEarnings((e) => e + grossIncome);
   if (newGuests >= 5) {
