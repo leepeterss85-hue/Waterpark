@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { TrendingUp, TrendingDown, CreditCard, Wallet, Building2, Target } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
-import { getParkItem } from "@/data/gameData";
+import { ATTRACTIONS, getParkItem } from "@/data/gameData";
 import { LOAN_TERMS } from "@/data/loans";
 
 const FOOD_IDS = ["dining", "coffee_bar"];
@@ -99,6 +99,31 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
       return { ...item, estimatedRevenue, contribution, dailyRoi, paybackDays };
     }).sort((a, b) => b.contribution - a.contribution).slice(0, 5);
   }, [grid, last]);
+
+  const expansionPlan = useMemo(() => {
+    const owned = new Set((grid || []).filter(Boolean));
+    const candidates = ATTRACTIONS
+      .filter((item) => !owned.has(item.id) && item.cost > 0)
+      .map((item) => {
+        const contribution = Math.max(0, (item.income || 0) - (item.maintenance || 0));
+        const roi = item.cost > 0 ? (contribution / item.cost) * 100 : 0;
+        return { ...item, contribution, roi, affordable: money >= item.cost };
+      })
+      .filter((item) => item.contribution > 0)
+      .sort((a, b) => b.roi - a.roi);
+    const affordable = candidates.find((item) => item.affordable);
+    const target = affordable || candidates[0] || null;
+    const healthyBuffer = target ? money - target.cost >= Math.max(5000, target.cost * 0.2) : false;
+    return { target, affordable: Boolean(affordable), healthyBuffer };
+  }, [grid, money]);
+
+  const nextMilestone = useMemo(() => {
+    const milestones = [25, 50, 75, 100, 150, 200, 250, 365, 500];
+    const next = milestones.find((value) => day < value);
+    if (!next) return { day: 500, progress: 100 };
+    const previous = milestones.filter((value) => value < next).pop() || 1;
+    return { day: next, progress: Math.max(0, Math.min(100, ((day - previous) / (next - previous)) * 100)) };
+  }, [day]);
 
   const strategy = useMemo(() => {
     const debtService = last?.loanPayment || 0;
@@ -211,6 +236,38 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
           </div>
         </div>
       )}
+
+      <div className="rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-white p-4">
+        <h3 className="mb-1 flex items-center gap-1.5 text-sm font-black text-slate-900">
+          <TrendingUp className="h-4 w-4 text-emerald-500" /> Expansion Plan
+        </h3>
+        {expansionPlan.target ? (
+          <>
+            <div className="rounded-xl bg-white p-3 shadow-sm ring-1 ring-emerald-100">
+              <div className="flex items-center justify-between gap-2">
+                <span className="truncate text-xs font-black text-slate-700">Next candidate: {expansionPlan.target.name}</span>
+                <span className="shrink-0 text-[10px] font-black text-emerald-600">ROI {expansionPlan.target.roi.toFixed(1)}%</span>
+              </div>
+              <div className="mt-1 text-[10px] text-slate-500">Cost ${expansionPlan.target.cost.toLocaleString()} · estimated contribution ${expansionPlan.target.contribution.toLocaleString()}/day</div>
+            </div>
+            <div className="mt-2 rounded-lg bg-emerald-100/70 px-2.5 py-2 text-[10px] font-bold text-emerald-800">
+              {expansionPlan.affordable
+                ? (expansionPlan.healthyBuffer ? "Affordable with a healthy cash buffer. Good time to expand." : "Affordable, but protect a cash buffer before building.")
+                : "Build cash first, or compare this return against a carefully sized loan."}
+            </div>
+          </>
+        ) : (
+          <div className="rounded-lg bg-slate-50 p-3 text-[10px] text-slate-500">No positive-return attraction is available yet. Focus on improving attendance and cash flow.</div>
+        )}
+        <div className="mt-3">
+          <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-wide text-slate-400">
+            <span>Long-term milestone</span><span>Day {day} / {nextMilestone.day}</span>
+          </div>
+          <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-white ring-1 ring-emerald-100">
+            <div className="h-full rounded-full bg-emerald-500" style={{ width: nextMilestone.progress + "%" }} />
+          </div>
+        </div>
+      </div>
 
       <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <h3 className="mb-1 flex items-center gap-1.5 text-sm font-black text-slate-900">
