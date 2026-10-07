@@ -235,6 +235,9 @@ export default function Home() {
           seasonEvent={game.seasonEvent}
           hotelGuests={game.hotelGuests}
           activeEvents={game.activeEvents}
+          waterQuality={game.waterQuality}
+          acceptedBookings={game.acceptedBookings}
+          sponsorships={game.sponsorships}
           mascot={game.mascotDef}
           onTileClick={handleTileClickWithSound}
           topControls={

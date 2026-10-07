@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { getParkItem } from "@/data/gameData";
+import { isWaterAttraction } from "@/data/waterQuality";
 import PersonSprite from "@/components/game/PersonSprite";
 
 const STAFF_ROLES = [
@@ -12,7 +13,7 @@ const STAFF_ROLES = [
   { id: "gardener", color: "bg-lime-600", label: "Groundskeeper" },
 ];
 
-export default function GuestLayer({ grid, parkZones = [], guests = 0, movements = {}, queueStats = {}, staff = {}, staffAssignments = {}, incidents = [] }) {
+export default function GuestLayer({ grid, parkZones = [], guests = 0, movements = {}, queueStats = {}, staff = {}, staffAssignments = {}, incidents = [], attractionCondition = [] }) {
   const [tick, setTick] = useState(0);
   useEffect(() => { const timer = setInterval(() => setTick(value => value + 1), 1600); return () => clearInterval(timer); }, []);
   const rows = Math.max(1, Math.ceil(grid.length / 8));
@@ -34,10 +35,19 @@ export default function GuestLayer({ grid, parkZones = [], guests = 0, movements
   });
   const personnel = STAFF_ROLES.flatMap((role, roleIndex) => {
     const assignment = staffAssignments[role.id] || "";
-    const positions = targets.filter(target => !assignment || (parkZones[target.index] || "") === assignment);
+    let positions = targets.filter(target => !assignment || (parkZones[target.index] || "") === assignment);
+    // Role-aware placement: staff gravitate to the things they actually work on,
+    // so the map shows lifeguards by pools, mechanics at degrading rides, cleaners at facilities.
+    if (!assignment) {
+      if (role.id === "lifeguard") positions = positions.filter(t => t.attr?.category === "attraction" && isWaterAttraction(t.id));
+      else if (role.id === "mechanic") positions = positions.filter(t => t.attr?.category === "attraction" && (attractionCondition[t.index] ?? 100) < 75);
+      else if (role.id === "cleaner") positions = positions.filter(t => t.attr?.category === "facility" || (attractionCondition[t.index] ?? 100) < 50);
+      // fall back to all targets if the role-specific set is empty (nothing to work on yet)
+      if (!positions.length) positions = targets.filter(target => !assignment || (parkZones[target.index] || "") === assignment);
+    }
     return Array.from({ length: Math.min(3, Math.max(0, staff[role.id] || 0)) }, (_, i) => {
       const target = positions[(i + tick + roleIndex) % Math.max(1, positions.length)];
-      return target ? <span key={role.id + i} className="park-pedestrian park-staff" data-role={role.id} data-activity="walking" style={position(target.index % 8 + .8, Math.floor(target.index / 8) + .7)} title={role.label}><PersonSprite variant={roleIndex + 1} role={role.id} /></span> : null;
+      return target ? <span key={role.id + i} className="park-pedestrian park-staff" data-role={role.id} data-activity="working" style={position(target.index % 8 + .8, Math.floor(target.index / 8) + .7)} title={role.label + " on duty"}><PersonSprite variant={roleIndex + 1} role={role.id} /></span> : null;
     });
   });
   return <div className="pointer-events-none absolute inset-0 z-30 overflow-hidden" data-people-layer>

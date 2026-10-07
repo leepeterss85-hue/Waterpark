@@ -6,13 +6,14 @@ import Tile from "@/components/game/Tile";
 import GuestLayer from "@/components/game/GuestLayer";
 import MapAmbience from "@/components/game/MapAmbience";
 import MascotSprite from "@/components/game/MascotSprite";
+import GroupArrivalIndicator from "@/components/game/GroupArrivalIndicator";
 import { useTouchZoom } from "@/hooks/useTouchZoom";
 import "@/components/game/parkMap.css";
 import "@/components/game/parkArtwork.css";
 import "@/components/game/parkPeople.css";
 import "@/components/game/parkChrome.css";
 
-export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, visitorMovements, queueStats = {}, attractionCondition = [], staff = {}, staffAssignments = {}, lifeguardTotal = 0, day = 1, weather, seasonEvent, hotelGuests = [], activeEvents = [], onTileClick, topControls, bottomMenu, statsBar, themeClass = "", mascot = null }) {
+export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, visitorMovements, queueStats = {}, attractionCondition = [], staff = {}, staffAssignments = {}, lifeguardTotal = 0, day = 1, weather, seasonEvent, hotelGuests = [], activeEvents = [], waterQuality = [], acceptedBookings = [], sponsorships = [], onTileClick, topControls, bottomMenu, statsBar, themeClass = "", mascot = null }) {
   const { zoom, setZoom, panX, panY, resetView, containerRef } = useTouchZoom(1);
   const incidentMap = new Map((incidents || []).map((incident) => [incident.tileIndex, incident]));
   const phase = ((day - 1) % 8);
@@ -24,6 +25,8 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
   const requiredGuards = Math.max(1, Math.ceil(attractionCount / 3));
   const guardCoverage = Math.min(1, lifeguardTotal / requiredGuards + lifeguardStations * 0.12);
   const facilityStatus = { toilets: guests <= Math.max(1, toilets) * 80 ? "COVERED" : "OVERLOADED", lifeguard_station: guardCoverage >= 0.7 ? "COVERED" : "OVERLOADED" };
+  const entranceIndex = grid.indexOf("park_entrance") >= 0 ? grid.indexOf("park_entrance") : Math.max(0, grid.length - 8);
+  const sponsorNames = (sponsorships || []).filter(Boolean).map((s) => s.name).join(" · ");
 
   return (
     <section className={"game-board-shell aquatic-map park-time-" + timeOfDay + " park-weather-" + weatherId + " flex h-full flex-col " + themeClass}>
@@ -31,6 +34,7 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
         <div className="flex min-w-0 items-center gap-3"><div className="game-board-icon"><MapIcon className="h-5 w-5" /></div><div className="min-w-0"><div className="flex items-center gap-2"><h2 className="font-display text-base font-black text-white sm:text-lg">Your Water Park</h2><span className="game-live-pill"><span /> LIVE</span></div><p className="hidden text-[10px] font-bold text-white/60 sm:block">Build, decorate and manage your resort.</p></div></div>
         <div className="flex shrink-0 items-center gap-2 text-[9px] font-black uppercase tracking-wider text-white/75 sm:text-[10px]"><span className="flex items-center gap-1.5"><Users className="h-3.5 w-3.5 text-cyan-200" />{guests.toLocaleString()}</span><span className="hidden h-4 w-px bg-white/20 sm:block" /><span className="hidden items-center gap-1.5 sm:flex"><Footprints className="h-3.5 w-3.5 text-amber-200" />GUESTS MOVING</span></div>
       </div>
+      {sponsorNames && <div className="sponsor-ribbon"><span className="sponsor-dot" />Sponsored by <span className="sponsor-names">{sponsorNames}</span></div>}
       {topControls}
       {(seasonEvent || weatherId === "storm") && <div className={"park-event-ribbon " + (weatherId === "storm" ? "storm" : "")}><Sparkles className="h-3.5 w-3.5" /><span>{weatherId === "storm" ? "THUNDERSTORM — SAFETY MODE" : seasonEvent?.name}</span><b>{weatherId === "storm" ? "Outdoor demand reduced" : seasonEvent?.description}</b></div>}
       {activeEvents.length > 0 && <div className="park-event-ribbon"><Sparkles className="h-3.5 w-3.5 text-amber-300" /><span>{activeEvents.map((e) => e.name).join(" · ")}</span><b>{activeEvents.length} active event{activeEvents.length > 1 ? "s" : ""} — bonuses applied</b></div>}
@@ -57,10 +61,11 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
                 const hotelDef = value ? getHotelDef(value) : null;
                 const hotelOcc = hotelDef ? hotelGuests.filter((g) => g.hotelTile === index).length : 0;
                 const hotelRm = hotelDef ? hotelRooms(hotelDef, upgrades?.[index] || 0) : 0;
-                return <Tile key={index} index={index} grid={grid} zone={parkZones?.[index]} upgradeLevel={upgrades?.[index] || 0} value={value} selectedBuild={selectedBuild} expansionTheme={expansionTheme} isSelected={selectedTile === index} incident={incidentMap.get(index)} condition={attractionCondition?.[index]} queueWait={queueWait} queueConnected={queueConnected} movement={movement} guests={guests} facilityStatus={facilityStatus} timeOfDay={timeOfDay} nightSwim={seasonEvent?.id === "night_swim"} hotelOccupancy={hotelOcc} hotelRoomsTotal={hotelRm} onClick={() => onTileClick(index)} />;
+                return <Tile key={index} index={index} grid={grid} zone={parkZones?.[index]} upgradeLevel={upgrades?.[index] || 0} value={value} selectedBuild={selectedBuild} expansionTheme={expansionTheme} isSelected={selectedTile === index} incident={incidentMap.get(index)} condition={attractionCondition?.[index]} queueWait={queueWait} queueConnected={queueConnected} movement={movement} guests={guests} facilityStatus={facilityStatus} timeOfDay={timeOfDay} nightSwim={seasonEvent?.id === "night_swim"} hotelOccupancy={hotelOcc} hotelRoomsTotal={hotelRm} waterQuality={waterQuality?.[index]} onClick={() => onTileClick(index)} />;
               })}
             </div>
-            <GuestLayer grid={grid} parkZones={parkZones} guests={guests} movements={visitorMovements} queueStats={queueStats} staff={staff} staffAssignments={staffAssignments} incidents={incidents || []} />
+            <GuestLayer grid={grid} parkZones={parkZones} guests={guests} movements={visitorMovements} queueStats={queueStats} staff={staff} staffAssignments={staffAssignments} incidents={incidents || []} attractionCondition={attractionCondition} />
+            <GroupArrivalIndicator acceptedBookings={acceptedBookings} entranceIndex={entranceIndex} rows={Math.ceil(grid.length / 8)} />
             {mascot && <MascotSprite mascot={mascot} grid={grid} />}
           </div></div>
         </div>

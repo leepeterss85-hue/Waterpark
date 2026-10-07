@@ -1030,7 +1030,7 @@ export function useGameState() {
     staffWages: staffWages(staff),
     staffMorale, wageBoost, payStaffBonus, toggleWageBoost,
     sponsorships, acceptSponsor, endSponsor,
-    groupBookings, acceptBooking, declineBooking,
+    groupBookings, acceptBooking, declineBooking, acceptedBookings,
     estimatedUtilities: Math.round((150 + grid.filter((id) => id && getParkItem(id)?.category === "attraction").length * 45 + grid.filter((id) => id && getParkItem(id)?.category === "facility").length * 18 + guests * 2.2) * (weather?.utilityMult ?? 1)),
     GRID_SIZE,
     setPlaying, setSpeed, setTicketPrice, setAdBudget, setPriorityPass,

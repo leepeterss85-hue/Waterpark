@@ -7,6 +7,7 @@ import RideVisitors from "@/components/game/RideVisitors";
 import RideStatus from "@/components/game/RideStatus";
 import RideParticles from "@/components/game/RideParticles";
 import UpgradeAura from "@/components/game/UpgradeAura";
+import { isWaterAttraction, getQualityLevel } from "@/data/waterQuality";
 
 
 
@@ -28,7 +29,7 @@ function ExpansionDecor({ theme, night, nightSwim }) {
 }
 
 
-export default function Tile({ value, index, grid, zone, expansionTheme = "starter", upgradeLevel = 0, selectedBuild, isSelected, incident, queueWait, queueConnected, movement = 0, guests = 0, condition = 100, facilityStatus, timeOfDay = "day", nightSwim = false, hotelOccupancy = null, hotelRoomsTotal = 0, onClick }) {
+export default function Tile({ value, index, grid, zone, expansionTheme = "starter", upgradeLevel = 0, selectedBuild, isSelected, incident, queueWait, queueConnected, movement = 0, guests = 0, condition = 100, facilityStatus, timeOfDay = "day", nightSwim = false, hotelOccupancy = null, hotelRoomsTotal = 0, waterQuality = 100, onClick }) {
   const attr = value ? getParkItem(value) : null;
   const canPlace = !attr && selectedBuild;
   const ghostAttr = canPlace ? getParkItem(selectedBuild) : null;
@@ -42,6 +43,7 @@ export default function Tile({ value, index, grid, zone, expansionTheme = "start
     {canPlace && <div className="park-build-hint relative z-10 flex h-full flex-col items-center justify-center gap-1"><div className="park-build-symbol grid h-8 w-8 place-items-center rounded-full bg-white shadow-sm ring-1 ring-cyan-200"><span className="text-xl font-light text-cyan-500">+</span></div><span className="park-build-label text-[8px] font-extrabold uppercase tracking-wider text-cyan-700">Build</span></div>}
     {canPlace && ghostAttr && <div className="pointer-events-none absolute inset-0 z-[5] opacity-40 transition-opacity duration-150 group-hover:opacity-70"><ParkItemArtwork attr={ghostAttr} grid={grid} index={index} /></div>}
     {zoneTint && <div className={"pointer-events-none absolute inset-0 z-10 rounded-[15px] ring-2 " + zoneTint} />}
+    {isWater && isWaterAttraction(attr.id) && waterQuality < 65 && (() => { const lvl = getQualityLevel(waterQuality); return ["fair","poor","critical"].includes(lvl) ? <div className={"pool-quality-tint " + lvl} aria-hidden="true" /> : null; })()}
     {isWater && <RideStatus incident={incident} queueConnected={queueConnected} queueWait={queueWait} movement={movement} capacity={attr.capacity || 1} condition={condition} level={upgradeLevel} />}
     {attr?.category === "facility" && facilityStatus?.[attr.id] && <span className={"absolute right-1 top-1 z-20 rounded bg-slate-950/65 px-1 py-0.5 text-[6px] font-black text-white " + (facilityStatus[attr.id] === "OVERLOADED" ? "facility-overloaded" : "facility-covered")}>{facilityStatus[attr.id]}</span>}
     {incident && <span className={"park-incident-marker absolute right-1.5 top-1.5 z-20 grid h-6 w-6 place-items-center rounded-full border-2 border-white text-white shadow-lg " + (incident.type === "breakdown" ? "animate-pulse bg-rose-500" : "bg-amber-500")}>{incident.type === "breakdown" ? <Wrench className="h-3 w-3" /> : <Sparkles className="h-3 w-3" />}</span>}
