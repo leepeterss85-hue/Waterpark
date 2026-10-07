@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Hammer, Settings, Users, Activity, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2, MapPin, Star, Clock, Wrench, Grid3x3, ChevronUp, Target, Zap, Palette, RotateCcw, Gift, PawPrint, MessageSquare, Camera, HeartPulse, Handshake, UsersRound, UtensilsCrossed, Trophy, BookOpen, Globe2 } from "lucide-react";
+import { Hammer, Settings, Users, Activity, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2, MapPin, Star, Clock, Wrench, Grid3x3, ChevronUp, Target, Zap, Palette, RotateCcw, Gift, PawPrint, MessageSquare, Camera, HeartPulse, Handshake, UsersRound, UtensilsCrossed, BookOpen, Globe2, Waves } from "lucide-react";
 
 const PRIMARY = [
   { key: "build", icon: Hammer, label: "Build", tutorialTarget: "build" },
@@ -43,6 +43,7 @@ const SECONDARY = [
   { key: "chains", icon: Trophy, label: "Ride Chains" },
   { key: "campaignChapters", icon: BookOpen, label: "Campaign" },
   { key: "empireExpansion", icon: Globe2, label: "Global Empire" },
+  { key: "advancedPark", icon: Waves, label: "Park Life" },
   { key: "photo", icon: Camera, label: "Photo" },
   { key: "prestige", icon: RotateCcw, label: "Prestige" },
   { key: "settings", icon: SlidersHorizontal, label: "Settings" },
