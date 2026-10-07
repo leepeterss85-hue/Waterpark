@@ -6,7 +6,7 @@ function Choice({ active, children, onClick }) {
   return <button onClick={onClick} className={"rounded-lg px-2.5 py-1.5 text-[10px] font-extrabold transition " + (active ? "bg-slate-900 text-white" : "bg-white text-slate-500 ring-1 ring-slate-200 hover:bg-slate-50")}>{children}</button>;
 }
 
-export default function ParkManagementPanel({ admissionFee, marketingSpend, expressLane, utilities, wages, history = [], visitorStats, grid = [], upgrades = [], incidents = [], onAdmission, onMarketing, onExpressLane }) {
+export default function ParkManagementPanel({ admissionFee, marketingSpend, expressLane, utilities, wages, history = [], visitorStats, grid = [], upgrades = [], incidents = [], onAdmission, onMarketing, onExpressLane, uptime = 0, safety = 0, cleanliness = 0, entertainment = 0, waterQualityAvg = 100, waterQualityCriticalCount = 0, marketShare = 100, popularity = [], popularityTrend = [] }) {
   const rides = grid.map((id, idx) => id ? { id, idx, item: getParkItem(id), level: upgrades[idx] || 0 } : null).filter((x) => x?.item?.category === "attraction");
   const broken = incidents.filter((x) => x.type === "breakdown").length;
   const maintenance = incidents.filter((x) => x.type === "maintenance").length;
@@ -17,6 +17,24 @@ export default function ParkManagementPanel({ admissionFee, marketingSpend, expr
   const totalCapacity = rides.reduce((sum, r) => sum + Math.round((r.item?.capacity || 0) * (1 + r.level * 0.2)), 0);
   const parkLoad = totalCapacity ? Math.min(100, Math.round(((visitorStats?.totalVisits || 0) / totalCapacity) * 100)) : 0;
   const latestExpenses = latest ? Math.max(0, latest.income - latest.net) : 0;
+  const operationalSignals = [
+    { label: "Safety", value: Math.round(safety * 100), good: safety >= 0.8 },
+    { label: "Cleanliness", value: Math.round(cleanliness * 100), good: cleanliness >= 0.8 },
+    { label: "Ride uptime", value: Math.round(uptime * 100), good: uptime >= 0.8 },
+    { label: "Water quality", value: Math.round(waterQualityAvg), good: waterQualityAvg >= 70 },
+  ];
+  const weakestSignal = operationalSignals.reduce((weakest, item) => item.value < weakest.value ? item : weakest, operationalSignals[0]);
+  const risingRides = popularityTrend.filter((v) => v > 0.08).length;
+  const fallingRides = popularityTrend.filter((v) => v < -0.08).length;
+  const managementAdvice = weakestSignal.value < 60
+    ? "Urgent: improve " + weakestSignal.label.toLowerCase() + " before expanding."
+    : marketShare < 35
+      ? "Competitive priority: raise appeal and guest satisfaction before adding expensive rides."
+      : risingRides > fallingRides
+        ? "Expansion window: visitor interest is trending upward across the park."
+        : fallingRides > risingRides
+          ? "Refresh rides or improve service — visitor interest is cooling."
+          : "Operations are balanced. Build or upgrade where your ROI is strongest.";
   return <section className="waterpark-panel bg-white/85 p-4">
     <div className="mb-3"><div className="text-[10px] font-extrabold uppercase tracking-wider text-cyan-700">Business Office</div><h3 className="font-display text-lg font-extrabold text-slate-900">Run the resort</h3><p className="mt-1 text-[11px] leading-4 text-slate-500">Balance admissions, marketing and premium services against daily operating costs.</p></div>
     <div className="rounded-xl bg-emerald-50 p-3 ring-1 ring-emerald-100"><div className="flex items-center justify-between"><div className="flex items-center gap-2 text-xs font-extrabold text-emerald-800"><DollarSign className="h-4 w-4" /> Admission</div><span className="font-display text-lg font-extrabold text-slate-900">{`$${admissionFee}`}</span></div><div className="mt-2 flex flex-wrap gap-1.5">{[15,20,28,35,45,60].map((value)=><Choice key={value} active={admissionFee===value} onClick={()=>onAdmission(value)}>{`$${value}`}</Choice>)}</div></div>
@@ -52,5 +70,19 @@ export default function ParkManagementPanel({ admissionFee, marketingSpend, expr
       </div>}
       {topRide && <div className="mt-2 rounded-lg bg-cyan-400/10 px-2.5 py-2 text-[9px] font-bold text-cyan-200">⭐ Top attraction: {topRide}</div>}
     </div>
-  </section>;
+      <div className="mt-3 rounded-xl bg-cyan-50 p-3 ring-1 ring-cyan-100">
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="text-[9px] font-black uppercase tracking-wider text-cyan-700">Operations Pulse</div>
+          <div className="mt-0.5 text-xs font-black text-slate-800">Management recommendation</div>
+        </div>
+        <div className="rounded-full bg-white px-2 py-1 text-[9px] font-black text-cyan-700">{marketShare.toFixed(0)}% market</div>
+      </div>
+      <div className="mt-2 rounded-lg bg-white p-2 text-[10px] font-bold leading-4 text-slate-600 ring-1 ring-cyan-100">{managementAdvice}</div>
+      <div className="mt-2 grid grid-cols-4 gap-1.5">
+        {operationalSignals.map((s) => <div key={s.label} className="rounded-lg bg-white p-1.5 text-center ring-1 ring-slate-100"><div className="text-[8px] font-bold text-slate-400">{s.label}</div><div className={"mt-0.5 text-xs font-black " + (s.good ? "text-emerald-600" : "text-rose-600")}>{s.value}%</div></div>)}
+      </div>
+      <div className="mt-2 flex items-center justify-between text-[8px] font-bold text-slate-400"><span>{risingRides} rides rising</span><span>{fallingRides} rides cooling</span><span>{waterQualityCriticalCount ? waterQualityCriticalCount + " water alerts" : "Water systems healthy"}</span></div>
+    </div>
+</section>;
 }
