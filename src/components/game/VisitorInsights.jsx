@@ -62,6 +62,18 @@ export default function VisitorInsights({ visitorStats }) {
           <div className="mt-3 flex flex-wrap gap-1.5">{Object.entries(stats.groupTypes || stats.guestTypes || {}).sort((a,b)=>b[1]-a[1]).map(([type,count])=><span key={type} className="rounded-full bg-cyan-50 px-2 py-1 text-[10px] font-bold text-cyan-800">{type} · {Math.round(count)}</span>)}</div>
         </div>
       </div>
+      <div className="mt-3 rounded-xl border border-violet-100 bg-violet-50/60 p-3">
+        <div className="mb-2 flex items-center gap-1.5 text-[11px] font-extrabold text-violet-700"><TrendingUp className="h-3.5 w-3.5" /> Visitor intelligence</div>
+        {(() => {
+          const types = stats.guestTypes || {};
+          const ranked = Object.entries(types).sort((a,b) => b[1]-a[1]);
+          const leader = ranked[0];
+          const queueWait = queue.wait || 0;
+          const needsHigh = [needs.hunger || 0, needs.thirst || 0, needs.fatigue || 0].filter(v => v > 65).length;
+          const advice = queueWait > 25 ? "Queue pressure is the biggest guest-experience risk. Add capacity or queue support." : needsHigh >= 2 ? "Guests have unmet needs. More food, drinks and rest facilities should improve satisfaction." : mood < 50 ? "Guest mood is soft. Review pricing, cleanliness, safety and attraction variety." : leader ? leader[0] + " groups are your strongest audience. Tailor your next investment to them." : "Open the park for more visitor intelligence.";
+          return <><div className="text-[10px] font-bold leading-4 text-violet-900">{advice}</div>{leader && <div className="mt-2 flex items-center justify-between rounded-lg bg-white px-2.5 py-2 text-[9px] font-bold text-slate-500"><span>Largest audience</span><span className="text-violet-700">{leader[0]} · {Math.round(leader[1])}</span></div>}</>;
+        })()}
+      </div>
       <div className="mt-3 rounded-xl bg-white p-3 ring-1 ring-slate-100">
         <div className="mb-2 flex items-center gap-1.5 text-[11px] font-extrabold text-slate-600"><Users className="h-3.5 w-3.5 text-violet-600" /> Guest demographics</div>
         {(() => {
