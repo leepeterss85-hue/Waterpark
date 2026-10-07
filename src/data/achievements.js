@@ -33,7 +33,7 @@ export const ACHIEVEMENTS = [
   { id: "disaster_survivor", title: "Disaster Survivor", desc: "Survive 3 disasters.", icon: "Shield", color: "from-rose-400 to-red-600", check: (s) => (s.disastersSurvived || 0) >= 3 },
   { id: "sandbox_explorer", title: "Sandbox Explorer", desc: "Try Sandbox Mode.", icon: "Sparkles", color: "from-amber-400 to-yellow-500", check: (s) => s.sandboxUsed },
   // --- Empire-level achievements ---
-  { id: "empire_founder", title: "Empire Founder", desc: "Reach Tycoon empire tier.", icon: "Crown", color: "from-cyan-400 to-blue-500", check: (s) => (s.empirePoints || 0) >= 0 },
+  { id: "empire_founder", title: "Empire Founder", desc: "Earn your first Empire Point.", icon: "Crown", color: "from-cyan-400 to-blue-500", check: (s) => (s.empirePoints || 0) > 0 },
   { id: "resort_magnate_ach", title: "Resort Magnate", desc: "Reach 4.5-star resort rating.", icon: "Star", color: "from-violet-400 to-purple-600", check: (s) => (s.resortRating || 0) >= 4.5 },
   { id: "mega_resort_ach", title: "Mega Resort", desc: "Welcome 2,000 guests in a single day.", icon: "Users", color: "from-blue-400 to-indigo-600", check: (s) => s.peakGuests >= 2000 },
   { id: "billionaire", title: "Billionaire", desc: "Earn $10,000,000 in total revenue.", icon: "TrendingUp", color: "from-emerald-500 to-teal-700", check: (s) => s.lifetimeEarnings >= 10000000 },
@@ -41,7 +41,7 @@ export const ACHIEVEMENTS = [
   { id: "full_empire", title: "Full Empire", desc: "Fill all 144 tiles in your park.", icon: "Maximize2", color: "from-rose-400 to-fuchsia-600", check: (s) => (s.tilesFilled || 0) >= 144 },
   { id: "century_park", title: "Century Park", desc: "Reach Day 100.", icon: "CalendarDays", color: "from-amber-400 to-orange-600", check: (s) => s.day >= 100 },
   { id: "legendary_reputation", title: "Legendary Reputation", desc: "Reach 99% reputation.", icon: "Star", color: "from-yellow-400 to-amber-500", check: (s) => s.reputation >= 99 },
-  { id: "milestone_25", title: "Survivor", desc: "Reach Day 25 and claim the milestone bonus.", icon: "Medal", color: "from-teal-400 to-cyan-600", check: (s) => s.day >= 25 },
+  { id: "milestone_25", title: "Quarter Century", desc: "Reach Day 25 and claim the milestone bonus.", icon: "Medal", color: "from-teal-400 to-cyan-600", check: (s) => s.day >= 25 },
   { id: "milestone_50", title: "Veteran", desc: "Reach Day 50.", icon: "Medal", color: "from-indigo-400 to-blue-600", check: (s) => s.day >= 50 },
   { id: "milestone_100", title: "Centurion", desc: "Reach Day 100.", icon: "Medal", color: "from-amber-400 to-orange-600", check: (s) => s.day >= 100 },
   { id: "milestone_200", title: "Immortal Tycoon", desc: "Reach Day 200.", icon: "Medal", color: "from-rose-400 via-fuchsia-500 to-purple-600", check: (s) => s.day >= 200 },
