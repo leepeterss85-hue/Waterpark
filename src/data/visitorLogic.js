@@ -470,9 +470,10 @@ export function simulateVisits({
   let longestQueue = { id: null, wait: 0, guests: 0 };
   for (const item of options) {
     if (item.attr.category !== "attraction") continue;
-    const guestsInQueue = Math.max(0, Math.round(item.load - item.cap * 0.55));
+    const queuePressure = item.queueSupport > 0 ? 0.55 : 0.72;
+    const guestsInQueue = Math.max(0, Math.round(item.load - item.cap * queuePressure));
     const wait = Math.min(90, Math.max(0, Math.round((item.load / Math.max(1, item.cap)) * (item.attr.duration || 4) * 3 - item.queueSupport * 1.5)));
-    const queueCapacity = item.queueSupport > 0 ? item.queueSupport * 12 : 8;
+    const queueCapacity = item.queueSupport > 0 ? item.queueSupport * 12 : Math.max(8, Math.round(item.cap * 0.18));
     queueStats[item.idx] = { id: item.attr.id, guests: guestsInQueue, wait, load: Math.round(item.load), capacity: Math.round(item.cap), queueCapacity, queueRails: item.queueSupport, overflow: Math.max(0, guestsInQueue - queueCapacity) };
     if (wait > longestQueue.wait) longestQueue = { id: item.attr.id, wait, guests: guestsInQueue };
   }
