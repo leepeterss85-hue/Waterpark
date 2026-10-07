@@ -8,6 +8,7 @@ import {
   Wine, Beef, CupSoda, Shirt, CreditCard, Pizza, Bath, Leaf, Thermometer, Moon,
   Briefcase, Trash2, Info, Droplet, Circle, Car,
   FerrisWheel, Ghost, Dices, Drama, Hammer, Target, Compass, Ship, Disc, Eye, Train, ArrowDown,
+  Trees, Feather, Pickaxe, Snowflake, Hexagon, Triangle, Rabbit, Rocket, Bike, Joystick,
 } from "lucide-react";
 
 export const ICONS = {
@@ -20,6 +21,7 @@ export const ICONS = {
   Wine, Beef, CupSoda, Shirt, CreditCard, Pizza, Bath, Leaf, Thermometer, Moon,
   Briefcase, Trash2, Info, Droplet, Circle, Car,
   FerrisWheel, Ghost, Dices, Drama, Hammer, Target, Compass, Ship, Disc, Eye, Train, ArrowDown,
+  Trees, Feather, Pickaxe, Snowflake, Hexagon, Triangle, Rabbit, Rocket, Bike, Joystick,
 };
 
 export function getIcon(name) {
