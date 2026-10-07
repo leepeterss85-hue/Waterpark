@@ -73,7 +73,7 @@ export function runDay(stateRef, setters) {
     setMegaProjects, setGuestStories,
   } = setters;
 
-  const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, staffAssignments: currentAssignments, incidents: currentIncidents, upgrades: currentUpgrades, attractionCondition: currentCondition, challenge: currentChallenge, parkZones: currentZones, forecast: currentForecast, seasonEvent: currentSeasonEvent, parkAppeal: currentParkAppeal, ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass, vipVisit: currentVipVisit, completedResearch: currentResearch } = stateRef.current;
+  const { grid: prevGrid, reputation: rep, day: d, sandboxSettings: sandboxTools = {}, staff: currentStaff, staffAssignments: currentAssignments, incidents: currentIncidents, upgrades: currentUpgrades, attractionCondition: currentCondition, challenge: currentChallenge, parkZones: currentZones, forecast: currentForecast, seasonEvent: currentSeasonEvent, parkAppeal: currentParkAppeal, ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass, vipVisit: currentVipVisit, completedResearch: currentResearch } = stateRef.current;
   const hasResearch = (id) => (currentResearch || []).includes(id);
   const masterPlanContext = getMasterPlanMetrics({
     grid: prevGrid, money: stateRef.current.money || 0, reputation: rep,
@@ -94,7 +94,7 @@ export function runDay(stateRef, setters) {
   const masterGuestMult = 1 + (activeMasterPlanBonuses.guestDemandMult || 0);
   const masterIncomeMult = 1 + (activeMasterPlanBonuses.incomeMult || 0) + (activeMasterPlanBonuses.attractionIncomeMult || 0);
   const ticketResearchMult = hasResearch("marketing") ? 1.10 : 1;
-  const dayWeather = currentForecast || rollWeather(d + 1);
+  const dayWeather = sandboxTools.weatherLock && sandboxTools.weather ? sandboxTools.weather : (currentForecast || rollWeather(d + 1));
   const dayForecast = rollWeather(d + 2);
   const currentDisaster = stateRef.current.disaster;
   const isSandbox = stateRef.current.sandbox;
@@ -266,7 +266,7 @@ export function runDay(stateRef, setters) {
     );
     const safetyCoverage = Math.min(1, (effectiveStaff.lifeguard || 0) / Math.max(1, Math.ceil(attractions.length / 3)) + lifeguardStations * 0.12);
     const guestSafetyMult = safetyCoverage < 0.45 ? 0.88 : safetyCoverage < 0.7 ? 0.96 : 1;
-    newGuests = Math.min(demand, Math.round(totalCapacity * guestSafetyMult));
+    const sandboxDemand = isSandbox ? Math.max(0.1, Number(sandboxTools.guestDemandMult || 1)) : 1;\n    newGuests = Math.min(Math.round(demand * sandboxDemand), Math.round(totalCapacity * guestSafetyMult * sandboxDemand));
 
     const currentPricing = stateRef.current.pricing || DEFAULT_PRICING;
     const sim = simulateVisits({
@@ -801,7 +801,7 @@ export function runDay(stateRef, setters) {
     if (ceremonyEntries.length) setLog((l) => [...ceremonyEntries, ...l].slice(0, 12));
   } else setAwardCeremonyTimer(ceremonyTimer - 1);
 
-  const constructionResult = simulateConstruction({ day: d + 1, projects: stateRef.current.constructionProjects, grid: prevGrid });
+  const constructionProjects = stateRef.current.constructionProjects || [];\n  if (isSandbox && sandboxTools.instantConstruction && constructionProjects.length) {\n    setConstructionProjects(constructionProjects.map((p) => ({ ...p, daysLeft: 0 })));\n  }\n  const constructionResult = simulateConstruction({ day: d + 1, projects: constructionProjects, grid: prevGrid });
   setConstructionProjects(constructionResult.updatedProjects);
   for (const action of constructionResult.completionActions) {
     if (action.type === "place") {
