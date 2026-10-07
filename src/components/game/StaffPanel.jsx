@@ -74,6 +74,20 @@ export default function StaffPanel({
         />
       </div>
 
+      <div className="mb-3 rounded-xl border border-emerald-100 bg-emerald-50/60 p-3">
+        <div className="mb-2 flex items-center justify-between"><span className="text-[10px] font-black uppercase tracking-wide text-emerald-700">Workforce planner</span><span className="text-[9px] font-bold text-slate-500">Live staffing advice</span></div>
+        {(() => {
+          const gaps = [
+            { label: "Safety", value: safety, target: 0.82, role: "lifeguards / security" },
+            { label: "Uptime", value: uptime, target: 0.82, role: "mechanics" },
+            { label: "Cleanliness", value: cleanliness, target: 0.82, role: "cleaners" },
+          ];
+          const gap = gaps.reduce((a, b) => (b.target - b.value) > (a.target - a.value) ? b : a, gaps[0]);
+          const priority = gap.target - gap.value > 0.04 ? "Priority: strengthen " + gap.label.toLowerCase() + " with more " + gap.role + "." : entertainment < 2 ? "Consider an entertainer or event coordinator to improve guest atmosphere." : "Staffing is balanced. Train your strongest teams before hiring more.";
+          return <div className="text-[10px] font-bold leading-4 text-emerald-900">{priority}</div>;
+        })()}
+      </div>
+
       <div className="mb-3 rounded-xl border border-indigo-100 bg-indigo-50/60 p-3">
         <div className="mb-2 flex items-center justify-between">
           <span className="text-[10px] font-black uppercase tracking-wide text-indigo-500">Management efficiency</span>
