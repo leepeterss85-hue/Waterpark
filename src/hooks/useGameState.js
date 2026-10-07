@@ -1015,7 +1015,7 @@ export function useGameState() {
     trackEvent("story_step_completed", { id: step.id, chapter: step.chapter, step: storyStep + 1 });
     const next = Math.min(STORY_STEPS.length - 1, storyStep + 1);
     setStoryStep(next);
-    const done = next === STORY_STEPS.length - 1;
+    const done = step.id === "finish";
     setStoryCompleted(done);
     saveSettings({ gameMode, storyStep: next, storyCompleted: done });
   }, [gameMode, storyCompleted, storyStep, grid, staff, day, history, totalUpgrades, expansionsDone, completedResearch, hotelGuests, resortRating, incidents, emergencies, disastersSurvived, peakGuests, guests, marketShare, parkAppeal, reputation, level]);
@@ -1040,7 +1040,7 @@ export function useGameState() {
     if (gameMode !== "story" || storyCompleted) return;
     const next = Math.min(STORY_STEPS.length - 1, storyStep + 1);
     setStoryStep(next);
-    setStoryCompleted(next === STORY_STEPS.length - 1);
+    setStoryCompleted(STORY_STEPS[storyStep]?.id === "finish");
     saveSettings({ gameMode, storyStep: next, storyCompleted: next === STORY_STEPS.length - 1 });
   }, [storyStep, gameMode, storyCompleted]);
 
