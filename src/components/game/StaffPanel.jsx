@@ -3,6 +3,7 @@ import { Plus, Minus, Users } from "lucide-react";
 import { STAFF } from "@/data/gameData";
 import { getIcon } from "./icons";
 import StaffTrainingSection from "./StaffTrainingSection";
+import { staffLevelFromXp, trainingEffectMult, trainingCost, MAX_STAFF_LEVEL } from "@/data/staffTraining";
 
 function EffectMeter({ label, value, color }) {
   return (
@@ -71,6 +72,30 @@ export default function StaffPanel({
           value={Math.min(1, (entertainment || 0) / 6)}
           color="bg-gradient-to-r from-pink-400 to-rose-500"
         />
+      </div>
+
+      <div className="mb-3 rounded-xl border border-indigo-100 bg-indigo-50/60 p-3">
+        <div className="mb-2 flex items-center justify-between">
+          <span className="text-[10px] font-black uppercase tracking-wide text-indigo-500">Management efficiency</span>
+          <span className="text-[10px] font-bold text-slate-500">Training improves output</span>
+        </div>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {types.filter((s) => (staff[s.id] || 0) > 0).slice(0, 4).map((s) => {
+            const count = staff[s.id] || 0;
+            const xp = staffXp[s.id] || 0;
+            const level = staffLevelFromXp(xp);
+            const efficiency = Math.round((trainingEffectMult(s.id, xp) - 1) * 100);
+            const nextCost = level < MAX_STAFF_LEVEL ? trainingCost(s.id, xp) : null;
+            return (
+              <div key={s.id} className="rounded-lg bg-white p-2 shadow-sm ring-1 ring-indigo-100">
+                <div className="truncate text-[10px] font-black text-slate-700">{s.name}</div>
+                <div className="mt-0.5 text-[9px] font-bold text-indigo-600">Lv {level} · +{efficiency}%</div>
+                <div className="mt-0.5 text-[9px] text-slate-400">{count} employed{nextCost ? " · Train $" + nextCost.toLocaleString() : " · MAX"}</div>
+              </div>
+            );
+          })}
+        </div>
+        {types.every((s) => !(staff[s.id] || 0)) && <div className="text-[10px] text-slate-400">Hire staff to start building trained management capacity.</div>}
       </div>
 
       <div className="flex flex-col gap-2.5">
