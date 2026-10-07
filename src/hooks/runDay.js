@@ -223,7 +223,7 @@ export function runDay(stateRef, setters) {
     else remaining.push(inc);
   }
   const incidentByTile = new Map(remaining.map((i) => [i.tileIndex, i]));
-  const workingAttractions = attractions.filter((p) => incidentByTile.get(p.idx)?.type !== "breakdown");
+  const workingAttractions = attractions.filter((p) => incidentByTile.get(p.idx)?.type !== "breakdown" && !eventDownsides.closedFacilities.has(p.id));
   const totalCapacity = workingAttractions.reduce((s, p) => s + capOf(p), 0);
 
   let newGuests = 0;
@@ -280,7 +280,7 @@ export function runDay(stateRef, setters) {
     const bigMoment = signatureRides.find((p) => (visitorStats.movements?.[p.id] || 0) >= Math.max(10, p.attr.capacity * 0.08));
     if (bigMoment) dayFeedback = [{ day: d + 1, text: `🔥 MASSIVE SPLASH! ${bigMoment.attr.name} is the star of the park today.` }, ...dayFeedback];
 
-    const avgMood = sim.avgMood;
+    const avgMood = Math.max(0, sim.avgMood - eventDownsides.nonVipMoodPenalty);
     let repDelta = 0;
     if (avgMood >= 70) repDelta += 1.5;
     else if (avgMood < 40) repDelta -= 1.5;
