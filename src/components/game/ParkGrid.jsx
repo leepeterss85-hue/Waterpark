@@ -8,11 +8,13 @@ import MapAmbience from "@/components/game/MapAmbience";
 import MascotSprite from "@/components/game/MascotSprite";
 import GroupArrivalIndicator from "@/components/game/GroupArrivalIndicator";
 import StrikeBanner from "@/components/game/StrikeBanner";
+import EventOverlay from "@/components/game/EventOverlay";
 import { useTouchZoom } from "@/hooks/useTouchZoom";
 import "@/components/game/parkMap.css";
 import "@/components/game/parkArtwork.css";
 import "@/components/game/parkPeople.css";
 import "@/components/game/parkChrome.css";
+import "@/components/game/eventOverlay.css";
 
 export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, visitorMovements, queueStats = {}, attractionCondition = [], staff = {}, staffAssignments = {}, lifeguardTotal = 0, day = 1, weather, seasonEvent, hotelGuests = [], activeEvents = [], waterQuality = [], acceptedBookings = [], sponsorships = [], activeStrikes = [], onTileClick, topControls, bottomMenu, statsBar, themeClass = "", mascot = null }) {
   const { zoom, setZoom, panX, panY, resetView, containerRef } = useTouchZoom(1);
@@ -45,6 +47,7 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
         <div ref={containerRef} className="relative flex-1 min-h-0 overflow-auto rounded-[20px] border-[5px] border-[#315f47] bg-[#7aa966] p-2 shadow-[inset_0_0_0_2px_rgba(255,255,255,.15),inset_0_12px_35px_rgba(19,70,44,.18)] sm:p-3 game-map-surface">
           <div className="park-atmosphere" aria-hidden="true"><span className="park-sun" /><span className="park-cloud park-cloud-a" /><span className="park-cloud park-cloud-b" /><span className="park-rain" /><span className="park-lightning" /></div>
           <MapAmbience timeOfDay={timeOfDay} />
+          <EventOverlay activeEvents={activeEvents} grid={grid} />
           
           <div className="relative h-full overflow-visible game-map-stage"><div className="relative h-full park-playfield" style={{ transform: `translate(${panX}px, ${panY}px) scale(${zoom})`, transformOrigin: "top left", width: (100 / zoom) + "%", marginBottom: ((zoom - 1) * 100 / zoom * 0.8) + "%" }}>
             <div className="relative grid h-full grid-rows-[repeat(var(--map-rows),1fr)] grid-cols-8 gap-1 sm:gap-1.5 game-map-grid" style={{ "--map-rows": Math.ceil(grid.length / 8) }}>

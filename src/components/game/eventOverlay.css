@@ -1,0 +1,57 @@
+/* Visible event effects on the park map */
+.event-overlay { position: absolute; inset: 0; z-index: 18; pointer-events: none; overflow: hidden; border-radius: 16px; }
+
+/* === Fireworks === */
+.event-fx-fireworks { position: absolute; inset: 0; }
+.firework-burst { position: absolute; width: 4px; height: 4px; }
+.firework-burst i { position: absolute; left: 0; top: 0; width: 3px; height: 14px; border-radius: 2px; background: var(--burst-color); box-shadow: 0 0 6px var(--burst-color); transform-origin: bottom center; animation: firework-expand 1.5s ease-out infinite; opacity: 0; }
+@keyframes firework-expand { 0% { opacity: 0; height: 0; } 15% { opacity: 1; height: 18px; } 60% { opacity: .6; height: 22px; } 100% { opacity: 0; height: 0; } }
+
+/* === Snow === */
+.event-fx-snow { position: absolute; inset: 0; }
+.snowflake { position: absolute; top: -20px; font-size: 10px; color: rgba(207,250,254,.9); text-shadow: 0 0 4px rgba(103,232,249,.6); animation: snowfall linear infinite; }
+@keyframes snowfall { 0% { transform: translateY(0) rotate(0); opacity: 0; } 10% { opacity: .9; } 90% { opacity: .7; } 100% { transform: translateY(400px) rotate(360deg); opacity: 0; } }
+
+/* === Fog (Halloween) === */
+.event-fx-fog { position: absolute; inset: 0; }
+.fog-layer { position: absolute; left: -10%; right: -10%; height: 60px; background: linear-gradient(90deg, transparent, rgba(168,85,247,.12), rgba(88,28,135,.08), transparent); filter: blur(8px); animation: fog-drift ease-in-out infinite; }
+@keyframes fog-drift { 0%,100% { transform: translateX(-30px); opacity: .5; } 50% { transform: translateX(30px); opacity: .8; } }
+.fog-emoji { position: absolute; font-size: 14px; filter: drop-shadow(0 0 6px rgba(168,85,247,.5)); animation: fog-emoji-float 3s ease-in-out infinite; }
+@keyframes fog-emoji-float { 0%,100% { transform: translateY(0) scale(1); opacity: .6; } 50% { transform: translateY(-8px) scale(1.1); opacity: .9; } }
+
+/* === Confetti (Summer) === */
+.event-fx-confetti { position: absolute; inset: 0; }
+.confetti-piece { position: absolute; top: -10px; width: 5px; height: 8px; border-radius: 1px; animation: confetti-fall linear infinite; }
+@keyframes confetti-fall { 0% { transform: translateY(0) rotate(0); opacity: 0; } 10% { opacity: 1; } 100% { transform: translateY(400px) rotate(720deg); opacity: 0; } }
+.event-emoji-float { position: absolute; font-size: 16px; filter: drop-shadow(0 2px 4px rgba(15,23,42,.2)); animation: emoji-bob 2.5s ease-in-out infinite; }
+@keyframes emoji-bob { 0%,100% { transform: translateY(0) scale(1); opacity: .7; } 50% { transform: translateY(-6px) scale(1.1); opacity: 1; } }
+
+/* === Music (Concert) === */
+.event-fx-music { position: absolute; inset: 0; }
+.music-note { position: absolute; font-size: 12px; filter: drop-shadow(0 0 4px rgba(236,72,153,.5)); animation: note-rise linear infinite; opacity: 0; }
+@keyframes note-rise { 0% { transform: translateY(20px) scale(.8); opacity: 0; } 20% { opacity: .9; } 80% { opacity: .7; } 100% { transform: translateY(-40px) scale(1.2); opacity: 0; } }
+.concert-stage-glow { position: absolute; left: 50%; bottom: 10%; width: 60%; height: 40%; transform: translateX(-50%); background: radial-gradient(ellipse at center bottom, rgba(236,72,153,.15), transparent 70%); animation: stage-pulse 2s ease-in-out infinite; }
+@keyframes stage-pulse { 0%,100% { opacity: .4; } 50% { opacity: .7; } }
+
+/* === Glow (Night swim) === */
+.event-fx-glow { position: absolute; inset: 0; }
+.glow-orb { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: rgba(129,140,248,.6); box-shadow: 0 0 12px 4px rgba(129,140,248,.4); animation: glow-pulse 2s ease-in-out infinite; }
+@keyframes glow-pulse { 0%,100% { opacity: .3; transform: scale(.8); } 50% { opacity: .8; transform: scale(1.3); } }
+
+/* === Flags (Competition) === */
+.event-fx-flags { position: absolute; inset: 0; }
+.event-flag { position: absolute; font-size: 14px; filter: drop-shadow(0 2px 3px rgba(15,23,42,.2)); animation: flag-wave 1.5s ease-in-out infinite; }
+@keyframes flag-wave { 0%,100% { transform: rotate(-5deg) scale(1); } 50% { transform: rotate(5deg) scale(1.05); } }
+.trophy-glow { position: absolute; left: 50%; top: 50%; width: 80%; height: 80%; transform: translate(-50%,-50%); background: radial-gradient(circle, rgba(245,158,11,.08), transparent 60%); animation: trophy-shimmer 3s ease-in-out infinite; }
+@keyframes trophy-shimmer { 0%,100% { opacity: .3; } 50% { opacity: .6; } }
+
+/* === Streamers (Promotion) === */
+.event-fx-streamers { position: absolute; inset: 0; }
+.streamer { position: absolute; top: -5px; width: 3px; height: 100%; background: linear-gradient(180deg, transparent, rgba(16,185,129,.3), rgba(16,185,129,.5), transparent); animation: streamer-wave 2s ease-in-out infinite; transform-origin: top center; }
+@keyframes streamer-wave { 0%,100% { transform: rotate(-3deg); opacity: .4; } 50% { transform: rotate(3deg); opacity: .7; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .event-overlay * { animation: none !important; }
+  .firework-burst i { opacity: .5; height: 18px; }
+  .snowflake, .confetti-piece { display: none; }
+}
