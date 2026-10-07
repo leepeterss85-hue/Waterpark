@@ -56,6 +56,7 @@ import CampaignChaptersPanel from "@/components/game/CampaignChaptersPanel";
 import EmpireExpansionPanel from "@/components/game/EmpireExpansionPanel";
 import AdvancedParkPanel from "@/components/game/AdvancedParkPanel";
 import GameModePanel from "@/components/game/GameModePanel";
+import StoryCoach from "@/components/game/StoryCoach";
 import { isWaterAttraction } from "@/data/waterQuality";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
@@ -74,6 +75,7 @@ function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-m
 
 export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
   const close = () => setOpenSheet(null);
+  const skipStory = () => { game.setMode("freeplay"); setOpenSheet(null); };
   const zones = [...new Set((game.parkZones || []).filter(Boolean))].map((id) => ({
     id,
     label: String(id).replace(/[-_]/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
