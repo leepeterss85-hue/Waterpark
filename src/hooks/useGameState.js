@@ -149,6 +149,9 @@ export function useGameState() {
   const [disaster, setDisaster] = useState(null);
   const [disastersSurvived, setDisastersSurvived] = useState(0);
   const [sandbox, setSandbox] = useState(getSettings().sandbox || false);
+  const [gameMode, setGameMode] = useState(() => getSettings().gameMode || "freeplay");
+  const [storyStep, setStoryStep] = useState(() => getSettings().storyStep || 0);
+  const [storyCompleted, setStoryCompleted] = useState(() => getSettings().storyCompleted || false);
   const [activeCampaigns, setActiveCampaigns] = useState([]);
   const [hotelGuests, setHotelGuests] = useState([]);
   const [hotelStats, setHotelStats] = useState({ roomRevenue: 0, hotelExpenses: 0, parkSpend: 0, occupancy: 0, avgHappiness: 0, totalGuests: 0, totalRooms: 0, guestsByHotel: {} });
@@ -956,6 +959,27 @@ export function useGameState() {
     setLog((l) => [{ day, text: `Day ${day}: 🌍 Destination changed to ${dest.name}.` }, ...l].slice(0, 12));
     return true;
   }, [level, sandbox, money, day, currentDestination, franchiseMaps]);
+  const STORY_STEPS = [
+    { id: "welcome", title: "Welcome to Waterpark Tycoon", text: "Let’s build your first attraction and open the gates.", target: "build", action: "Build your first attraction." },
+    { id: "staff", title: "Hire your first team", text: "A good park needs people. Hire a cleaner or lifeguard before you open.", target: "staff", action: "Open Staff and hire your first team member." },
+    { id: "open", title: "Open the gates", text: "Start the day and watch your first guests arrive.", target: null, action: "Start the park day." },
+    { id: "manage", title: "Read your park", text: "Check guest satisfaction, queues and your finances.", target: "manage", action: "Open Manage after your first day." },
+    { id: "expand", title: "Grow the park", text: "Build another attraction or improve an existing one.", target: "build", action: "Expand your attraction lineup." },
+    { id: "research", title: "Invest in the future", text: "Research unlocks stronger attractions and long-term growth.", target: "research", action: "Open Research and start your first project." },
+    { id: "resort", title: "Become a destination", text: "Once your park is established, develop hotels, events and the wider resort.", target: "resort", action: "Open Resort when you are ready." },
+    { id: "finish", title: "You’re in control", text: "The guided story is complete. From here, build your park your way.", target: null, action: "Keep playing." },
+  ];
+  const setMode = useCallback((mode) => {
+    setGameMode(mode);
+    saveSettings({ gameMode: mode });
+    if (mode === "story") { setStoryStep(0); setStoryCompleted(false); saveSettings({ gameMode: mode, storyStep: 0, storyCompleted: false }); }
+  }, []);
+  const advanceStory = useCallback(() => {
+    const next = Math.min(STORY_STEPS.length - 1, storyStep + 1);
+    setStoryStep(next);
+    setStoryCompleted(next === STORY_STEPS.length - 1);
+    saveSettings({ gameMode, storyStep: next, storyCompleted: next === STORY_STEPS.length - 1 });
+  }, [storyStep, gameMode]);
   const acquireRival = useCallback((id) => {
     const target = ACQUISITION_TARGETS.find((x) => x.id === id);
     if (!target || acquiredRivals.includes(id) || level < 18 || reputation < target.rep || marketShare < target.market || money < target.cost) return false;
