@@ -5,7 +5,7 @@
 import {
   getParkItem, STAFF, MAX_UPGRADE, staffWages, staffEffects, levelFromXp,
 } from "@/data/gameData";
-import { rollWeather, rollSeasonEvent } from "@/data/parkSystems";
+import { WEATHER, rollWeather, rollSeasonEvent } from "@/data/parkSystems";
 import { rollChallenge } from "@/data/challenges";
 import { RESEARCH, dailyResearchPoints } from "@/data/research";
 import { simulateVisits, aggregatePriceReaction } from "@/data/visitorLogic";
@@ -94,7 +94,7 @@ export function runDay(stateRef, setters) {
   const masterGuestMult = 1 + (activeMasterPlanBonuses.guestDemandMult || 0);
   const masterIncomeMult = 1 + (activeMasterPlanBonuses.incomeMult || 0) + (activeMasterPlanBonuses.attractionIncomeMult || 0);
   const ticketResearchMult = hasResearch("marketing") ? 1.10 : 1;
-  const dayWeather = sandboxTools.weatherLock && sandboxTools.weather ? sandboxTools.weather : (currentForecast || rollWeather(d + 1));
+  const dayWeather = sandboxTools.weatherLock && sandboxTools.weather ? (WEATHER.find((w) => w.id === sandboxTools.weather) || WEATHER[0]) : (currentForecast || rollWeather(d + 1));
   const dayForecast = rollWeather(d + 2);
   const currentDisaster = stateRef.current.disaster;
   const isSandbox = stateRef.current.sandbox;
