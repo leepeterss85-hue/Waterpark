@@ -168,8 +168,29 @@ export function simulateHotelDay({ hotels, hotelGuests, upgrades, day, reputatio
     for (let i = 0; i < checkInCount; i++) {
       const available = [...hotelRoomMap.values()].filter((h) => h.occupied < h.rooms);
       if (!available.length) break;
-      // Weight luxury hotels lower for budget reputation, but higher for high reputation
-      const hotel = available[Math.floor(Math.random() * available.length)];
+      // Match guests to the resort they can realistically afford.
+      // Better reputation/rating shifts demand toward family and luxury stock,
+      // while lower-rated parks naturally fill budget rooms first.
+      const quality = Math.max(0, Math.min(1, (reputation / 100) * 0.65 + (resortRating / 5) * 0.35));
+      const weighted = available.map((hotel) => {
+        const tierWeight = hotel.def.tier === "luxury"
+          ? 0.45 + quality * 1.75
+          : hotel.def.tier === "family"
+            ? 0.85 + quality * 0.9
+            : 1.55 - quality * 0.35;
+        const upgradeWeight = 1 + hotel.level * 0.08;
+        return { hotel, weight: Math.max(0.1, tierWeight * upgradeWeight) };
+      });
+      const totalWeight = weighted.reduce((sum, entry) => sum + entry.weight, 0);
+      let roll = Math.random() * totalWeight;
+      let hotel = weighted[weighted.length - 1].hotel;
+      for (const entry of weighted) {
+        roll -= entry.weight;
+        if (roll <= 0) {
+          hotel = entry.hotel;
+          break;
+        }
+      }
       const stayLength = 2 + Math.floor(Math.random() * 4); // 2-5 days
       newCheckIns.push({
         id: `g${day}-${i}-${Math.random().toString(36).slice(2, 6)}`,
@@ -205,7 +226,17 @@ export function simulateHotelDay({ hotels, hotelGuests, upgrades, day, reputatio
       g.dailyParkSpend = parkSpend;
       totalParkSpend += parkSpend;
       // Happiness: base + amenities + upgrade level + park mood influence
-      const happiness = Math.min(100, h.def.baseHappiness + amenityBonus + level * 3 + (parkMood - 50) * 0.3);
+      const ratingQuality = (resortRating || 0) * 1.2;
+      const weatherComfort = weather?.id === "sunny" ? 2 : weather?.id === "rain" ? -3 : 0;
+      const happiness = Math.min(
+        100,
+        h.def.baseHappiness +
+          amenityBonus +
+          level * 3 +
+          ratingQuality +
+          weatherComfort +
+          (parkMood - 50) * 0.3
+      );
       g.happiness = Math.round(happiness);
       totalHappiness += g.happiness;
     }
