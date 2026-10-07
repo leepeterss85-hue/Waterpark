@@ -44,6 +44,7 @@ import { generateVisitorReviews, reviewReputationImpact } from "@/data/visitorRe
 import { dailyStaffXp, trainingCost, staffLevelFromXp, trainingEffectMult } from "@/data/staffTraining";
 import { base44 } from "@/api/base44Client";
 import { sound } from "@/lib/soundManager";
+import { getMasterPlanMetrics, getCompletedMasterPlans, calculateMasterPlanBonuses, DEFAULT_MASTER_PLAN_BONUSES } from "@/data/masterPlans";
 
 const STORAGE_KEY = "waterpark-tycoon-save-v1";
 const MILESTONE_DAYS = [25, 50, 75, 100, 150, 200];
@@ -211,13 +212,15 @@ const [selectedZone, setSelectedZone] = useState(null);
   const [rewardStreak, setRewardStreak] = useState(0);
   const [visitorReviews, setVisitorReviews] = useState([]);
   const [staffXp, setStaffXp] = useState({});
+  const [completedMasterPlans, setCompletedMasterPlans] = useState([]);
+  const [masterPlanBonuses, setMasterPlanBonuses] = useState(DEFAULT_MASTER_PLAN_BONUSES);
 
   const level = levelFromXp(xp);
   const gridSize = grid.length;
 
   /** @type {import("react").MutableRefObject<Record<string, any>>} */
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, guests, grid, parkZones, history, log, lastNet, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, sandbox, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, awardGuestMult: totalAwardGuestMult(awards), socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, builtToday, upgradedToday, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp };
+  stateRef.current = { money, day, reputation, guests, grid, parkZones, history, log, lastNet, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, sandbox, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, awardGuestMult: totalAwardGuestMult(awards), socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, builtToday, upgradedToday, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp, completedMasterPlans, masterPlanBonuses };
 
   // Load saved game
   useEffect(() => {
@@ -321,6 +324,8 @@ const [selectedZone, setSelectedZone] = useState(null);
         if (data.rewardStreak !== undefined) setRewardStreak(data.rewardStreak);
         setVisitorReviews(data.visitorReviews ?? []);
         setStaffXp(data.staffXp ?? {});
+        setCompletedMasterPlans(Array.isArray(data.completedMasterPlans) ? data.completedMasterPlans : []);
+        setMasterPlanBonuses(calculateMasterPlanBonuses(Array.isArray(data.completedMasterPlans) ? data.completedMasterPlans : []));
         setBuiltToday(data.builtToday ?? 0);
         setUpgradedToday(data.upgradedToday ?? 0);
       }
@@ -342,7 +347,7 @@ const [selectedZone, setSelectedZone] = useState(null);
       }
     }, 300);
     return () => clearTimeout(t);
-  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp]);
+  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp, completedMasterPlans, masterPlanBonuses]);
 
   // Flush the latest complete state when the browser/app is backgrounded or closed.
   // This complements the 300ms debounced save and prevents the last few seconds of progress
@@ -378,7 +383,33 @@ const [selectedZone, setSelectedZone] = useState(null);
   const advanceDay = useCallback(() => {
     const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, staffAssignments: currentAssignments, incidents: currentIncidents, upgrades: currentUpgrades, attractionCondition: currentCondition, challenge: currentChallenge, parkZones: currentZones, forecast: currentForecast, seasonEvent: currentSeasonEvent, parkAppeal: currentParkAppeal,     ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass, vipVisit: currentVipVisit, completedResearch: currentResearch } = stateRef.current;
     const hasResearch = (id) => (currentResearch || []).includes(id);
+    // Master plans are permanent progression rewards. Existing saves start with no plans completed.
+    const masterPlanContext = getMasterPlanMetrics({
+      grid: prevGrid,
+      money: stateRef.current.money || 0,
+      reputation: rep,
+      peakGuests: stateRef.current.peakGuests || 0,
+      totalUpgrades: stateRef.current.totalUpgrades || 0,
+      resortRating: stateRef.current.resortRating || 0,
+      appeal: currentParkAppeal?.score || 50,
+      day: d,
+    });
+    const eligibleMasterPlans = getCompletedMasterPlans(masterPlanContext);
+    const priorMasterPlans = stateRef.current.completedMasterPlans || [];
+    const newlyCompletedPlans = eligibleMasterPlans.filter((id) => !priorMasterPlans.includes(id));
+    const nextMasterPlans = [...new Set([...priorMasterPlans, ...eligibleMasterPlans])];
+    const activeMasterPlanBonuses = calculateMasterPlanBonuses(nextMasterPlans);
+    if (newlyCompletedPlans.length > 0) {
+      setCompletedMasterPlans(nextMasterPlans);
+      setMasterPlanBonuses(activeMasterPlanBonuses);
+      setLog((l) => [
+        { day: d, text: "Day " + d + ": 🏆 Master plan completed: " + newlyCompletedPlans.join(", ") + ". Permanent park bonus unlocked!" },
+        ...l,
+      ].slice(0, 12));
+    }
     const upkeepResearchMult = hasResearch("efficiency") ? 0.85 : 1;
+    const masterGuestMult = 1 + (activeMasterPlanBonuses.guestDemandMult || 0);
+    const masterIncomeMult = 1 + (activeMasterPlanBonuses.incomeMult || 0) + (activeMasterPlanBonuses.attractionIncomeMult || 0);
     const ticketResearchMult = hasResearch("marketing") ? 1.10 : 1;
     const dayWeather = currentForecast || rollWeather(d + 1);
     const dayForecast = rollWeather(d + 2);
@@ -407,8 +438,8 @@ const [selectedZone, setSelectedZone] = useState(null);
     const activeDistrictIds = [...new Set((currentZones || []).filter((z) => z && DISTRICTS.some((d) => d.id === z)))];
     const districtBonuses = aggregateDistrictBonuses(activeDistrictIds, prevGrid, currentZones);
     // Apply district bonuses
-    eff.guestMult = (eff.guestMult ?? 1) * districtBonuses.guestMult;
-    eff.incomeMult = (eff.incomeMult ?? 1) * districtBonuses.incomeMult;
+    eff.guestMult = (eff.guestMult ?? 1) * districtBonuses.guestMult * masterGuestMult;
+    eff.incomeMult = (eff.incomeMult ?? 1) * districtBonuses.incomeMult * masterIncomeMult;
     // Ride synergy bonuses from adjacent complementary rides
     const synergies = calculateSynergies(prevGrid);
     setSynergyBonuses(synergies);
@@ -559,7 +590,7 @@ const [selectedZone, setSelectedZone] = useState(null);
         incomeMult: eff.incomeMult ?? 1,
         entertainment,
         facilityBonus,
-        appealBonus: (calculatedAppeal.score - 50) * 0.025 + empireTier.bonuses.satisfaction * 10 + resortBonuses.moodBoost,
+        appealBonus: (calculatedAppeal.score - 50) * 0.025 + empireTier.bonuses.satisfaction * 10 + resortBonuses.moodBoost + (activeMasterPlanBonuses.satisfactionBonus || 0) * 10,
         pricing: currentPricing,
         weather: dayWeather,
         seasonEvent: currentSeasonEvent,
