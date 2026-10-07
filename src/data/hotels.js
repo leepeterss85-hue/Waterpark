@@ -95,7 +95,7 @@ export function hotelAmenities(hotel, level) {
     return [...new Set([...hotel.amenities, ...extra])];
   }
   if (hotel.tier === "budget") {
-    const extra = level >= 2 ? ["pool"] : level >= 4 ? ["gym"] : [];
+    const extra = level >= 4 ? ["pool", "gym"] : level >= 2 ? ["pool"] : [];
     return [...new Set([...hotel.amenities, ...extra])];
   }
   return hotel.amenities;
