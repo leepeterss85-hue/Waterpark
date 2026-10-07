@@ -1154,6 +1154,7 @@ export function useGameState() {
     setRetailStats({ revenue: 0, restockCost: 0, served: { food: 0, retail: 0, services: 0 }, unmetFood: 0, stockHealth: { food: 100, retail: 100, services: 100 } });
     setCompletedChains([]); setCompletedCampaignChapters([]); setAcquiredRivals([]); setFranchiseMaps([]);
     setMegaProjects([]); setGuestStories([]); setCurrentDestination("home_resort");
+    setSandboxSettings({ unlimitedCash: true, unlockAll: false, guestDemandMult: 1, instantConstruction: false, weatherLock: false, weather: null });
     const startPopularity = Array(startGrid.length).fill(0);
     const startPopTrend = Array(startGrid.length).fill(0);
     for (let i = 0; i < startGrid.length; i += 1) {
