@@ -4,6 +4,7 @@ import { MASTER_PLANS, getMasterPlanMetrics } from "@/data/masterPlans";
 
 export default function MasterPlansPanel({ grid = [], reputation = 50, peakGuests = 0, totalUpgrades = 0, resortRating = 0, appeal = 50, day = 1, money = 0, completedPlans = [] }) {
   const context = useMemo(() => getMasterPlanMetrics({ grid, reputation, peakGuests, totalUpgrades, resortRating, appeal, day, money }), [grid, reputation, peakGuests, totalUpgrades, resortRating, appeal, day, money]);
+  const icons = { family_resort: Users, thrill_capital: Waves, five_star: Hotel, park_empire: TrendingUp };
 
   return (
     <div className="space-y-3">
@@ -20,7 +21,7 @@ export default function MasterPlansPanel({ grid = [], reputation = 50, peakGuest
       {MASTER_PLANS.map((plan) => {
         const completed = plan.goals.filter((goal) => goal.test(context)).length;
         const percent = Math.round((completed / plan.goals.length) * 100);
-        const Icon = plan.icon;
+        const Icon = icons[plan.id] || Target;
         return (
           <div key={plan.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <div className="flex items-start gap-3">
