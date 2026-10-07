@@ -45,6 +45,7 @@ import VisitorReviewsPanel from "@/components/game/VisitorReviewsPanel";
 import MasterPlansPanel from "@/components/game/MasterPlansPanel";
 import ParkPhotoMode from "@/components/game/ParkPhotoMode";
 import GuestNeedsPanel from "@/components/game/GuestNeedsPanel";
+import DemandForecast from "@/components/game/DemandForecast";
 import StrategyCentre from "@/components/game/StrategyCentre";
 import { isWaterAttraction } from "@/data/waterQuality";
 
@@ -108,6 +109,13 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
           marketShare={game.marketShare}
           popularity={game.popularity}
           popularityTrend={game.popularityTrend}
+        />
+        <DemandForecast
+          day={game.day}
+          forecast={game.forecast}
+          seasonEvent={game.seasonEvent}
+          marketShare={game.marketShare}
+          ticketPrice={game.ticketPrice}
         />
         <PricingPanel
           pricing={game.pricing}
