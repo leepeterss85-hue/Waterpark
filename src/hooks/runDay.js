@@ -520,7 +520,7 @@ export function runDay(stateRef, setters) {
   if (dayFeedback.length) setFeedback((prev) => [...dayFeedback, ...prev].slice(0, 40));
   setLifetimeEarnings((e) => e + grossIncome);
   if (newGuests >= 5) {
-    const newReviews = generateVisitorReviews({ day: d + 1, guests: newGuests, avgMood: visitorStats?.avgMood || 50, attractions, facilities, incidents: remaining, popularity: stateRef.current.popularity, attractionCondition: nextCondition, cleanliness, safety });
+    const newReviews = generateVisitorReviews({ day: d + 1, guests: newGuests, avgMood: visitorStats?.avgMood || 50, attractions, facilities, incidents: remaining, popularity: stateRef.current.popularity, attractionCondition: nextCondition, cleanliness, safety, visitorStats, activeEvents: currentActiveEvents });
     if (newReviews.length) {
       setVisitorReviews((prev) => [...newReviews, ...prev].slice(0, 100));
       const repImpact = reviewReputationImpact(newReviews);
