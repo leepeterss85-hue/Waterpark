@@ -151,7 +151,8 @@ export function useGameState() {
   const [sandbox, setSandbox] = useState(getSettings().sandbox || false);
   const [gameMode, setGameMode] = useState(() => getSettings().gameMode || "freeplay");
   const [storyStep, setStoryStep] = useState(() => getSettings().storyStep || 0);
-  const [storyCompleted, setStoryCompleted] = useState(() => getSettings().storyCompleted || false);\n  const [sandboxSettings, setSandboxSettings] = useState(() => ({ unlimitedCash: true, unlockAll: false, guestDemandMult: 1, instantConstruction: false, weatherLock: false, weather: null }));
+  const [storyCompleted, setStoryCompleted] = useState(() => getSettings().storyCompleted || false);
+  const [sandboxSettings, setSandboxSettings] = useState(() => ({ unlimitedCash: true, unlockAll: false, guestDemandMult: 1, instantConstruction: false, weatherLock: false, weather: null }));
   const [activeCampaigns, setActiveCampaigns] = useState([]);
   const [hotelGuests, setHotelGuests] = useState([]);
   const [hotelStats, setHotelStats] = useState({ roomRevenue: 0, hotelExpenses: 0, parkSpend: 0, occupancy: 0, avgHappiness: 0, totalGuests: 0, totalRooms: 0, guestsByHotel: {} });
@@ -330,7 +331,8 @@ export function useGameState() {
       setCurrentDestination(data.currentDestination ?? "home_resort");
       if (data.gameMode) setGameMode(data.gameMode);
       if (data.storyStep != null) setStoryStep(data.storyStep);
-      if (data.storyCompleted != null) setStoryCompleted(data.storyCompleted);\n      if (data.sandboxSettings) setSandboxSettings({ unlimitedCash: true, unlockAll: false, guestDemandMult: 1, instantConstruction: false, weatherLock: false, weather: null, ...data.sandboxSettings });
+      if (data.storyCompleted != null) setStoryCompleted(data.storyCompleted);
+      if (data.sandboxSettings) setSandboxSettings({ unlimitedCash: true, unlockAll: false, guestDemandMult: 1, instantConstruction: false, weatherLock: false, weather: null, ...data.sandboxSettings });
       setUpgradedToday(data.upgradedToday ?? 0);
     } catch { /* ignore */ }
   }, []);
@@ -341,7 +343,7 @@ export function useGameState() {
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ saveVersion: SAVE_SCHEMA_VERSION, savedAt: Date.now(), ...stateRef.current })); } catch { /* ignore */ }
     }, 300);
     return () => clearTimeout(t);
-  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp, staffMorale, wageBoost, sponsorships,     groupBookings, acceptedBookings, activeStrikes, completedMasterPlans, masterPlanBonuses, megaProjects, guestStories, currentDestination, gameMode, storyStep, storyCompleted]);
+  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, sandboxSettings, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp, staffMorale, wageBoost, sponsorships,     groupBookings, acceptedBookings, activeStrikes, completedMasterPlans, masterPlanBonuses, megaProjects, guestStories, currentDestination, gameMode, storyStep, storyCompleted]);
 
   // Flush save on background/close
   useEffect(() => {
@@ -1240,5 +1242,6 @@ export function useGameState() {
     guestMemory, retailStock, retailStats, completedChains, completedCampaignChapters, acquiredRivals, franchiseMaps,
     acquisitionTargets: ACQUISITION_TARGETS, franchiseOptions: FRANCHISE_MAPS, empireExpansionBonuses: empireBonuses(acquiredRivals, franchiseMaps), acquireRival, openFranchise,
     completedMasterPlans, masterPlanBonuses,
+    annualReport: (() => { const rows=(history||[]).filter((h)=>h.day > Math.max(0, day-30)); const income=rows.reduce((s,h)=>s+(h.income||h.net||0),0); const avgGuests=rows.length?Math.round(rows.reduce((s,h)=>s+(h.guests||0),0)/rows.length):guests; return { period: Math.ceil(day/30), days: rows.length, income, avgGuests, peakGuests, reputation, appeal: parkAppeal?.score||0, resortRating, marketShare, lifetimeEarnings }; })(),
   };
 }
