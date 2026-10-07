@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { TrendingUp, TrendingDown, CreditCard, Wallet } from "lucide-react";
+import { TrendingUp, TrendingDown, CreditCard, Wallet, Building2, Target } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { getParkItem } from "@/data/gameData";
 import { LOAN_TERMS } from "@/data/loans";
@@ -56,6 +56,23 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
     : {};
   const totalExpenses = Object.values(expenses).reduce((s, v) => s + v, 0);
   const net = last?.net || 0;
+
+  const assetValue = (grid || []).reduce((sum, id) => {
+    if (!id) return sum;
+    const item = getParkItem(id);
+    return sum + (item?.cost || 0);
+  }, 0);
+  const outstandingDebt = activeLoans.reduce(
+    (sum, loan) => sum + Math.max(0, (loan.totalRepayable || 0) - (loan.totalPaid || 0)),
+    0
+  );
+  const businessValue = Math.max(0, money + assetValue - outstandingDebt);
+  const recentHistory = (history || []).slice(-7);
+  const averageDailyProfit = recentHistory.length
+    ? Math.round(recentHistory.reduce((sum, h) => sum + (h.net || 0), 0) / recentHistory.length)
+    : 0;
+  const operatingMargin = totalIncome > 0 ? Math.round((net / totalIncome) * 100) : 0;
+  const breakEvenDays = averageDailyProfit > 0 ? Math.ceil(Math.max(0, assetValue - money) / averageDailyProfit) : null;
 
   const chartData = (history || []).slice(-20).map((h) => ({
     day: `D${h.day}`,
@@ -117,8 +134,24 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
         </div>
       </div>
 
-      {/* Income */}
-      {incomeItems.length > 0 && (
+      {/* Business / tycoon metrics */}
+      <div className="rounded-2xl border border-indigo-100 bg-gradient-to-br from-indigo-50 to-white p-4">
+        <h3 className="mb-3 flex items-center gap-1.5 text-sm font-black text-slate-900">
+          <Building2 className="h-4 w-4 text-indigo-500" /> Business Overview
+        </h3>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="rounded-xl bg-white p-2.5 shadow-sm"><div className="text-[9px] font-bold uppercase tracking-wide text-slate-400">Business Value</div><div className="text-base font-black text-indigo-600">${businessValue.toLocaleString()}</div></div>
+          <div className="rounded-xl bg-white p-2.5 shadow-sm"><div className="text-[9px] font-bold uppercase tracking-wide text-slate-400">Park Assets</div><div className="text-base font-black text-slate-800">${assetValue.toLocaleString()}</div></div>
+          <div className="rounded-xl bg-white p-2.5 shadow-sm"><div className="text-[9px] font-bold uppercase tracking-wide text-slate-400">7-Day Avg Profit</div><div className={`text-base font-black ${averageDailyProfit >= 0 ? "text-emerald-600" : "text-rose-600"}`}>{averageDailyProfit >= 0 ? "+" : ""}${averageDailyProfit.toLocaleString()}</div></div>
+          <div className="rounded-xl bg-white p-2.5 shadow-sm"><div className="text-[9px] font-bold uppercase tracking-wide text-slate-400">Operating Margin</div><div className={`text-base font-black ${operatingMargin >= 0 ? "text-emerald-600" : "text-rose-600"}`}>{operatingMargin}%</div></div>
+        </div>
+        <div className="mt-2 flex items-center justify-between rounded-lg bg-indigo-100/60 px-2.5 py-2 text-[10px] font-bold text-indigo-700">
+          <span className="flex items-center gap-1"><Target className="h-3 w-3" /> {breakEvenDays ? `~${breakEvenDays} days to recover invested capital` : "Grow daily profit to accelerate expansion"}</span>
+          {outstandingDebt > 0 && <span>Debt ${outstandingDebt.toLocaleString()}</span>}
+        </div>
+      </div>
+
+      {/* Income */}      {incomeItems.length > 0 && (
         <div>
           <h3 className="mb-2 flex items-center gap-1.5 text-sm font-black text-slate-900">
             <TrendingUp className="h-4 w-4 text-emerald-500" /> Income Breakdown
