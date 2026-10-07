@@ -30,7 +30,7 @@ export default function SandboxLabPanel({ game }) {
       <label className="flex items-center justify-between rounded-xl bg-slate-50 p-3 text-xs font-bold"><span className="flex items-center gap-2"><Zap className="h-4 w-4"/>Instant construction</span><input type="checkbox" checked={!!s.instantConstruction} onChange={e=>set({instantConstruction:e.target.checked})}/></label>
       <label className="flex items-center justify-between rounded-xl bg-slate-50 p-3 text-xs font-bold"><span className="flex items-center gap-2"><CloudSun className="h-4 w-4"/>Lock weather</span><input type="checkbox" checked={!!s.weatherLock} onChange={e=>set({weatherLock:e.target.checked})}/></label>
       {s.weatherLock && <select value={s.weather || ""} onChange={e=>set({weather:e.target.value || null})} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold">
-        <option value="">Use current forecast</option><option value="Sunny">Sunny</option><option value="Partly Cloudy">Partly Cloudy</option><option value="Cloudy">Cloudy</option><option value="Rain">Rain</option><option value="Storm">Storm</option>
+        <option value="">Use current forecast</option><option value="">Choose weather</option><option value="sunny">Sunny</option><option value="warm">Warm</option><option value="cloudy">Cloudy</option><option value="rain">Rain</option><option value="storm">Thunderstorm</option>
       </select>}
       <Button variant="ghost" className="w-full" onClick={()=>game.sandboxAction("resetTools")}>Reset lab settings</Button>
     </CardContent></Card>
