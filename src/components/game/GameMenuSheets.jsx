@@ -97,6 +97,15 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
           onAdmission={game.setTicketPrice}
           onMarketing={game.setAdBudget}
           onExpressLane={game.setPriorityPass}
+          uptime={game.uptime}
+          safety={game.safety}
+          cleanliness={game.cleanliness}
+          entertainment={game.entertainment}
+          waterQualityAvg={game.waterQualityAvg}
+          waterQualityCriticalCount={game.waterQualityCriticalCount}
+          marketShare={game.marketShare}
+          popularity={game.popularity}
+          popularityTrend={game.popularityTrend}
         />
         <PricingPanel
           pricing={game.pricing}
