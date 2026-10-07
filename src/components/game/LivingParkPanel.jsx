@@ -1,0 +1,11 @@
+import React from "react";
+import { UtensilsCrossed, ShoppingBag, HeartPulse, Users, TrendingUp } from "lucide-react";
+export default function LivingParkPanel({ retailStats={}, retailStock={}, guestMemory={} }){
+ const served=retailStats.served||{}; const health=retailStats.stockHealth||{};
+ const rows=[["Food & drink","food"],["Retail & swimwear","retail"],["Guest services","services"]];
+ return <div className="space-y-3">
+  <div className="grid grid-cols-3 gap-2">{rows.map(([label,key])=><div key={key} className="rounded-xl bg-white p-3 shadow-sm"><div className="text-[10px] font-bold uppercase text-slate-500">{label}</div><div className="mt-1 text-lg font-black text-slate-900">{served[key]||0}</div><div className="text-[10px] text-slate-500">served today</div><div className="mt-2 h-1.5 rounded-full bg-slate-100"><div className="h-1.5 rounded-full bg-cyan-500" style={{width:`${health[key]??100}%`}} /></div></div>)}</div>
+  <div className="rounded-xl bg-white p-3 shadow-sm"><div className="flex items-center gap-2 font-black"><TrendingUp className="h-4 w-4 text-emerald-600"/> Daily guest economy</div><div className="mt-2 grid grid-cols-2 gap-2 text-sm"><div>Sales <b>£{(retailStats.revenue||0).toLocaleString()}</b></div><div>Restock <b>£{(retailStats.restockCost||0).toLocaleString()}</b></div><div>Food stock <b>{retailStock.food||0}</b></div><div>Missed food sales <b>{retailStats.unmetFood||0}</b></div></div></div>
+  <div className="rounded-xl bg-white p-3 shadow-sm"><div className="flex items-center gap-2 font-black"><Users className="h-4 w-4 text-violet-600"/> Returning guest memory</div><div className="mt-2 space-y-2">{Object.entries(guestMemory).length?Object.entries(guestMemory).map(([id,m])=><div key={id} className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2"><span className="text-sm font-bold">{id.replaceAll("_"," ")}</span><span className="text-xs text-slate-500">{m.visits||0} visits · {m.happyDays||0} happy days · favourite {m.favourite||"—"}</span></div>):<p className="text-sm text-slate-500">Guest memories will build as visitors return.</p>}</div></div>
+ </div>;
+}
