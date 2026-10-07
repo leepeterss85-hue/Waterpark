@@ -238,6 +238,7 @@ export default function Home() {
           waterQuality={game.waterQuality}
           acceptedBookings={game.acceptedBookings}
           sponsorships={game.sponsorships}
+          activeStrikes={game.activeStrikes}
           mascot={game.mascotDef}
           onTileClick={handleTileClickWithSound}
           topControls={

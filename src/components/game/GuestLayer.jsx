@@ -13,7 +13,7 @@ const STAFF_ROLES = [
   { id: "gardener", color: "bg-lime-600", label: "Groundskeeper" },
 ];
 
-export default function GuestLayer({ grid, parkZones = [], guests = 0, movements = {}, queueStats = {}, staff = {}, staffAssignments = {}, incidents = [], attractionCondition = [] }) {
+export default function GuestLayer({ grid, parkZones = [], guests = 0, movements = {}, queueStats = {}, staff = {}, staffAssignments = {}, incidents = [], attractionCondition = [], hotelGuests = [] }) {
   const [tick, setTick] = useState(0);
   useEffect(() => { const timer = setInterval(() => setTick(value => value + 1), 1600); return () => clearInterval(timer); }, []);
   const rows = Math.max(1, Math.ceil(grid.length / 8));
@@ -50,8 +50,28 @@ export default function GuestLayer({ grid, parkZones = [], guests = 0, movements
       return target ? <span key={role.id + i} className="park-pedestrian park-staff" data-role={role.id} data-activity="working" style={position(target.index % 8 + .8, Math.floor(target.index / 8) + .7)} title={role.label + " on duty"}><PersonSprite variant={roleIndex + 1} role={role.id} /></span> : null;
     });
   });
+  // Hotel guests: visible resort visitors with luggage travelling between
+  // their hotel and park attractions, so occupancy isn't just a number.
+  const hotelTiles = targets.filter((t) => t.attr?.category === "hotel");
+  const hotelSprites = hotelGuests.slice(0, 8).map((hg, i) => {
+    const hotel = hotelTiles.find((h) => h.index === hg.hotelTile);
+    if (!hotel) return null;
+    const dest = destinations[(i + tick) % Math.max(1, destinations.length)] || hotel;
+    const phase = (tick + i * 2) % 10;
+    // 0-2: at hotel, 3-6: walking to park, 7-9: returning
+    const hx = hotel.index % 8 + .5, hy = Math.floor(hotel.index / 8) + .5;
+    const dx = dest.index % 8 + .5, dy = Math.floor(dest.index / 8) + .7;
+    const t = phase < 3 ? 0 : phase < 7 ? (phase - 3) / 4 : 1 - (phase - 7) / 3;
+    const x = hx + (dx - hx) * t, y = hy + (dy - hy) * t;
+    const atHotel = phase < 3 || phase >= 7;
+    return <span key={"hg" + i} className="hotel-guest-sprite" style={position(x, y)} title={`Hotel guest (${hg.tier}) — ${atHotel ? "at hotel" : "visiting park"}`}>
+      <span className="hotel-guest-label">{atHotel ? "🏨" : "🏊"}</span>
+      <span className={"hotel-guest-body " + (hg.tier || "family")} />
+    </span>;
+  });
+
   return <div className="pointer-events-none absolute inset-0 z-30 overflow-hidden" data-people-layer>
-    {walkers}{personnel}
+    {walkers}{personnel}{hotelSprites}
     {guests > 0 && Object.entries(queueStats).filter(([, queue]) => queue.guests > 0).flatMap(([tileIndex, queue]) => Array.from({ length: Math.min(3, Math.max(1, Math.ceil(queue.guests / 5))) }, (_, i) => <span key={`q${tileIndex}-${i}`} className="park-pedestrian park-queue-guest" data-activity="waiting" title={`Queue: ${queue.guests} guests · ${queue.wait}m wait · rail capacity ${queue.queueCapacity ?? 8}${queue.overflow > 0 ? " · overflow " + queue.overflow : ""}`} style={position(Number(tileIndex) % 8 + .18 + i * .31, Math.floor(Number(tileIndex) / 8) + .76)}><PersonSprite activity="waiting" variant={i + 1} /></span>))}
   </div>;
 }
