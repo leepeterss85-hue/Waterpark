@@ -609,7 +609,7 @@ export function runDay(stateRef, setters) {
   const struckRivals = applyStrikesToRivals(stateRef.current.competitors || createCompetitors(d + 1), currentStrikes);
   const compResult = simulateCompetitors({
     competitors: struckRivals, playerReputation: Math.round(newReputation),
-    playerAppeal: calculatedAppeal.score, playerGuests: newGuests, day: d + 1, playerLevel: levelFromXp(stateRef.current.xp || 0),
+    playerAppeal: calculatedAppeal.score, playerGuests: newGuests, day: d + 1, playerLevel: levelFromXp(stateRef.current.xp || 0), acquiredRivals: stateRef.current.acquiredRivals || [],
   });
   setCompetitors(compResult.updated);
   setMarketShare(compResult.marketShare);
