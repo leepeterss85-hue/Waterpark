@@ -372,10 +372,14 @@
   .park-time-night .park-atmosphere { background: linear-gradient(180deg, rgba(12,27,55,.42), rgba(4,18,36,.14)); }
   .park-time-night .park-sun { opacity: .18; width: 25px; height: 25px; background: rgba(220,235,255,.85); box-shadow: 0 0 0 5px rgba(200,220,255,.08), 0 0 18px rgba(190,215,255,.3); }
   .park-time-night .park-cloud { opacity: .16; }
-  .park-weather-rain .park-rain,
-  .park-weather-storm .park-rain { opacity: .34; animation: park-rain-fall .7s linear infinite; }
-  .park-weather-rain .park-atmosphere { background: rgba(80,105,120,.13); }
-  .park-weather-storm .park-atmosphere { background: rgba(35,50,70,.2); }
+  .park-weather-rain .park-rain { opacity: .5; animation: park-rain-fall .6s linear infinite; }
+  .park-weather-storm .park-rain { opacity: .7; animation: park-rain-fall .4s linear infinite; }
+  .park-weather-rain .park-atmosphere { background: rgba(70,100,120,.18); }
+  .park-weather-storm .park-atmosphere { background: rgba(20,30,50,.32); }
+  .park-weather-storm .park-cloud { opacity: .5; background: rgba(60,70,90,.5); }
+  .park-lightning { position: absolute; inset: 0; opacity: 0; background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(200,220,255,.3)); pointer-events: none; }
+  .park-weather-storm .park-lightning { animation: storm-flash 5s linear infinite; }
+  @keyframes storm-flash { 0%, 86%, 88%, 100% { opacity: 0; } 87% { opacity: .65; } 87.4% { opacity: .1; } 87.7% { opacity: .35; } }
   .park-weather-cloudy .park-sun { opacity: .28; }
   .park-weather-sunny .park-cloud { opacity: .18; }
   @keyframes park-cloud-drift {
@@ -1194,3 +1198,19 @@
 @media (min-width: 640px) {
   .game-board-statsbar { padding: 0.5rem 0.875rem; }
 }
+
+/* === Upgrade tier aura: upgraded rides visibly glow with tier-coloured stars === */
+.upgrade-aura { position: absolute; inset: 0; z-index: 15; pointer-events: none; }
+.upgrade-aura-ring { position: absolute; inset: -2px; border-radius: 17px; box-shadow: 0 0 0 2px var(--aura-color), 0 0 14px 3px var(--aura-glow); animation: upgrade-pulse 2.2s ease-in-out infinite; }
+.upgrade-aura-stars { position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); display: flex; gap: 1px; }
+.upgrade-star { width: 7px; height: 7px; color: var(--aura-color); filter: drop-shadow(0 0 3px var(--aura-glow)); animation: upgrade-twinkle 1.8s ease-in-out infinite; }
+.upgrade-star:nth-child(2) { animation-delay: .2s; }
+.upgrade-star:nth-child(3) { animation-delay: .4s; }
+.upgrade-star:nth-child(4) { animation-delay: .6s; }
+.upgrade-star:nth-child(5) { animation-delay: .8s; }
+.upgrade-aura[data-tier="legendary"] .upgrade-aura-ring { animation-duration: 1.4s; }
+.upgrade-aura[data-tier="mythic"] .upgrade-aura-ring { animation: upgrade-pulse 1s ease-in-out infinite, mythic-shift 3s linear infinite; }
+@keyframes upgrade-pulse { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+@keyframes upgrade-twinkle { 0%, 100% { opacity: .5; transform: scale(.85); } 50% { opacity: 1; transform: scale(1.1); } }
+@keyframes mythic-shift { 0% { filter: hue-rotate(0); } 100% { filter: hue-rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .upgrade-aura-ring, .upgrade-star { animation: none; } }

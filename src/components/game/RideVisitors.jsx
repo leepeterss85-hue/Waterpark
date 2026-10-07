@@ -3,11 +3,12 @@ import { useReducedMotion } from "framer-motion";
 import PersonSprite from "@/components/game/PersonSprite";
 import { getRideScene } from "@/components/game/artwork/rideScenes";
 
-export default function RideVisitors({ attr, guests, movement, incident }) {
+export default function RideVisitors({ attr, guests, movement, incident, queueWait = 0 }) {
   const reduced = useReducedMotion();
   const scene = getRideScene(attr.id);
   if (guests <= 0 || movement <= 0 || incident?.type === "breakdown" || scene.kind === "dry") return null;
-  const count = Math.min(6, Math.max(3, Math.ceil(movement / 18)));
+  const count = Math.min(6, Math.max(0, Math.ceil(movement / 14) + Math.ceil(queueWait / 12)));
+  if (count === 0) return null;
   const positions = scene.kind === "slide" ? [[26, 72], [48, 76], [70, 72]] : attr.id === "play_structure" ? [[22, 66], [48, 70], [74, 66], [38, 78]] : [[26, 38], [50, 38], [74, 38], [28, 68], [58, 70], [76, 66]];
   const activity = scene.kind === "splash" ? "playing" : "swimming";
   const size = 42;
