@@ -1150,6 +1150,7 @@ export function useGameState() {
     parkZones, selectedZone, selectedBuild, selectedTile, lastNet, log, history,
     staff, staffAssignments, assignStaff, incidents, attractionCondition, upgrades, upgradeAttraction,
     level, xp, xpForNext: xpForLevel(level), applyCheat,
+    gameMode, storyStep, storyCompleted, STORY_STEPS, setMode, advanceStory,
     expansionsDone, gridSize, maxGridSize: MAX_GRID_SIZE, expandPark,
     peakGuests, totalUpgrades, claimedMissions, claimMission,
     challenge, vipVisit, vipHistory, claimedLegendary, activeCalendarEvent,
