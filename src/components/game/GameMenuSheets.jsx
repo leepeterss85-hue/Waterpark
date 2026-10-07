@@ -44,6 +44,7 @@ import MascotPanel from "@/components/game/MascotPanel";
 import VisitorReviewsPanel from "@/components/game/VisitorReviewsPanel";
 import MasterPlansPanel from "@/components/game/MasterPlansPanel";
 import ParkPhotoMode from "@/components/game/ParkPhotoMode";
+import StrategyCentre from "@/components/game/StrategyCentre";
 import { isWaterAttraction } from "@/data/waterQuality";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
