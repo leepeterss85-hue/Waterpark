@@ -47,6 +47,7 @@ import { simulateFoodRetail, buildGuestMemory, guestMemoryDemandBoost, GUEST_PER
 import { evaluateChains } from "@/data/attractionChains";
 import { evaluateCampaigns } from "@/data/campaignChapters";
 import { empireBonuses } from "@/data/parkEmpire";
+import { MEGA_PROJECTS, DESTINATIONS, simulateMegaProjects, megaBonuses as calculateMegaBonuses, generateGuestStories, waterEngineering } from "@/data/advancedParkSystems";
 
 const MILESTONE_DAYS = [25, 50, 75, 100, 150, 200];
 const MILESTONE_REWARDS = { 25: 25000, 50: 75000, 75: 150000, 100: 500000, 150: 750000, 200: 1000000 };
@@ -69,6 +70,7 @@ export function runDay(stateRef, setters) {
     setBuiltToday, setUpgradedToday, setTicketPrice, setLog, setLastNet, setHistory, setPeakGuests,
     setResearchPoints, setXp, setCompletedMasterPlans, setMasterPlanBonuses, setActiveStrikes,
     setGuestMemory, setRetailStock, setRetailStats, setCompletedChains, setCompletedCampaignChapters,
+    setMegaProjects, setGuestStories,
   } = setters;
 
   const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, staffAssignments: currentAssignments, incidents: currentIncidents, upgrades: currentUpgrades, attractionCondition: currentCondition, challenge: currentChallenge, parkZones: currentZones, forecast: currentForecast, seasonEvent: currentSeasonEvent, parkAppeal: currentParkAppeal, ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass, vipVisit: currentVipVisit, completedResearch: currentResearch } = stateRef.current;
@@ -138,6 +140,12 @@ export function runDay(stateRef, setters) {
   const pMult = prestigeMultiplier(stateRef.current.prestigeCount || 0);
   eff.incomeMult = (eff.incomeMult ?? 1) * pMult.incomeMult;
   eff.guestMult = (eff.guestMult ?? 1) * pMult.demandMult;
+  const megaState = simulateMegaProjects(stateRef.current.megaProjects || [], d + 1);
+  const mega = calculateMegaBonuses(megaState);
+  const destination = DESTINATIONS.find((x) => x.id === (stateRef.current.currentDestination || "home_resort")) || DESTINATIONS[0];
+  eff.guestMult = (eff.guestMult ?? 1) * (1 + mega.guestMult) * destination.guestMult;
+  eff.incomeMult = (eff.incomeMult ?? 1) * (1 + mega.incomeMult) * destination.incomeMult;
+  setMegaProjects(megaState);
   const chainBonuses = evaluateChains(prevGrid, stateRef.current.completedChains || []).bonuses;
   const memoryBoosts = Object.keys(GUEST_PERSONALITIES).map((id) => guestMemoryDemandBoost(stateRef.current.guestMemory || {}, id, prevGrid));
   const memoryDemandMult = memoryBoosts.length ? memoryBoosts.reduce((s, v) => s + v, 0) / memoryBoosts.length : 1;
@@ -384,6 +392,7 @@ export function runDay(stateRef, setters) {
   }
   setAttractionCondition(nextCondition);
 
+  const engineering = waterEngineering({ grid: prevGrid, waterQuality: stateRef.current.waterQuality || [], weather: dayWeather, staff: counts, upgrades: currentUpgrades, destination, megaProjects: megaState });
   const hasWaterTreatment = prevGrid.some((id) => id === "water_treatment");
   const hasFiltration = hasResearch("filtration");
   const wqResult = simulateWaterQuality({
@@ -391,6 +400,7 @@ export function runDay(stateRef, setters) {
     guests: newGuests, staff: counts, weather: dayWeather, hasFiltration, hasWaterTreatment,
   });
   setWaterQuality(wqResult.nextQuality);
+  if (engineering.engineeringScore < 45 && visitorStats) visitorStats = { ...visitorStats, avgMood: Math.max(0, (visitorStats.avgMood || 0) - 3) };
   if (wqResult.moodPenalty !== 0 && visitorStats) visitorStats = { ...visitorStats, avgMood: Math.max(0, (visitorStats.avgMood || 0) - wqResult.moodPenalty) };
   if (wqResult.reputationRisk > 0) newReputation = Math.max(0, newReputation - wqResult.reputationRisk);
 
@@ -508,13 +518,15 @@ export function runDay(stateRef, setters) {
   const retailRestockCost = retailResult.restockCost || 0;
   const emergencyCost = emergencyResult.totalCost;
   const sponsorIncome = activeSponsorIncome(currentSponsorships);
-  const grossIncome = Math.round(ticketRevenue + rideIncome + hotelRoomRevenue + hotelParkSpend + retailRevenue + eventRevenuePerDay + membershipResult.totalRevenue + membershipResult.memberSpend + sponsorIncome);
+  const guestStoriesToday = generateGuestStories({ day: d + 1, guests: newGuests, visitorStats, hotelStats: stateRef.current.hotelStats, retailStats, weather: dayWeather, megaProjects: megaState, activeEvents: currentActiveEvents, waterEngineering: engineering });
+  if (guestStoriesToday.length) setGuestStories((prev) => [...guestStoriesToday, ...prev].slice(0, 80));
+  const grossIncome = Math.round((ticketRevenue + rideIncome + hotelRoomRevenue + hotelParkSpend + retailRevenue + eventRevenuePerDay + membershipResult.totalRevenue + membershipResult.memberSpend + sponsorIncome) * (1 + mega.incomeMult) * destination.incomeMult);
   const upkeep = Math.round(placedItems.filter((p) => p.attr.category !== "hotel").reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) * upkeepResearchMult);
   const wageCost = Math.round(wages * (eff.wageMult ?? 1) * (1 - (fx.wageReduction || 0)) * wageBoostMult);
   const marketingCost = currentAdBudget;
   const utilityCost = utilities;
   const premiumCost = currentPriorityPass ? 120 : 0;
-  const net = isSandbox ? Math.round(grossIncome - emergencyCost - loanResult.loanPayment) : Math.round(grossIncome - expenses - emergencyCost - loanResult.loanPayment);
+  const net = isSandbox ? Math.round(grossIncome - emergencyCost - loanResult.loanPayment) : Math.round(grossIncome - expenses - emergencyCost - loanResult.loanPayment - engineering.energyCost);
 
   const entries = [];
   for (const inc of newIncidents) {
