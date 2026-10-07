@@ -36,6 +36,7 @@ import { canClaimReward } from "@/data/dailyRewards";
 import { DEFAULT_MORALE, bonusCost, MORALE_RESTORE_TARGET } from "@/data/staffMorale";
 import { trainingCost, staffLevelFromXp } from "@/data/staffTraining";
 import { SPONSOR_DURATION, MAX_SPONSORS, getTier } from "@/data/sponsorships";
+import { createCounterStrike, counterStrikeCost } from "@/data/marketWarfare";
 import { calculateMasterPlanBonuses, DEFAULT_MASTER_PLAN_BONUSES } from "@/data/masterPlans";
 import { buildSavePayload } from "@/lib/savePayload";
 import { runDay } from "@/hooks/runDay";
@@ -194,6 +195,7 @@ export function useGameState() {
   const [sponsorships, setSponsorships] = useState([]);
   const [groupBookings, setGroupBookings] = useState([]);
   const [acceptedBookings, setAcceptedBookings] = useState([]);
+  const [activeStrikes, setActiveStrikes] = useState([]);
   const [completedMasterPlans, setCompletedMasterPlans] = useState([]);
   const [masterPlanBonuses, setMasterPlanBonuses] = useState(DEFAULT_MASTER_PLAN_BONUSES);
 
@@ -202,7 +204,7 @@ export function useGameState() {
 
   /** @type {import("react").MutableRefObject<Record<string, any>>} */
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, guests, grid, parkZones, history, log, lastNet, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, sandbox, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, builtToday, upgradedToday, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp, staffMorale, wageBoost, sponsorships, groupBookings, acceptedBookings, completedMasterPlans, masterPlanBonuses };
+  stateRef.current = { money, day, reputation, guests, grid, parkZones, history, log, lastNet, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, sandbox, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, builtToday, upgradedToday, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp, staffMorale, wageBoost, sponsorships, groupBookings, acceptedBookings, activeStrikes, completedMasterPlans, masterPlanBonuses };
 
   // Load saved game
   useEffect(() => {
@@ -318,7 +320,7 @@ export function useGameState() {
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ saveVersion: SAVE_SCHEMA_VERSION, savedAt: Date.now(), ...stateRef.current })); } catch { /* ignore */ }
     }, 300);
     return () => clearTimeout(t);
-  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp, staffMorale, wageBoost, sponsorships, groupBookings, acceptedBookings, completedMasterPlans, masterPlanBonuses]);
+  }, [money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp, staffMorale, wageBoost, sponsorships,     groupBookings, acceptedBookings, activeStrikes, completedMasterPlans, masterPlanBonuses]);
 
   // Flush save on background/close
   useEffect(() => {
@@ -349,7 +351,7 @@ export function useGameState() {
       setAwards, setAwardCeremonyTimer, setAwardStats, setConstructionProjects,
       setExpansionsDone, setBuiltAttractionIds, setDailyChallenges, setChallengeDayCounter,
       setBuiltToday, setUpgradedToday, setTicketPrice, setLog, setLastNet, setHistory, setPeakGuests,
-      setResearchPoints, setXp, setCompletedMasterPlans, setMasterPlanBonuses,
+      setResearchPoints, setXp, setCompletedMasterPlans, setMasterPlanBonuses, setActiveStrikes,
     });
   }, []);
 
@@ -522,6 +524,20 @@ export function useGameState() {
     setGroupBookings((prev) => prev.filter((b) => b.id !== bookingId));
     trackEvent("group_booking_declined", { id: bookingId });
   }, []);
+
+  const launchStrike = useCallback((rivalId) => {
+    const rivals = stateRef.current.competitors || [];
+    const rival = rivals.find((c) => c.id === rivalId);
+    if (!rival) return;
+    const cost = counterStrikeCost(rival, level);
+    if (!sandbox && money < cost) return;
+    if ((stateRef.current.activeStrikes || []).some((s) => s.rivalId === rivalId)) return;
+    const strike = createCounterStrike(rival, level);
+    if (!sandbox) setMoney((m) => m - cost);
+    setActiveStrikes((prev) => [...prev, strike]);
+    setLog((l) => [{ day, text: `Day ${day}: ⚔️ Counter-strike launched against ${rival.name}! Their appeal -${Math.round(strike.appealReduction)} for ${strike.daysLeft} days. Cost: $${cost.toLocaleString()}.` }, ...l].slice(0, 12));
+    trackEvent("rival_strike_launched", { rivalId, cost });
+  }, [level, money, sandbox, day]);
 
   const expandPark = useCallback(() => {
     if (expansionsDone >= MAX_EXPANSIONS) return;
@@ -785,6 +801,7 @@ export function useGameState() {
     setSponsorships(data.sponsorships ?? []);
     setGroupBookings(data.groupBookings ?? []);
     setAcceptedBookings(data.acceptedBookings ?? []);
+    setActiveStrikes(data.activeStrikes ?? []);
     setBuiltToday(0);
     setUpgradedToday(0);
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
@@ -959,7 +976,7 @@ export function useGameState() {
     setHotelGuests([]); setHotelStats({ roomRevenue: 0, hotelExpenses: 0, parkSpend: 0, occupancy: 0, avgHappiness: 0, totalGuests: 0, totalRooms: 0, guestsByHotel: {} });
     setResortRating(0); setPricing(DEFAULT_PRICING); setMascot(null); setLastRewardDay(null); setRewardStreak(0);
     setVisitorReviews([]); setStaffXp({});
-    setStaffMorale(DEFAULT_MORALE); setWageBoost(false); setSponsorships([]); setGroupBookings([]); setAcceptedBookings([]);
+    setStaffMorale(DEFAULT_MORALE); setWageBoost(false); setSponsorships([]); setGroupBookings([]); setAcceptedBookings([]); setActiveStrikes([]);
     setCompletedMasterPlans([]); setMasterPlanBonuses(DEFAULT_MASTER_PLAN_BONUSES);
     const startPopularity = Array(startGrid.length).fill(0);
     const startPopTrend = Array(startGrid.length).fill(0);
@@ -1031,6 +1048,7 @@ export function useGameState() {
     staffMorale, wageBoost, payStaffBonus, toggleWageBoost,
     sponsorships, acceptSponsor, endSponsor,
     groupBookings, acceptBooking, declineBooking, acceptedBookings,
+    activeStrikes, launchStrike,
     estimatedUtilities: Math.round((150 + grid.filter((id) => id && getParkItem(id)?.category === "attraction").length * 45 + grid.filter((id) => id && getParkItem(id)?.category === "facility").length * 18 + guests * 2.2) * (weather?.utilityMult ?? 1)),
     GRID_SIZE,
     setPlaying, setSpeed, setTicketPrice, setAdBudget, setPriorityPass,

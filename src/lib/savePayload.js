@@ -21,7 +21,7 @@ export const SAVE_FIELDS = [
   "autoPricing", "activeTheme", "prestigeCount", "synergyBonuses",
   "builtToday", "upgradedToday", "mascot", "lastRewardDay", "rewardStreak",
   "visitorReviews", "staffXp", "staffMorale", "wageBoost", "sponsorships",
-  "groupBookings", "acceptedBookings",
+  "groupBookings", "acceptedBookings", "activeStrikes",
 ];
 
 // Build the persistable game-data object from a state snapshot.

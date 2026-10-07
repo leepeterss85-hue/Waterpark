@@ -25,6 +25,7 @@ import { getConstructionDisruption, simulateConstruction } from "@/data/construc
 import { simulateLoans } from "@/data/loans";
 import { getEmpireTier, calculateResortBonuses, calculateEmpirePoints } from "@/data/empire";
 import { createCompetitors, simulateCompetitors } from "@/data/competitors";
+import { tickStrikes, strikeDemandBoost, applyStrikesToRivals } from "@/data/marketWarfare";
 import { simulateWaterQuality } from "@/data/waterQuality";
 import { DISTRICTS, aggregateDistrictBonuses } from "@/data/districts";
 import { rollVipVisit, evaluateVipVisit, generateVipSocialPost } from "@/data/vipGuests";
@@ -62,7 +63,7 @@ export function runDay(stateRef, setters) {
     setAwards, setAwardCeremonyTimer, setAwardStats, setConstructionProjects,
     setExpansionsDone, setBuiltAttractionIds, setDailyChallenges, setChallengeDayCounter,
     setBuiltToday, setUpgradedToday, setTicketPrice, setLog, setLastNet, setHistory, setPeakGuests,
-    setResearchPoints, setXp, setCompletedMasterPlans, setMasterPlanBonuses,
+    setResearchPoints, setXp, setCompletedMasterPlans, setMasterPlanBonuses, setActiveStrikes,
   } = setters;
 
   const { grid: prevGrid, reputation: rep, day: d, staff: currentStaff, staffAssignments: currentAssignments, incidents: currentIncidents, upgrades: currentUpgrades, attractionCondition: currentCondition, challenge: currentChallenge, parkZones: currentZones, forecast: currentForecast, seasonEvent: currentSeasonEvent, parkAppeal: currentParkAppeal, ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass, vipVisit: currentVipVisit, completedResearch: currentResearch } = stateRef.current;
@@ -119,6 +120,9 @@ export function runDay(stateRef, setters) {
   const pMult = prestigeMultiplier(stateRef.current.prestigeCount || 0);
   eff.incomeMult = (eff.incomeMult ?? 1) * pMult.incomeMult;
   eff.guestMult = (eff.guestMult ?? 1) * pMult.demandMult;
+  const currentStrikes = stateRef.current.activeStrikes || [];
+  const strikeBoost = strikeDemandBoost(currentStrikes);
+  eff.guestMult = (eff.guestMult ?? 1) * (1 + strikeBoost);
   const currentRideAges = stateRef.current.rideAges || initRideAges(prevGrid.length);
   const nextRideAges = tickRideAges(currentRideAges, prevGrid);
   const agingUpkeepMult = aggregateAgingUpkeepMult(currentRideAges, prevGrid);
@@ -530,13 +534,20 @@ export function runDay(stateRef, setters) {
   if (epEarned > 0) setEmpirePoints((ep) => ep + epEarned);
   setReputation(Math.round(newReputation));
 
+  const struckRivals = applyStrikesToRivals(stateRef.current.competitors || createCompetitors(d + 1), currentStrikes);
   const compResult = simulateCompetitors({
-    competitors: stateRef.current.competitors || createCompetitors(d + 1), playerReputation: Math.round(newReputation),
+    competitors: struckRivals, playerReputation: Math.round(newReputation),
     playerAppeal: calculatedAppeal.score, playerGuests: newGuests, day: d + 1, playerLevel: levelFromXp(stateRef.current.xp || 0),
   });
   setCompetitors(compResult.updated);
   setMarketShare(compResult.marketShare);
   if (compResult.playerGuestLoss > 0) setLog((l) => [{ day: d + 1, text: `Day ${d + 1}: 🏊 Rivals stole ${compResult.playerGuestLoss} guests! Improve your park to win them back.` }, ...l].slice(0, 12));
+  const nextStrikes = tickStrikes(currentStrikes);
+  if (nextStrikes.length !== currentStrikes.length) {
+    const expired = currentStrikes.filter((s) => !nextStrikes.some((n) => n.rivalId === s.rivalId));
+    if (expired.length > 0) setLog((l) => [{ day: d + 1, text: `Day ${d + 1}: ⚔️ Counter-strike against ${expired[0].rivalName} has ended. Their appeal is recovering.` }, ...l].slice(0, 12));
+  }
+  setActiveStrikes(nextStrikes);
 
   setLastNet(net);
   const staffTotal = Object.values(counts).reduce((s, n) => s + (n || 0), 0);

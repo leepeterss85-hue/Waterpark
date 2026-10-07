@@ -1215,6 +1215,23 @@
 @keyframes mythic-shift { 0% { filter: hue-rotate(0); } 100% { filter: hue-rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .upgrade-aura-ring, .upgrade-star { animation: none; } }
 
+/* === Rival strike banner on the map === */
+.strike-banner { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 4px 10px; background: linear-gradient(90deg, rgba(136,19,55,.92), rgba(159,18,57,.92)); border-radius: 0 0 12px 12px; color: #fff; font-size: 9px; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; box-shadow: 0 3px 8px rgba(15,23,42,.18); animation: strike-pulse 2.5s ease-in-out infinite; }
+.strike-banner-label { color: #fecaca; }
+.strike-banner-boost { display: inline-flex; align-items: center; gap: 2px; color: #fde68a; }
+.strike-banner-chip { display: inline-flex; align-items: center; gap: 2px; padding: 1px 5px; border-radius: 999px; background: rgba(255,255,255,.12); color: #fff; font-size: 7px; font-weight: 800; text-transform: none; letter-spacing: 0; }
+@keyframes strike-pulse { 0%,100% { box-shadow: 0 3px 8px rgba(15,23,42,.18), 0 0 0 0 rgba(244,63,94,.3); } 50% { box-shadow: 0 3px 8px rgba(15,23,42,.18), 0 0 0 4px rgba(244,63,94,0); } }
+@media (prefers-reduced-motion: reduce) { .strike-banner { animation: none; } }
+
+/* === Hotel guest sprites on the map === */
+.hotel-guest-sprite { position: absolute; z-index: 28; transform: translate(-50%, -50%); transition: left 1.2s ease-in-out, top 1.2s ease-in-out; pointer-events: none; }
+.hotel-guest-body { width: 14px; height: 18px; border-radius: 50% 50% 40% 40%; background: linear-gradient(180deg, #a78bfa, #7c3aed); box-shadow: 0 2px 4px rgba(15,23,42,.3), 0 0 0 2px rgba(167,139,250,.15); position: relative; }
+.hotel-guest-body::after { content: "🧳"; position: absolute; right: -5px; bottom: -2px; font-size: 7px; filter: drop-shadow(0 1px 1px rgba(15,23,42,.3)); }
+.hotel-guest-body.budget { background: linear-gradient(180deg, #fbbf24, #d97706); }
+.hotel-guest-body.family { background: linear-gradient(180deg, #60a5fa, #2563eb); }
+.hotel-guest-body.luxury { background: linear-gradient(180deg, #a78bfa, #7c3aed); }
+.hotel-guest-label { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 6px; font-weight: 900; color: #fff; background: rgba(15,23,42,.6); padding: 0 3px; border-radius: 999px; white-space: nowrap; letter-spacing: .03em; }
+
 /* === Visible simulation feedback: water quality, group arrivals, sponsors === */
 .pool-quality-tint { position: absolute; inset: 14%; border-radius: 30%; pointer-events: none; z-index: 6; mix-blend-mode: multiply; transition: opacity .4s ease, background .4s ease; }
 .pool-quality-tint.fair { background: rgba(132, 204, 22, .10); }

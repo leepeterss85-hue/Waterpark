@@ -262,6 +262,9 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
           playerGuests={game.guests}
           playerLevel={game.level}
           marketShare={game.marketShare}
+          money={game.money}
+          activeStrikes={game.activeStrikes}
+          onLaunchStrike={game.launchStrike}
         />
       </SheetShell>
 

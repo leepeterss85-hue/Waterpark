@@ -7,13 +7,14 @@ import GuestLayer from "@/components/game/GuestLayer";
 import MapAmbience from "@/components/game/MapAmbience";
 import MascotSprite from "@/components/game/MascotSprite";
 import GroupArrivalIndicator from "@/components/game/GroupArrivalIndicator";
+import StrikeBanner from "@/components/game/StrikeBanner";
 import { useTouchZoom } from "@/hooks/useTouchZoom";
 import "@/components/game/parkMap.css";
 import "@/components/game/parkArtwork.css";
 import "@/components/game/parkPeople.css";
 import "@/components/game/parkChrome.css";
 
-export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, visitorMovements, queueStats = {}, attractionCondition = [], staff = {}, staffAssignments = {}, lifeguardTotal = 0, day = 1, weather, seasonEvent, hotelGuests = [], activeEvents = [], waterQuality = [], acceptedBookings = [], sponsorships = [], onTileClick, topControls, bottomMenu, statsBar, themeClass = "", mascot = null }) {
+export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, visitorMovements, queueStats = {}, attractionCondition = [], staff = {}, staffAssignments = {}, lifeguardTotal = 0, day = 1, weather, seasonEvent, hotelGuests = [], activeEvents = [], waterQuality = [], acceptedBookings = [], sponsorships = [], activeStrikes = [], onTileClick, topControls, bottomMenu, statsBar, themeClass = "", mascot = null }) {
   const { zoom, setZoom, panX, panY, resetView, containerRef } = useTouchZoom(1);
   const incidentMap = new Map((incidents || []).map((incident) => [incident.tileIndex, incident]));
   const phase = ((day - 1) % 8);
@@ -35,6 +36,7 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
         <div className="flex shrink-0 items-center gap-2 text-[9px] font-black uppercase tracking-wider text-white/75 sm:text-[10px]"><span className="flex items-center gap-1.5"><Users className="h-3.5 w-3.5 text-cyan-200" />{guests.toLocaleString()}</span><span className="hidden h-4 w-px bg-white/20 sm:block" /><span className="hidden items-center gap-1.5 sm:flex"><Footprints className="h-3.5 w-3.5 text-amber-200" />GUESTS MOVING</span></div>
       </div>
       {sponsorNames && <div className="sponsor-ribbon"><span className="sponsor-dot" />Sponsored by <span className="sponsor-names">{sponsorNames}</span></div>}
+      <StrikeBanner activeStrikes={activeStrikes} />
       {topControls}
       {(seasonEvent || weatherId === "storm") && <div className={"park-event-ribbon " + (weatherId === "storm" ? "storm" : "")}><Sparkles className="h-3.5 w-3.5" /><span>{weatherId === "storm" ? "THUNDERSTORM — SAFETY MODE" : seasonEvent?.name}</span><b>{weatherId === "storm" ? "Outdoor demand reduced" : seasonEvent?.description}</b></div>}
       {activeEvents.length > 0 && <div className="park-event-ribbon"><Sparkles className="h-3.5 w-3.5 text-amber-300" /><span>{activeEvents.map((e) => e.name).join(" · ")}</span><b>{activeEvents.length} active event{activeEvents.length > 1 ? "s" : ""} — bonuses applied</b></div>}
@@ -64,7 +66,7 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
                 return <Tile key={index} index={index} grid={grid} zone={parkZones?.[index]} upgradeLevel={upgrades?.[index] || 0} value={value} selectedBuild={selectedBuild} expansionTheme={expansionTheme} isSelected={selectedTile === index} incident={incidentMap.get(index)} condition={attractionCondition?.[index]} queueWait={queueWait} queueConnected={queueConnected} movement={movement} guests={guests} facilityStatus={facilityStatus} timeOfDay={timeOfDay} nightSwim={seasonEvent?.id === "night_swim"} hotelOccupancy={hotelOcc} hotelRoomsTotal={hotelRm} waterQuality={waterQuality?.[index]} onClick={() => onTileClick(index)} />;
               })}
             </div>
-            <GuestLayer grid={grid} parkZones={parkZones} guests={guests} movements={visitorMovements} queueStats={queueStats} staff={staff} staffAssignments={staffAssignments} incidents={incidents || []} attractionCondition={attractionCondition} />
+            <GuestLayer grid={grid} parkZones={parkZones} guests={guests} movements={visitorMovements} queueStats={queueStats} staff={staff} staffAssignments={staffAssignments} incidents={incidents || []} attractionCondition={attractionCondition} hotelGuests={hotelGuests} />
             <GroupArrivalIndicator acceptedBookings={acceptedBookings} entranceIndex={entranceIndex} rows={Math.ceil(grid.length / 8)} />
             {mascot && <MascotSprite mascot={mascot} grid={grid} />}
           </div></div>
