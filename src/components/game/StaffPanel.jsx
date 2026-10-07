@@ -1,6 +1,6 @@
 import React from "react";
 import { Plus, Minus, Users } from "lucide-react";
-import { STAFF, staffEffects } from "@/data/gameData";
+import { STAFF } from "@/data/gameData";
 import { getIcon } from "./icons";
 import StaffTrainingSection from "./StaffTrainingSection";
 import { staffLevelFromXp, trainingEffectMult, trainingCost, MAX_STAFF_LEVEL } from "@/data/staffTraining";
@@ -84,14 +84,12 @@ export default function StaffPanel({
             const count = staff[s.id] || 0;
             const xp = staffXp[s.id] || 0;
             const level = staffLevelFromXp(xp);
-            const efficiency = Math.round((trainingEffectMult(s.id, xp) - 1) * 100);\n            const roleEffect = staffEffects?.[s.id];
-            const nextCost = level < MAX_STAFF_LEVEL ? trainingCost(s.id, xp) : null;
+            const efficiency = Math.round((trainingEffectMult(s.id, xp) - 1) * 100);\n            const nextCost = level < MAX_STAFF_LEVEL ? trainingCost(s.id, xp) : null;
             return (
               <div key={s.id} className="rounded-lg bg-white p-2 shadow-sm ring-1 ring-indigo-100">
                 <div className="truncate text-[10px] font-black text-slate-700">{s.name}</div>
                 <div className="mt-0.5 text-[9px] font-bold text-indigo-600">Lv {level} · +{efficiency}%</div>
-                <div className="mt-0.5 text-[9px] text-slate-400">{count} employed{nextCost ? " · Train $" + nextCost.toLocaleString() : " · MAX"}</div>\n                {roleEffect && <div className="mt-1 text-[8px] font-semibold leading-3 text-slate-400">{typeof roleEffect === "string" ? roleEffect : "Role effects active in park operations"}</div>}
-              </div>
+                <div className="mt-0.5 text-[9px] text-slate-400">{count} employed{nextCost ? " · Train $" + nextCost.toLocaleString() : " · MAX"}</div>\n              </div>
             );
           })}
         </div>
