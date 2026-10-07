@@ -55,6 +55,7 @@ import AttractionChainsPanel from "@/components/game/AttractionChainsPanel";
 import CampaignChaptersPanel from "@/components/game/CampaignChaptersPanel";
 import EmpireExpansionPanel from "@/components/game/EmpireExpansionPanel";
 import AdvancedParkPanel from "@/components/game/AdvancedParkPanel";
+import GameModePanel from "@/components/game/GameModePanel";
 import { isWaterAttraction } from "@/data/waterQuality";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
@@ -419,6 +420,10 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
           onAcquire={game.acquireRival}
           onFranchise={game.openFranchise}
         />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "gameModes"} onOpenChange={(v) => !v && close()} title="Game Modes" icon={BookOpen} width="sm:max-w-lg">
+        <GameModePanel game={game} onClose={close} />
       </SheetShell>
 
       <SheetShell open={openSheet === "advancedPark"} onOpenChange={(v) => !v && close()} title="Park Life & Destinations" icon={Waves} width="sm:max-w-lg">
