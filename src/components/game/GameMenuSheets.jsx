@@ -1,7 +1,7 @@
 import React from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2, MapPin, Star, Clock, Wrench, Zap, Palette, RotateCcw, Gift, PawPrint, MessageSquare, Camera, HeartPulse, Handshake, UsersRound, UtensilsCrossed, BookOpen, Globe2, Waves } from "lucide-react";
+import { Hammer, Settings, Users, Grid3x3, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2, MapPin, Star, Clock, Wrench, Zap, Palette, RotateCcw, Gift, PawPrint, MessageSquare, Camera, HeartPulse, Handshake, UsersRound, UtensilsCrossed, BookOpen, Globe2, Waves } from "lucide-react";
 import { MISSIONS, missionProgress } from "@/data/missions";
 import BuildPanel from "@/components/game/BuildPanel";
 import ExpansionPanel from "@/components/game/ExpansionPanel";
@@ -59,6 +59,7 @@ import GameModePanel from "@/components/game/GameModePanel";
 import StoryCoach from "@/components/game/StoryCoach";
 import SandboxLabPanel from "@/components/game/SandboxLabPanel";
 import AnnualReportPanel from "@/components/game/AnnualReportPanel";
+import ParkMenuHub from "@/components/game/ParkMenuHub";
 import { isWaterAttraction } from "@/data/waterQuality";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
@@ -89,6 +90,7 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
   return (
     <>
       <StoryCoach game={game} setOpenSheet={setOpenSheet} />
+      <SheetShell open={openSheet === "menu"} onOpenChange={(v) => !v && close()} title="More Park Tools" icon={Grid3x3} width="sm:max-w-2xl"><ParkMenuHub onOpen={setOpenSheet} /></SheetShell>
       <SheetShell open={openSheet === "build"} onOpenChange={(v) => !v && close()} title="Build" icon={Hammer} width="sm:max-w-lg">
         <ExpansionPanel gridSize={game.gridSize} expansionsDone={game.expansionsDone} level={game.level} money={game.money} onExpand={game.expandPark} />
         <BuildPanel money={game.money} level={game.level} selectedBuild={game.selectedBuild} onSelect={game.setSelectedBuild} completedResearch={game.completedResearch} sandbox={game.sandbox} />
