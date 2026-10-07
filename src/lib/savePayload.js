@@ -21,7 +21,7 @@ export const SAVE_FIELDS = [
   "autoPricing", "activeTheme", "prestigeCount", "synergyBonuses",
   "builtToday", "upgradedToday", "mascot", "lastRewardDay", "rewardStreak",
   "visitorReviews", "staffXp", "staffMorale", "wageBoost", "sponsorships",
-  "groupBookings", "acceptedBookings", "activeStrikes",
+  "groupBookings", "acceptedBookings", "activeStrikes", "gameMode", "storyStep", "storyCompleted",
   "guestMemory", "retailStock", "megaProjects", "guestStories", "currentDestination", "retailStats", "completedChains", "completedCampaignChapters", "acquiredRivals", "franchiseMaps",
 ];
 
