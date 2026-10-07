@@ -27,6 +27,10 @@ export default function CompetitorsPanel({ competitors, playerReputation, player
   }
 
   const intelLevel = Math.min(3, Math.floor(playerLevel / 3));
+  const strongestRival = competitors.reduce((best, c) => !best || (c.marketShare || 0) > (best.marketShare || 0) ? c : best, null);
+  const rivalToBeat = competitors.reduce((best, c) => !best || (c.appeal || 0) > (best.appeal || 0) ? c : best, null);
+  const competitiveGap = strongestRival ? Math.round(playerReputation + playerAppeal - (strongestRival.appeal * 1.5)) : 0;
+  const strategy = marketShare < 30 ? "Defensive strategy: improve guest experience, appeal and reputation before major expansion." : marketShare < 50 ? "Competitive strategy: target the strongest rival with upgrades, events and marketing." : marketShare >= 70 ? "Market leader: keep service quality high and reinvest into your strongest attractions." : "Balanced position: focus investment on attractions with the best visitor demand.";
 
   return (
     <div className="flex flex-col gap-3">
@@ -94,6 +98,15 @@ export default function CompetitorsPanel({ competitors, playerReputation, player
           </div>
         );
       })}
+
+      <div className="rounded-xl border border-indigo-100 bg-indigo-50 p-3">
+        <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-indigo-700"><TrendingUp className="h-3 w-3" /> CEO Competitive Strategy</div>
+        <p className="mt-1 text-[10px] font-bold leading-4 text-indigo-900">{strategy}</p>
+        <div className="mt-2 grid grid-cols-2 gap-2">
+          <div className="rounded-lg bg-white p-2"><div className="text-[8px] font-black uppercase text-slate-400">Strongest rival</div><div className="mt-0.5 text-[10px] font-black text-slate-800">{strongestRival?.name || "—"}</div><div className="text-[8px] text-slate-400">{Math.round(strongestRival?.marketShare || 0)}% share</div></div>
+          <div className="rounded-lg bg-white p-2"><div className="text-[8px] font-black uppercase text-slate-400">Gap to beat</div><div className={"mt-0.5 text-[10px] font-black " + (competitiveGap >= 0 ? "text-emerald-600" : "text-rose-600")}>{competitiveGap >= 0 ? "Ahead" : Math.abs(competitiveGap) + " points"}</div><div className="text-[8px] text-slate-400">{rivalToBeat?.name || "No rival"}</div></div>
+        </div>
+      </div>
 
       {/* Tips */}
       <div className="rounded-lg bg-amber-50 p-2.5 ring-1 ring-amber-100">
