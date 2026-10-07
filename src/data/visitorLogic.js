@@ -228,6 +228,9 @@ function scoreDestination(guest, item) {
     if (["drinking_fountain", "concessions", "juice_bar", "smoothie_bar"].includes(attr.id)) score += guest.thirst * 0.08;
     // Rest / energy
     if (REST_IDS.has(attr.id)) score += (100 - guest.energy) * 0.045;
+    // Toilets become a strong destination as a guest need rises.
+    if (attr.id === "toilets") score += Math.max(0, guest.hunger - 45) * 0.025 + Math.max(0, guest.thirst - 55) * 0.02 + 1;
+    if (attr.id === "lockers" && guest.energy < 45) score += 1.5;
     // Services
     if (["lost_found", "atm", "guest_services"].includes(attr.id)) score += 1.5;
     if (attr.id === "guest_services") score += (100 - guest.mood) * 0.03 + 1.5;
@@ -445,12 +448,19 @@ export function simulateVisits({
 
       guest.hunger = clamp(guest.hunger + 3);
       guest.thirst = clamp(guest.thirst + 4);
+      // A busy day gradually increases fatigue, making rest facilities meaningful.
+      guest.energy = clamp(guest.energy - 1.5, 0, 100);
       guest.energy = clamp(guest.energy, 0, 100);
       guest.mood += (safety - 0.7) * 6 + (cleanliness - 0.6) * 5 + entertainment + appealBonus;
       guest.mood -= pricingMoodPenalty(pricing) * 0.3;
       if (pick.overcrowded) guest.mood -= 2;
-      // Queue reaction: impatient guests lose more mood in long queues
-      if (pick.queueWait > guest.patience / 5) guest.mood -= 2 + (guest.patience < 50 ? 2 : 0);
+      // Queue reaction: long waits now have a visible effect on guest happiness,
+      // especially for impatient groups, and can push guests away from repeat visits.
+      if (pick.queueWait > guest.patience / 5) {
+        const waitPenalty = Math.min(8, 2 + (pick.queueWait - guest.patience / 5) * 0.12);
+        guest.mood -= waitPenalty + (guest.patience < 50 ? 2 : 0);
+        guest.energy = Math.max(0, guest.energy - Math.min(4, pick.queueWait * 0.08));
+      }
       if (guest.hunger > 80) guest.mood -= 4;
       if (guest.thirst > 80) guest.mood -= 5;
       if (guest.energy < 25) guest.mood -= 3;
