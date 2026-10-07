@@ -239,6 +239,7 @@ export function runDay(stateRef, setters) {
   let newReputation = rep;
   let visitorStats = { avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {}, guestTypes: {} };
   let dayFeedback = [];
+  let retailResult = { revenue: 0, restockCost: 0, nextStock: stateRef.current.retailStock || {}, unmetFood: 0, satisfactionBonus: 0, served: { food: 0, retail: 0, services: 0 }, stockHealth: { food: 100, retail: 100, services: 100 } };
 
   if (attractions.length > 0) {
     const demand = Math.floor(
@@ -283,7 +284,7 @@ export function runDay(stateRef, setters) {
     if (currentDisaster?.effects?.repDelta) {
       visitorStats = { ...visitorStats, avgMood: Math.max(0, visitorStats.avgMood - Math.abs(currentDisaster.effects.repDelta) * 4) };
     }
-    const retailResult = simulateFoodRetail({
+    retailResult = simulateFoodRetail({
       grid: prevGrid, guests: newGuests, visitorStats: sim, weather: dayWeather,
       activeEvents: currentActiveEvents, stock: stateRef.current.retailStock || {},
       staff: counts, pricing: currentPricing,
@@ -497,8 +498,8 @@ export function runDay(stateRef, setters) {
     wages * (eff.wageMult ?? 1) * (1 - (fx.wageReduction || 0)) * wageBoostMult + eventUtilityCost + currentAdBudget + (currentPriorityPass ? 120 : 0) + retailRestockCost) * diffUpkeepMult +
     hotelExpensesAmount;
   const eventRevenuePerDay = currentActiveEvents.reduce((s, e) => s + (e.revenuePerDay || 0), 0);
-  const retailRevenue = stateRef.current.retailStats?.revenue || 0;
-  const retailRestockCost = stateRef.current.retailStats?.restockCost || 0;
+  const retailRevenue = retailResult.revenue || 0;
+  const retailRestockCost = retailResult.restockCost || 0;
   const emergencyCost = emergencyResult.totalCost;
   const sponsorIncome = activeSponsorIncome(currentSponsorships);
   const grossIncome = Math.round(ticketRevenue + rideIncome + hotelRoomRevenue + hotelParkSpend + retailRevenue + eventRevenuePerDay + membershipResult.totalRevenue + membershipResult.memberSpend + sponsorIncome);
