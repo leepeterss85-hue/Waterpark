@@ -1,7 +1,7 @@
 import React from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2, MapPin, Star, Clock, Wrench, Zap, Palette, RotateCcw, Gift, PawPrint, MessageSquare, Camera, HeartPulse, Handshake, UsersRound, UtensilsCrossed, BookOpen, Globe2 } from "lucide-react";
+import { Hammer, Settings, Users, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2, MapPin, Star, Clock, Wrench, Zap, Palette, RotateCcw, Gift, PawPrint, MessageSquare, Camera, HeartPulse, Handshake, UsersRound, UtensilsCrossed, BookOpen, Globe2, Waves } from "lucide-react";
 import { MISSIONS, missionProgress } from "@/data/missions";
 import BuildPanel from "@/components/game/BuildPanel";
 import ExpansionPanel from "@/components/game/ExpansionPanel";
@@ -54,6 +54,7 @@ import LivingParkPanel from "@/components/game/LivingParkPanel";
 import AttractionChainsPanel from "@/components/game/AttractionChainsPanel";
 import CampaignChaptersPanel from "@/components/game/CampaignChaptersPanel";
 import EmpireExpansionPanel from "@/components/game/EmpireExpansionPanel";
+import AdvancedParkPanel from "@/components/game/AdvancedParkPanel";
 import { isWaterAttraction } from "@/data/waterQuality";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
@@ -417,6 +418,22 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
           options={game.franchiseOptions}
           onAcquire={game.acquireRival}
           onFranchise={game.openFranchise}
+        />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "advancedPark"} onOpenChange={(v) => !v && close()} title="Park Life & Destinations" icon={Waves} width="sm:max-w-lg">
+        <AdvancedParkPanel
+          megaProjects={game.megaProjectDefinitions.map((d) => ({ ...d, ...(game.megaProjects.find((p) => p.projectId === d.id) || {}) }))}
+          megaBonuses={game.megaBonuses}
+          stories={game.guestStories}
+          destinations={game.destinations}
+          currentDestination={game.currentDestination}
+          level={game.level}
+          money={game.money}
+          sandbox={game.sandbox}
+          onBuildMega={game.buildMegaProject}
+          onSelectDestination={game.selectDestination}
+          water={game.waterEngineering}
         />
       </SheetShell>
 
