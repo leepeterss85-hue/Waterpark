@@ -4,7 +4,7 @@ import { ATTRACTIONS, PARK_OBJECTS, HOTELS, CATEGORIES, unlockLevelFor } from "@
 import { researchReqFor } from "@/data/research";
 import BuildCard from "@/components/game/BuildCard";
 
-export default function BuildPanel({ money, level = 1, selectedBuild, onSelect, completedResearch = [] }) {
+export default function BuildPanel({ money, level = 1, selectedBuild, onSelect, completedResearch = [], sandbox = false }) {
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState({ attraction: true, facility: false, hotel: true, environment: false });
   const filtered = useMemo(() => {
@@ -42,7 +42,7 @@ export default function BuildPanel({ money, level = 1, selectedBuild, onSelect, 
               {items.map((item) => {
                 const req = researchReqFor(item.id);
                 const researchLocked = req && !completedResearch.includes(req.id);
-                const unlocked = level >= unlockLevelFor(item) && !researchLocked;
+                const unlocked = (level >= unlockLevelFor(item) || sandbox) && !researchLocked;
                 return <BuildCard key={item.id} item={item} selected={selectedBuild === item.id} affordable={money >= item.cost} unlocked={unlocked} onSelect={onSelect} lockLabel={researchLocked ? `Research: ${req.name}` : null} />;
               })}
             </div>}

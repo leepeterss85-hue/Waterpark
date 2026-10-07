@@ -79,7 +79,7 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
     <>
       <SheetShell open={openSheet === "build"} onOpenChange={(v) => !v && close()} title="Build" icon={Hammer} width="sm:max-w-lg">
         <ExpansionPanel gridSize={game.gridSize} expansionsDone={game.expansionsDone} level={game.level} money={game.money} onExpand={game.expandPark} />
-        <BuildPanel money={game.money} level={game.level} selectedBuild={game.selectedBuild} onSelect={game.setSelectedBuild} completedResearch={game.completedResearch} />
+        <BuildPanel money={game.money} level={game.level} selectedBuild={game.selectedBuild} onSelect={game.setSelectedBuild} completedResearch={game.completedResearch} sandbox={game.sandbox} />
       </SheetShell>
 
       <SheetShell open={openSheet === "research"} onOpenChange={(v) => !v && close()} title="Research" icon={FlaskConical} width="sm:max-w-md">
