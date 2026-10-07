@@ -43,6 +43,7 @@ import { buildSavePayload } from "@/lib/savePayload";
 import { runDay } from "@/hooks/runDay";
 import { base44 } from "@/api/base44Client";
 import { sound } from "@/lib/soundManager";
+import { MEGA_PROJECTS, DESTINATIONS, megaBonuses as calculateMegaBonuses, waterEngineering } from "@/data/advancedParkSystems";
 
 const STORAGE_KEY = "waterpark-tycoon-save-v1";
 const FIRST_ATTRACTION_BONUS = 5000;
@@ -206,13 +207,16 @@ export function useGameState() {
   const [completedCampaignChapters, setCompletedCampaignChapters] = useState([]);
   const [acquiredRivals, setAcquiredRivals] = useState([]);
   const [franchiseMaps, setFranchiseMaps] = useState([]);
+  const [megaProjects, setMegaProjects] = useState([]);
+  const [guestStories, setGuestStories] = useState([]);
+  const [currentDestination, setCurrentDestination] = useState("home_resort");
 
   const level = levelFromXp(xp);
   const gridSize = grid.length;
 
   /** @type {import("react").MutableRefObject<Record<string, any>>} */
   const stateRef = useRef({});
-  stateRef.current = { money, day, reputation, guests, grid, parkZones, history, log, lastNet, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, sandbox, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, builtToday, upgradedToday, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp, staffMorale, wageBoost, sponsorships, groupBookings, acceptedBookings, activeStrikes, completedMasterPlans, masterPlanBonuses, guestMemory, retailStock, retailStats, completedChains, completedCampaignChapters, acquiredRivals, franchiseMaps, guestMemory, retailStock, retailStats, completedChains, completedCampaignChapters, acquiredRivals, franchiseMaps };
+  stateRef.current = { money, day, reputation, guests, grid, parkZones, history, log, lastNet, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, sandbox, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, builtToday, upgradedToday, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp, staffMorale, wageBoost, sponsorships, groupBookings, acceptedBookings, activeStrikes, completedMasterPlans, masterPlanBonuses, guestMemory, retailStock, retailStats, completedChains, completedCampaignChapters, acquiredRivals, franchiseMaps, megaProjects, guestStories, currentDestination, guestMemory, retailStock, retailStats, completedChains, completedCampaignChapters, acquiredRivals, franchiseMaps };
 
   // Load saved game
   useEffect(() => {
@@ -824,6 +828,9 @@ export function useGameState() {
     setCompletedCampaignChapters(data.completedCampaignChapters ?? []);
     setAcquiredRivals(data.acquiredRivals ?? []);
     setFranchiseMaps(data.franchiseMaps ?? []);
+      setMegaProjects(data.megaProjects ?? []);
+      setGuestStories(data.guestStories ?? []);
+      setCurrentDestination(data.currentDestination ?? "home_resort");
     setBuiltToday(0);
     setUpgradedToday(0);
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
@@ -925,6 +932,27 @@ export function useGameState() {
     trackEvent("daily_reward_claimed", { type: reward.id, amount: reward.amount, streak: newStreak });
   }, []);
 
+  const buildMegaProject = useCallback((projectId) => {
+    const def = MEGA_PROJECTS.find((p) => p.id === projectId);
+    if (!def || level < def.level || (stateRef.current.megaProjects || []).some((p) => p.projectId === projectId && p.status !== "complete")) return false;
+    if (!sandbox && money < def.cost) return false;
+    if (!sandbox) setMoney((m) => m - def.cost);
+    setMegaProjects((prev) => [...prev, { projectId: def.id, name: def.name, startedDay: day, progress: 0, buildDays: def.buildDays, status: "building" }]);
+    setLog((l) => [{ day, text: `Day ${day}: 🏗️ Started signature project ${def.name}. It will open in ${def.buildDays} days.` }, ...l].slice(0, 12));
+    setEmpirePoints((p) => p + Math.round(def.prestige / 4));
+    return true;
+  }, [level, sandbox, money, day]);
+  const selectDestination = useCallback((id) => {
+    const dest = DESTINATIONS.find((d) => d.id === id);
+    if (!dest || level < dest.level || (!sandbox && money < dest.cost)) return false;
+    if (currentDestination !== id && dest.cost > 0 && !franchiseMaps.includes(id)) {
+      if (!sandbox) setMoney((m) => m - dest.cost);
+      setFranchiseMaps((prev) => prev.includes(id) ? prev : [...prev, id]);
+    }
+    setCurrentDestination(id);
+    setLog((l) => [{ day, text: `Day ${day}: 🌍 Destination changed to ${dest.name}.` }, ...l].slice(0, 12));
+    return true;
+  }, [level, sandbox, money, day, currentDestination, franchiseMaps]);
   const acquireRival = useCallback((id) => {
     const target = ACQUISITION_TARGETS.find((x) => x.id === id);
     if (!target || acquiredRivals.includes(id) || level < 18 || reputation < target.rep || marketShare < target.market || money < target.cost) return false;
@@ -1017,6 +1045,7 @@ export function useGameState() {
     setGuestMemory({}); setRetailStock({ food: 0, retail: 0, services: 0 });
     setRetailStats({ revenue: 0, restockCost: 0, served: { food: 0, retail: 0, services: 0 }, unmetFood: 0, stockHealth: { food: 100, retail: 100, services: 100 } });
     setCompletedChains([]); setCompletedCampaignChapters([]); setAcquiredRivals([]); setFranchiseMaps([]);
+    setMegaProjects([]); setGuestStories([]); setCurrentDestination("home_resort");
     const startPopularity = Array(startGrid.length).fill(0);
     const startPopTrend = Array(startGrid.length).fill(0);
     for (let i = 0; i < startGrid.length; i += 1) {
