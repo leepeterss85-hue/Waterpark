@@ -46,6 +46,7 @@ const SECONDARY = [
   { key: "advancedPark", icon: Waves, label: "Park Life" },
   { key: "photo", icon: Camera, label: "Photo" },
   { key: "prestige", icon: RotateCcw, label: "Prestige" },
+  { key: "gameModes", icon: BookOpen, label: "Game Modes" },
   { key: "settings", icon: SlidersHorizontal, label: "Settings" },
 ];
 
