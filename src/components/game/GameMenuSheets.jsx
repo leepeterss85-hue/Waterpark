@@ -196,7 +196,8 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
           </TabsList>
           <TabsContent value="activity"><ActivityLog feedback={game.feedback} log={game.log} issueCount={game.incidents.length} guestExperience={game.visitorStats?.guestExperience} /></TabsContent>
           <TabsContent value="insights"><VisitorInsight visitorStats={game.visitorStats} /></TabsContent>
-          <TabsContent value="missions"><MissionsPanel level={game.level} xp={game.xp} xpForNext={game.xpForNext} missionState={game.missionState} claimedMissions={game.claimedMissions} onClaim={game.claimMission} /></TabsContent>\n          <TabsContent value="plans"><MasterPlansPanel grid={game.grid} reputation={game.reputation} peakGuests={game.peakGuests} totalUpgrades={game.totalUpgrades} resortRating={game.resortRating} appeal={game.parkAppeal?.score || 50} day={game.day} money={game.money} completedPlans={game.completedMasterPlans} /></TabsContent>
+          <TabsContent value="missions"><MissionsPanel level={game.level} xp={game.xp} xpForNext={game.xpForNext} missionState={game.missionState} claimedMissions={game.claimedMissions} onClaim={game.claimMission} /></TabsContent>
+          <TabsContent value="plans"><MasterPlansPanel grid={game.grid} reputation={game.reputation} peakGuests={game.peakGuests} totalUpgrades={game.totalUpgrades} resortRating={game.resortRating} appeal={game.parkAppeal?.score || 50} day={game.day} money={game.money} completedPlans={game.completedMasterPlans} /></TabsContent>
         </Tabs>
       </SheetShell>
 
@@ -426,7 +427,11 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
         />
       </SheetShell>
 
-      <SheetShell open={openSheet === "annualReport"} onOpenChange={(v) => !v && close()} title="Management Report" icon={CalendarDays} width="sm:max-w-lg"><AnnualReportPanel report={game.annualReport} /></SheetShell>\n\n      <SheetShell open={openSheet === "sandboxLab"} onOpenChange={(v) => !v && close()} title="Sandbox Lab" icon={Waves} width="sm:max-w-lg"><SandboxLabPanel game={game} /></SheetShell>\n\n      <SheetShell open={openSheet === "gameModes"} onOpenChange={(v) => !v && close()} title="Game Modes" icon={BookOpen} width="sm:max-w-lg">
+      <SheetShell open={openSheet === "annualReport"} onOpenChange={(v) => !v && close()} title="Management Report" icon={CalendarDays} width="sm:max-w-lg"><AnnualReportPanel report={game.annualReport} /></SheetShell>
+
+      <SheetShell open={openSheet === "sandboxLab"} onOpenChange={(v) => !v && close()} title="Sandbox Lab" icon={Waves} width="sm:max-w-lg"><SandboxLabPanel game={game} /></SheetShell>
+
+      <SheetShell open={openSheet === "gameModes"} onOpenChange={(v) => !v && close()} title="Game Modes" icon={BookOpen} width="sm:max-w-lg">
         <GameModePanel game={game} onClose={close} />
       </SheetShell>
 
