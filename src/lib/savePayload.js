@@ -10,7 +10,7 @@ export const SAVE_FIELDS = [
   "visitorStats", "feedback", "weather", "forecast", "seasonEvent",
   "ticketPrice", "adBudget", "priorityPass", "vipVisit", "researchPoints",
   "completedResearch", "parkAppeal", "disaster", "disastersSurvived",
-  "activeCampaigns", "hotelGuests", "hotelStats", "resortRating", "pricing",
+  "activeCampaigns", "sandboxSettings", "hotelGuests", "hotelStats", "resortRating", "pricing",
   "popularity", "popularityTrend", "prevPopularity", "activeEvents",
   "membershipCounts", "membershipTimers", "membershipStats", "awards",
   "awardCeremonyTimer", "awardStats", "socialPosts", "socialReputation",
