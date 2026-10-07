@@ -30,7 +30,16 @@ export default function PricingPanel({ pricing, ticketPrice, weather, seasonEven
   const peak = getPeakMultiplier(weather, seasonEvent);
   const isPeak = peak > 1;
   const isOffPeak = peak < 1;
-  const tier = priceTierLabel(ticketPrice);\n  const pricingAdvice = isPeak && ticketPrice < 28\n    ? "Demand is strong today. Consider a modest ticket increase before raising ride prices."\n    : isOffPeak && ticketPrice > 35\n    ? "Demand is soft today. A lower gate price can recover attendance and improve secondary spending."\n    : pricing.ridePriceMult > 1.2 && pricing.foodPriceMult > 1.2\n    ? "Both ride and food prices are high. Watch guest mood and queue demand closely."\n    : pricing.hotelPriceMult > 1.25 && isOffPeak\n    ? "Hotel pricing is premium for an off-peak period. A small reduction may improve occupancy."\n    : "Pricing is broadly balanced. Watch demand and guest satisfaction before making another change.";
+  const tier = priceTierLabel(ticketPrice);
+  const pricingAdvice = isPeak && ticketPrice < 28
+    ? "Demand is strong today. Consider a modest ticket increase before raising ride prices."
+    : isOffPeak && ticketPrice > 35
+    ? "Demand is soft today. A lower gate price can recover attendance and improve secondary spending."
+    : pricing.ridePriceMult > 1.2 && pricing.foodPriceMult > 1.2
+    ? "Both ride and food prices are high. Watch guest mood and queue demand closely."
+    : pricing.hotelPriceMult > 1.25 && isOffPeak
+    ? "Hotel pricing is premium for an off-peak period. A small reduction may improve occupancy."
+    : "Pricing is broadly balanced. Watch demand and guest satisfaction before making another change.";
 
   const applyPreset = (preset) => {
     onChange({ ...pricing, ...preset });
@@ -74,7 +83,12 @@ export default function PricingPanel({ pricing, ticketPrice, weather, seasonEven
         </div>
       </div>
 
-      <div className="mb-3 flex items-start gap-2 rounded-xl bg-indigo-50 p-3 ring-1 ring-indigo-100">\n        <TrendingUp className="mt-0.5 h-4 w-4 shrink-0 text-indigo-500" />\n        <div><div className="text-[10px] font-black uppercase tracking-wide text-indigo-600">Pricing advisor</div><div className="mt-0.5 text-[10px] leading-4 text-indigo-800">{pricingAdvice}</div></div>\n      </div>\n\n      {/* Ticket price */}
+      <div className="mb-3 flex items-start gap-2 rounded-xl bg-indigo-50 p-3 ring-1 ring-indigo-100">
+        <TrendingUp className="mt-0.5 h-4 w-4 shrink-0 text-indigo-500" />
+        <div><div className="text-[10px] font-black uppercase tracking-wide text-indigo-600">Pricing advisor</div><div className="mt-0.5 text-[10px] leading-4 text-indigo-800">{pricingAdvice}</div></div>
+      </div>
+
+      {/* Ticket price */}
       <div className="mb-3 rounded-xl bg-emerald-50 p-3 ring-1 ring-emerald-100">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs font-extrabold text-emerald-800">
