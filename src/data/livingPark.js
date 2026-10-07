@@ -32,7 +32,7 @@ export function simulateFoodRetail({grid=[],guests=0,visitorStats={},weather={},
  const hasFood=grid.filter(id=>FOOD_IDS.includes(id)).length,hasRetail=grid.filter(id=>RETAIL_IDS.includes(id)).length,hasService=grid.filter(id=>SERVICE_IDS.includes(id)).length;
  const chef=staff.chef||0,photographer=staff.photographer||0;
  const eventBoost=activeEvents.reduce((s,e)=>s*(e.downside?.foodDepleteMult||1),1);
- const weatherMult=weather.id==="sunny"||weather.id==="warm"?1.16:weather.id==="rain"?.82:1;
+ const weatherMult=weather.id==="sunny"||weather.id==="warm"?1.16:weather.id==="rain"?0.82:1;
  const foodDemand=Math.round(guests*Math.min(.92,.28+hasFood*.08)*weatherMult*eventBoost*(1+chef*.05));
  const retailDemand=Math.round(guests*Math.min(.45,hasRetail*.07)*(1+photographer*.04));
  const serviceDemand=Math.round(guests*Math.min(.5,hasService*.06));
