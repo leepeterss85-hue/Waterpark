@@ -36,6 +36,7 @@ const SECONDARY = [
   { key: "mascot", icon: PawPrint, label: "Mascot" },
   { key: "reviews", icon: MessageSquare, label: "Reviews" },
   { key: "needs", icon: HeartPulse, label: "Needs" },
+  { key: "guestExperience", icon: HeartPulse, label: "Experience" },
   { key: "sponsorships", icon: Handshake, label: "Sponsors" },
   { key: "bookings", icon: UsersRound, label: "Groups" },
   { key: "photo", icon: Camera, label: "Photo" },
