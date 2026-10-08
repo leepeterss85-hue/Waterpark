@@ -44,6 +44,7 @@ import { runDay } from "@/hooks/runDay";
 import { base44 } from "@/api/base44Client";
 import { sound } from "@/lib/soundManager";
 import { MEGA_PROJECTS, DESTINATIONS, megaBonuses as calculateMegaBonuses, waterEngineering } from "@/data/advancedParkSystems";
+import { DEFAULT_PARK_STRATEGY, strategyFor, packageFor, masteryEffects } from "@/data/parkMastery";
 
 const STORAGE_KEY = "waterpark-tycoon-save-v1";
 const FIRST_ATTRACTION_BONUS = 5000;
@@ -214,13 +215,15 @@ export function useGameState() {
   const [megaProjects, setMegaProjects] = useState([]);
   const [guestStories, setGuestStories] = useState([]);
   const [currentDestination, setCurrentDestination] = useState("home_resort");
+  const [parkStrategy, setParkStrategyState] = useState(DEFAULT_PARK_STRATEGY);
+  const [mastery, setMastery] = useState({ points: 0, completed: [] });
 
   const level = levelFromXp(xp);
   const gridSize = grid.length;
 
   /** @type {import("react").MutableRefObject<Record<string, any>>} */
   const stateRef = useRef({});
-  stateRef.current = { sandboxSettings, money, day, reputation, guests, grid, parkZones, history, log, lastNet, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, sandbox, activeCampaigns, sandboxSettings, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, builtToday, upgradedToday, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp, staffMorale, wageBoost, sponsorships, groupBookings, acceptedBookings, activeStrikes, completedMasterPlans, masterPlanBonuses, guestMemory, retailStock, retailStats, completedChains, completedCampaignChapters, acquiredRivals, franchiseMaps, megaProjects, guestStories, currentDestination, gameMode, storyStep, storyCompleted, guestMemory, retailStock, retailStats, completedChains, completedCampaignChapters, acquiredRivals, franchiseMaps };
+  stateRef.current = { parkStrategy, mastery, sandboxSettings, money, day, reputation, guests, grid, parkZones, history, log, lastNet, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, sandbox, activeCampaigns, sandboxSettings, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, builtToday, upgradedToday, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp, staffMorale, wageBoost, sponsorships, groupBookings, acceptedBookings, activeStrikes, completedMasterPlans, masterPlanBonuses, guestMemory, retailStock, retailStats, completedChains, completedCampaignChapters, acquiredRivals, franchiseMaps, megaProjects, guestStories, currentDestination, gameMode, storyStep, storyCompleted, guestMemory, retailStock, retailStats, completedChains, completedCampaignChapters, acquiredRivals, franchiseMaps };
 
   // Load saved game
   useEffect(() => {
@@ -329,6 +332,8 @@ export function useGameState() {
       setMegaProjects(data.megaProjects ?? []);
       setGuestStories(data.guestStories ?? []);
       setCurrentDestination(data.currentDestination ?? "home_resort");
+      if (data.parkStrategy) setParkStrategyState({ ...DEFAULT_PARK_STRATEGY, ...data.parkStrategy });
+      if (data.mastery) setMastery({ points: Math.max(0, Number(data.mastery.points) || 0), completed: Array.isArray(data.mastery.completed) ? data.mastery.completed : [] });
       if (data.gameMode) setGameMode(data.gameMode);
       if (data.storyStep != null) setStoryStep(data.storyStep);
       if (data.storyCompleted != null) setStoryCompleted(data.storyCompleted);
@@ -1082,6 +1087,13 @@ export function useGameState() {
     trackEvent("theme_selected", { theme: themeId });
   }, [level]);
 
+  const setParkStrategy = useCallback((next) => {
+    const strategy = strategyFor(next?.strategy || parkStrategy.strategy);
+    const hotelPackage = packageFor(next?.hotelPackage || parkStrategy.hotelPackage);
+    setParkStrategyState({ strategy: strategy.id, hotelPackage: hotelPackage.id });
+    setLog((l) => [{ day, text: "Day " + day + ": 🎯 Strategy set to " + strategy.name + " · hotel package: " + hotelPackage.name + "." }, ...l].slice(0, 12));
+  }, [parkStrategy, day]);
+
   const prestigePark = useCallback(() => {
     if (level < PRESTIGE_LEVEL_REQ) return;
     const points = calculatePrestigePoints({ level, empirePoints, lifetimeEarnings });
@@ -1154,6 +1166,7 @@ export function useGameState() {
     setRetailStats({ revenue: 0, restockCost: 0, served: { food: 0, retail: 0, services: 0 }, unmetFood: 0, stockHealth: { food: 100, retail: 100, services: 100 } });
     setCompletedChains([]); setCompletedCampaignChapters([]); setAcquiredRivals([]); setFranchiseMaps([]);
     setMegaProjects([]); setGuestStories([]); setCurrentDestination("home_resort");
+    setParkStrategyState(DEFAULT_PARK_STRATEGY); setMastery({ points: 0, completed: [] });
     setSandboxSettings({ unlimitedCash: true, unlockAll: false, guestDemandMult: 1, instantConstruction: false, weatherLock: false, weather: null });
     const startPopularity = Array(startGrid.length).fill(0);
     const startPopTrend = Array(startGrid.length).fill(0);
