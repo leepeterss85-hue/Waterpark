@@ -22,7 +22,7 @@ export const SAVE_FIELDS = [
   "builtToday", "upgradedToday", "mascot", "lastRewardDay", "rewardStreak",
   "visitorReviews", "staffXp", "staffMorale", "wageBoost", "sponsorships",
   "groupBookings", "acceptedBookings", "activeStrikes", "gameMode", "storyStep", "storyCompleted",
-  "guestMemory", "retailStock", "parkStrategy", "mastery", "resortMilestones", "megaProjects", "guestStories", "currentDestination", "retailStats", "completedChains", "completedCampaignChapters", "acquiredRivals", "franchiseMaps",
+  "guestMemory", "retailStock", "parkStrategy", "mastery", "resortMilestones", "activeScenario", "scenarioStatus", "megaProjects", "guestStories", "currentDestination", "retailStats", "completedChains", "completedCampaignChapters", "acquiredRivals", "franchiseMaps",
 ];
 
 // Build the persistable game-data object from a state snapshot.
