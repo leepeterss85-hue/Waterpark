@@ -20,6 +20,10 @@ export default function ParkOverviewPanel({ game, onOpen }) {
   const weatherLabel = game.weather?.name || game.weather?.label || game.weather?.id || "Normal";
   const operations = Math.round(((game.safety || 0) + (game.cleanliness || 0) + (game.entertainment || 0) + (game.uptime || 0)) / 4);
   const visitorMix = game.visitorStats?.guestExperience || game.visitorStats?.averageExperience || null;
+  const monthlyIncomeTarget = 25000 + (monthNumber - 1) * 7500;
+  const monthlyGuestTarget = 500 + (monthNumber - 1) * 150;
+  const incomeProgress = Math.min(100, Math.round((income / monthlyIncomeTarget) * 100));
+  const guestProgress = Math.min(100, Math.round(((game.peakGuests || 0) / monthlyGuestTarget) * 100));
   const objective = game.gameMode === "story" && !game.storyCompleted
     ? game.STORY_STEPS?.[game.storyStep]
     : null;
@@ -68,7 +72,7 @@ export default function ParkOverviewPanel({ game, onOpen }) {
       </div>
     </CardContent></Card>
 
-    <Card><CardContent className="p-4"><div className="text-sm font-black">Quick Management</div><div className="mt-2 grid grid-cols-2 gap-2">
+    <Card><CardContent className="p-4">\n      <div className="text-sm font-black">Monthly targets</div>\n      <div className="mt-1 text-[10px] text-slate-500">Keep the park growing each month. Targets scale as your empire develops.</div>\n      <div className="mt-3 space-y-3">\n        <div><div className="flex justify-between text-[10px] font-bold"><span>Revenue</span><span>${Math.round(income).toLocaleString()} / ${monthlyIncomeTarget.toLocaleString()}</span></div><div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-cyan-500" style={{width: incomeProgress + "%"}} /></div></div>\n        <div><div className="flex justify-between text-[10px] font-bold"><span>Peak guests</span><span>{Math.round(game.peakGuests || 0)} / {monthlyGuestTarget.toLocaleString()}</span></div><div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-blue-500" style={{width: guestProgress + "%"}} /></div></div>\n      </div>\n    </CardContent></Card>\n\n    <Card><CardContent className="p-4"><div className="text-sm font-black">Quick Management</div><div className="mt-2 grid grid-cols-2 gap-2">
       <Button variant="outline" size="sm" onClick={()=>open("build")}><Hammer className="mr-1 h-3.5 w-3.5"/>Build</Button>
       <Button variant="outline" size="sm" onClick={()=>open("staff")}><UserPlus className="mr-1 h-3.5 w-3.5"/>Staff</Button>
       <Button variant="outline" size="sm" onClick={()=>open("manage")}><TrendingUp className="mr-1 h-3.5 w-3.5"/>Manage</Button>
