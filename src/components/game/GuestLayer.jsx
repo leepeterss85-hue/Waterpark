@@ -23,15 +23,20 @@ export default function GuestLayer({ grid, parkZones = [], guests = 0, movements
   const entrance = targets.find(target => target.id === "park_entrance")?.index ?? Math.max(0, grid.length - 8);
   const entry = { x: entrance % 8 + .5, y: Math.floor(entrance / 8) + .65 };
   const position = (x, y) => ({ left: x / 8 * 100 + "%", top: y / rows * 100 + "%" });
-  const walkers = Array.from({ length: Math.min(24, guests > 0 ? Math.max(4, Math.ceil(Math.sqrt(guests) * 1.7)) : 0) }, (_, i) => {
+  const walkers = Array.from({ length: Math.min(40, guests > 0 ? Math.max(6, Math.ceil(Math.sqrt(guests) * 2.2)) : 0) }, (_, i) => {
     const target = destinations[(i + Math.floor(tick / 10)) % Math.max(1, destinations.length)];
     if (!target) return null;
     const phase = (tick + i * 3) % 10, x = target.index % 8 + .3, y = Math.floor(target.index / 8) + .73;
     const inWater = target.attr.category === "attraction" && !["soft_play", "gem_mining"].includes(target.id);
     if (inWater && phase >= 4 && phase <= 7) return null;
     const spot = phase === 0 || phase === 9 ? entry : phase === 1 ? { x, y: entry.y } : phase === 2 ? { x, y: (entry.y + y) / 2 } : { x, y };
-    const activity = phase >= 4 && phase <= 7 ? "waiting" : "walking";
-    return <span key={"g" + i} className="park-pedestrian park-guest" data-activity={activity} data-destination={target.id} style={position(spot.x + (i % 3 - 1) * .18, spot.y)} title={`Guest ${activity === "waiting" ? "visiting" : "heading to"} ${target.attr.name}`}><PersonSprite activity={activity} variant={i} /></span>;
+    const isFood = ["dining","burger_shack","pizza_stand","ice_cream","coffee_bar","beach_bar","smoothie_bar","juice_bar","sushi_bar"].includes(target.id);
+    const isRelax = ["sun_lounge","spa","hot_tub","sauna","beach_lounging","cabanas"].includes(target.id);
+    const activity = inWater && phase >= 4 && phase <= 7 ? (target.id === "lazy_river" ? "floating" : "swimming") :
+      isFood && phase >= 4 && phase <= 7 ? "eating" :
+      isRelax && phase >= 4 && phase <= 7 ? "resting" :
+      phase >= 4 && phase <= 7 ? "waiting" : "walking";
+    return <span key={"g" + i} className="park-pedestrian park-guest" data-activity={activity} data-destination={target.id} data-guest-activity={activity} style={position(spot.x + (i % 3 - 1) * .18, spot.y)} title={`Guest ${activity === "waiting" ? "visiting" : "heading to"} ${target.attr.name}`}><PersonSprite activity={activity} variant={i} /></span>;
   });
   const personnel = STAFF_ROLES.flatMap((role, roleIndex) => {
     const assignment = staffAssignments[role.id] || "";
