@@ -339,6 +339,8 @@ export function useGameState() {
     setResortMilestones(Array.isArray(data.resortMilestones) ? data.resortMilestones : []);
       if (data.parkStrategy) setParkStrategyState({ ...DEFAULT_PARK_STRATEGY, ...data.parkStrategy });
       if (data.mastery) setMastery({ points: Math.max(0, Number(data.mastery.points) || 0), completed: Array.isArray(data.mastery.completed) ? data.mastery.completed : [] });
+      if (data.activeScenario) setActiveScenario(data.activeScenario);
+      if (data.scenarioStatus) setScenarioStatus(data.scenarioStatus);
       setResortMilestones(Array.isArray(data.resortMilestones) ? data.resortMilestones : []);
       if (data.gameMode) setGameMode(data.gameMode);
       if (data.storyStep != null) setStoryStep(data.storyStep);
