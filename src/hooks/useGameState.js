@@ -381,6 +381,7 @@ export function useGameState() {
       setExpansionsDone, setBuiltAttractionIds, setDailyChallenges, setChallengeDayCounter,
       setBuiltToday, setUpgradedToday, setTicketPrice, setLog, setLastNet, setHistory, setPeakGuests,
       setResearchPoints, setXp, setCompletedMasterPlans, setMasterPlanBonuses, setActiveStrikes,
+      setMegaProjects, setGuestStories, setMastery,
     });
   }, []);
 
