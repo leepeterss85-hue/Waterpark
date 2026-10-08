@@ -2,10 +2,11 @@ import React from "react";
 import { FlaskConical, Wallet, HardHat, CalendarDays, Droplets, Hotel, CloudSun, MapPin, Crown, Swords, Medal, Star, Ticket, Trophy, Clock, Siren, Activity, Target, Zap, Palette, Gift, PawPrint, MessageSquare, HeartPulse, Handshake, UsersRound, UtensilsCrossed, BookOpen, Globe2, Waves, Camera, RotateCcw, BarChart3, Settings, ChevronRight } from "lucide-react";
 
 const GROUPS = [
+  { title: "Command", items: [["overview","Park Overview",BarChart3],["annualReport","Management Report",BarChart3]] },
   { title: "Park Operations", items: [["research","Research",FlaskConical],["economy","Economy",Wallet],["construction","Projects",HardHat],["events","Events",CalendarDays],["waterQuality","Water Quality",Droplets],["resort","Resort",Hotel],["conditions","Weather & Conditions",CloudSun],["districts","Districts",MapPin]] },
   { title: "Growth & Competition", items: [["empire","Empire",Crown],["competitors","Rival Parks",Swords],["leaderboard","Leaderboards",Medal],["vipGuests","VIP Guests",Star],["memberships","Memberships",Ticket],["awards","Awards",Trophy],["sponsorships","Sponsors",Handshake],["bookings","Group Bookings",UsersRound],["empireExpansion","Global Empire",Globe2]] },
   { title: "Guests & Park Life", items: [["info","Activity & Missions",Activity],["trends","Ride Trends",BarChart3],["seasonalCalendar","Calendar",Clock],["emergencies","Emergencies",Siren],["challenges","Challenges",Target],["reviews","Visitor Reviews",MessageSquare],["needs","Guest Needs",HeartPulse],["guestExperience","Guest Experience",HeartPulse],["livingPark","Food & Retail",UtensilsCrossed],["chains","Ride Chains",Trophy],["campaignChapters","Campaign",BookOpen]] },
-  { title: "Advanced & Creative", items: [["synergies","Ride Synergies",Zap],["themes","Park Themes",Palette],["rewards","Daily Rewards",Gift],["mascot","Park Mascot",PawPrint],["advancedPark","Park Life & Destinations",Waves],["photo","Photo Mode",Camera],["prestige","Prestige",RotateCcw],["annualReport","Management Report",BarChart3],["sandboxLab","Sandbox Lab",Waves],["settings","Settings",Settings]] }
+  { title: "Advanced & Creative", items: [["synergies","Ride Synergies",Zap],["themes","Park Themes",Palette],["rewards","Daily Rewards",Gift],["mascot","Park Mascot",PawPrint],["advancedPark","Park Life & Destinations",Waves],["photo","Photo Mode",Camera],["prestige","Prestige",RotateCcw],["sandboxLab","Sandbox Lab",Waves],["settings","Settings",Settings]] }
 ];
 
 export default function ParkMenuHub({ onOpen }) {
