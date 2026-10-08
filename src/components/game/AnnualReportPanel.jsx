@@ -10,7 +10,7 @@ export default function AnnualReportPanel({ report }) {
       <p className="mt-1 text-xs text-slate-500">A rolling 30-day executive snapshot for your current park year.</p>
     </CardContent></Card>
     <div className="grid grid-cols-2 gap-2">
-      <Metric icon={TrendingUp} label="Income" value={"$"+Number(r.income||0).toLocaleString()}/>
+      <Metric icon={TrendingUp} label="Income" value={"$"+Number(r.income||0).toLocaleString()}/><Metric icon={TrendingUp} label="Expenses" value={"$"+Number(r.expenses||0).toLocaleString()}/>
       <Metric icon={Users} label="Avg guests/day" value={Number(r.avgGuests||0).toLocaleString()}/>
       <Metric icon={Star} label="Park appeal" value={Math.round(r.appeal||0)+"/100"}/>
       <Metric icon={Trophy} label="Market share" value={Math.round(r.marketShare||0)+"%"}/>
@@ -19,8 +19,9 @@ export default function AnnualReportPanel({ report }) {
       <Stat label="Peak guests" value={Number(r.peakGuests||0).toLocaleString()}/>
       <Stat label="Reputation" value={Math.round(r.reputation||0)+"/100"}/>
       <Stat label="Resort rating" value={Math.round(r.resortRating||0)+"/100"}/>
-      <Stat label="Lifetime earnings" value={"$"+Number(r.lifetimeEarnings||0).toLocaleString()}/>
+      <Stat label="Lifetime earnings" value={"$"+Number(r.lifetimeEarnings||0).toLocaleString()}/><Stat label="Best day" value={r.bestDay ? "Day "+r.bestDay+" · $"+Number(r.bestIncome||0).toLocaleString() : "—"}/><Stat label="Worst day" value={r.worstDay ? "Day "+r.worstDay+" · $"+Number(r.worstNet||0).toLocaleString() : "—"}/>
     </CardContent></Card>
+    <Card className="border-cyan-100 bg-cyan-50/60"><CardContent className="p-4 text-xs leading-5 text-slate-700"><div className="font-black text-cyan-800">CEO recommendations</div><ul className="mt-1 list-disc pl-4">{(r.recommendations||[]).map((item,i)=><li key={i}>{item}</li>)}</ul></CardContent></Card>
     <Card className="border-emerald-100 bg-emerald-50/60"><CardContent className="p-4 text-xs font-semibold leading-5 text-emerald-900">CEO tip: compare this period with the previous month in your Activity history. Strong growth usually comes from improving guest satisfaction before simply raising prices.</CardContent></Card>
   </div>;
 }
