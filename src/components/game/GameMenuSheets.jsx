@@ -1,5 +1,6 @@
 import React from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Hammer, Settings, Users, Grid3x3, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2, MapPin, Star, Clock, Wrench, Zap, Palette, RotateCcw, Gift, PawPrint, MessageSquare, Camera, HeartPulse, Handshake, UsersRound, UtensilsCrossed, BookOpen, Globe2, Waves } from "lucide-react";
 import { MISSIONS, missionProgress } from "@/data/missions";
@@ -434,7 +435,12 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
 
       <SheetShell open={openSheet === "sandboxLab"} onOpenChange={(v) => !v && close()} title="Sandbox Lab" icon={Waves} width="sm:max-w-lg"><SandboxLabPanel game={game} /></SheetShell>
 
-      <SheetShell open={openSheet === "gameModes"} onOpenChange={(v) => !v && close()} title="Game Modes" icon={BookOpen} width="sm:max-w-lg">
+      <SheetShell open={openSheet === "gameModes"} onOpenChange={(v) => !v && close()} title="Choose Your Park Mode" icon={BookOpen} width="sm:max-w-xl">
+        <div className="mb-3 rounded-2xl border border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-blue-50 p-4">
+          <div className="text-xs font-black uppercase tracking-wider text-cyan-700">Your Park • Mode Select</div>
+          <div className="mt-1 text-lg font-black text-slate-900">How do you want to play?</div>
+          <p className="mt-1 text-xs leading-5 text-slate-500">Choose a guided campaign, build freely, or experiment with the full park.</p>
+        </div>
         <GameModePanel game={game} onClose={close} />
       </SheetShell>
 
