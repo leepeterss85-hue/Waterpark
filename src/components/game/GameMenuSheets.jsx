@@ -62,6 +62,7 @@ import SandboxLabPanel from "@/components/game/SandboxLabPanel";
 import AnnualReportPanel from "@/components/game/AnnualReportPanel";
 import ParkMenuHub from "@/components/game/ParkMenuHub";
 import ParkOverviewPanel from "@/components/game/ParkOverviewPanel";
+import ParkMasteryPanel from "@/components/game/ParkMasteryPanel";
 import { isWaterAttraction } from "@/data/waterQuality";
 
 function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-md", children }) {
@@ -92,7 +93,7 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
   return (
     <>
       <StoryCoach game={game} setOpenSheet={setOpenSheet} />
-      <SheetShell open={openSheet === "overview"} onOpenChange={(v) => !v && close()} title="Park Overview" icon={BarChart3} width="sm:max-w-xl">
+      <SheetShell open={openSheet === "mastery"} onOpenChange={(v) => !v && close()} title="Park Mastery" icon={Trophy} width="sm:max-w-xl"><ParkMasteryPanel game={game} /></SheetShell>\n      <SheetShell open={openSheet === "overview"} onOpenChange={(v) => !v && close()} title="Park Overview" icon={BarChart3} width="sm:max-w-xl">
         <ParkOverviewPanel game={game} onOpen={setOpenSheet} />
       </SheetShell>
       <SheetShell open={openSheet === "menu"} onOpenChange={(v) => !v && close()} title="More Park Tools" icon={Grid3x3} width="sm:max-w-2xl"><ParkMenuHub onOpen={setOpenSheet} /></SheetShell>
