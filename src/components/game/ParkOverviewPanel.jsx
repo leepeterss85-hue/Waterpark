@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Banknote, Users, Star, TrendingUp, Hotel, AlertTriangle, Target, Hammer, UserPlus, Play, Trophy, CalendarDays } from "lucide-react";
+import { Banknote, Users, Star, TrendingUp, Hotel, AlertTriangle, Target, Hammer, UserPlus, Play, Trophy, CalendarDays, HeartPulse } from "lucide-react";
 
 function Metric({ icon:Icon, label, value, sub }) {
   return <Card className="border-slate-200 bg-white shadow-sm"><CardContent className="p-3"><div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wide text-slate-400"><Icon className="h-3.5 w-3.5 text-cyan-600"/>{label}</div><div className="mt-1 text-xl font-black text-slate-900">{value}</div>{sub&&<div className="mt-0.5 text-[10px] text-slate-500">{sub}</div>}</CardContent></Card>;

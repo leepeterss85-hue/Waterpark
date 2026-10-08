@@ -450,10 +450,10 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
 
       <SheetShell open={openSheet === "advancedPark"} onOpenChange={(v) => !v && close()} title="Park Life & Destinations" icon={Waves} width="sm:max-w-lg">
         <AdvancedParkPanel
-          megaProjects={game.megaProjectDefinitions.map((d) => ({ ...d, ...(game.megaProjects.find((p) => p.projectId === d.id) || {}) }))}
-          megaBonuses={game.megaBonuses}
-          stories={game.guestStories}
-          destinations={game.destinations}
+          megaProjects={(game.megaProjectDefinitions || []).map((d) => ({ ...d, ...((game.megaProjects || []).find((p) => p.projectId === d.id) || {}) }))}
+          megaBonuses={game.megaBonuses || []}
+          stories={game.guestStories || []}
+          destinations={game.destinations || []}
           currentDestination={game.currentDestination}
           level={game.level}
           money={game.money}
