@@ -8,6 +8,7 @@ import MapAmbience from "@/components/game/MapAmbience";
 import MascotSprite from "@/components/game/MascotSprite";
 import GroupArrivalIndicator from "@/components/game/GroupArrivalIndicator";
 import StrikeBanner from "@/components/game/StrikeBanner";
+import ParkSceneryLayer from "@/components/game/ParkSceneryLayer";
 import EventOverlay from "@/components/game/EventOverlay";
 import { useTouchZoom } from "@/hooks/useTouchZoom";
 import "@/components/game/parkMap.css";
@@ -50,7 +51,7 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
           <EventOverlay activeEvents={activeEvents} grid={grid} />
           
           <div className="relative h-full overflow-visible game-map-stage"><div className="relative h-full park-playfield" style={{ transform: `translate(${panX}px, ${panY}px) scale(${zoom})`, transformOrigin: "top left", width: (100 / zoom) + "%", marginBottom: ((zoom - 1) * 100 / zoom * 0.8) + "%" }}>
-            <div className="relative grid h-full grid-rows-[repeat(var(--map-rows),1fr)] grid-cols-8 gap-1 sm:gap-1.5 game-map-grid" style={{ "--map-rows": Math.ceil(grid.length / 8) }}>
+            <div className="relative grid h-full grid-rows-[repeat(var(--map-rows),1fr)] grid-cols-8 gap-1 sm:gap-1.5 game-map-grid" style={{ "--map-rows": Math.ceil(grid.length / 8) }}><ParkSceneryLayer grid={grid} />
               {grid.map((value, index) => {
                 const item = value ? getParkItem(value) : null;
                 const isWater = item?.category === "attraction";
