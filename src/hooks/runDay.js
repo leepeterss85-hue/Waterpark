@@ -71,7 +71,7 @@ export function runDay(stateRef, setters) {
     setBuiltToday, setUpgradedToday, setTicketPrice, setLog, setLastNet, setHistory, setPeakGuests,
     setResearchPoints, setXp, setCompletedMasterPlans, setMasterPlanBonuses, setActiveStrikes,
     setGuestMemory, setRetailStock, setRetailStats, setCompletedChains, setCompletedCampaignChapters,
-    setMegaProjects, setGuestStories, setMastery,
+    setMegaProjects, setGuestStories, setMastery, setResortMilestones,
   } = setters;
 
   const { parkStrategy: currentParkStrategy = { strategy: "balanced", hotelPackage: "room_only" }, mastery: currentMastery = { points: 0, completed: [] }, grid: prevGrid, reputation: rep, day: d, sandboxSettings: sandboxTools = {}, staff: currentStaff, staffAssignments: currentAssignments, incidents: currentIncidents, upgrades: currentUpgrades, attractionCondition: currentCondition, challenge: currentChallenge, parkZones: currentZones, forecast: currentForecast, seasonEvent: currentSeasonEvent, parkAppeal: currentParkAppeal, ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass, vipVisit: currentVipVisit, completedResearch: currentResearch } = stateRef.current;
@@ -458,7 +458,7 @@ export function runDay(stateRef, setters) {
         pricing: stateRef.current.pricing || DEFAULT_PRICING, weather: dayWeather, seasonEvent: currentSeasonEvent, popularity: stateRef.current.popularity,
       });
       hotelResult.parkSpend = hotelParkSim.income;
-      if (hotelResult.avgHappiness > 0) hotelResult.avgHappiness = Math.round((hotelResult.avgHappiness + hotelParkSim.avgMood) / 2);
+      if (hotelResult.avgHappiness > 0) hotelResult.avgHappiness = Math.min(100, Math.round((hotelResult.avgHappiness + hotelParkSim.avgMood) / 2 + selectedHotelPackage.happiness + masteryFx.hotelHappiness));
     }
     if (hotelResult?.avgHappiness > 0) hotelResult.avgHappiness = Math.min(100, hotelResult.avgHappiness + selectedHotelPackage.happiness + masteryFx.hotelHappiness);
     newResortRating = calculateResortRating(placedHotels, currentUpgrades);
@@ -469,6 +469,28 @@ export function runDay(stateRef, setters) {
     setHotelStats({ roomRevenue: hotelResult.roomRevenue, hotelExpenses: hotelResult.hotelExpenses, parkSpend: hotelResult.parkSpend, occupancy: hotelResult.occupancy, avgHappiness: hotelResult.avgHappiness, totalGuests: hotelResult.totalGuests, totalRooms: hotelResult.totalRooms, guestsByHotel });
   }
   const hotelRoomRevenue = hotelResult?.roomRevenue || 0;
+  // Resort milestone progression: occupancy/rating unlocks permanent management rewards.
+  if (hotelResult && hotelResult.totalRooms > 0) {
+    const resortMilestoneDefs = [
+      { id: "resort_25", threshold: 25, cash: 5000, xp: 75, rep: 1, label: "Resort Rising" },
+      { id: "resort_50", threshold: 50, cash: 10000, xp: 150, rep: 2, label: "Resort Momentum" },
+      { id: "resort_75", threshold: 75, cash: 20000, xp: 250, rep: 3, label: "Destination Resort" },
+      { id: "resort_90", threshold: 90, cash: 35000, xp: 400, rep: 5, label: "Fully Booked Paradise" },
+    ];
+    const priorResortMilestones = Array.isArray(stateRef.current.resortMilestones) ? stateRef.current.resortMilestones : [];
+    const newlyUnlocked = resortMilestoneDefs.filter((m) => hotelResult.occupancy >= m.threshold && !priorResortMilestones.includes(m.id));
+    if (newlyUnlocked.length) {
+      const unlockedIds = [...new Set([...priorResortMilestones, ...newlyUnlocked.map((m) => m.id)])];
+      setResortMilestones(unlockedIds);
+      const cashReward = newlyUnlocked.reduce((s, m) => s + m.cash, 0);
+      const xpReward = newlyUnlocked.reduce((s, m) => s + m.xp, 0);
+      const repReward = newlyUnlocked.reduce((s, m) => s + m.rep, 0);
+      setMoney((m) => m + cashReward);
+      setXp((x) => x + xpReward);
+      if (repReward) setReputation((rv) => Math.min(100, rv + repReward));
+      setLog((l) => [{ day: d + 1, text: `Day ${d + 1}: 🏨 Resort milestone unlocked — ${newlyUnlocked.map((m) => m.label).join(", ")}. +${cashReward.toLocaleString()} · +${xpReward} XP.` }, ...l].slice(0, 12));
+    }
+  }
   const hotelParkSpend = hotelResult?.parkSpend || 0;
   const hotelExpensesAmount = hotelResult?.hotelExpenses || 0;
 
@@ -918,6 +940,34 @@ export function runDay(stateRef, setters) {
       day: d + 1,
       text: "Day " + (d + 1) + ": 📅 Month " + monthNumber + " closed — Grade " + grade + " · $" + managementBonus.toLocaleString() + " management bonus · +" + tier.xp + " XP."
     }, ...l].slice(0, 12));
+  }
+
+  // Long-term Park Mastery: evaluate every goal from the live end-of-day state and award each once.
+  {
+    const masterySnapshot = {
+      peakGuests: Math.max(stateRef.current.peakGuests || 0, newGuests || 0),
+      attractionCount: attractions.length,
+      totalUpgrades: stateRef.current.totalUpgrades || 0,
+      appeal: calculatedAppeal.score,
+      reputation: Math.round(newReputation),
+      occupancy: hotelResult?.occupancy ?? stateRef.current.hotelStats?.occupancy ?? 0,
+      lifetimeEarnings: (stateRef.current.lifetimeEarnings || 0) + Math.max(0, grossIncome),
+      day: d + 1,
+      completedResearch: (currentResearch || []).length,
+      completedChains: (stateRef.current.completedChains || []).length,
+      completedMegaProjects: (megaState || []).filter((p) => p.status === "completed" || p.status === "complete" || p.completed).length,
+      disastersSurvived: (stateRef.current.disastersSurvived || 0) + ((currentDisaster && currentDisaster.daysLeft <= 1) ? 1 : 0),
+    };
+    const priorMastery = stateRef.current.mastery || { points: 0, completed: [] };
+    const newlyMastered = evaluateMastery(masterySnapshot, priorMastery.completed || []);
+    if (newlyMastered.length) {
+      const nextCompleted = [...new Set([...(priorMastery.completed || []), ...newlyMastered.map((g) => g.id)])];
+      const points = (priorMastery.points || 0) + newlyMastered.reduce((sum, g) => sum + g.points, 0);
+      setMastery({ points, completed: nextCompleted });
+      setMoney((m) => m + newlyMastered.reduce((sum, g) => sum + g.reward, 0));
+      setXp((x) => x + newlyMastered.reduce((sum, g) => sum + g.xp, 0));
+      setLog((l) => [{ day: d + 1, text: `Day ${d + 1}: 👑 Park Mastery unlocked — ${newlyMastered.map((g) => g.name).join(", ")}. Permanent mastery points earned.` }, ...l].slice(0, 12));
+    }
   }
 
   if (stateRef.current.autoPricing) {
