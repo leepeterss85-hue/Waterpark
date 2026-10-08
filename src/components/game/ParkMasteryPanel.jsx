@@ -65,6 +65,12 @@ export default function ParkMasteryPanel({ game }) {
       </div>
     </CardContent></Card>
 
+    <Card className="border-amber-200 bg-amber-50/60"><CardContent className="p-3">
+      <div className="text-sm font-black text-amber-900">Resort milestones</div>
+      <p className="mt-1 text-[10px] text-amber-700">Occupancy milestones unlock one-time cash, XP and reputation bonuses.</p>
+      <div className="mt-2 grid grid-cols-2 gap-2">{[["resort_25","25%"],["resort_50","50%"],["resort_75","75%"],["resort_90","90%"]].map(([id,label]) => <div key={id} className={"rounded-xl border p-2 text-center text-[10px] font-black "+((game.resortMilestones||[]).includes(id)?"border-amber-300 bg-white text-amber-800":"border-amber-100 bg-white/50 text-slate-400")}>{(game.resortMilestones||[]).includes(id)?"✓ ":""}{label} occupancy</div>)}</div>
+    </CardContent></Card>
+
     <Card><CardContent className="p-3">
       <div className="text-sm font-black">Permanent perks</div>
       <div className="mt-2 space-y-2">{MASTERY_PERKS.map(p => <div key={p.id} className={"rounded-xl border p-2.5 "+(mastery.points>=p.threshold?"border-cyan-200 bg-cyan-50":"border-slate-200 bg-slate-50")}><div className="flex justify-between"><span className="text-xs font-black">{p.name}</span><span className="text-[9px] font-black">{p.threshold} MP</span></div><div className="text-[10px] text-slate-500">{p.description}</div></div>)}</div>
