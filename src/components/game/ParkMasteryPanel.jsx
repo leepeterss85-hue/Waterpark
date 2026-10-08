@@ -2,6 +2,7 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Crown, Hotel, Target, TrendingUp, CheckCircle2 } from "lucide-react";
 import { PARK_STRATEGIES, HOTEL_PACKAGES, MASTERY_GOALS, MASTERY_PERKS, strategyFor, packageFor } from "@/data/parkMastery";
+import { getParkItem } from "@/data/gameData";
 
 export default function ParkMasteryPanel({ game }) {
   const mastery = game.mastery || { points:0, completed:[] };
@@ -10,7 +11,7 @@ export default function ParkMasteryPanel({ game }) {
   const nextPerk = MASTERY_PERKS.find(p => mastery.points < p.threshold);
   const state = {
     peakGuests: game.peakGuests || 0,
-    attractionCount: game.missionState?.attractionCount || 0,
+    attractionCount: (game.grid || []).reduce((count, id) => count + (getParkItem(id)?.category === "attraction" ? 1 : 0), 0),
     totalUpgrades: game.totalUpgrades || 0,
     appeal: game.parkAppeal?.score || 0,
     reputation: game.reputation || 0,
@@ -54,7 +55,7 @@ export default function ParkMasteryPanel({ game }) {
           const done=mastery.completed?.includes(g.id) || g.check(state);
           return <div key={g.id} className={"rounded-xl border p-2.5 "+(done?"border-emerald-200 bg-emerald-50":"border-slate-200 bg-white")}>
             <div className="flex items-center gap-2"><span className="text-xs font-black flex-1">{g.name}</span>{done?<CheckCircle2 className="h-4 w-4 text-emerald-600"/>:<span className="text-[9px] font-black text-slate-400">+{g.points} MP</span>}</div>
-            <div className="mt-0.5 text-[10px] text-slate-500">{g.text}</div>
+            <div className="mt-0.5 text-[10px] text-slate-500">{g.text}</div><div className="mt-1 text-[9px] font-bold text-slate-400">Reward: ${g.reward.toLocaleString()} · +{g.xp} XP</div>
           </div>;
         })}
       </div>
