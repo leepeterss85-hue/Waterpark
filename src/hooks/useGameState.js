@@ -989,7 +989,11 @@ export function useGameState() {
     { id: "resort", chapter: 4, title: "Become a Destination", text: "Turn day visitors into holiday guests with accommodation and resort services.", target: "resort", action: "Build your first hotel or resort facility.", reward: { money: 5000, xp: 200, reputation: 5 } },
     { id: "rival", chapter: 5, title: "Beat the Rivals", text: "Build a park strong enough to compete for attention and market share.", target: "competitors", action: "Reach 250 peak guests or 60% market share.", reward: { money: 7500, xp: 250, reputation: 5 } },
     { id: "worldclass", chapter: 6, title: "World-Class Waterpark", text: "Reach a world-class standard: high appeal, strong reputation and a thriving destination.", target: "advancedPark", action: "Reach 80+ park appeal and 80+ reputation.", reward: { money: 15000, xp: 500, reputation: 10 } },
-    { id: "finish", chapter: 6, title: "You’re in Control", text: "The opening campaign is complete. Freeplay, Sandbox and the full park empire are now yours.", target: null, action: "Continue building your own legacy.", reward: { money: 10000, xp: 500, reputation: 8 } },
+    { id: "mastery", chapter: 7, title: "Master the Park", text: "Turn a successful waterpark into a finely tuned operation. Master research, upgrades, guests and long-term strategy.", target: "manage", action: "Earn 12 Park Mastery points.", reward: { money: 18000, xp: 650, reputation: 8 } },
+    { id: "mega", chapter: 7, title: "Build Something Legendary", text: "A true destination needs a signature attraction. Complete a mega project and make the skyline part of your brand.", target: "advancedPark", action: "Complete your first mega project.", reward: { money: 25000, xp: 800, reputation: 10 } },
+    { id: "empire", chapter: 8, title: "Build the Empire", text: "Your home park is only the beginning. Expand your influence through rivals, franchises and destinations.", target: "competitors", action: "Acquire a rival or open a franchise.", reward: { money: 40000, xp: 1000, reputation: 12 } },
+    { id: "prestige", chapter: 9, title: "Leave a Legacy", text: "Reach the highest levels of park management, then decide whether to prestige and build an even stronger legacy.", target: "advancedPark", action: "Reach level 25 and 1,000,000 lifetime earnings.", reward: { money: 75000, xp: 1500, reputation: 15 } },
+    { id: "finish", chapter: 9, title: "Waterpark Legend", text: "The campaign is complete. Your park is now ready for endless Freeplay, Sandbox experiments and the global park empire.", target: null, action: "Continue building your own legacy.", reward: { money: 100000, xp: 2000, reputation: 10 } },
   ];
 
   useEffect(() => {
@@ -1011,7 +1015,11 @@ export function useGameState() {
       resort: hotelBuilt || (hotelGuests || []).length > 0 || (resortRating || 0) > 0,
       rival: (peakGuests || 0) >= 250 || (marketShare || 0) >= 60,
       worldclass: (parkAppeal?.score || 0) >= 80 && reputation >= 80,
-      finish: (parkAppeal?.score || 0) >= 80 && reputation >= 80 && level >= 10,
+      mastery: (mastery?.points || 0) >= 12,
+      mega: (megaProjects || []).some((p) => p.status === "complete" || p.status === "completed" || p.completed),
+      empire: (acquiredRivals || []).length > 0 || (franchiseMaps || []).length > 0,
+      prestige: level >= 25 && (lifetimeEarnings || 0) >= 1000000,
+      finish: level >= 25 && (lifetimeEarnings || 0) >= 1000000 && ((mastery?.points || 0) >= 12) && ((acquiredRivals || []).length > 0 || (franchiseMaps || []).length > 0),
     };
     const step = STORY_STEPS[storyStep];
     if (!step || !completed[step.id]) return;
@@ -1027,7 +1035,7 @@ export function useGameState() {
     const done = step.id === "finish";
     setStoryCompleted(done);
     saveSettings({ gameMode, storyStep: next, storyCompleted: done });
-  }, [gameMode, storyCompleted, storyStep, grid, staff, day, history, totalUpgrades, expansionsDone, completedResearch, hotelGuests, resortRating, incidents, emergencies, disastersSurvived, peakGuests, guests, marketShare, parkAppeal, reputation, level]);
+  }, [gameMode, storyCompleted, storyStep, grid, staff, day, history, totalUpgrades, expansionsDone, completedResearch, hotelGuests, resortRating, incidents, emergencies, disastersSurvived, peakGuests, guests, marketShare, parkAppeal, reputation, level, mastery, megaProjects, acquiredRivals, franchiseMaps, lifetimeEarnings]);
 
   const setMode = useCallback((mode) => {
     const nextMode = ["story", "freeplay", "sandbox"].includes(mode) ? mode : "freeplay";
@@ -1038,7 +1046,7 @@ export function useGameState() {
     if (nextMode === "story") {
       setStoryStep(0);
       setStoryCompleted(false);
-      setLog((l) => [{ day, text: "📖 Story Mode started. Maya will guide you through six chapters of your opening season." }, ...l].slice(0, 12));
+      setLog((l) => [{ day, text: "📖 Story Mode started. Maya will guide you through nine chapters from your first splash to a full park empire." }, ...l].slice(0, 12));
       saveSettings({ gameMode: nextMode, sandbox: false, storyStep: 0, storyCompleted: false });
     } else if (nextMode === "sandbox") {
       setLog((l) => [{ day, text: "🛠️ Sandbox Mode enabled — creative testing controls are available." }, ...l].slice(0, 12));
