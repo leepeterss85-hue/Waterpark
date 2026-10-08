@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Waves, Map, Wrench, Users, Star, Zap } from "lucide-react";
 
-export default function AdvancedParkPanel({ megaProjects, megaBonuses, stories, destinations, currentDestination, level, money, sandbox, onBuildMega, onSelectDestination, water }) {
+export default function AdvancedParkPanel({ megaProjects, megaBonuses, stories, destinations, currentDestination, level, money, sandbox, onBuildMega, onSelectDestination, water = {} }) {
   return <div className="space-y-3">
     <Card><CardHeader className="pb-2"><CardTitle className="flex items-center gap-2 text-sm"><Waves className="h-4 w-4 text-cyan-600"/>Signature Mega-Attractions</CardTitle></CardHeader><CardContent className="space-y-2">
       {megaProjects.map((p) => {
@@ -22,7 +22,7 @@ export default function AdvancedParkPanel({ megaProjects, megaBonuses, stories, 
     </CardContent></Card>
 
     <Card><CardHeader className="pb-2"><CardTitle className="flex items-center gap-2 text-sm"><Wrench className="h-4 w-4 text-blue-600"/>Water Engineering</CardTitle></CardHeader><CardContent><div className="grid grid-cols-2 gap-2 text-xs">
-      <Metric label="Engineering" value={water.engineeringScore+"%"} /><Metric label="Filtration" value={water.filtration+"%"} /><Metric label="Water temp" value={water.temperature+"°C / "+water.targetTemperature+"°C"} /><Metric label="Pumps" value={water.pumps} /><Metric label="Water quality" value={water.qualityAvg+"%"} /><Metric label="Daily energy" value={"$"+water.energyCost.toLocaleString()} />
+      <Metric label="Engineering" value={(water.engineeringScore ?? 0)+"%"} /><Metric label="Filtration" value={(water.filtration ?? 0)+"%"} /><Metric label="Water temp" value={(water.temperature ?? 0)+"°C / "+(water.targetTemperature ?? 0)+"°C"} /><Metric label="Pumps" value={water.pumps ?? 0} /><Metric label="Water quality" value={(water.qualityAvg ?? 0)+"%"} /><Metric label="Daily energy" value={"$"+(water.energyCost ?? 0).toLocaleString()} />
     </div></CardContent></Card>
 
     <Card><CardHeader className="pb-2"><CardTitle className="flex items-center gap-2 text-sm"><Users className="h-4 w-4 text-violet-600"/>Individual Guest Stories</CardTitle></CardHeader><CardContent className="space-y-2">{stories.length ? stories.slice(0,8).map(s=><div key={s.id} className="rounded-lg bg-white border p-2"><div className="flex justify-between text-xs font-bold"><span>{s.title}</span><span>Day {s.day}</span></div><div className="text-[11px] text-slate-600 mt-1">{s.text}</div></div>) : <div className="text-xs text-slate-500">Stories will appear as the park attracts more visitors.</div>}</CardContent></Card>
