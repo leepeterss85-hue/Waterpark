@@ -29,6 +29,10 @@ export const MASTERY_GOALS = [
   { id:"hotel_70", name:"Resort Operator", text:"Reach 70% hotel occupancy.", check:s=>s.occupancy>=70, reward:5000, xp:160, points:3 },
   { id:"million_earnings", name:"Million Pound Park", text:"Reach $1,000,000 lifetime earnings.", check:s=>s.lifetimeEarnings>=1000000, reward:20000, xp:300, points:5 },
   { id:"day_120", name:"Long Game", text:"Operate the park for 120 days.", check:s=>s.day>=120, reward:12000, xp:250, points:4 },
+  { id:"research_master", name:"Research Leader", text:"Complete 10 research projects.", check:s=>s.completedResearch>=10, reward:7000, xp:180, points:3 },
+  { id:"chain_master", name:"Waterpark Network", text:"Complete 3 attraction chains.", check:s=>s.completedChains>=3, reward:8000, xp:200, points:3 },
+  { id:"mega_builder", name:"Mega Builder", text:"Complete a mega project.", check:s=>s.completedMegaProjects>=1, reward:15000, xp:300, points:4 },
+  { id:"disaster_ready", name:"Disaster Ready", text:"Survive 3 park disasters.", check:s=>s.disastersSurvived>=3, reward:6000, xp:160, points:2 },
 ];
 
 export const MASTERY_PERKS = [
