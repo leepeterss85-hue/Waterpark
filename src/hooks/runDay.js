@@ -545,6 +545,10 @@ export function runDay(stateRef, setters) {
       reputation: Math.round(newReputation),
       occupancy: hotelResult?.occupancy || stateRef.current.hotelStats?.occupancy || 0,
       lifetimeEarnings: (stateRef.current.lifetimeEarnings || 0) + grossIncome,
+      completedResearch: (currentResearch || []).length,
+      completedChains: (stateRef.current.completedChains || []).length,
+      completedMegaProjects: (stateRef.current.megaProjects || []).filter((p) => p.status === "completed" || p.completed).length,
+      disastersSurvived: stateRef.current.disastersSurvived || 0,
     };
     const completed = currentMastery.completed || [];
     const newly = evaluateMastery(masteryState, completed);
