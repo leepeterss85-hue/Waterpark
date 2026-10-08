@@ -169,7 +169,7 @@ export function runDay(stateRef, setters) {
   const calculatedAppeal = calculateParkAppeal({ grid: prevGrid, zones: currentZones, getItem: getParkItem });
   calculatedAppeal.score = Math.round(calculatedAppeal.score * agingAppealMult);
   const currentSponsorships = stateRef.current.sponsorships || [];
-  calculatedAppeal.score = Math.max(0, calculatedAppeal.score - activeSponsorAppealCost(currentSponsorships));
+  calculatedAppeal.score = Math.max(0, calculatedAppeal.score + selectedStrategy.appeal - activeSponsorAppealCost(currentSponsorships));
   setParkAppeal(calculatedAppeal);
   const appealDemandMult = 0.85 + (calculatedAppeal.score / 100) * 0.30;
   const campaignGuestMult = currentCampaigns.reduce((sum, c) => sum + (c.effectiveBoost || 0), 1);
@@ -447,7 +447,7 @@ export function runDay(stateRef, setters) {
     hotelResult = simulateHotelDay({
       hotels: placedHotels, hotelGuests: stateRef.current.hotelGuests || [], upgrades: currentUpgrades, day: d + 1,
       reputation: Math.round(newReputation), resortRating: stateRef.current.resortRating || 0, seasonEvent: currentSeasonEvent,
-      weather: dayWeather, parkMood: visitorStats?.avgMood || 50, sandbox: isSandbox, hotelPriceMult: (stateRef.current.pricing || DEFAULT_PRICING).hotelPriceMult * selectedHotelPackage.priceMult,
+      weather: dayWeather, parkMood: visitorStats?.avgMood || 50, sandbox: isSandbox, demandMult: selectedHotelPackage.guestMult * masteryFx.hotelGuestMult, hotelPriceMult: (stateRef.current.pricing || DEFAULT_PRICING).hotelPriceMult * selectedHotelPackage.priceMult,
     });
     if (hotelResult.totalGuests > 0) {
       const hotelParkSim = simulateVisits({
