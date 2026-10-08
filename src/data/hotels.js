@@ -222,7 +222,7 @@ export function simulateHotelDay({ hotels, hotelGuests, upgrades, day, reputatio
     const amenityBonus = hotelAmenityBonus(h.def, level);
     for (const g of guestsInHotel) {
       // Hotel guests spend money in the waterpark (proportional to room price tier)
-      const parkSpend = Math.round(h.def.roomPrice * 0.25 * (0.8 + Math.random() * 0.4));
+      const parkSpend = Math.round(h.def.roomPrice * 0.25 * hotelPriceMult * (0.8 + Math.random() * 0.4));
       g.dailyParkSpend = parkSpend;
       totalParkSpend += parkSpend;
       // Happiness: base + amenities + upgrade level + park mood influence
