@@ -859,6 +859,18 @@ export function runDay(stateRef, setters) {
     setUpgradedToday(0);
   }
 
+  // Monthly park cycle: every 30 in-game days closes the month with a performance bonus.
+  if ((d + 1) % 30 === 0) {
+    const monthNumber = Math.floor((d + 1) / 30);
+    const monthlyNet = Math.max(0, Math.round(net));
+    const monthlyBonus = Math.max(2500, Math.min(75000, Math.round(monthlyNet * 0.12) + monthNumber * 1000));
+    const monthlyXp = Math.max(50, Math.min(750, Math.round(monthlyBonus / 100)));
+    setMoney((m) => m + monthlyBonus);
+    setXp((x) => x + monthlyXp);
+    setReputation((rv) => Math.min(100, rv + (monthlyNet > 0 ? 1 : 0)));
+    setLog((l) => [{ day: d + 1, text: "Day " + (d + 1) + ": 📅 Month " + monthNumber + " closed — management bonus $" + monthlyBonus.toLocaleString() + " and +" + monthlyXp + " XP." }, ...l].slice(0, 12));
+  }
+
   if (stateRef.current.autoPricing) {
     const repFactor = (newReputation - 50) / 50;
     const weatherFactor = dayWeather.id === "sunny" ? 0.1 : dayWeather.id === "rain" ? -0.15 : dayWeather.id === "storm" ? -0.25 : 0;
