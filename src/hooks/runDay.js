@@ -48,6 +48,7 @@ import { evaluateChains } from "@/data/attractionChains";
 import { evaluateCampaigns } from "@/data/campaignChapters";
 import { empireBonuses } from "@/data/parkEmpire";
 import { MEGA_PROJECTS, DESTINATIONS, simulateMegaProjects, megaBonuses as calculateMegaBonuses, generateGuestStories, waterEngineering } from "@/data/advancedParkSystems";
+import { strategyFor, packageFor, masteryEffects, evaluateMastery } from "@/data/parkMastery";
 
 const MILESTONE_DAYS = [25, 50, 75, 100, 150, 200];
 const MILESTONE_REWARDS = { 25: 25000, 50: 75000, 75: 150000, 100: 500000, 150: 750000, 200: 1000000 };
@@ -73,7 +74,7 @@ export function runDay(stateRef, setters) {
     setMegaProjects, setGuestStories,
   } = setters;
 
-  const { grid: prevGrid, reputation: rep, day: d, sandboxSettings: sandboxTools = {}, staff: currentStaff, staffAssignments: currentAssignments, incidents: currentIncidents, upgrades: currentUpgrades, attractionCondition: currentCondition, challenge: currentChallenge, parkZones: currentZones, forecast: currentForecast, seasonEvent: currentSeasonEvent, parkAppeal: currentParkAppeal, ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass, vipVisit: currentVipVisit, completedResearch: currentResearch } = stateRef.current;
+  const { parkStrategy: currentParkStrategy = { strategy: "balanced", hotelPackage: "room_only" }, mastery: currentMastery = { points: 0, completed: [] }, grid: prevGrid, reputation: rep, day: d, sandboxSettings: sandboxTools = {}, staff: currentStaff, staffAssignments: currentAssignments, incidents: currentIncidents, upgrades: currentUpgrades, attractionCondition: currentCondition, challenge: currentChallenge, parkZones: currentZones, forecast: currentForecast, seasonEvent: currentSeasonEvent, parkAppeal: currentParkAppeal, ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass, vipVisit: currentVipVisit, completedResearch: currentResearch } = stateRef.current;
   const hasResearch = (id) => (currentResearch || []).includes(id);
   const masterPlanContext = getMasterPlanMetrics({
     grid: prevGrid, money: stateRef.current.money || 0, reputation: rep,
@@ -90,9 +91,12 @@ export function runDay(stateRef, setters) {
     setMasterPlanBonuses(activeMasterPlanBonuses);
     setLog((l) => [{ day: d, text: "Day " + d + ": 🏆 Master plan completed: " + newlyCompletedPlans.join(", ") + ". Permanent park bonus unlocked!" }, ...l].slice(0, 12));
   }
-  const upkeepResearchMult = hasResearch("efficiency") ? 0.85 : 1;
-  const masterGuestMult = 1 + (activeMasterPlanBonuses.guestDemandMult || 0);
-  const masterIncomeMult = 1 + (activeMasterPlanBonuses.incomeMult || 0) + (activeMasterPlanBonuses.attractionIncomeMult || 0);
+  const selectedStrategy = strategyFor(currentParkStrategy.strategy);
+  const selectedHotelPackage = packageFor(currentParkStrategy.hotelPackage);
+  const masteryFx = masteryEffects(currentMastery.points);
+  const upkeepResearchMult = (hasResearch("efficiency") ? 0.85 : 1) * selectedStrategy.upkeepMult * masteryFx.upkeepMult;
+  const masterGuestMult = (1 + (activeMasterPlanBonuses.guestDemandMult || 0)) * selectedStrategy.guestMult * masteryFx.guestMult;
+  const masterIncomeMult = (1 + (activeMasterPlanBonuses.incomeMult || 0) + (activeMasterPlanBonuses.attractionIncomeMult || 0)) * selectedStrategy.incomeMult * masteryFx.incomeMult;
   const ticketResearchMult = hasResearch("marketing") ? 1.10 : 1;
   const dayWeather = sandboxTools.weatherLock && sandboxTools.weather ? (WEATHER.find((w) => w.id === sandboxTools.weather) || WEATHER[0]) : (currentForecast || rollWeather(d + 1));
   const dayForecast = rollWeather(d + 2);
@@ -443,7 +447,7 @@ export function runDay(stateRef, setters) {
     hotelResult = simulateHotelDay({
       hotels: placedHotels, hotelGuests: stateRef.current.hotelGuests || [], upgrades: currentUpgrades, day: d + 1,
       reputation: Math.round(newReputation), resortRating: stateRef.current.resortRating || 0, seasonEvent: currentSeasonEvent,
-      weather: dayWeather, parkMood: visitorStats?.avgMood || 50, sandbox: isSandbox, hotelPriceMult: (stateRef.current.pricing || DEFAULT_PRICING).hotelPriceMult,
+      weather: dayWeather, parkMood: visitorStats?.avgMood || 50, sandbox: isSandbox, hotelPriceMult: (stateRef.current.pricing || DEFAULT_PRICING).hotelPriceMult * selectedHotelPackage.priceMult,
     });
     if (hotelResult.totalGuests > 0) {
       const hotelParkSim = simulateVisits({
@@ -456,6 +460,8 @@ export function runDay(stateRef, setters) {
       hotelResult.parkSpend = hotelParkSim.income;
       if (hotelResult.avgHappiness > 0) hotelResult.avgHappiness = Math.round((hotelResult.avgHappiness + hotelParkSim.avgMood) / 2);
     }
+    if (hotelResult?.avgHappiness > 0) hotelResult.avgHappiness = Math.min(100, hotelResult.avgHappiness + selectedHotelPackage.happiness + masteryFx.hotelHappiness);
+    if (hotelResult?.totalGuests > 0 && selectedHotelPackage.guestMult !== 1) hotelResult.totalGuests = Math.max(0, Math.round(hotelResult.totalGuests * selectedHotelPackage.guestMult * masteryFx.hotelGuestMult));
     newResortRating = calculateResortRating(placedHotels, currentUpgrades);
     setHotelGuests(hotelResult.remainingGuests);
     setResortRating(newResortRating);
@@ -528,6 +534,32 @@ export function runDay(stateRef, setters) {
   const utilityCost = utilities;
   const premiumCost = currentPriorityPass ? 120 : 0;
   const net = isSandbox ? Math.round(grossIncome - emergencyCost - loanResult.loanPayment) : Math.round(grossIncome - expenses - emergencyCost - loanResult.loanPayment - engineering.energyCost);
+
+  // Park mastery turns the long game into permanent progression.
+  {
+    const masteryState = {
+      day: d + 1,
+      peakGuests: Math.max(stateRef.current.peakGuests || 0, newGuests),
+      attractionCount: attractions.length,
+      totalUpgrades: stateRef.current.totalUpgrades || 0,
+      appeal: calculatedAppeal.score,
+      reputation: Math.round(newReputation),
+      occupancy: hotelResult?.occupancy || stateRef.current.hotelStats?.occupancy || 0,
+      lifetimeEarnings: (stateRef.current.lifetimeEarnings || 0) + grossIncome,
+    };
+    const completed = currentMastery.completed || [];
+    const newly = evaluateMastery(masteryState, completed);
+    if (newly.length) {
+      const points = newly.reduce((sum, g) => sum + g.points, 0);
+      const cash = newly.reduce((sum, g) => sum + g.reward, 0);
+      const xpGain = newly.reduce((sum, g) => sum + g.xp, 0);
+      setMastery({ points: (currentMastery.points || 0) + points, completed: [...completed, ...newly.map(g => g.id)] });
+      setMoney((m) => m + cash);
+      setXp((x) => x + xpGain);
+      setLog((l) => [{ day: d + 1, text: "Day " + (d + 1) + ": 👑 Mastery unlocked — " + newly.map(g => g.name).join(", ") + ". +$" + cash.toLocaleString() + " · +" + points + " MP · +" + xpGain + " XP." }, ...l].slice(0, 12));
+      sound.milestone();
+    }
+  }
 
   const entries = [];
   for (const inc of newIncidents) {
