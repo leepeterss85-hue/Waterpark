@@ -8,12 +8,13 @@ export default function GameModePanel({ game }) {
   const story = game.STORY_STEPS?.[game.storyStep] || game.STORY_STEPS?.[0];
   const chapter = story?.chapter || 1;
   const modes = [
-    { id:"story", title:"Story Mode", text:"Six guided chapters with Maya, contextual instructions, objectives and rewards.", icon:BookOpen },
-    { id:"freeplay", title:"Freeplay", text:"The complete tycoon with no scripted objectives.", icon:Gamepad2 },
-    { id:"sandbox", title:"Sandbox", text:"Creative testing with unlimited building and a dedicated lab.", icon:Wrench },
+    { id:"story", title:"Story Mode", short:"Learn the game", text:"Maya guides you through six chapters, with objectives, rewards and direct actions.", icon:BookOpen },
+    { id:"freeplay", title:"Freeplay", short:"Build your empire", text:"The full tycoon experience. Set your own goals and use every management system.", icon:Gamepad2 },
+    { id:"sandbox", title:"Sandbox", short:"Experiment freely", text:"Unlimited creative tools, testing controls and instant experimentation.", icon:Wrench },
   ];
+  const select = (id) => game.setMode(id);
   return <div className="space-y-3">
-    <Card><CardContent className="p-3 space-y-2">{modes.map(m=>{const I=m.icon; const active=game.gameMode===m.id; return <button key={m.id} onClick={()=>game.setMode(m.id)} className={"w-full text-left rounded-xl border p-3 transition "+(active?"border-cyan-500 bg-cyan-50 shadow-sm":"bg-white hover:bg-slate-50")}><div className="flex items-center gap-2 font-black text-sm"><I className="h-4 w-4"/>{m.title}{active&&<CheckCircle2 className="ml-auto h-4 w-4"/>}</div><div className="text-xs text-slate-500 mt-1">{m.text}</div></button>})}</CardContent></Card>
+    <div className="grid gap-3 sm:grid-cols-3">{modes.map(m=>{const I=m.icon; const active=game.gameMode===m.id; return <button key={m.id} type="button" onClick={()=>select(m.id)} aria-pressed={active} className={"group min-h-36 rounded-2xl border p-4 text-left transition "+(active?"border-cyan-500 bg-cyan-50 shadow-md ring-1 ring-cyan-200":"border-slate-200 bg-white hover:border-cyan-300 hover:shadow-sm")}><div className="flex items-start justify-between"><div className="grid h-10 w-10 place-items-center rounded-xl bg-slate-900 text-white"><I className="h-5 w-5"/></div>{active&&<CheckCircle2 className="h-5 w-5 text-cyan-600"/>}</div><div className="mt-3 text-sm font-black text-slate-900">{m.title}</div><div className="mt-0.5 text-[11px] font-bold text-cyan-700">{m.short}</div><div className="mt-1 text-[11px] leading-4 text-slate-500">{m.text}</div></button>})}</div>
     {game.gameMode==="story" && story && !game.storyCompleted && <Card className="border-cyan-200 bg-gradient-to-br from-cyan-50 to-white"><CardContent className="p-4">
       <div className="flex items-center justify-between text-xs font-bold text-cyan-700"><span className="flex items-center gap-2"><Sparkles className="h-4 w-4"/>CHAPTER {chapter}</span><span>STEP {game.storyStep+1}/{game.STORY_STEPS.length}</span></div>
       <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-cyan-100"><div className="h-full rounded-full bg-cyan-500 transition-all" style={{width: ((game.storyStep+1)/game.STORY_STEPS.length*100)+"%"}}/></div>
