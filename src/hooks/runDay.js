@@ -451,7 +451,7 @@ export function runDay(stateRef, setters) {
     });
     if (hotelResult.totalGuests > 0) {
       const hotelParkSim = simulateVisits({
-        demand: hotelResult.totalGuests, placedItems: [...attractions, ...facilities],
+        demand: Math.max(0, Math.round(hotelResult.totalGuests * selectedHotelPackage.guestMult * masteryFx.hotelGuestMult)), placedItems: [...attractions, ...facilities],
         queuePaths: environment.filter((p) => p.id === "queue_path"), incidents: incidentByTile,
         uptime, safety, cleanliness, incomeMult: eff.incomeMult ?? 1, entertainment, facilityBonus,
         appealBonus: (calculatedAppeal.score - 50) * 0.025 + empireTier.bonuses.satisfaction * 10 + resortBonuses.moodBoost + districtBonuses.moodBoost,
@@ -461,7 +461,6 @@ export function runDay(stateRef, setters) {
       if (hotelResult.avgHappiness > 0) hotelResult.avgHappiness = Math.round((hotelResult.avgHappiness + hotelParkSim.avgMood) / 2);
     }
     if (hotelResult?.avgHappiness > 0) hotelResult.avgHappiness = Math.min(100, hotelResult.avgHappiness + selectedHotelPackage.happiness + masteryFx.hotelHappiness);
-    if (hotelResult?.totalGuests > 0 && selectedHotelPackage.guestMult !== 1) hotelResult.totalGuests = Math.max(0, Math.round(hotelResult.totalGuests * selectedHotelPackage.guestMult * masteryFx.hotelGuestMult));
     newResortRating = calculateResortRating(placedHotels, currentUpgrades);
     setHotelGuests(hotelResult.remainingGuests);
     setResortRating(newResortRating);
