@@ -890,16 +890,30 @@ export function runDay(stateRef, setters) {
     setUpgradedToday(0);
   }
 
-  // Monthly park cycle: every 30 in-game days closes the month with a performance bonus.
+  // Monthly park cycle: close every 30 days with a performance grade and tiered reward.
   if ((d + 1) % 30 === 0) {
     const monthNumber = Math.floor((d + 1) / 30);
-    const monthlyNet = Math.max(0, Math.round(net));
-    const monthlyBonus = Math.max(2500, Math.min(75000, Math.round(monthlyNet * 0.12) + monthNumber * 1000));
-    const monthlyXp = Math.max(50, Math.min(750, Math.round(monthlyBonus / 100)));
-    setMoney((m) => m + monthlyBonus);
-    setXp((x) => x + monthlyXp);
-    setReputation((rv) => Math.min(100, rv + (monthlyNet > 0 ? 1 : 0)));
-    setLog((l) => [{ day: d + 1, text: "Day " + (d + 1) + ": 📅 Month " + monthNumber + " closed — management bonus $" + monthlyBonus.toLocaleString() + " and +" + monthlyXp + " XP." }, ...l].slice(0, 12));
+    const recentHistory = Array.isArray(stateRef.current.history) ? stateRef.current.history.slice(-29) : [];
+    const monthlyNet = Math.max(0, Math.round(recentHistory.reduce((sum, entry) => sum + Math.max(0, Number(entry?.net) || 0), 0) + Math.max(0, net)));
+    const monthPeakGuests = Math.max(
+      newGuests || 0,
+      ...recentHistory.map((entry) => Math.max(0, Number(entry?.guests) || 0))
+    );
+    const incomeTarget = 25000 + (monthNumber - 1) * 7500;
+    const guestTarget = 500 + (monthNumber - 1) * 150;
+    const incomeRatio = monthlyNet / Math.max(1, incomeTarget);
+    const guestRatio = monthPeakGuests / Math.max(1, guestTarget);
+    const performance = Math.min(incomeRatio, guestRatio);
+    const grade = performance >= 1.25 ? "A+" : performance >= 1 ? "A" : performance >= 0.8 ? "B" : performance >= 0.6 ? "C" : "D";
+    const tier = performance >= 1.25 ? { cash: 18000, xp: 300, rep: 3 } : performance >= 1 ? { cash: 10000, xp: 200, rep: 2 } : performance >= 0.8 ? { cash: 6000, xp: 120, rep: 1 } : performance >= 0.6 ? { cash: 3000, xp: 70, rep: 0 } : { cash: 1500, xp: 35, rep: 0 };
+    const managementBonus = Math.min(75000, tier.cash + Math.round(Math.max(0, monthlyNet) * 0.04) + monthNumber * 500);
+    setMoney((m) => m + managementBonus);
+    setXp((x) => x + tier.xp);
+    if (tier.rep) setReputation((rv) => Math.min(100, rv + tier.rep));
+    setLog((l) => [{
+      day: d + 1,
+      text: "Day " + (d + 1) + ": 📅 Month " + monthNumber + " closed — Grade " + grade + " · $" + managementBonus.toLocaleString() + " management bonus · +" + tier.xp + " XP."
+    }, ...l].slice(0, 12));
   }
 
   if (stateRef.current.autoPricing) {
