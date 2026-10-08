@@ -3,7 +3,7 @@ import React from "react";
 export default function PersonSprite({ activity = "walking", variant = 0, role, className = "", ...props }) {
   const swimming = activity === "swimming";
   const floating = activity === "floating";
-  const seated = floating || activity === "sliding";
+  const seated = floating || activity === "sliding" || activity === "eating" || activity === "resting";
   const water = swimming || floating;
   return <svg {...props} viewBox="0 0 32 44" className={`park-person person-color-${variant % 5} person-skin-${variant % 3} ${role ? "person-uniform-" + role : ""} ${className}`} data-activity={activity} aria-hidden="true" focusable="false">
     {!water && <ellipse cx="16" cy="42" rx="10" ry="2" className="person-shadow" />}
