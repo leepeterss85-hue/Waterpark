@@ -460,7 +460,7 @@ export function runDay(stateRef, setters) {
       hotelResult.parkSpend = hotelParkSim.income;
       if (hotelResult.avgHappiness > 0) hotelResult.avgHappiness = Math.min(100, Math.round((hotelResult.avgHappiness + hotelParkSim.avgMood) / 2 + selectedHotelPackage.happiness + masteryFx.hotelHappiness));
     }
-    if (hotelResult?.avgHappiness > 0) hotelResult.avgHappiness = Math.min(100, hotelResult.avgHappiness + selectedHotelPackage.happiness + masteryFx.hotelHappiness);
+    // Package and mastery happiness are applied once below after the park-spend simulation.
     newResortRating = calculateResortRating(placedHotels, currentUpgrades);
     setHotelGuests(hotelResult.remainingGuests);
     setResortRating(newResortRating);
