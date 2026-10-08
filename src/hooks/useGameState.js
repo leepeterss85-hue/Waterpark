@@ -1186,6 +1186,7 @@ export function useGameState() {
     staff, staffAssignments, assignStaff, incidents, attractionCondition, upgrades, upgradeAttraction,
     level, xp, xpForNext: xpForLevel(level), applyCheat,
     gameMode, storyStep, storyCompleted, STORY_STEPS, setMode, advanceStory, sandboxSettings, updateSandboxSettings, sandboxAction,
+    parkStrategy, setParkStrategy, mastery, masteryEffects: masteryEffects(mastery.points),
     expansionsDone, gridSize, maxGridSize: MAX_GRID_SIZE, expandPark,
     peakGuests, totalUpgrades, claimedMissions, claimMission,
     challenge, vipVisit, vipHistory, claimedLegendary, activeCalendarEvent,
