@@ -1,6 +1,6 @@
 import React from "react";
 import { Wrench, Sparkles, Umbrella, CircleDot, MapPin, Users, Bed } from "lucide-react";
-import { getParkItem } from "@/data/gameData";
+import { getParkItem, getAttractionTier } from "@/data/gameData";
 import ParkItemArtwork from "@/components/game/ParkItemArtwork";
 import { hotelRooms } from "@/data/hotels";
 import RideVisitors from "@/components/game/RideVisitors";
@@ -38,7 +38,7 @@ export default function Tile({ value, index, grid, zone, expansionTheme = "start
   const zoneTint = zone ? ZONE_TINT[zone] : "";
 
   return <button onClick={onClick} data-park-tile={index} data-item={value || undefined} data-kind={attr?.category || "empty"} data-buildable={Boolean(canPlace)} title={attr ? attr.name : canPlace ? "Build here" : zone ? "Park zone" : "Open land"} className={"group relative h-full w-full overflow-hidden rounded-[17px] border-2 transition-all duration-200 park-expansion-theme-" + expansionTheme + " " + (attr ? (isSelected ? "scale-[.97] border-white ring-4 ring-cyan-300/80 shadow-[0_10px_24px_rgba(15,23,42,.24)]" : "border-white/75 shadow-[0_6px_15px_rgba(15,23,42,.13)] hover:-translate-y-0.5 hover:shadow-[0_10px_20px_rgba(15,23,42,.18)]") : canPlace ? "border-dashed border-cyan-300 bg-cyan-50 hover:bg-white" : "border-white/70 bg-[#e8d8a8] hover:bg-[#f0e3b8]")}>
-    {attr && <><div className="ride-depth-shadow" />{isWater && <RideParticles rideId={attr.id} />}<ParkItemArtwork attr={attr} grid={grid} index={index} upgradeLevel={upgradeLevel} />{upgradeLevel > 0 && attr.category !== "environment" && <UpgradeAura level={upgradeLevel} />}{isWater && <RideVisitors attr={attr} guests={guests} movement={movement} incident={incident} queueWait={queueWait} />}{attr.category !== "environment" && <span className="park-tile-caption">{attr.name}</span>}</>}
+    {attr && <><div className="ride-depth-shadow" />{isWater && <RideParticles rideId={attr.id} />}<ParkItemArtwork attr={attr} grid={grid} index={index} upgradeLevel={upgradeLevel} />{upgradeLevel > 0 && attr.category !== "environment" && <UpgradeAura level={upgradeLevel} />}{isWater && <RideVisitors attr={attr} guests={guests} movement={movement} incident={incident} queueWait={queueWait} />}{attr.category !== "environment" && <span className="park-tile-caption">{attr.name}{isWater && upgradeLevel > 0 ? ` · ${getAttractionTier(upgradeLevel).name}` : ""}</span>}</>}
     {isHotel && hotelOccupancy != null && hotelRoomsTotal > 0 && <span className="hotel-occupancy-badge"><Bed className="h-2 w-2" />{hotelOccupancy}/{hotelRoomsTotal}</span>}
     {canPlace && <div className="park-build-hint relative z-10 flex h-full flex-col items-center justify-center gap-1"><div className="park-build-symbol grid h-8 w-8 place-items-center rounded-full bg-white shadow-sm ring-1 ring-cyan-200"><span className="text-xl font-light text-cyan-500">+</span></div><span className="park-build-label text-[8px] font-extrabold uppercase tracking-wider text-cyan-700">Build</span></div>}
     {canPlace && ghostAttr && <div className="pointer-events-none absolute inset-0 z-[5] opacity-40 transition-opacity duration-150 group-hover:opacity-70"><ParkItemArtwork attr={ghostAttr} grid={grid} index={index} /></div>}
