@@ -18,6 +18,10 @@ export default function ParkMasteryPanel({ game }) {
     occupancy: Math.round((game.hotelStats?.occupancy || 0)),
     lifetimeEarnings: game.lifetimeEarnings || 0,
     day: game.day || 1,
+    completedResearch: (game.completedResearch || []).length,
+    completedChains: (game.completedChains || []).length,
+    completedMegaProjects: (game.megaProjects || []).filter((p) => p.status === "completed" || p.completed).length,
+    disastersSurvived: game.disastersSurvived || 0,
   };
   return <div className="space-y-3">
     <div className="rounded-2xl bg-gradient-to-br from-indigo-700 to-cyan-700 p-4 text-white">
