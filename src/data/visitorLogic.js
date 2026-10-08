@@ -1,4 +1,4 @@
-import { getAttraction } from "./gameData";
+import { getAttraction, getAttractionTier } from "./gameData";
 import { getThemeGuestAffinity } from "./parkThemes";
 import { adjustedVisitSpend, pricingMoodPenalty } from "./pricing";
 import { popularityDestinationWeight, popularityRevenueMult } from "./popularity";
@@ -194,7 +194,9 @@ function createGuest() {
 
 function perVisitSpend(item, level) {
   const attr = item.attr;
-  const income = attr.income * (1 + 0.15 * level);
+  const tier = attr.category === "attraction" ? getAttractionTier(item.level || level || 0) : null;
+  const tierSpendMult = tier ? 1 + Math.max(0, tier.multiplier - 1) * 0.55 : 1;
+  const income = attr.income * (1 + 0.15 * level) * tierSpendMult;
   return income / (attr.capacity > 0 ? attr.capacity : FACILITY_CAPACITY);
 }
 
@@ -215,7 +217,9 @@ function foodClassFor(attr) {
 function scoreDestination(guest, item) {
   const zoneAffinity = item.zone ? getThemeGuestAffinity(item.zone, guest.type) : 1;
   const attr = item.attr;
-  let score = Math.max(0.5, attr.fun * 0.4 + 1);
+  const tier = attr.category === "attraction" ? getAttractionTier(item.level || 0) : null;
+  const tierAppealMult = tier ? 1 + Math.max(0, tier.multiplier - 1) * 0.55 : 1;
+  let score = Math.max(0.5, attr.fun * 0.4 * tierAppealMult + 1);
 
   if (attr.category === "facility") {
     // Food preference
