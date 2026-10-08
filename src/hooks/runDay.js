@@ -71,7 +71,7 @@ export function runDay(stateRef, setters) {
     setBuiltToday, setUpgradedToday, setTicketPrice, setLog, setLastNet, setHistory, setPeakGuests,
     setResearchPoints, setXp, setCompletedMasterPlans, setMasterPlanBonuses, setActiveStrikes,
     setGuestMemory, setRetailStock, setRetailStats, setCompletedChains, setCompletedCampaignChapters,
-    setMegaProjects, setGuestStories,
+    setMegaProjects, setGuestStories, setMastery,
   } = setters;
 
   const { parkStrategy: currentParkStrategy = { strategy: "balanced", hotelPackage: "room_only" }, mastery: currentMastery = { points: 0, completed: [] }, grid: prevGrid, reputation: rep, day: d, sandboxSettings: sandboxTools = {}, staff: currentStaff, staffAssignments: currentAssignments, incidents: currentIncidents, upgrades: currentUpgrades, attractionCondition: currentCondition, challenge: currentChallenge, parkZones: currentZones, forecast: currentForecast, seasonEvent: currentSeasonEvent, parkAppeal: currentParkAppeal, ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass, vipVisit: currentVipVisit, completedResearch: currentResearch } = stateRef.current;
