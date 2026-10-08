@@ -1944,3 +1944,16 @@ export function xpForLevel(level) {
   if (level >= LEVEL_XP.length) return LEVEL_XP[LEVEL_XP.length - 1];
   return LEVEL_XP[level];
 }
+
+// Visual progression tiers for the existing 10-level attraction upgrade system.
+export const ATTRACTION_TIERS = [
+  { min:0, max:1, id:"basic", name:"Basic", multiplier:1 },
+  { min:2, max:4, id:"improved", name:"Improved", multiplier:1.08 },
+  { min:5, max:7, id:"premium", name:"Premium", multiplier:1.18 },
+  { min:8, max:9, id:"signature", name:"Signature", multiplier:1.30 },
+  { min:10, max:10, id:"legendary", name:"Legendary", multiplier:1.45 },
+];
+export function getAttractionTier(level = 0) {
+  const n = Math.max(0, Math.min(10, Number(level) || 0));
+  return ATTRACTION_TIERS.find((tier) => n >= tier.min && n <= tier.max) || ATTRACTION_TIERS[0];
+}
