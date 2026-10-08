@@ -92,3 +92,12 @@
 @keyframes pool-spray { 0%,100% { transform: translateY(1px); opacity: .55; } 50% { transform: translateY(-4px); opacity: 1; } }
 @media (max-width:640px) { .aquatic-map .game-map-stage { padding: 5px; } .aquatic-map .game-map-grid { gap: 2px !important; } }
 @media (prefers-reduced-motion:reduce) { .pool-splash { animation: none; } }
+.park-scenery-layer { position:absolute; inset:0; z-index:3; display:grid; grid-template-rows:repeat(var(--map-rows),1fr); grid-template-columns:repeat(8,1fr); gap:3px; pointer-events:none; }
+.park-scenery-item { display:grid; place-items:center; pointer-events:none; opacity:.55; filter:drop-shadow(0 2px 2px rgba(20,50,30,.18)); }
+.park-scenery-item svg { width:clamp(13px,2vw,24px); height:clamp(13px,2vw,24px); }
+.scenery-tree { color:hsl(var(--park-green)); opacity:.7; }
+.scenery-flower { color:hsl(var(--park-sun)); opacity:.7; }
+.scenery-bench { color:hsl(var(--park-edge)); opacity:.42; }
+.scenery-lamp { color:hsl(var(--park-sun)); opacity:.52; }
+@media (max-width:640px){.park-scenery-layer{gap:2px}.park-scenery-item svg{width:14px;height:14px}}
+@media (prefers-reduced-motion:reduce){.park-scenery-item{filter:none}}
