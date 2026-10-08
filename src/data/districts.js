@@ -24,7 +24,7 @@ export const DISTRICTS = [
     desc: "High-adrenaline slides and extreme drops for thrill seekers.",
     bonus: { guestMult: 1.08, incomeMult: 1.05, desc: "+8% thrill guests, +5% income" },
     legendary: { id: "thrill_legend", name: "Adrenaline Capital", desc: "Have 4 thrill attractions in this district.", reward: { money: 40000, empirePoints: 350 } },
-    matchItems: ["mega_slide", "extreme_slide", "loop_slide", "halfpipe_slide", "coaster", "ninja_course"],
+    matchItems: ["mega_slide_complex", "kamikaze_slide", "aqua_loop", "halfpipe", "water_coaster", "ninja_course", "freefall_drop"],
   },
   {
     id: "resort_springs",
@@ -48,7 +48,7 @@ export const DISTRICTS = [
     desc: "Large wave pools and flow rides — the heart of the park.",
     bonus: { guestMult: 1.06, satisfaction: 0.05, desc: "+6% guests, +5% satisfaction" },
     legendary: { id: "wave_legend", name: "Tidal Empire", desc: "Have 3 wave attractions in this district.", reward: { money: 45000, empirePoints: 380 } },
-    matchItems: ["wave_pool", "surf_wave_pool", "flow_rider", "adventure_river", "dive_pool"],
+    matchItems: ["wave_pool", "surf_wave_pool", "flowrider", "adventure_river", "dive_pool"],
   },
   {
     id: "extreme_zone",
@@ -60,7 +60,7 @@ export const DISTRICTS = [
     desc: "The most extreme attractions — only for the bravest visitors.",
     bonus: { incomeMult: 1.12, guestMult: 1.04, desc: "+12% income, +4% guests" },
     legendary: { id: "extreme_legend", name: "Legend of Extreme", desc: "Have 3 extreme attractions in this district.", reward: { money: 60000, empirePoints: 500 } },
-    matchItems: ["extreme_slide", "loop_slide", "halfpipe_slide", "ninja_course", "cliff_dive"],
+    matchItems: ["kamikaze_slide", "aqua_loop", "halfpipe", "ninja_course", "cliff_jump", "freefall_drop"],
   },
   {
     id: "grand_promenade",
