@@ -1,6 +1,5 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Crown, Hotel, Target, TrendingUp, CheckCircle2 } from "lucide-react";
 import { PARK_STRATEGIES, HOTEL_PACKAGES, MASTERY_GOALS, MASTERY_PERKS, strategyFor, packageFor } from "@/data/parkMastery";
 
