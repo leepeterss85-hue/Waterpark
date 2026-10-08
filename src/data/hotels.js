@@ -127,7 +127,7 @@ export function calculateResortRating(hotels, upgrades) {
 }
 
 // Simulate one day of hotel operations
-export function simulateHotelDay({ hotels, hotelGuests, upgrades, day, reputation, resortRating, seasonEvent, weather, parkMood, sandbox, hotelPriceMult = 1 }) {
+export function simulateHotelDay({ hotels, hotelGuests, upgrades, day, reputation, resortRating, seasonEvent, weather, parkMood, sandbox, hotelPriceMult = 1, demandMult = 1 }) {
   // 1. Check out guests whose stay is over
   const remaining = [];
   const checkedOut = [];
@@ -162,7 +162,7 @@ export function simulateHotelDay({ hotels, hotelGuests, upgrades, day, reputatio
     const seasonMult = seasonEvent?.guestMult ?? 1;
     const weatherMult = weather?.id === "sunny" ? 1.15 : weather?.id === "rain" ? 0.7 : 1;
     const moodMult = parkMood > 60 ? 1.1 : parkMood < 40 ? 0.85 : 1;
-    const demand = Math.floor(baseDemand * ratingMult * seasonMult * weatherMult * moodMult * priceDemandMult);
+    const demand = Math.floor(baseDemand * ratingMult * seasonMult * weatherMult * moodMult * priceDemandMult * Math.max(0, demandMult));
     const checkInCount = Math.min(availableRooms, Math.max(0, demand));
 
     for (let i = 0; i < checkInCount; i++) {
