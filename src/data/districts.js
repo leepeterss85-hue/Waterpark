@@ -36,7 +36,7 @@ export const DISTRICTS = [
     desc: "Luxury cabanas, spas and VIP lounges for premium guests.",
     bonus: { incomeMult: 1.10, moodBoost: 5, desc: "+10% income, +5 mood" },
     legendary: { id: "resort_legend", name: "Five-Star Sanctuary", desc: "Have 3 resort facilities in this district.", reward: { money: 50000, empirePoints: 400 }, requiredCount: 3 } },
-    matchItems: ["vip_lounge", "spa", "cabanas", "luxury_hotel", "gym", "fine_dining"],
+    matchItems: ["vip_lounge", "spa", "cabanas", "grand_luxury", "gym", "dining", "sushi_bar"],
   },
   {
     id: "wave_plaza",
