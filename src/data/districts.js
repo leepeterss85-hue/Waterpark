@@ -1,3 +1,5 @@
+import { getParkItem } from "./gameData";
+
 // District system: themed zones that unlock at expansion milestones,
 // providing passive bonuses and legendary endgame objectives.
 
@@ -167,7 +169,7 @@ export function checkDistrictLegendary(district, grid, parkZones, getItem) {
     if (!id) return count;
     const zone = parkZones?.[idx];
     if (zone !== district.id) return count;
-    if (district.matchItems.length === 0) return count + 1; // grand promenade matches all
+    if (district.matchItems.length === 0) return getItem?.(id)?.category === "attraction" ? count + 1 : count; // open-ended districts count attractions only
     return district.matchItems.includes(id) ? count + 1 : count;
   }, 0);
   const required = district.legendary?.requiredCount ?? (district.matchItems.length === 0 ? 5 : 4);
@@ -183,7 +185,9 @@ export function aggregateDistrictBonuses(activeDistrictIds, grid, parkZones) {
     // Only count the bonus if at least one matching item is in the district zone
     const hasMatch = grid.some((gid, idx) => {
       if (!gid || parkZones?.[idx] !== id) return false;
-      return district.matchItems.length === 0 || district.matchItems.includes(gid);
+      return district.matchItems.length === 0
+        ? getParkItem(gid)?.category === "attraction"
+        : district.matchItems.includes(gid);
     });
     if (hasMatch) {
       bonuses.guestMult *= district.bonus.guestMult || 1;
