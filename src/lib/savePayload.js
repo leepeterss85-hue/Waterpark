@@ -3,7 +3,7 @@
 // local saves, cloud saves and the auto-persist spread.
 
 export const SAVE_FIELDS = [
-  "money", "day", "reputation", "guests", "grid", "parkZones", "history",
+  "money", "day", "reputation", "guests", "grid", "parkZones", "history", "sandbox",
   "staff", "staffAssignments", "attractionCondition", "log", "lastNet",
   "incidents", "upgrades", "xp", "expansionsDone", "peakGuests", "totalUpgrades",
   "claimedMissions", "challenge", "lifetimeEarnings", "builtAttractionIds",
@@ -21,7 +21,7 @@ export const SAVE_FIELDS = [
   "autoPricing", "activeTheme", "prestigeCount", "synergyBonuses",
   "builtToday", "upgradedToday", "mascot", "lastRewardDay", "rewardStreak",
   "visitorReviews", "staffXp", "staffMorale", "wageBoost", "sponsorships",
-  "groupBookings", "acceptedBookings", "activeStrikes", "gameMode", "storyStep", "storyCompleted",
+  "groupBookings", "acceptedBookings", "activeStrikes", "completedMasterPlans", "masterPlanBonuses", "gameMode", "storyStep", "storyCompleted",
   "guestMemory", "retailStock", "parkStrategy", "mastery", "resortMilestones", "activeScenario", "scenarioStatus", "completedScenarios", "megaProjects", "guestStories", "currentDestination", "retailStats", "completedChains", "completedCampaignChapters", "acquiredRivals", "franchiseMaps",
 ];
 
