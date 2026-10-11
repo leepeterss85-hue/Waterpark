@@ -19,7 +19,12 @@ const CHALLENGE_POOL = [
 export const CHALLENGE_REFRESH_DAYS = 3;
 
 export function rollDailyChallenges() {
-  const shuffled = [...CHALLENGE_POOL].sort(() => Math.random() - 0.5);
+  // Fisher–Yates gives each challenge an equal chance of appearing.
+  const shuffled = [...CHALLENGE_POOL];
+  for (let i = shuffled.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
   return shuffled.slice(0, 3).map((c) => ({
     id: c.id + "_" + Date.now() + "_" + Math.random().toString(36).slice(2, 5),
     baseId: c.id,
