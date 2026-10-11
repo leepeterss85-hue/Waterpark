@@ -24,7 +24,7 @@ export function rollDailyChallenges() {
     id: c.id + "_" + Date.now() + "_" + Math.random().toString(36).slice(2, 5),
     baseId: c.id,
     type: c.type,
-    label: c.label.replace("%target%", c.target),
+    label: c.label.replace("%target%", String(c.target)),
     target: c.target,
     reward: c.reward,
     progress: 0,
