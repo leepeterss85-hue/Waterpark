@@ -289,7 +289,7 @@ export function useGameState() {
       if (data.completedResearch) setCompletedResearch(data.completedResearch);
       if (data.parkAppeal) setParkAppeal(data.parkAppeal);
       setDisaster(data.disaster ?? null);
-      setSandbox(data.sandbox ?? false);
+      setSandbox(data.sandbox ?? data.gameMode === "sandbox");
       if (data.disastersSurvived != null) setDisastersSurvived(data.disastersSurvived);
       setActiveCampaigns(data.activeCampaigns ?? []);
       setHotelGuests(data.hotelGuests ?? []);
@@ -333,7 +333,7 @@ export function useGameState() {
       setGroupBookings(data.groupBookings ?? []);
       setAcceptedBookings(data.acceptedBookings ?? []);
       setCompletedMasterPlans(Array.isArray(data.completedMasterPlans) ? data.completedMasterPlans : []);
-      setMasterPlanBonuses(calculateMasterPlanBonuses(Array.isArray(data.completedMasterPlans) ? data.completedMasterPlans : []));
+      setMasterPlanBonuses(data.masterPlanBonuses ?? calculateMasterPlanBonuses(Array.isArray(data.completedMasterPlans) ? data.completedMasterPlans : []));
       setBuiltToday(data.builtToday ?? 0);
       setMegaProjects(data.megaProjects ?? []);
       setGuestStories(data.guestStories ?? []);
@@ -341,8 +341,8 @@ export function useGameState() {
     setResortMilestones(Array.isArray(data.resortMilestones) ? data.resortMilestones : []);
       if (data.parkStrategy) setParkStrategyState({ ...DEFAULT_PARK_STRATEGY, ...data.parkStrategy });
       if (data.mastery) setMastery({ points: Math.max(0, Number(data.mastery.points) || 0), completed: Array.isArray(data.mastery.completed) ? data.mastery.completed : [] });
-      if (data.activeScenario) setActiveScenario(data.activeScenario);
-      if (data.scenarioStatus) setScenarioStatus(data.scenarioStatus);
+      setActiveScenario(data.activeScenario ?? null);
+      setScenarioStatus(data.scenarioStatus ?? "idle");
       setCompletedScenarios(Array.isArray(data.completedScenarios) ? data.completedScenarios : []);
       setResortMilestones(Array.isArray(data.resortMilestones) ? data.resortMilestones : []);
       if (data.gameMode) setGameMode(data.gameMode);
@@ -359,7 +359,7 @@ export function useGameState() {
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ saveVersion: SAVE_SCHEMA_VERSION, savedAt: Date.now(), ...stateRef.current })); } catch { /* ignore */ }
     }, 300);
     return () => clearTimeout(t);
-  }, [parkStrategy, mastery, money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, sandboxSettings, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp, staffMorale, wageBoost, sponsorships,     groupBookings, acceptedBookings, activeStrikes, completedMasterPlans, masterPlanBonuses, megaProjects, guestStories, currentDestination, resortMilestones, gameMode, storyStep, storyCompleted, activeScenario, scenarioStatus, completedScenarios, log, guestMemory, retailStock, retailStats, completedChains, completedCampaignChapters, acquiredRivals, franchiseMaps]);
+  }, [parkStrategy, mastery, money, day, reputation, guests, grid, parkZones, history, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, sandboxSettings, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp, staffMorale, wageBoost, sponsorships,     groupBookings, acceptedBookings, activeStrikes, completedMasterPlans, masterPlanBonuses, sandbox, megaProjects, guestStories, currentDestination, resortMilestones, gameMode, storyStep, storyCompleted, activeScenario, scenarioStatus, completedScenarios, log, guestMemory, retailStock, retailStats, completedChains, completedCampaignChapters, acquiredRivals, franchiseMaps]);
 
   // Flush save on background/close
   useEffect(() => {
@@ -856,10 +856,10 @@ export function useGameState() {
     setCompletedCampaignChapters(data.completedCampaignChapters ?? []);
     setAcquiredRivals(data.acquiredRivals ?? []);
     setFranchiseMaps(data.franchiseMaps ?? []);
-    setSandbox(data.sandbox ?? false);
+    setSandbox(data.sandbox ?? data.gameMode === "sandbox");
     setSandboxSettings({ unlimitedCash: true, unlockAll: false, guestDemandMult: 1, instantConstruction: false, weatherLock: false, weather: null, ...(data.sandboxSettings || {}) });
     setCompletedMasterPlans(Array.isArray(data.completedMasterPlans) ? data.completedMasterPlans : []);
-    setMasterPlanBonuses(calculateMasterPlanBonuses(Array.isArray(data.completedMasterPlans) ? data.completedMasterPlans : []));
+    setMasterPlanBonuses(data.masterPlanBonuses ?? calculateMasterPlanBonuses(Array.isArray(data.completedMasterPlans) ? data.completedMasterPlans : []));
     if (data.parkStrategy) setParkStrategyState({ ...DEFAULT_PARK_STRATEGY, ...data.parkStrategy });
     if (data.mastery) setMastery({ points: Math.max(0, Number(data.mastery.points) || 0), completed: Array.isArray(data.mastery.completed) ? data.mastery.completed : [] });
     setResortMilestones(Array.isArray(data.resortMilestones) ? data.resortMilestones : []);
