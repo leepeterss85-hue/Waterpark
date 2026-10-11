@@ -537,13 +537,13 @@ export function runDay(stateRef, setters) {
   const diffUpkeepMult = getDifficulty(getSettings().difficulty).upkeepMult;
   const wageBoostMult = stateRef.current.wageBoost ? 1.2 : 1;
   const eventUtilityCost = utilities * eventDownsides.utilityCostMult;
+  const retailRevenue = retailResult.revenue || 0;
+  const retailRestockCost = retailResult.restockCost || 0;
   const expenses =
     (placedItems.filter((p) => p.attr.category !== "hotel").reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) * upkeepResearchMult * agingUpkeepMult +
     wages * (eff.wageMult ?? 1) * (1 - (fx.wageReduction || 0)) * wageBoostMult + eventUtilityCost + currentAdBudget + (currentPriorityPass ? 120 : 0) + retailRestockCost) * diffUpkeepMult +
     hotelExpensesAmount;
   const eventRevenuePerDay = currentActiveEvents.reduce((s, e) => s + (e.revenuePerDay || 0), 0);
-  const retailRevenue = retailResult.revenue || 0;
-  const retailRestockCost = retailResult.restockCost || 0;
   const emergencyCost = emergencyResult.totalCost;
   const sponsorIncome = activeSponsorIncome(currentSponsorships);
   const guestStoriesToday = generateGuestStories({ day: d + 1, guests: newGuests, visitorStats, hotelStats: stateRef.current.hotelStats, retailStats: retailResult, weather: dayWeather, megaProjects: megaState, activeEvents: currentActiveEvents, waterEngineering: engineering });
