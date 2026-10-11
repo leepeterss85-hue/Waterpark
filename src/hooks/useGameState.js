@@ -289,6 +289,7 @@ export function useGameState() {
       if (data.completedResearch) setCompletedResearch(data.completedResearch);
       if (data.parkAppeal) setParkAppeal(data.parkAppeal);
       setDisaster(data.disaster ?? null);
+      setSandbox(data.sandbox ?? false);
       if (data.disastersSurvived != null) setDisastersSurvived(data.disastersSurvived);
       setActiveCampaigns(data.activeCampaigns ?? []);
       setHotelGuests(data.hotelGuests ?? []);
@@ -855,6 +856,16 @@ export function useGameState() {
     setCompletedCampaignChapters(data.completedCampaignChapters ?? []);
     setAcquiredRivals(data.acquiredRivals ?? []);
     setFranchiseMaps(data.franchiseMaps ?? []);
+    setSandbox(data.sandbox ?? false);
+    setSandboxSettings({ unlimitedCash: true, unlockAll: false, guestDemandMult: 1, instantConstruction: false, weatherLock: false, weather: null, ...(data.sandboxSettings || {}) });
+    setCompletedMasterPlans(Array.isArray(data.completedMasterPlans) ? data.completedMasterPlans : []);
+    setMasterPlanBonuses(calculateMasterPlanBonuses(Array.isArray(data.completedMasterPlans) ? data.completedMasterPlans : []));
+    if (data.parkStrategy) setParkStrategyState({ ...DEFAULT_PARK_STRATEGY, ...data.parkStrategy });
+    if (data.mastery) setMastery({ points: Math.max(0, Number(data.mastery.points) || 0), completed: Array.isArray(data.mastery.completed) ? data.mastery.completed : [] });
+    setResortMilestones(Array.isArray(data.resortMilestones) ? data.resortMilestones : []);
+    setActiveScenario(data.activeScenario ?? null);
+    setScenarioStatus(data.scenarioStatus ?? "idle");
+    setCompletedScenarios(Array.isArray(data.completedScenarios) ? data.completedScenarios : []);
       setMegaProjects(data.megaProjects ?? []);
       setGuestStories(data.guestStories ?? []);
       setCurrentDestination(data.currentDestination ?? "home_resort");
