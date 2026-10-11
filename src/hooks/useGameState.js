@@ -344,7 +344,6 @@ export function useGameState() {
       setActiveScenario(data.activeScenario ?? null);
       setScenarioStatus(data.scenarioStatus ?? "idle");
       setCompletedScenarios(Array.isArray(data.completedScenarios) ? data.completedScenarios : []);
-      setResortMilestones(Array.isArray(data.resortMilestones) ? data.resortMilestones : []);
       if (data.gameMode) setGameMode(data.gameMode);
       if (data.storyStep != null) setStoryStep(data.storyStep);
       if (data.storyCompleted != null) setStoryCompleted(data.storyCompleted);
