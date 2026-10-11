@@ -334,7 +334,7 @@ export function useGameState() {
       setAcceptedBookings(data.acceptedBookings ?? []);
       setCompletedMasterPlans(Array.isArray(data.completedMasterPlans) ? data.completedMasterPlans : []);
       setMasterPlanBonuses(data.masterPlanBonuses ?? calculateMasterPlanBonuses(Array.isArray(data.completedMasterPlans) ? data.completedMasterPlans : []));
-      setBuiltToday(data.builtToday ?? 0);
+      setBuiltToday(Math.max(0, Math.floor(safeNumber(data.builtToday, 0, { min: 0 }))));
       setMegaProjects(data.megaProjects ?? []);
       setGuestStories(data.guestStories ?? []);
       setCurrentDestination(data.currentDestination ?? "home_resort");
@@ -349,7 +349,7 @@ export function useGameState() {
       if (data.storyStep != null) setStoryStep(data.storyStep);
       if (data.storyCompleted != null) setStoryCompleted(data.storyCompleted);
       if (data.sandboxSettings) setSandboxSettings({ unlimitedCash: true, unlockAll: false, guestDemandMult: 1, instantConstruction: false, weatherLock: false, weather: null, ...data.sandboxSettings });
-      setUpgradedToday(data.upgradedToday ?? 0);
+      setUpgradedToday(Math.max(0, Math.floor(safeNumber(data.upgradedToday, 0, { min: 0 }))));
     } catch { /* ignore */ }
   }, []);
 
