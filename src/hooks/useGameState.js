@@ -872,8 +872,8 @@ export function useGameState() {
     if (data.gameMode) setGameMode(data.gameMode);
     if (data.storyStep != null) setStoryStep(data.storyStep);
     if (data.storyCompleted != null) setStoryCompleted(data.storyCompleted);
-    setBuiltToday(0);
-    setUpgradedToday(0);
+    setBuiltToday(Math.max(0, Math.floor(safeNumber(data.builtToday, 0, { min: 0 }))));
+    setUpgradedToday(Math.max(0, Math.floor(safeNumber(data.upgradedToday, 0, { min: 0 }))));
     setLog(data.log ?? [{ day: 0, text: "Welcome back to your park!" }]);
     setLastNet(data.lastNet ?? 0);
   }, []);
