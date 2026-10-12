@@ -26,6 +26,16 @@ export default function Tutorial({ game }) {
     };
   }, [targetId, step, shouldShow]);
 
+  // Advance when the player completes the action described by a tutorial step.
+  // This keeps the tutorial in sync with real gameplay instead of requiring
+  // players to dismiss each instruction manually.
+  useEffect(() => {
+    if (!shouldShow || step >= TUTORIAL_STEPS.length - 1 || typeof current?.done !== "function") return;
+    if (current.done(game)) {
+      setStep((previous) => previous === step ? Math.min(previous + 1, TUTORIAL_STEPS.length - 1) : previous);
+    }
+  }, [current, game.grid, game.playing, game.staff, shouldShow, step]);
+
   if (!shouldShow) return null;
 
   const finish = () => {
@@ -41,8 +51,8 @@ export default function Tutorial({ game }) {
   const skip = () => finish();
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-slate-900/40 p-3 backdrop-blur-sm sm:items-center sm:p-4">
-      <div className="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-slate-200">
+    <div className="pointer-events-none fixed inset-x-0 bottom-20 z-[60] flex justify-center p-3 sm:bottom-6 sm:justify-end sm:px-6">
+      <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-slate-200">
         <div className="relative bg-gradient-to-br from-cyan-500 via-sky-500 to-blue-600 px-5 py-4 text-white">
           <button type="button" onClick={skip} aria-label="Skip tutorial" className="absolute right-3 top-3 grid h-7 w-7 place-items-center rounded-full bg-white/20 text-white transition hover:bg-white/30">
             <X className="h-4 w-4" />
