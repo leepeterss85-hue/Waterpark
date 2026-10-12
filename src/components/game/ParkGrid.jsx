@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Footprints, Users, Map as MapIcon, Sparkles } from "lucide-react";
 import { getParkItem } from "@/data/gameData";
 import { getHotelDef, hotelRooms } from "@/data/hotels";

@@ -1,5 +1,5 @@
 import React from "react";
-import { Swords, TrendingUp, Users, Crown, Eye, Building2, Zap } from "lucide-react";
+import { Swords, TrendingUp, Crown, Eye, Building2, Zap } from "lucide-react";
 import { getCompetitorIntel } from "@/data/competitors";
 import { counterStrikeCost } from "@/data/marketWarfare";
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Target, Check, Gift, RefreshCw } from "lucide-react";
+import { Target, Check, Gift } from "lucide-react";
 
 export default function DailyChallengesPanel({ challenges, onClaim, daysUntilRefresh }) {
   return (

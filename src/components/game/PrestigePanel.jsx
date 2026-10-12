@@ -1,5 +1,5 @@
 import React from "react";
-import { Sparkles, Crown, RotateCcw } from "lucide-react";
+import { Crown, RotateCcw } from "lucide-react";
 import { calculatePrestigePoints, prestigeMultiplier, getPrestigeTier, PRESTIGE_LEVEL_REQ } from "@/data/prestige";
 
 export default function PrestigePanel({ level, empirePoints, lifetimeEarnings, prestigeCount, onPrestige }) {

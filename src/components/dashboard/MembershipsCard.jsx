@@ -1,5 +1,5 @@
 import React from "react";
-import { Ticket, CalendarCheck, Users, Crown, TrendingUp, DollarSign, Repeat } from "lucide-react";
+import { Ticket, CalendarCheck, Users, Crown } from "lucide-react";
 import { MEMBERSHIP_TIERS, totalMemberCount } from "@/data/memberships";
 
 const ICONS = { Ticket, CalendarCheck, Users, Crown };

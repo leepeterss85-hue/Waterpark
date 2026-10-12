@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sun, Cloud, CloudRain, CloudLightning, CloudSun } from "lucide-react";
+import { Sun, Cloud, CloudRain, CloudLightning } from "lucide-react";
 
 const WEATHER_ICON = { clear: Sun, sunny: Sun, cloudy: Cloud, rain: CloudRain, storm: CloudLightning };
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { HardHat, Hotel, Waves, Wind, ArrowDownUp, Maximize2, Sparkles, DoorOpen, Car, Clock, DollarSign, AlertTriangle, CheckCircle2, Star, Construction } from "lucide-react";
+import { HardHat, Hotel, Waves, Maximize2, Sparkles, DoorOpen, Clock, DollarSign, AlertTriangle, CheckCircle2, Star, Construction } from "lucide-react";
 import { PROJECT_TYPES, CATEGORY_LABELS } from "@/data/construction";
 
 const CATEGORY_ICONS = { hotel: Hotel, ride: Waves, expansion: Maximize2, renovation: Sparkles, infrastructure: DoorOpen };

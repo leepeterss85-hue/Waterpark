@@ -1,5 +1,5 @@
 import React from "react";
-import { Siren, AlertTriangle, CheckCircle2, DollarSign } from "lucide-react";
+import { Siren, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { SEVERITY_LABELS, SEVERITY_COLORS } from "@/data/emergencies";
 
 const ICONS = { Wrench: AlertTriangle, HeartPulse: AlertTriangle, Baby: AlertTriangle, CloudLightning: AlertTriangle, Droplet: AlertTriangle, Footprints: AlertTriangle };

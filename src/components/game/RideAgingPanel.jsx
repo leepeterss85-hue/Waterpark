@@ -1,5 +1,5 @@
 import React from "react";
-import { Wrench, AlertTriangle, TrendingDown, DollarSign } from "lucide-react";
+import { Wrench, AlertTriangle } from "lucide-react";
 import { AGE_TIERS, getAgeTier, refurbishCost, MAX_AGE } from "@/data/rideAging";
 import { getParkItem } from "@/data/gameData";
 

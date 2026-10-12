@@ -1,5 +1,5 @@
 import React from "react";
-import { Trophy, Star, TrendingUp } from "lucide-react";
+import { Trophy, Star } from "lucide-react";
 
 const COLORS = {
   amber: "from-amber-400 to-orange-500",

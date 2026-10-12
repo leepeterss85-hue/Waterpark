@@ -1,6 +1,5 @@
 import React from "react";
 import { UsersRound, Check, X, Clock, TrendingDown } from "lucide-react";
-import { getGroupType } from "@/data/groupBookings";
 import { getIcon } from "./icons";
 
 export default function GroupBookingsPanel({ bookings = [], onAccept, onDecline, guests, level }) {

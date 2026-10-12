@@ -1,9 +1,8 @@
 import React, { useState, useMemo } from "react";
-import { CalendarDays, DollarSign, Users, TrendingUp, Star, Lock, Check, Clock, Sparkles, AlertTriangle, Ban, Wrench } from "lucide-react";
+import { DollarSign, Users, TrendingUp, Star, Lock, Clock, Sparkles, AlertTriangle, Ban, Wrench } from "lucide-react";
 import { MAJOR_EVENTS, EVENT_CATEGORIES, getCategory, isEventAvailable, getEvent, checkEventRequirements, checkEventConflict } from "@/data/parkEvents";
 import { getIcon } from "@/components/game/icons";
 import { getSeasonLabel } from "@/data/parkSystems";
-import { getParkItem } from "@/data/gameData";
 
 function EventCard({ event, active, available, season, level, money, grid, staff, activeEvents, onLaunch }) {
   const Icon = getIcon(event.icon);

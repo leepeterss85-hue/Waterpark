@@ -1,9 +1,8 @@
 import React from "react";
-import { GraduationCap, Star, Lock, ChevronRight } from "lucide-react";
+import { GraduationCap, Star, Lock } from "lucide-react";
 import { STAFF } from "@/data/gameData";
 import { getIcon } from "./icons";
 import {
-  STAFF_XP_THRESHOLDS,
   STAFF_PERKS as STAFF_PERKS_LOOKUP,
   staffLevelFromXp,
   xpForNextStaffLevel,

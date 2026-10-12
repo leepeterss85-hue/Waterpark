@@ -2,7 +2,6 @@ import React from "react";
 import { Wrench, Sparkles, Umbrella, CircleDot, MapPin, Users, Bed } from "lucide-react";
 import { getParkItem, getAttractionTier } from "@/data/gameData";
 import ParkItemArtwork from "@/components/game/ParkItemArtwork";
-import { hotelRooms } from "@/data/hotels";
 import RideVisitors from "@/components/game/RideVisitors";
 import RideStatus from "@/components/game/RideStatus";
 import RideParticles from "@/components/game/RideParticles";

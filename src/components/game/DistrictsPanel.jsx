@@ -1,6 +1,6 @@
 import React from "react";
 import { Baby, Zap, Hotel, Waves, Flame, Crown, Lock, CheckCircle2, Star, Palmtree, Sailboat, Compass, Sparkles } from "lucide-react";
-import { DISTRICTS, unlockedDistricts, nextLockedDistrict, checkDistrictLegendary, getDistrict } from "@/data/districts";
+import { unlockedDistricts, nextLockedDistrict, checkDistrictLegendary } from "@/data/districts";
 import { getParkItem } from "@/data/gameData";
 
 const ICONS = { Baby, Zap, Hotel, Waves, Flame, Crown, Palmtree, Sailboat, Compass, Sparkles, Star };

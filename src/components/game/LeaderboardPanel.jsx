@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Medal, RefreshCw, Loader2, TrendingUp, Star, Users, Crown, Calendar, DollarSign, Send } from "lucide-react";
+import { Medal, RefreshCw, Loader2, TrendingUp, Star, Users, Crown, Send } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 export default function LeaderboardPanel({ level, day, reputation, guests, money, empirePoints, resortRating, peakGuests, onSubmit }) {

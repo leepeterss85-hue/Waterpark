@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Lock, Unlock } from "lucide-react";
+import { Sparkles, Unlock } from "lucide-react";
 import { sound } from "@/lib/soundManager";
 
 export default function LevelUpCelebration({ level, trigger }) {
@@ -14,7 +14,7 @@ export default function LevelUpCelebration({ level, trigger }) {
     sound.levelUp();
     const t = setTimeout(() => setShow(false), 2800);
     return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [trigger]);
 
   return (

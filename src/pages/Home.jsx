@@ -24,7 +24,7 @@ import UndoButton from "@/components/game/UndoButton";
 import VipBanner from "@/components/game/VipBanner";
 import DisasterBanner from "@/components/game/DisasterBanner";
 import HotelDetail from "@/components/game/HotelDetail";
-import { getHotelDef, hotelRooms, isHotelItem } from "@/data/hotels";
+import { hotelRooms } from "@/data/hotels";
 import { getTheme } from "@/data/visualThemes";
 import { trackEvent } from "@/lib/gameAnalytics";
 import { sound } from "@/lib/soundManager";

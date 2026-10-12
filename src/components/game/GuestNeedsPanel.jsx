@@ -1,6 +1,5 @@
 import React from "react";
 import { Utensils, Droplet, BatteryCharging, TrendingUp, Lightbulb } from "lucide-react";
-import { getParkItem } from "@/data/gameData";
 
 const FOOD_IDS = new Set([
   "dining", "ice_cream", "coffee_bar", "concessions", "sushi_bar",

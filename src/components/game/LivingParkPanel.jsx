@@ -1,5 +1,5 @@
 import React from "react";
-import { UtensilsCrossed, ShoppingBag, HeartPulse, Users, TrendingUp } from "lucide-react";
+import { Users, TrendingUp } from "lucide-react";
 export default function LivingParkPanel({ retailStats={}, retailStock={}, guestMemory={} }){
  const served=retailStats.served||{}; const health=retailStats.stockHealth||{};
  const rows=[["Food & drink","food"],["Retail & swimwear","retail"],["Guest services","services"]];

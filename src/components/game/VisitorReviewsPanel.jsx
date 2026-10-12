@@ -1,5 +1,5 @@
 import React from "react";
-import { Star, MessageSquare, ThumbsUp, AlertCircle, TrendingUp, TrendingDown } from "lucide-react";
+import { Star, MessageSquare, AlertCircle, TrendingUp, TrendingDown } from "lucide-react";
 import { computeReviewStats } from "@/data/visitorReviews";
 
 function Stars({ rating, size = "h-3.5 w-3.5" }) {

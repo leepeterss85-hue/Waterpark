@@ -1,6 +1,6 @@
 import React from "react";
-import { Crown, TrendingUp, Sparkles, Star, Users, Calendar, Maximize2, Trophy, Waves } from "lucide-react";
-import { EMPIRE_TIERS, getEmpireTier, getNextEmpireTier } from "@/data/empire";
+import { Crown, TrendingUp, Sparkles, Star, Users, Trophy, Waves } from "lucide-react";
+import { getEmpireTier, getNextEmpireTier } from "@/data/empire";
 import { MISSIONS, missionProgress } from "@/data/missions";
 import { ACHIEVEMENTS } from "@/data/achievements";
 
