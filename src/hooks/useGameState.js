@@ -1094,14 +1094,21 @@ export function useGameState() {
     setSandbox(isSandbox);
     saveSettings({ gameMode: nextMode, sandbox: isSandbox });
     if (nextMode === "story") {
-      setStoryStep(0);
-      setStoryCompleted(false);
-      setLog((l) => [{ day, text: "📖 Story Mode started. Maya will guide you through nine chapters from your first splash to a full park empire." }, ...l].slice(0, 12));
-      saveSettings({ gameMode: nextMode, sandbox: false, storyStep: 0, storyCompleted: false });
+      // Keep campaign progress when switching between modes. Resetting to step
+      // zero here made Story Mode restart every time the player returned to it.
+      setLog((l) => [{
+        day,
+        text: storyCompleted
+          ? "📖 Story Mode campaign already complete. Continue in Freeplay or start a new park to replay it."
+          : storyStep > 0
+            ? `📖 Story Mode resumed at objective ${storyStep + 1} of ${STORY_STEPS.length}.`
+            : "📖 Story Mode started. Maya will guide you through nine chapters from your first splash to a full park empire."
+      }, ...l].slice(0, 12));
+      saveSettings({ gameMode: nextMode, sandbox: false, storyStep, storyCompleted });
     } else if (nextMode === "sandbox") {
       setLog((l) => [{ day, text: "🛠️ Sandbox Mode enabled — creative testing controls are available." }, ...l].slice(0, 12));
     }
-  }, [day]);
+  }, [day, storyStep, storyCompleted]);
 
   const advanceStory = useCallback(() => {
     if (gameMode !== "story" || storyCompleted) return;
