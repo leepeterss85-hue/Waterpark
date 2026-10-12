@@ -31,13 +31,19 @@ export default function ParkManagementPanel({ admissionFee, marketingSpend, expr
   const fallingRides = popularityTrend.filter((v) => v < -0.08).length;
   const managementAdvice = weakestSignal.value < 60
     ? "Urgent: improve " + weakestSignal.label.toLowerCase() + " before expanding."
-    : marketShare < 35
-      ? "Competitive priority: raise appeal and guest satisfaction before adding expensive rides."
-      : risingRides > fallingRides
-        ? "Expansion window: visitor interest is trending upward across the park."
-        : fallingRides > risingRides
-          ? "Refresh rides or improve service — visitor interest is cooling."
-          : "Operations are balanced. Build or upgrade where your ROI is strongest.";
+    : longestQueue?.wait >= 20
+      ? "Queue pressure: " + (getParkItem(longestQueue.id)?.name || "A popular ride") + " has an estimated " + longestQueue.wait + " minute wait. Add queue paths or upgrade capacity."
+      : (guestNeeds.hunger >= 65 || guestNeeds.thirst >= 65)
+        ? "Guest services: visitors are leaving hungry or thirsty. Add food outlets and drink points near busy rides."
+        : avgMood > 0 && avgMood < 55
+          ? "Guest happiness is low. Check prices, cleanliness, safety and attraction variety before expanding."
+          : marketShare < 35
+            ? "Competitive priority: raise appeal and guest satisfaction before adding expensive rides."
+            : risingRides > fallingRides
+              ? "Expansion window: visitor interest is trending upward across the park."
+              : fallingRides > risingRides
+                ? "Refresh rides or improve service — visitor interest is cooling."
+                : "Operations are balanced. Build or upgrade where your ROI is strongest.";
   return <section className="waterpark-panel bg-white/85 p-4">
     <div className="mb-3"><div className="text-[10px] font-extrabold uppercase tracking-wider text-cyan-700">Business Office</div><h3 className="font-display text-lg font-extrabold text-slate-900">Run the resort</h3><p className="mt-1 text-[11px] leading-4 text-slate-500">Balance admissions, marketing and premium services against daily operating costs.</p></div>
     <div className="rounded-xl bg-emerald-50 p-3 ring-1 ring-emerald-100"><div className="flex items-center justify-between"><div className="flex items-center gap-2 text-xs font-extrabold text-emerald-800"><DollarSign className="h-4 w-4" /> Admission</div><span className="font-display text-lg font-extrabold text-slate-900">{`$${admissionFee}`}</span></div><div className="mt-2 flex flex-wrap gap-1.5">{[15,20,28,35,45,60].map((value)=><Choice key={value} active={admissionFee===value} onClick={()=>onAdmission(value)}>{`$${value}`}</Choice>)}</div></div>
