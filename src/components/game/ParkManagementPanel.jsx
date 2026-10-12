@@ -13,6 +13,9 @@ export default function ParkManagementPanel({ admissionFee, marketingSpend, expr
   const latest = history[history.length - 1];
   const avgMood = Math.round(visitorStats?.avgMood || 0);
   const topRide = visitorStats?.topAttraction ? getParkItem(visitorStats.topAttraction)?.name : null;
+  const longestQueue = visitorStats?.longestQueue || null;
+  const guestNeeds = visitorStats?.needs || {};
+  const guestExperience = visitorStats?.guestExperience || {};
   const totalRideLevels = rides.reduce((sum, r) => sum + r.level, 0);
   const totalCapacity = rides.reduce((sum, r) => sum + Math.round((r.item?.capacity || 0) * (1 + r.level * 0.2)), 0);
   const parkLoad = totalCapacity ? Math.min(100, Math.round(((visitorStats?.totalVisits || 0) / totalCapacity) * 100)) : 0;
@@ -69,6 +72,11 @@ export default function ParkManagementPanel({ admissionFee, marketingSpend, expr
         {(latest.weather || latest.event) && <div className="mt-2 text-[8px] font-bold text-cyan-200">{latest.weather}{latest.event ? " · " + latest.event : ""}</div>}
       </div>}
       {topRide && <div className="mt-2 rounded-lg bg-cyan-400/10 px-2.5 py-2 text-[9px] font-bold text-cyan-200">⭐ Top attraction: {topRide}</div>}
+      {visitorStats?.totalVisits > 0 && <div className="mt-2 grid grid-cols-2 gap-2">
+        <div className="rounded-lg bg-white/5 p-2 ring-1 ring-white/10"><div className="text-[8px] font-black uppercase tracking-wider text-white/45">Guest experience</div><div className="mt-1 text-[10px] font-bold text-emerald-200">{Math.round(guestExperience.happy || 0)} happy</div><div className="text-[9px] text-white/55">{Math.round(guestExperience.content || 0)} content · {Math.round(guestExperience.unhappy || 0)} unhappy</div></div>
+        <div className="rounded-lg bg-white/5 p-2 ring-1 ring-white/10"><div className="text-[8px] font-black uppercase tracking-wider text-white/45">Longest queue</div><div className="mt-1 text-[10px] font-bold text-amber-200">{longestQueue?.wait ? `${longestQueue.wait} min` : "No major queue"}</div><div className="text-[9px] text-white/55">{longestQueue?.id ? (getParkItem(longestQueue.id)?.name || "Attraction") : "Keep monitoring capacity"}</div></div>
+      </div>}
+      {(guestNeeds.hunger >= 65 || guestNeeds.thirst >= 65) && <div className="mt-2 rounded-lg bg-amber-400/10 px-2.5 py-2 text-[9px] font-bold text-amber-100">Guest needs warning: average hunger {Math.round(guestNeeds.hunger || 0)}% · thirst {Math.round(guestNeeds.thirst || 0)}%. Add refreshments nearby.</div>}
     </div>
       <div className="mt-3 rounded-xl bg-cyan-50 p-3 ring-1 ring-cyan-100">
       <div className="flex items-center justify-between">
