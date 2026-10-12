@@ -5,12 +5,15 @@ import { TUTORIAL_STEPS, TUTORIAL_KEY } from "@/data/tutorial";
 const STEP_TARGETS = { build: "build", open: "open", staff: "staff" };
 
 export default function Tutorial({ game }) {
-  const [dismissed, setDismissed] = useState(() => localStorage.getItem(TUTORIAL_KEY) === "1");
-  const [step, setStep] = useState(0);
-
-  // Only show for a genuinely new park: day 1, nothing built yet, never dismissed.
+  // Decide whether this is a new park only on first mount. Do not keep
+  // re-checking the empty-grid condition: building the first ride is part of
+  // the tutorial and must not make the tutorial disappear mid-way.
   const hasProgress = game.grid.some((id) => id && id !== "park_entrance" && id !== "main_path");
-  const shouldShow = !dismissed && game.day <= 1 && !hasProgress && step < TUTORIAL_STEPS.length;
+  const [dismissed, setDismissed] = useState(() => (
+    localStorage.getItem(TUTORIAL_KEY) === "1" || game.day > 1 || hasProgress
+  ));
+  const [step, setStep] = useState(0);
+  const shouldShow = !dismissed && step < TUTORIAL_STEPS.length;
 
   const current = TUTORIAL_STEPS[step];
   const isLast = step === TUTORIAL_STEPS.length - 1;
