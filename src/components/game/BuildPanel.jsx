@@ -12,12 +12,12 @@ export default function BuildPanel({ money, level = 1, selectedBuild, onSelect, 
     const req = researchReqFor(item.id);
     return (level >= unlockLevelFor(item) || sandbox) && !(req && !completedResearch.includes(req.id));
   };
-  const categoryCounts = useMemo(() => Object.fromEntries(
+  const categoryCounts = Object.fromEntries(
     ["attraction", "facility", "hotel"].map((category) => {
       const items = allItems.filter((item) => item.category === category);
       return [category, { total: items.length, unlocked: items.filter(itemIsUnlocked).length }];
     })
-  ), [allItems, level, sandbox, completedResearch]);
+  );
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return allItems;
