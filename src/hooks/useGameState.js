@@ -1009,8 +1009,16 @@ export function useGameState() {
     { id: "mastery", chapter: 7, title: "Master the Park", text: "Turn a successful waterpark into a finely tuned operation. Master research, upgrades, guests and long-term strategy.", target: "manage", action: "Earn 12 Park Mastery points.", reward: { money: 18000, xp: 650, reputation: 8 } },
     { id: "mega", chapter: 7, title: "Build Something Legendary", text: "A true destination needs a signature attraction. Complete a mega project and make the skyline part of your brand.", target: "advancedPark", action: "Complete your first mega project.", reward: { money: 25000, xp: 800, reputation: 10 } },
     { id: "empire", chapter: 8, title: "Build the Empire", text: "Your home park is only the beginning. Expand your influence through rivals, franchises and destinations.", target: "competitors", action: "Acquire a rival or open a franchise.", reward: { money: 40000, xp: 1000, reputation: 12 } },
-    { id: "prestige", chapter: 9, title: "Leave a Legacy", text: "Reach the highest levels of park management, then decide whether to prestige and build an even stronger legacy.", target: "advancedPark", action: "Reach level 25 and 1,000,000 lifetime earnings.", reward: { money: 75000, xp: 1500, reputation: 15 } },
-    { id: "finish", chapter: 9, title: "Waterpark Legend", text: "The campaign is complete. Your park is now ready for endless Freeplay, Sandbox experiments and the global park empire.", target: null, action: "Continue building your own legacy.", reward: { money: 100000, xp: 2000, reputation: 10 } },
+    { id: "variety", chapter: 8, title: "A Park for Everyone", text: "A great destination offers something for every guest. Grow a varied lineup instead of relying on one star ride.", target: "build", action: "Build at least five attractions.", reward: { money: 18000, xp: 450, reputation: 4, research: 2 } },
+    { id: "upgrade_master", chapter: 8, title: "Upgrade the Experience", text: "Invest in the rides guests already love. Better attractions help your park compete without relying on new builds alone.", target: "build", action: "Complete five attraction upgrades in total.", reward: { money: 22000, xp: 600, reputation: 4, research: 2 } },
+    { id: "researcher", chapter: 8, title: "The Innovation Lab", text: "Keep researching to unlock more advanced attractions, facilities and strategies for the next stage of your park.", target: "research", action: "Complete three research projects.", reward: { money: 24000, xp: 700, reputation: 5, research: 3 } },
+    { id: "resort_living", chapter: 9, title: "A Holiday to Remember", text: "Turn your waterpark into a multi-day holiday destination. Invest in hotels and keep rooms attractive to guests.", target: "resort", action: "Reach at least 50% hotel occupancy.", reward: { money: 30000, xp: 850, reputation: 6, research: 2 } },
+    { id: "award_winner", chapter: 9, title: "Earn Industry Respect", text: "Run a park worth celebrating. Improve operations and guest experience until your park wins its first industry award.", target: "manage", action: "Win your first park award.", reward: { money: 35000, xp: 1000, reputation: 8, research: 3 } },
+    { id: "land_developer", chapter: 9, title: "Make Room to Grow", text: "Big ambitions need room. Expand your land and plan districts that connect attractions, facilities and resort areas.", target: "build", action: "Complete three park expansions.", reward: { money: 40000, xp: 1100, reputation: 5, research: 3 } },
+    { id: "signature", chapter: 10, title: "Create a Signature Skyline", text: "Build a destination people travel to see. Complete another mega project and make your park truly distinctive.", target: "advancedPark", action: "Complete two mega projects in total.", reward: { money: 55000, xp: 1600, reputation: 8, research: 4 } },
+    { id: "legendary_operations", chapter: 10, title: "A Legendary Operation", text: "Prove you can manage a major resort at scale: strong earnings, high-level management and a park that keeps growing.", target: "manage", action: "Reach level 30 and earn $2,000,000 over your career.", reward: { money: 70000, xp: 2200, reputation: 10, research: 5 } },
+    { id: "prestige", chapter: 11, title: "Leave a Legacy", text: "Reach the highest levels of park management, then decide whether to prestige and build an even stronger legacy.", target: "advancedPark", action: "Reach level 35 and $3,000,000 lifetime earnings.", reward: { money: 90000, xp: 3000, reputation: 15, research: 5 } },
+    { id: "finish", chapter: 11, title: "Waterpark Legend", text: "The campaign is complete. Your park is now ready for endless Freeplay, Sandbox experiments and the global park empire.", target: null, action: "Continue building your own legacy.", reward: { money: 150000, xp: 4000, reputation: 10, research: 8 } },
   ];
 
   useEffect(() => {
@@ -1035,8 +1043,16 @@ export function useGameState() {
       mastery: (mastery?.points || 0) >= 12,
       mega: (megaProjects || []).some((p) => p.status === "complete" || p.status === "completed" || p.completed),
       empire: (acquiredRivals || []).length > 0 || (franchiseMaps || []).length > 0,
-      prestige: level >= 25 && (lifetimeEarnings || 0) >= 1000000,
-      finish: level >= 25 && (lifetimeEarnings || 0) >= 1000000 && ((mastery?.points || 0) >= 12) && ((acquiredRivals || []).length > 0 || (franchiseMaps || []).length > 0),
+      variety: attractions >= 5,
+      upgrade_master: totalUpgrades >= 5,
+      researcher: (completedResearch || []).length >= 3,
+      resort_living: (hotelStats?.occupancy || 0) >= 50,
+      award_winner: (awardStats?.totalWon || 0) >= 1,
+      land_developer: expansionsDone >= 3,
+      signature: (megaProjects || []).filter((p) => p.status === "complete" || p.status === "completed" || p.completed).length >= 2,
+      legendary_operations: level >= 30 && (lifetimeEarnings || 0) >= 2000000,
+      prestige: level >= 35 && (lifetimeEarnings || 0) >= 3000000,
+      finish: level >= 35 && (lifetimeEarnings || 0) >= 3000000 && ((mastery?.points || 0) >= 12) && ((acquiredRivals || []).length > 0 || (franchiseMaps || []).length > 0),
     };
     const step = STORY_STEPS[storyStep];
     if (!step || !completed[step.id]) return;
@@ -1044,7 +1060,8 @@ export function useGameState() {
     if (reward.money) setMoney((m) => m + reward.money);
     if (reward.xp) setXp((x) => x + reward.xp);
     if (reward.reputation) setReputation((rep) => Math.min(100, rep + reward.reputation));
-    setLog((l) => [{ day, text: `Story complete: ${step.title}. +$${(reward.money || 0).toLocaleString()} • +${reward.xp || 0} XP.` }, ...l].slice(0, 12));
+    if (reward.research) setResearchPoints((points) => points + reward.research);
+    setLog((l) => [{ day, text: `Story complete: ${step.title}. +$${(reward.money || 0).toLocaleString()} • +${reward.xp || 0} XP${reward.research ? ` • +${reward.research} research` : ""}.` }, ...l].slice(0, 12));
     sound.mission();
     trackEvent("story_step_completed", { id: step.id, chapter: step.chapter, step: storyStep + 1 });
     const next = Math.min(STORY_STEPS.length - 1, storyStep + 1);
@@ -1052,7 +1069,7 @@ export function useGameState() {
     const done = step.id === "finish";
     setStoryCompleted(done);
     saveSettings({ gameMode, storyStep: next, storyCompleted: done });
-  }, [gameMode, storyCompleted, storyStep, grid, staff, day, history, totalUpgrades, expansionsDone, completedResearch, hotelGuests, resortRating, incidents, emergencies, disastersSurvived, peakGuests, guests, marketShare, parkAppeal, reputation, level, mastery, megaProjects, acquiredRivals, franchiseMaps, lifetimeEarnings]);
+  }, [gameMode, storyCompleted, storyStep, grid, staff, day, history, totalUpgrades, expansionsDone, completedResearch, hotelGuests, hotelStats, resortRating, incidents, emergencies, disastersSurvived, peakGuests, guests, marketShare, parkAppeal, reputation, level, mastery, megaProjects, acquiredRivals, franchiseMaps, lifetimeEarnings, awardStats]);
 
   const selectScenario = useCallback((id) => {
     const scenario = getScenario(id);
