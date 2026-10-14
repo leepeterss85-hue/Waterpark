@@ -55,12 +55,12 @@ export default function StrategyCentre({
 
   return <div className="space-y-3">
     <Card title="Smart Investment Advisor" icon={Lightbulb} tone={advisor.tone}>
-      <div className="flex items-center justify-between"><span className="rounded-full bg-white px-2 py-1 text-[9px] font-black ring-1 ring-slate-200">{advisor.action}</span><span className="text-[10px] font-bold text-slate-500">Cash $ {Math.round(money).toLocaleString()}</span></div>
+      <div className="flex items-center justify-between"><span className="rounded-full bg-white px-2 py-1 text-[9px] font-black ring-1 ring-slate-200">{advisor.action}</span><span className="text-[10px] font-bold text-slate-500">Cash £{Math.round(money).toLocaleString()}</span></div>
       <div className="mt-2 text-xs font-black text-slate-800">{advisor.title}</div><div className="mt-1 text-[10px] font-semibold text-slate-600">{advisor.text}</div>
     </Card>
 
     <Card title="Attraction Performance Centre" icon={TrendingUp} tone="sky">
-      {performance.slice(0,5).map((x,i)=><div key={x.index} className="mb-2 rounded-xl bg-white p-2.5 ring-1 ring-slate-100"><div className="flex justify-between text-[10px] font-black"><span className="truncate">{i+1}. {x.name}</span><span className="text-emerald-600">{x.roi.toFixed(1)}% ROI</span></div><div className="mt-1 flex justify-between text-[9px] text-slate-400"><span>$ {Math.max(0,x.contribution).toLocaleString()}/day</span><span>$ {x.cost.toLocaleString()} asset</span></div></div>)}
+      {performance.slice(0,5).map((x,i)=><div key={x.index} className="mb-2 rounded-xl bg-white p-2.5 ring-1 ring-slate-100"><div className="flex justify-between text-[10px] font-black"><span className="truncate">{i+1}. {x.name}</span><span className="text-emerald-600">{x.roi.toFixed(1)}% ROI</span></div><div className="mt-1 flex justify-between text-[9px] text-slate-400"><span>£{Math.max(0,x.contribution).toLocaleString()}/day</span><span>£{x.cost.toLocaleString()} asset</span></div></div>)}
       {!performance.length&&<div className="text-[10px] text-slate-500">Build attractions to start performance tracking.</div>}
       {hot?.item&&<div className="mt-2 rounded-lg bg-sky-100 px-2.5 py-2 text-[10px] font-bold text-sky-800">Hot ride: {hot.item.name} · {Math.round(hot.score)}% {hot.trend>0?"↗ rising":hot.trend<0?"↘ falling":"→ stable"}</div>}
     </Card>
@@ -69,7 +69,7 @@ export default function StrategyCentre({
       <div className="grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-white p-2.5"><div className="text-[8px] uppercase font-black text-slate-400">Occupancy</div><div className="text-base font-black text-violet-700">{Math.round(occupancy)}%</div></div>
         <div className="rounded-xl bg-white p-2.5"><div className="text-[8px] uppercase font-black text-slate-400">Happiness</div><div className="text-base font-black text-emerald-600">{Math.round(hotelStats.avgHappiness||0)}%</div></div>
-        <div className="rounded-xl bg-white p-2.5"><div className="text-[8px] uppercase font-black text-slate-400">Room Revenue</div><div className="text-base font-black">$ {Math.round(hotelStats.roomRevenue||0).toLocaleString()}</div></div>
+        <div className="rounded-xl bg-white p-2.5"><div className="text-[8px] uppercase font-black text-slate-400">Room Revenue</div><div className="text-base font-black">£{Math.round(hotelStats.roomRevenue||0).toLocaleString()}</div></div>
         <div className="rounded-xl bg-white p-2.5"><div className="text-[8px] uppercase font-black text-slate-400">Rating</div><div className="text-base font-black text-amber-600">{Number(resortRating||0).toFixed(1)} ★</div></div>
       </div><div className="mt-2 text-[10px] font-bold text-violet-800">{hotelAdvice}</div>
       {hotelGuests.length>0&&<div className="mt-2 text-[9px] text-slate-500">{hotelGuests.length} hotel guest record(s) active.</div>}
