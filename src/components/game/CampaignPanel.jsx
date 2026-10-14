@@ -1,5 +1,5 @@
 import React from "react";
-import { Megaphone, Clock, DollarSign, TrendingUp, Check, X, Users } from "lucide-react";
+import { Megaphone, Clock, PoundSterling, TrendingUp, Check, X, Users } from "lucide-react";
 import { CAMPAIGNS, campaignEffectiveness } from "@/data/campaigns";
 import { getIcon } from "./icons";
 
@@ -64,7 +64,7 @@ export default function CampaignPanel({ money, activeCampaigns = [], grid = [], 
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-xs font-bold text-slate-700">{c.name}</span>
-                    <span className="flex items-center gap-0.5 text-[10px] font-black text-slate-500"><DollarSign className="h-3 w-3" />{c.cost.toLocaleString()}</span>
+                    <span className="flex items-center gap-0.5 text-[10px] font-black text-slate-500"><PoundSterling className="h-3 w-3" />{c.cost.toLocaleString()}</span>
                   </div>
                   <p className="mt-0.5 text-[10px] leading-3 text-slate-400">{c.description}</p>
                   <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[9px] font-bold">

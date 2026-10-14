@@ -1,5 +1,5 @@
 export const REWARD_TYPES = [
-  { id: "cash_small", label: "Cash Drop", icon: "DollarSign", color: "from-emerald-400 to-green-600", minAmount: 2000, maxAmount: 5000, weight: 30 },
+  { id: "cash_small", label: "Cash Drop", icon: "PoundSterling", color: "from-emerald-400 to-green-600", minAmount: 2000, maxAmount: 5000, weight: 30 },
   { id: "cash_big", label: "Jackpot!", icon: "Coins", color: "from-amber-400 to-yellow-600", minAmount: 10000, maxAmount: 25000, weight: 8 },
   { id: "xp", label: "XP Boost", icon: "Star", color: "from-violet-400 to-purple-600", minAmount: 100, maxAmount: 300, weight: 20 },
   { id: "rep", label: "Rep Surge", icon: "TrendingUp", color: "from-cyan-400 to-blue-600", minAmount: 3, maxAmount: 8, weight: 15 },

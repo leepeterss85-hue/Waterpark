@@ -1,7 +1,7 @@
 import React from "react";
 import {
   Ticket, CalendarCheck, Users, Crown,
-  TrendingUp, DollarSign, UserCheck, Repeat, Sparkles,
+  TrendingUp, PoundSterling, UserCheck, Repeat, Sparkles,
 } from "lucide-react";
 import { MEMBERSHIP_TIERS, totalMemberCount } from "@/data/memberships";
 
@@ -44,11 +44,11 @@ export default function MembershipsPanel({ counts, stats, level }) {
       {/* Stats summary */}
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <StatCard icon={Users} label="Active Members" value={totalMembers.toLocaleString()} />
-        <StatCard icon={DollarSign} label="Today's Revenue" value={`£${(stats?.dailyRevenue || 0).toLocaleString()}`} />
+        <StatCard icon={PoundSterling} label="Today's Revenue" value={`£${(stats?.dailyRevenue || 0).toLocaleString()}`} />
         <StatCard icon={TrendingUp} label="Lifetime Revenue" value={`£${(stats?.totalRevenue || 0).toLocaleString()}`} />
         <StatCard icon={UserCheck} label="Member Visits" value={(stats?.memberVisits || 0).toLocaleString()} sublabel="today" />
         <StatCard icon={Repeat} label="Retention" value={`${retentionRate}%`} sublabel={`${renewed} renewed · ${churned} lapsed`} />
-        <StatCard icon={DollarSign} label="Member Spend" value={`£${(stats?.memberSpend || 0).toLocaleString()}`} sublabel="today at facilities" />
+        <StatCard icon={PoundSterling} label="Member Spend" value={`£${(stats?.memberSpend || 0).toLocaleString()}`} sublabel="today at facilities" />
       </div>
 
       {/* Tier cards */}

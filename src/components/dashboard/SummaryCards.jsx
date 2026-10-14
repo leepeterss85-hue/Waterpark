@@ -1,5 +1,5 @@
 import React from "react";
-import { DollarSign, Users, Star, CalendarDays, TrendingUp } from "lucide-react";
+import { PoundSterling, Users, Star, CalendarDays, TrendingUp } from "lucide-react";
 
 function satisfactionLabel(r) {
   if (r >= 80) return "Excellent";
@@ -37,7 +37,7 @@ export default function SummaryCards({ history, guests, reputation, day, lastNet
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
       <Card
-        icon={DollarSign}
+        icon={PoundSterling}
         label="Today's Income"
         value={`£${Math.max(0, lastNet).toLocaleString()}`}
         sub={`net ${lastNet >= 0 ? "+" : ""}£${lastNet.toLocaleString()}`}

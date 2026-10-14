@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { getIcon } from "@/components/game/icons";
 import { STARTER_PARKS } from "@/data/starterParks";
 import { levelTier } from "@/data/gameData";
-import { Trophy, DollarSign, Star } from "lucide-react";
+import { Trophy, PoundSterling, Star } from "lucide-react";
 
 export default function StarterParkPicker({ onPick }) {
   const [selected, setSelected] = useState("empty_lot");
@@ -37,7 +37,7 @@ export default function StarterParkPicker({ onPick }) {
                 <div className="text-[10px] font-bold text-slate-400">{park.tagline}</div>
                 <p className="mt-1 text-[10px] leading-tight text-slate-500">{park.description}</p>
                 <div className="mt-1.5 flex flex-wrap items-center gap-2 text-[10px] font-extrabold">
-                  <span className="inline-flex items-center gap-0.5 text-emerald-600"><DollarSign className="h-3 w-3" />{park.money.toLocaleString()}</span>
+                  <span className="inline-flex items-center gap-0.5 text-emerald-600"><PoundSterling className="h-3 w-3" />{park.money.toLocaleString()}</span>
                   <span className="inline-flex items-center gap-0.5 text-violet-500"><Trophy className="h-3 w-3" />Lv {park.level}</span>
                   <span className="inline-flex items-center gap-0.5 text-amber-500"><Star className="h-3 w-3" />{park.grid.filter(Boolean).length} items</span>
                 </div>

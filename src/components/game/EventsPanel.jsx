@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { DollarSign, Users, TrendingUp, Star, Lock, Clock, Sparkles, AlertTriangle, Ban, Wrench } from "lucide-react";
+import { PoundSterling, Users, TrendingUp, Star, Lock, Clock, Sparkles, AlertTriangle, Ban, Wrench } from "lucide-react";
 import { MAJOR_EVENTS, EVENT_CATEGORIES, getCategory, isEventAvailable, getEvent, checkEventRequirements, checkEventConflict } from "@/data/parkEvents";
 import { getIcon } from "@/components/game/icons";
 import { getSeasonLabel } from "@/data/parkSystems";
@@ -42,11 +42,11 @@ function EventCard({ event, active, available, season, level, money, grid, staff
       </div>
 
       <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[9px] font-extrabold">
-        <span className="inline-flex items-center gap-0.5 text-emerald-600"><DollarSign className="h-2.5 w-2.5" />{event.cost.toLocaleString()}</span>
+        <span className="inline-flex items-center gap-0.5 text-emerald-600"><PoundSterling className="h-2.5 w-2.5" />{event.cost.toLocaleString()}</span>
         <span className="inline-flex items-center gap-0.5 text-cyan-600"><Clock className="h-2.5 w-2.5" />{event.duration}d</span>
         <span className="inline-flex items-center gap-0.5 text-violet-500"><Users className="h-2.5 w-2.5" />+{Math.round((event.guestMult - 1) * 100)}%</span>
         <span className="inline-flex items-center gap-0.5 text-amber-500"><TrendingUp className="h-2.5 w-2.5" />+{Math.round((event.incomeMult - 1) * 100)}%</span>
-        {event.revenuePerDay > 0 && <span className="inline-flex items-center gap-0.5 text-emerald-600"><DollarSign className="h-2.5 w-2.5" />{event.revenuePerDay}/day</span>}
+        {event.revenuePerDay > 0 && <span className="inline-flex items-center gap-0.5 text-emerald-600"><PoundSterling className="h-2.5 w-2.5" />{event.revenuePerDay}/day</span>}
         <span className="inline-flex items-center gap-0.5 text-rose-400"><Star className="h-2.5 w-2.5" />+{event.repDelta}</span>
       </div>
 

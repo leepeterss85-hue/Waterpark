@@ -1,5 +1,5 @@
 import React from "react";
-import { Bed, Users, DollarSign, Smile, Star, ArrowUpCircle, Trash2, X, Crown } from "lucide-react";
+import { Bed, Users, PoundSterling, Smile, Star, ArrowUpCircle, Trash2, X, Crown } from "lucide-react";
 import { hotelRooms, hotelRoomPrice, hotelAmenities, hotelAmenityBonus, HOTEL_AMENITIES } from "@/data/hotels";
 import { upgradeCost, MAX_UPGRADE } from "@/data/gameData";
 
@@ -40,8 +40,8 @@ export default function HotelDetail({ hotelDef, level, occupancy, guestsInHotel,
       <div className="grid grid-cols-2 gap-2">
         <StatRow icon={Bed} label="Rooms" value={`${guestsInHotel}/${rooms}`} tone="text-cyan-600" />
         <StatRow icon={Users} label="Occupancy" value={`${occupancyPct}%`} tone={occupancyPct >= 80 ? "text-emerald-600" : occupancyPct >= 50 ? "text-amber-600" : "text-slate-500"} />
-        <StatRow icon={DollarSign} label="Room Rate" value={`£${roomPrice}/night`} tone="text-emerald-600" />
-        <StatRow icon={DollarSign} label="Nightly Revenue" value={`£${nightlyRevenue.toLocaleString()}`} tone="text-emerald-600" />
+        <StatRow icon={PoundSterling} label="Room Rate" value={`£${roomPrice}/night`} tone="text-emerald-600" />
+        <StatRow icon={PoundSterling} label="Nightly Revenue" value={`£${nightlyRevenue.toLocaleString()}`} tone="text-emerald-600" />
       </div>
 
       <div>

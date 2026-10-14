@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Cloud, Save, FolderOpen, Trash2, Calendar, DollarSign, Star, Users, RefreshCw, Loader2 } from "lucide-react";
+import { Cloud, Save, FolderOpen, Trash2, Calendar, PoundSterling, Star, Users, RefreshCw, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 export default function CloudSavesPanel({ onLoadCloud, onSaveCloud }) {
@@ -131,7 +131,7 @@ export default function CloudSavesPanel({ onLoadCloud, onSaveCloud }) {
               </div>
               <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-slate-500">
                 <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> Day {s.day ?? 1}</span>
-                <span className="flex items-center gap-1"><DollarSign className="h-3 w-3" /> ${(s.money ?? 0).toLocaleString()}</span>
+                <span className="flex items-center gap-1"><PoundSterling className="h-3 w-3" /> ${(s.money ?? 0).toLocaleString()}</span>
                 <span className="flex items-center gap-1"><Star className="h-3 w-3" /> {s.reputation ?? 50}%</span>
                 <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {(s.guests ?? 0).toLocaleString()}</span>
               </div>

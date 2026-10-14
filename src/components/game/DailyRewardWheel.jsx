@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { DollarSign, Coins, Star, TrendingUp, FlaskConical, ArrowUpCircle, Gift, Sparkles } from "lucide-react";
+import { PoundSterling, Coins, Star, TrendingUp, FlaskConical, ArrowUpCircle, Gift, Sparkles } from "lucide-react";
 import { REWARD_TYPES, spinWheel, getStreakBonus, canClaimReward } from "@/data/dailyRewards";
 
-const ICONS = { DollarSign, Coins, Star, TrendingUp, FlaskConical, ArrowUpCircle, Gift };
+const ICONS = { PoundSterling, Coins, Star, TrendingUp, FlaskConical, ArrowUpCircle, Gift };
 
 export default function DailyRewardWheel({ day, lastRewardDay, streak, onClaim }) {
   const [spinning, setSpinning] = useState(false);

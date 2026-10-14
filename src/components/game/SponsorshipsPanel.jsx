@@ -1,5 +1,5 @@
 import React from "react";
-import { Handshake, TrendingDown, DollarSign, X, Lock } from "lucide-react";
+import { Handshake, TrendingDown, PoundSterling, X, Lock } from "lucide-react";
 import { SPONSOR_TIERS, MAX_SPONSORS, SPONSOR_DURATION, activeSponsorIncome, activeSponsorAppealCost } from "@/data/sponsorships";
 import { getIcon } from "./icons";
 
@@ -34,7 +34,7 @@ export default function SponsorshipsPanel({ money, level, sponsorships = [], onA
       {/* Active summary */}
       <div className="mb-3 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-emerald-50 p-2.5 ring-1 ring-emerald-100">
-          <div className="flex items-center gap-1 text-[9px] font-black uppercase tracking-wide text-emerald-700"><DollarSign className="h-3 w-3" /> Daily income</div>
+          <div className="flex items-center gap-1 text-[9px] font-black uppercase tracking-wide text-emerald-700"><PoundSterling className="h-3 w-3" /> Daily income</div>
           <div className="mt-0.5 text-sm font-extrabold text-slate-800">+£{dailyIncome.toLocaleString()}/day</div>
         </div>
         <div className="rounded-xl bg-rose-50 p-2.5 ring-1 ring-rose-100">

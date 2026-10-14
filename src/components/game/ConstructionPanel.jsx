@@ -1,5 +1,5 @@
 import React from "react";
-import { HardHat, Hotel, Waves, Maximize2, Sparkles, DoorOpen, Clock, DollarSign, AlertTriangle, CheckCircle2, Star, Construction } from "lucide-react";
+import { HardHat, Hotel, Waves, Maximize2, Sparkles, DoorOpen, Clock, PoundSterling, AlertTriangle, CheckCircle2, Star, Construction } from "lucide-react";
 import { PROJECT_TYPES, CATEGORY_LABELS } from "@/data/construction";
 
 const CATEGORY_ICONS = { hotel: Hotel, ride: Waves, expansion: Maximize2, renovation: Sparkles, infrastructure: DoorOpen };
@@ -72,7 +72,7 @@ export default function ConstructionPanel({ projects, money, day, sandbox, onSta
                       <h5 className="text-sm font-bold text-slate-900">{def.name}</h5>
                       <p className="text-[11px] leading-snug text-slate-500">{def.description}</p>
                       <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[10px] font-bold">
-                        <span className="flex items-center gap-0.5 rounded-lg bg-rose-50 px-1.5 py-0.5 text-rose-600"><DollarSign className="h-3 w-3" /> {def.cost.toLocaleString()}</span>
+                        <span className="flex items-center gap-0.5 rounded-lg bg-rose-50 px-1.5 py-0.5 text-rose-600"><PoundSterling className="h-3 w-3" /> {def.cost.toLocaleString()}</span>
                         <span className="flex items-center gap-0.5 rounded-lg bg-blue-50 px-1.5 py-0.5 text-blue-600"><Clock className="h-3 w-3" /> {def.duration}d</span>
                         <span className="flex items-center gap-0.5 rounded-lg bg-amber-50 px-1.5 py-0.5 text-amber-600"><AlertTriangle className="h-3 w-3" /> -{Math.round((1 - def.disruption.guestMult) * 100)}%</span>
                         <span className="flex items-center gap-0.5 rounded-lg bg-emerald-50 px-1.5 py-0.5 text-emerald-600"><Star className="h-3 w-3" /> +{def.rewards.reputation} rep</span>

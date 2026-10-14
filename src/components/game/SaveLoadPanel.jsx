@@ -4,7 +4,7 @@ import {
   FolderOpen,
   Trash2,
   Calendar,
-  DollarSign,
+  PoundSterling,
   Star,
   Users,
 } from "lucide-react";
@@ -62,7 +62,7 @@ export default function SaveLoadPanel({ saves, onSave, onLoad, onDelete }) {
                   <Calendar className="h-3 w-3" /> Day {s.day ?? 1}
                 </span>
                 <span className="flex items-center gap-1">
-                  <DollarSign className="h-3 w-3" /> ${(s.money ?? 0).toLocaleString()}
+                  <PoundSterling className="h-3 w-3" /> ${(s.money ?? 0).toLocaleString()}
                 </span>
                 <span className="flex items-center gap-1">
                   <Star className="h-3 w-3" /> {s.reputation ?? 50}%
