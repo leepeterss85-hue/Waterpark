@@ -142,7 +142,7 @@ export function simulateMemberships({
       totalChurned += churned;
       renewalRevenue += retained * tier.price;
       if (retained > 0) {
-        logEntries.push(`${retained} ${tier.name}${retained > 1 ? "s" : ""} renewed (+$${(retained * tier.price).toLocaleString()}).`);
+        logEntries.push(`${retained} ${tier.name}${retained > 1 ? "s" : ""} renewed (+£${(retained * tier.price).toLocaleString()}).`);
       }
       if (churned > 0) {
         logEntries.push(`${churned} ${tier.name}${churned > 1 ? "s" : ""} lapsed.`);
@@ -156,7 +156,7 @@ export function simulateMemberships({
 
     if (newSales > 0) {
       newSalesRevenue += newSales * tier.price;
-      logEntries.push(`${newSales} new ${tier.name}${newSales > 1 ? "s" : ""} sold (+$${(newSales * tier.price).toLocaleString()}).`);
+      logEntries.push(`${newSales} new ${tier.name}${newSales > 1 ? "s" : ""} sold (+£${(newSales * tier.price).toLocaleString()}).`);
     }
 
     // Member visits today — a fraction of total members visit based on visitFrequency

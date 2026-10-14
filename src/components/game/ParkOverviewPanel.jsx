@@ -48,14 +48,14 @@ export default function ParkOverviewPanel({ game, onOpen }) {
     {objective && <Card className="border-cyan-200 bg-cyan-50"><CardContent className="p-4"><div className="flex items-center gap-2 text-xs font-black text-cyan-700"><Target className="h-4 w-4"/>CURRENT OBJECTIVE</div><div className="mt-1 text-base font-black">{objective.title}</div><p className="mt-1 text-xs leading-5 text-slate-600">{objective.text}</p><Button className="mt-3 w-full" size="sm" onClick={()=>open(next[0])}>{next[1]}</Button></CardContent></Card>}
 
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-      <Metric icon={Banknote} label="Cash" value={"$"+Math.round(game.money).toLocaleString()} sub={"Lifetime $"+Math.round(game.lifetimeEarnings||0).toLocaleString()}/>
+      <Metric icon={Banknote} label="Cash" value={"£"+Math.round(game.money).toLocaleString()} sub={"Lifetime £"+Math.round(game.lifetimeEarnings||0).toLocaleString()}/>
       <Metric icon={Users} label="Guests" value={Math.round(game.guests)} sub={"Peak "+Math.round(game.peakGuests||0)}/>
       <Metric icon={Star} label="Appeal" value={appeal+"/100"} sub={(game.parkAppeal?.label||"Park appeal")}/>
       <Metric icon={TrendingUp} label="Reputation" value={Math.round(game.reputation)+"/100"} sub={"Market "+Math.round(game.marketShare||0)+"%"}/>
     </div>
 
     <div className="grid grid-cols-2 gap-2">
-      <Metric icon={CalendarDays} label="30-day income" value={"$"+Math.round(income).toLocaleString()} sub="Rolling management report"/>
+      <Metric icon={CalendarDays} label="30-day income" value={"£"+Math.round(income).toLocaleString()} sub="Rolling management report"/>
       <Metric icon={HeartPulse} label="Guest mood" value={mood+"/100"} sub={visitorMix ? "Live guest experience" : "Average visitor mood"}/>
       <Metric icon={Hotel} label="Hotel occupancy" value={occupancy+"%"} sub={"Rating "+Math.round(game.resortRating||0)+"/100"}/>
       <Metric icon={AlertTriangle} label="Alerts" value={alerts} sub={alerts ? "Needs attention" : "Park operating normally"}/>

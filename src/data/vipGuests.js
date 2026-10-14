@@ -114,7 +114,7 @@ export function evaluateVipVisit(vip, { avgMood, cleanliness, safety, reputation
       money: type.moneyReward + Math.round(score * 20),
       reputation: type.repReward,
       socialBoost: type.socialBoost,
-      message: `${vip.name} was blown away! +$${(type.moneyReward + Math.round(score * 20)).toLocaleString()}, +${type.repReward} reputation.`,
+      message: `${vip.name} was blown away! +£${(type.moneyReward + Math.round(score * 20)).toLocaleString()}, +${type.repReward} reputation.`,
     };
   } else if (score >= threshold - 20) {
     return {
@@ -122,7 +122,7 @@ export function evaluateVipVisit(vip, { avgMood, cleanliness, safety, reputation
       money: Math.round(type.moneyReward * 0.3),
       reputation: 1,
       socialBoost: false,
-      message: `${vip.name} had a decent visit. +$${Math.round(type.moneyReward * 0.3).toLocaleString()}.`,
+      message: `${vip.name} had a decent visit. +£${Math.round(type.moneyReward * 0.3).toLocaleString()}.`,
     };
   } else {
     return {

@@ -184,7 +184,7 @@ export default function Home() {
         </div>
         <h1 className="hidden font-display text-base font-extrabold tracking-tight text-white sm:block">Splash Tycoon</h1>
         <div className="flex flex-1 items-center gap-1.5 overflow-x-auto sm:justify-center sm:gap-2">
-          <StatPill icon={DollarSign} value={`$${game.money.toLocaleString()}`} tone="text-emerald-300" />
+          <StatPill icon={DollarSign} value={`£${game.money.toLocaleString()}`} tone="text-emerald-300" />
           <StatPill icon={CalendarDays} value={game.day} tone="text-sky-300" />
           <StatPill icon={Users} value={game.guests.toLocaleString()} tone="text-cyan-300" />
           <div className="hidden sm:block"><StatPill icon={Star} value={`${game.reputation}%`} tone="text-amber-300" /></div>

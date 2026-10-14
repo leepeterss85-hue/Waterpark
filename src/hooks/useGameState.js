@@ -423,7 +423,7 @@ export function useGameState() {
       setBuiltAttractionIds((ids) => (ids.includes(selectedBuild) ? ids : [...ids, selectedBuild]));
       if (isFirst && !sandbox) {
         setMoney((m) => m + FIRST_ATTRACTION_BONUS);
-        setLog((l) => [{ day, text: `Day ${day}: 🎉 Grand Opening bonus! +$${FIRST_ATTRACTION_BONUS.toLocaleString()} for your first attraction.` }, ...l].slice(0, 12));
+        setLog((l) => [{ day, text: `Day ${day}: 🎉 Grand Opening bonus! +£${FIRST_ATTRACTION_BONUS.toLocaleString()} for your first attraction.` }, ...l].slice(0, 12));
       }
     }
     setLastBuildAction({ index, id: selectedBuild, cost: attr.cost });
@@ -518,7 +518,7 @@ export function useGameState() {
     if (!sandbox && money < cost) return;
     if (!sandbox) setMoney((m) => m - cost);
     setStaffMorale(MORALE_RESTORE_TARGET);
-    setLog((l) => [{ day, text: `Day ${day}: 💚 Staff bonus paid ($${cost.toLocaleString()}). Morale restored to ${MORALE_RESTORE_TARGET}.` }, ...l].slice(0, 12));
+    setLog((l) => [{ day, text: `Day ${day}: 💚 Staff bonus paid (£${cost.toLocaleString()}). Morale restored to ${MORALE_RESTORE_TARGET}.` }, ...l].slice(0, 12));
     trackEvent("staff_bonus_paid", { cost });
   }, [money, sandbox, day]);
 
@@ -538,7 +538,7 @@ export function useGameState() {
     if ((stateRef.current.sponsorships || []).length >= MAX_SPONSORS) return;
     if ((stateRef.current.sponsorships || []).some((s) => s.id === tierId)) return;
     setSponsorships((prev) => [...prev, { id: tier.id, name: tier.name, tier: tier.tier, dailyIncome: tier.dailyIncome, appealCost: tier.appealCost, daysLeft: SPONSOR_DURATION }]);
-    setLog((l) => [{ day, text: `Day ${day}: 🤝 Signed ${tier.name} sponsorship: +$${tier.dailyIncome.toLocaleString()}/day, -${tier.appealCost} appeal for ${SPONSOR_DURATION} days.` }, ...l].slice(0, 12));
+    setLog((l) => [{ day, text: `Day ${day}: 🤝 Signed ${tier.name} sponsorship: +£${tier.dailyIncome.toLocaleString()}/day, -${tier.appealCost} appeal for ${SPONSOR_DURATION} days.` }, ...l].slice(0, 12));
     trackEvent("sponsor_accepted", { id: tierId });
   }, [level, day]);
 
@@ -556,7 +556,7 @@ export function useGameState() {
     setGroupBookings((prev) => prev.filter((b) => b.id !== bookingId));
     setAcceptedBookings((prev) => [...prev, { id: booking.id, name: booking.name, size: booking.size, moodImpact: booking.moodImpact }]);
     if (!sandbox) setMoney((m) => m + booking.payment);
-    setLog((l) => [{ day, text: `Day ${day}: 🚌 Accepted ${booking.name} (${booking.size} guests, +$${booking.payment.toLocaleString()}). They arrive tomorrow.` }, ...l].slice(0, 12));
+    setLog((l) => [{ day, text: `Day ${day}: 🚌 Accepted ${booking.name} (${booking.size} guests, +£${booking.payment.toLocaleString()}). They arrive tomorrow.` }, ...l].slice(0, 12));
     trackEvent("group_booking_accepted", { id: bookingId, size: booking.size, payment: booking.payment });
   }, [day, sandbox]);
 
@@ -575,7 +575,7 @@ export function useGameState() {
     const strike = createCounterStrike(rival, level);
     if (!sandbox) setMoney((m) => m - cost);
     setActiveStrikes((prev) => [...prev, strike]);
-    setLog((l) => [{ day, text: `Day ${day}: ⚔️ Counter-strike launched against ${rival.name}! Their appeal -${Math.round(strike.appealReduction)} for ${strike.daysLeft} days. Cost: $${cost.toLocaleString()}.` }, ...l].slice(0, 12));
+    setLog((l) => [{ day, text: `Day ${day}: ⚔️ Counter-strike launched against ${rival.name}! Their appeal -${Math.round(strike.appealReduction)} for ${strike.daysLeft} days. Cost: £${cost.toLocaleString()}.` }, ...l].slice(0, 12));
     trackEvent("rival_strike_launched", { rivalId, cost });
   }, [level, money, sandbox, day]);
 
@@ -724,7 +724,7 @@ export function useGameState() {
     if (money < cost) return;
     setMoney((m) => m - cost);
     setRideAges((ra) => { const next = Array.isArray(ra) ? [...ra] : []; while (next.length < grid.length) next.push(0); next[tileIndex] = 0; return next; });
-    setLog((l) => [{ day, text: `Day ${day}: 🔧 Refurbished ${def.name} for $${cost.toLocaleString()}.` }, ...l].slice(0, 12));
+    setLog((l) => [{ day, text: `Day ${day}: 🔧 Refurbished ${def.name} for £${cost.toLocaleString()}.` }, ...l].slice(0, 12));
     trackEvent("ride_refurbished", { item: itemId, cost });
   }, [grid, rideAges, money, day]);
 
@@ -1016,8 +1016,8 @@ export function useGameState() {
     { id: "award_winner", chapter: 9, title: "Earn Industry Respect", text: "Run a park worth celebrating. Improve operations and guest experience until your park wins its first industry award.", target: "manage", action: "Win your first park award.", reward: { money: 35000, xp: 1000, reputation: 8, research: 3 } },
     { id: "land_developer", chapter: 9, title: "Make Room to Grow", text: "Big ambitions need room. Expand your land and plan districts that connect attractions, facilities and resort areas.", target: "build", action: "Complete three park expansions.", reward: { money: 40000, xp: 1100, reputation: 5, research: 3 } },
     { id: "signature", chapter: 10, title: "Create a Signature Skyline", text: "Build a destination people travel to see. Complete another mega project and make your park truly distinctive.", target: "advancedPark", action: "Complete two mega projects in total.", reward: { money: 55000, xp: 1600, reputation: 8, research: 4 } },
-    { id: "legendary_operations", chapter: 10, title: "A Legendary Operation", text: "Prove you can manage a major resort at scale: strong earnings, high-level management and a park that keeps growing.", target: "manage", action: "Reach level 30 and earn $2,000,000 over your career.", reward: { money: 70000, xp: 2200, reputation: 10, research: 5 } },
-    { id: "prestige", chapter: 11, title: "Leave a Legacy", text: "Reach the highest levels of park management, then decide whether to prestige and build an even stronger legacy.", target: "advancedPark", action: "Reach level 35 and $3,000,000 lifetime earnings.", reward: { money: 90000, xp: 3000, reputation: 15, research: 5 } },
+    { id: "legendary_operations", chapter: 10, title: "A Legendary Operation", text: "Prove you can manage a major resort at scale: strong earnings, high-level management and a park that keeps growing.", target: "manage", action: "Reach level 30 and earn £2,000,000 over your career.", reward: { money: 70000, xp: 2200, reputation: 10, research: 5 } },
+    { id: "prestige", chapter: 11, title: "Leave a Legacy", text: "Reach the highest levels of park management, then decide whether to prestige and build an even stronger legacy.", target: "advancedPark", action: "Reach level 35 and £3,000,000 lifetime earnings.", reward: { money: 90000, xp: 3000, reputation: 15, research: 5 } },
     { id: "finish", chapter: 11, title: "Waterpark Legend", text: "The campaign is complete. Your park is now ready for endless Freeplay, Sandbox experiments and the global park empire.", target: null, action: "Continue building your own legacy.", reward: { money: 150000, xp: 4000, reputation: 10, research: 8 } },
   ];
 
@@ -1061,7 +1061,7 @@ export function useGameState() {
     if (reward.xp) setXp((x) => x + reward.xp);
     if (reward.reputation) setReputation((rep) => Math.min(100, rep + reward.reputation));
     if (reward.research) setResearchPoints((points) => points + reward.research);
-    setLog((l) => [{ day, text: `Story complete: ${step.title}. +$${(reward.money || 0).toLocaleString()} • +${reward.xp || 0} XP${reward.research ? ` • +${reward.research} research` : ""}.` }, ...l].slice(0, 12));
+    setLog((l) => [{ day, text: `Story complete: ${step.title}. +£${(reward.money || 0).toLocaleString()} • +${reward.xp || 0} XP${reward.research ? ` • +${reward.research} research` : ""}.` }, ...l].slice(0, 12));
     sound.mission();
     trackEvent("story_step_completed", { id: step.id, chapter: step.chapter, step: storyStep + 1 });
     const next = Math.min(STORY_STEPS.length - 1, storyStep + 1);

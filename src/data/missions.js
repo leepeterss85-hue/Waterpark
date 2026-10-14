@@ -119,7 +119,7 @@ export const MISSIONS = [
   {
     id: "water_empire_legend",
     title: "Water Empire Legend",
-    desc: "Earn $250,000 across the life of your park.",
+    desc: "Earn £250,000 across the life of your park.",
     type: "lifetime_earnings",
     target: 250000,
     level: 10,
@@ -147,7 +147,7 @@ export const MISSIONS = [
   {
     id: "empire_builder",
     title: "Empire Builder",
-    desc: "Earn $1,000,000 across the life of your park.",
+    desc: "Earn £1,000,000 across the life of your park.",
     type: "lifetime_earnings",
     target: 1000000,
     level: 20,
@@ -193,7 +193,7 @@ export const MISSIONS = [
   {
     id: "wealth_beyond_measure",
     title: "Wealth Beyond Measure",
-    desc: "Earn $5,000,000 across the life of your park.",
+    desc: "Earn £5,000,000 across the life of your park.",
     type: "lifetime_earnings",
     target: 5000000,
     level: 32,
@@ -238,7 +238,7 @@ export const MISSIONS = [
   {
     id: "ultimate_tycoon",
     title: "Ultimate Waterpark Tycoon",
-    desc: "Earn $50,000,000 across the life of your park.",
+    desc: "Earn £50,000,000 across the life of your park.",
     type: "lifetime_earnings",
     target: 50000000,
     level: 50,

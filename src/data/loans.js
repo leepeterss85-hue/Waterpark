@@ -44,7 +44,7 @@ export function simulateLoans(loans, day) {
     const newTotalPaid = loan.totalPaid + loan.dailyPayment;
     if (newDaysRemaining <= 0) {
       updatedLoans.push({ ...loan, daysRemaining: 0, totalPaid: loan.totalRepayable, paidOff: true, paidOffDay: day });
-      logEntries.push({ day, text: `Day ${day}: 💰 Loan paid off! $${loan.totalRepayable.toLocaleString()} fully repaid.` });
+      logEntries.push({ day, text: `Day ${day}: 💰 Loan paid off! £${loan.totalRepayable.toLocaleString()} fully repaid.` });
     } else {
       updatedLoans.push({ ...loan, daysRemaining: newDaysRemaining, totalPaid: newTotalPaid });
     }

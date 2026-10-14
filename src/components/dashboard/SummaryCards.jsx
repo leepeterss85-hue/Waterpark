@@ -39,8 +39,8 @@ export default function SummaryCards({ history, guests, reputation, day, lastNet
       <Card
         icon={DollarSign}
         label="Today's Income"
-        value={`$${Math.max(0, lastNet).toLocaleString()}`}
-        sub={`net ${lastNet >= 0 ? "+" : ""}$${lastNet.toLocaleString()}`}
+        value={`£${Math.max(0, lastNet).toLocaleString()}`}
+        sub={`net ${lastNet >= 0 ? "+" : ""}£${lastNet.toLocaleString()}`}
         tone="bg-gradient-to-br from-emerald-400 to-green-500"
       />
       <Card
@@ -59,7 +59,7 @@ export default function SummaryCards({ history, guests, reputation, day, lastNet
       <Card
         icon={TrendingUp}
         label="Avg Daily Income"
-        value={`$${avgIncome.toLocaleString()}`}
+        value={`£${avgIncome.toLocaleString()}`}
         tone="bg-gradient-to-br from-sky-400 to-blue-500"
       />
       <Card

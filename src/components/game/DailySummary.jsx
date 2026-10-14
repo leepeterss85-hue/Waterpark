@@ -33,15 +33,15 @@ export default function DailySummary({ report, onClose }) {
         </div>
         <div className="space-y-2 p-4">
           <div className="mb-1 text-[9px] font-black uppercase tracking-[0.18em] text-slate-400">Revenue</div>
-          <Row icon={Ticket} label="Admission" value={"$" + (report.ticketRevenue || 0).toLocaleString()} tone="text-emerald-600" />
-          <Row icon={Waves} label="Attractions & rides" value={"$" + (report.rideIncome || 0).toLocaleString()} tone="text-emerald-600" />
+          <Row icon={Ticket} label="Admission" value={"£" + (report.ticketRevenue || 0).toLocaleString()} tone="text-emerald-600" />
+          <Row icon={Waves} label="Attractions & rides" value={"£" + (report.rideIncome || 0).toLocaleString()} tone="text-emerald-600" />
           <div className="my-2 border-t border-slate-100" />
           <div className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-400">Operating costs</div>
-          <Row icon={Wrench} label="Upkeep" value={"-$" + (report.upkeep || 0).toLocaleString()} tone="text-rose-500" />
-          <Row icon={UserRound} label="Staff wages" value={"-$" + (report.wages || 0).toLocaleString()} tone="text-rose-500" />
-          <Row icon={Zap} label="Utilities" value={"-$" + (report.utilities || 0).toLocaleString()} tone="text-rose-500" />
-          <Row icon={Megaphone} label="Marketing" value={"-$" + (report.marketing || 0).toLocaleString()} tone="text-rose-500" />
-          ${report.premium > 0 && <Row icon={Crown} label="Premium service" value={"-$" + report.premium.toLocaleString()} tone="text-rose-500" />}
+          <Row icon={Wrench} label="Upkeep" value={"-£" + (report.upkeep || 0).toLocaleString()} tone="text-rose-500" />
+          <Row icon={UserRound} label="Staff wages" value={"-£" + (report.wages || 0).toLocaleString()} tone="text-rose-500" />
+          <Row icon={Zap} label="Utilities" value={"-£" + (report.utilities || 0).toLocaleString()} tone="text-rose-500" />
+          <Row icon={Megaphone} label="Marketing" value={"-£" + (report.marketing || 0).toLocaleString()} tone="text-rose-500" />
+          ${report.premium > 0 && <Row icon={Crown} label="Premium service" value={"-£" + report.premium.toLocaleString()} tone="text-rose-500" />}
           <div className="mt-3 flex items-center justify-between rounded-2xl bg-slate-900 px-4 py-3 text-white">
             <span className="text-[10px] font-black uppercase tracking-wider">Operating result</span>
             <span className={(report.net || 0) >= 0 ? "font-black text-emerald-300" : "font-black text-rose-300"}>${(report.net || 0) >= 0 ? "+" : ""}${(report.net || 0).toLocaleString()}</span>

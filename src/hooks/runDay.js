@@ -581,7 +581,7 @@ export function runDay(stateRef, setters) {
       setMastery({ points: (currentMastery.points || 0) + points, completed: [...completed, ...newly.map(g => g.id)] });
       setMoney((m) => m + cash);
       setXp((x) => x + xpGain);
-      setLog((l) => [{ day: d + 1, text: "Day " + (d + 1) + ": 👑 Mastery unlocked — " + newly.map(g => g.name).join(", ") + ". +$" + cash.toLocaleString() + " · +" + points + " MP · +" + xpGain + " XP." }, ...l].slice(0, 12));
+      setLog((l) => [{ day: d + 1, text: "Day " + (d + 1) + ": 👑 Mastery unlocked — " + newly.map(g => g.name).join(", ") + ". +£" + cash.toLocaleString() + " · +" + points + " MP · +" + xpGain + " XP." }, ...l].slice(0, 12));
       sound.milestone();
     }
   }
@@ -597,15 +597,15 @@ export function runDay(stateRef, setters) {
   }
   entries.push({
     day: d + 1,
-    text: attractions.length === 0 ? `Day ${d + 1}: No attractions yet — build something to draw guests!` : `Day ${d + 1}: ${newGuests} guests · income $${Math.round(income)} · upkeep $${expenses} · net ${net >= 0 ? "+" : ""}$${net}`,
+    text: attractions.length === 0 ? `Day ${d + 1}: No attractions yet — build something to draw guests!` : `Day ${d + 1}: ${newGuests} guests · income £${Math.round(income)} · upkeep £${expenses} · net ${net >= 0 ? "+" : ""}£${net}`,
   });
-  if (hotelResult && placedHotels.length > 0) entries.push({ day: d + 1, text: `Day ${d + 1}: 🏨 Resort: ${hotelResult.totalGuests} guests · $${(hotelResult.roomRevenue + hotelResult.parkSpend).toLocaleString()} revenue · ${hotelResult.occupancy}% occupancy · ${hotelResult.avgHappiness}% happiness` });
+  if (hotelResult && placedHotels.length > 0) entries.push({ day: d + 1, text: `Day ${d + 1}: 🏨 Resort: ${hotelResult.totalGuests} guests · £${(hotelResult.roomRevenue + hotelResult.parkSpend).toLocaleString()} revenue · ${hotelResult.occupancy}% occupancy · ${hotelResult.avgHappiness}% happiness` });
   if (currentActiveEvents.length > 0) {
     const eventNames = currentActiveEvents.map((e) => e.name).join(", ");
-    entries.push({ day: d + 1, text: eventRevenuePerDay > 0 ? `Day ${d + 1}: 🎉 Events active: ${eventNames} · +$${eventRevenuePerDay.toLocaleString()} event revenue` : `Day ${d + 1}: 🎉 Events active: ${eventNames}` });
+    entries.push({ day: d + 1, text: eventRevenuePerDay > 0 ? `Day ${d + 1}: 🎉 Events active: ${eventNames} · +£${eventRevenuePerDay.toLocaleString()} event revenue` : `Day ${d + 1}: 🎉 Events active: ${eventNames}` });
   }
-  if (membershipResult.totalRevenue > 0 || membershipResult.memberVisits > 0) entries.push({ day: d + 1, text: `Day ${d + 1}: 🎫 Members: ${totalMemberCount(membershipResult.counts)} active · ${membershipResult.memberVisits} visits · +$${membershipResult.totalRevenue.toLocaleString()} revenue` });
-  if (sponsorIncome > 0) entries.push({ day: d + 1, text: `Day ${d + 1}: 🤝 Sponsors paid +$${sponsorIncome.toLocaleString()} (appeal -${activeSponsorAppealCost(currentSponsorships)}).` });
+  if (membershipResult.totalRevenue > 0 || membershipResult.memberVisits > 0) entries.push({ day: d + 1, text: `Day ${d + 1}: 🎫 Members: ${totalMemberCount(membershipResult.counts)} active · ${membershipResult.memberVisits} visits · +£${membershipResult.totalRevenue.toLocaleString()} revenue` });
+  if (sponsorIncome > 0) entries.push({ day: d + 1, text: `Day ${d + 1}: 🤝 Sponsors paid +£${sponsorIncome.toLocaleString()} (appeal -${activeSponsorAppealCost(currentSponsorships)}).` });
 
   setMoney((m) => m + net);
   setDay((x) => x + 1);
@@ -711,7 +711,7 @@ export function runDay(stateRef, setters) {
       setMoney((m) => m + reward);
       setXp((x) => x + Math.floor(reward / 100));
       sound.milestone();
-      entries.push({ day: d + 1, text: `Day ${d + 1}: 🎖️ MILESTONE! Day ${d + 1} reached — bonus $${reward.toLocaleString()}!` });
+      entries.push({ day: d + 1, text: `Day ${d + 1}: 🎖️ MILESTONE! Day ${d + 1} reached — bonus £${reward.toLocaleString()}!` });
     }
   }
   setLog((l) => [...entries, ...l].slice(0, 12));
@@ -737,7 +737,7 @@ export function runDay(stateRef, setters) {
     if (nextLeft <= 0) {
       if (currentChallenge.resolve?.type === "vip") {
         const r = currentChallenge.resolve;
-        if (Math.round(newReputation) >= r.repRequired) { setMoney((m) => m + r.success.money); setReputation((rv) => Math.max(0, Math.min(100, rv + r.success.rep))); challengeEntries.push({ day: d + 1, text: `Day ${d + 1}: 👑 VIP impressed! +$${r.success.money.toLocaleString()} and +${r.success.rep} reputation.` }); }
+        if (Math.round(newReputation) >= r.repRequired) { setMoney((m) => m + r.success.money); setReputation((rv) => Math.max(0, Math.min(100, rv + r.success.rep))); challengeEntries.push({ day: d + 1, text: `Day ${d + 1}: 👑 VIP impressed! +£${r.success.money.toLocaleString()} and +${r.success.rep} reputation.` }); }
         else { setReputation((rv) => Math.max(0, Math.min(100, rv + r.fail.rep))); challengeEntries.push({ day: d + 1, text: `Day ${d + 1}: 👑 VIP left unimpressed. ${r.fail.rep} reputation.` }); }
       } else challengeEntries.push({ day: d + 1, text: `Day ${d + 1}: ${currentChallenge.name} has passed.` });
       setChallenge(null);
@@ -938,7 +938,7 @@ export function runDay(stateRef, setters) {
     if (tier.rep) setReputation((rv) => Math.min(100, rv + tier.rep));
     setLog((l) => [{
       day: d + 1,
-      text: "Day " + (d + 1) + ": 📅 Month " + monthNumber + " closed — Grade " + grade + " · $" + managementBonus.toLocaleString() + " management bonus · +" + tier.xp + " XP."
+      text: "Day " + (d + 1) + ": 📅 Month " + monthNumber + " closed — Grade " + grade + " · £" + managementBonus.toLocaleString() + " management bonus · +" + tier.xp + " XP."
     }, ...l].slice(0, 12));
   }
 

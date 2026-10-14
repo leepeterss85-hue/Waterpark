@@ -182,7 +182,7 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
   return (
     <div className="space-y-4">
       {/* Net P/L */}
-      <div className={`rounded-2xl p-4 text-center ${net >= 0 ? "bg-emerald-50" : "bg-rose-50"}`}>
+      <div className={`rounded-2xl p-4 text-center £{net >= 0 ? "bg-emerald-50" : "bg-rose-50"}`}>
         <div className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Today's Profit / Loss</div>
         <div className={`text-2xl font-black ${net >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
           {net >= 0 ? "+" : ""}${Math.round(net).toLocaleString()}
@@ -224,7 +224,7 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
           return <><div className="grid grid-cols-2 gap-2">
             <div className="rounded-xl bg-white p-2.5 ring-1 ring-slate-100"><div className="text-[8px] font-black uppercase text-slate-400">30-Day Profit</div><div className={"mt-0.5 text-sm font-black " + (profit >= 0 ? "text-emerald-600" : "text-rose-600")}>{profit >= 0 ? "+" : ""}${Math.round(profit).toLocaleString()}</div><div className="text-[8px] text-slate-400">{profitChange == null ? "Building baseline" : (profitChange >= 0 ? "+" : "") + profitChange + "% vs prior"}</div></div>
             <div className="rounded-xl bg-white p-2.5 ring-1 ring-slate-100"><div className="text-[8px] font-black uppercase text-slate-400">30-Day Guests</div><div className="mt-0.5 text-sm font-black text-slate-800">{Math.round(guestsNow).toLocaleString()}</div><div className="text-[8px] text-slate-400">{guestChange == null ? "Building baseline" : (guestChange >= 0 ? "+" : "") + guestChange + "% vs prior"}</div></div>
-            <div className="rounded-xl bg-white p-2.5 ring-1 ring-slate-100"><div className="text-[8px] font-black uppercase text-slate-400">Best Day</div><div className="mt-0.5 text-sm font-black text-indigo-600">{bestDay ? "Day " + bestDay.day : "—"}</div><div className="text-[8px] text-slate-400">{bestDay ? "$" + Math.round(bestDay.net || 0).toLocaleString() + " profit" : "No history"}</div></div>
+            <div className="rounded-xl bg-white p-2.5 ring-1 ring-slate-100"><div className="text-[8px] font-black uppercase text-slate-400">Best Day</div><div className="mt-0.5 text-sm font-black text-indigo-600">{bestDay ? "Day " + bestDay.day : "—"}</div><div className="text-[8px] text-slate-400">{bestDay ? "£" + Math.round(bestDay.net || 0).toLocaleString() + " profit" : "No history"}</div></div>
             <div className="rounded-xl bg-white p-2.5 ring-1 ring-slate-100"><div className="text-[8px] font-black uppercase text-slate-400">Period</div><div className="mt-0.5 text-sm font-black text-slate-800">{current.length} days</div><div className="text-[8px] text-slate-400">Current day {day}</div></div>
           </div><div className="mt-2 rounded-lg bg-sky-100/70 px-2.5 py-2 text-[10px] font-bold leading-4 text-sky-800">{advice}</div></>;
         })()}

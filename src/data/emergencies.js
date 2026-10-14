@@ -167,7 +167,7 @@ export function simulateEmergencies(context) {
       totalCost += em.cost;
       logEntries.push({
         day,
-        text: `Day ${day}: ✅ ${em.name} resolved${em.locationName ? ` at ${em.locationName}` : ""}. Cost: $${em.cost.toLocaleString()}. ${finalRep > 0 ? `-${finalRep} reputation.` : "Minimal reputation impact!"}`,
+        text: `Day ${day}: ✅ ${em.name} resolved${em.locationName ? ` at ${em.locationName}` : ""}. Cost: £${em.cost.toLocaleString()}. ${finalRep > 0 ? `-${finalRep} reputation.` : "Minimal reputation impact!"}`,
       });
     } else {
       let severity = em.severity;
@@ -236,7 +236,7 @@ export function simulateEmergencies(context) {
     guestsLost += Math.round(guests * em.guestLeaveChance);
     logEntries.push({
       day,
-      text: `Day ${day}: 🚨 ${em.name}${em.locationName ? ` at ${em.locationName}` : ""}! Severity: ${SEVERITY_LABELS[em.severity]}. Est. cost: $${em.cost.toLocaleString()}.`,
+      text: `Day ${day}: 🚨 ${em.name}${em.locationName ? ` at ${em.locationName}` : ""}! Severity: ${SEVERITY_LABELS[em.severity]}. Est. cost: £${em.cost.toLocaleString()}.`,
     });
   }
 

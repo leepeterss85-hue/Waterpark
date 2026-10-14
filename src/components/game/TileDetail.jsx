@@ -60,9 +60,9 @@ export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0,
         {incident?.type === "breakdown" ? <span>Needs mechanic</span> : incident?.type === "maintenance" ? <span>Needs cleaning</span> : <span>Ready for guests</span>}
       </div>
       <div className="mb-3 rounded-xl bg-slate-50 p-3 ring-1 ring-slate-100"><div className="flex items-center justify-between text-xs font-extrabold"><span className="text-slate-500">Ride condition</span><span className="text-slate-800">{conditionValue}% · {conditionLabel}</span></div><div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200"><div className={"h-full rounded-full transition-all " + conditionClass} style={{ width: conditionValue + "%" }} /></div><div className="mt-1 text-[9px] text-slate-400">Use causes wear. Mechanics restore condition during operating cycles.</div></div><div className="divide-y divide-slate-100">
-        <Row label="Build cost" value={`$${attr.cost.toLocaleString()}`} />
-        <Row label="Daily income" value={`$${attr.income.toLocaleString()}`} />
-        <Row label="Upkeep" value={`$${attr.maintenance.toLocaleString()}`} />
+        <Row label="Build cost" value={`£${attr.cost.toLocaleString()}`} />
+        <Row label="Daily income" value={`£${attr.income.toLocaleString()}`} />
+        <Row label="Upkeep" value={`£${attr.maintenance.toLocaleString()}`} />
         {attr.capacity > 0 && <Row label="Capacity" value={`${effectiveCapacity} riders/day`} />}
         {attr.capacity > 0 && <Row label="Current park load" value={<span className="inline-flex items-center gap-1"><Users className="h-3 w-3" />{estimatedLoad}%</span>} />}
         {attr.capacity > 0 && <Row label="Estimated queue" value={<span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" />{queueWait ? `${queueWait} min` : "Low / none"}</span>} />}

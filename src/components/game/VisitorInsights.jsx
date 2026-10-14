@@ -28,7 +28,7 @@ export default function VisitorInsights({ visitorStats }) {
       <div className="mb-3 flex items-center justify-between"><h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Guest behaviour & park operations</h3><span className="rounded-full bg-cyan-50 px-2 py-1 text-[9px] font-black uppercase text-cyan-700">Live simulation</span></div>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Metric icon={Heart} label="Guest mood" value={mood + "%"} note={moodLabel} tone={moodColor} />
-        <Metric icon={DollarSign} label="Spend / activity" value={"$" + (stats.avgSpendPerVisit || 0).toFixed(1)} note="Average guest spend" />
+        <Metric icon={DollarSign} label="Spend / activity" value={"£" + (stats.avgSpendPerVisit || 0).toFixed(1)} note="Average guest spend" />
         <Metric icon={TrendingUp} label="Activities" value={(stats.totalVisits || 0).toLocaleString()} note="Simulated visits today" />
         <Metric icon={Clock} label="Longest wait" value={(queue.wait || 0) + " min"} note={queue.id ? queue.id.replaceAll("_", " ") : "No active queue"} tone={(queue.wait || 0) > 25 ? "text-rose-500" : "text-slate-700"} />
       </div>
@@ -54,7 +54,7 @@ export default function VisitorInsights({ visitorStats }) {
       <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="rounded-xl bg-white p-3 ring-1 ring-slate-100">
           <div className="mb-2 flex items-center gap-1.5 text-[11px] font-extrabold text-slate-600"><DollarSign className="h-3.5 w-3.5 text-emerald-600" /> Revenue mix</div>
-          <div className="space-y-1.5 text-[10px] font-semibold text-slate-500">{[["Rides", spending.rides], ["Food & drink", spending.food], ["Retail", spending.retail], ["Premium", spending.premium], ["Other", spending.other]].map(([label, amount]) => <div key={label} className="flex justify-between"><span>{label}</span><b className="text-slate-700">{"$" + Math.round(amount || 0).toLocaleString()}</b></div>)}</div>
+          <div className="space-y-1.5 text-[10px] font-semibold text-slate-500">{[["Rides", spending.rides], ["Food & drink", spending.food], ["Retail", spending.retail], ["Premium", spending.premium], ["Other", spending.other]].map(([label, amount]) => <div key={label} className="flex justify-between"><span>{label}</span><b className="text-slate-700">{"£" + Math.round(amount || 0).toLocaleString()}</b></div>)}</div>
         </div>
         <div className="rounded-xl bg-white p-3 ring-1 ring-slate-100">
           <div className="mb-2 flex items-center gap-1.5 text-[11px] font-extrabold text-slate-600"><ShoppingBag className="h-3.5 w-3.5 text-cyan-600" /> Most popular attraction</div>

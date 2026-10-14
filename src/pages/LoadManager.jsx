@@ -99,7 +99,7 @@ export default function LoadManager() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
-                  <Stat icon={DollarSign} label="Cash" value={`$${(s.money ?? 0).toLocaleString()}`} tone="text-emerald-500" />
+                  <Stat icon={DollarSign} label="Cash" value={`£${(s.money ?? 0).toLocaleString()}`} tone="text-emerald-500" />
                   <Stat icon={Star} label="Reputation" value={`${s.reputation ?? 0}%`} tone="text-amber-500" />
                   <Stat icon={Users} label="Guests" value={s.guests ?? 0} tone="text-sky-500" />
                   <Stat icon={Calendar} label="Day" value={s.day ?? 1} tone="text-violet-500" />

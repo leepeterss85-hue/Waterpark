@@ -47,7 +47,7 @@ export default function ParkPhotoMode({ game }) {
       ctx.fillStyle = "#67e8f9";
       const stats = [
         `Day ${game.day}`,
-        `$${game.money.toLocaleString()}`,
+        `£${game.money.toLocaleString()}`,
         `${game.guests.toLocaleString()} guests`,
         `${game.reputation}% rep`,
         `Lv ${game.level}`,

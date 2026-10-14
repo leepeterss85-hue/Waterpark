@@ -2,8 +2,8 @@
 // Challenges refresh every 3 days and track progress from the game state.
 
 const CHALLENGE_POOL = [
-  { id: "earn_cash", type: "dailyNet", label: "Earn $%target% net today", target: 5000, reward: { money: 3000, xp: 50 } },
-  { id: "earn_cash_big", type: "dailyNet", label: "Earn $%target% net today", target: 15000, reward: { money: 8000, xp: 120 } },
+  { id: "earn_cash", type: "dailyNet", label: "Earn £%target% net today", target: 5000, reward: { money: 3000, xp: 50 } },
+  { id: "earn_cash_big", type: "dailyNet", label: "Earn £%target% net today", target: 15000, reward: { money: 8000, xp: 120 } },
   { id: "welcome_guests", type: "dailyGuests", label: "Welcome %target% guests today", target: 200, reward: { money: 2500, xp: 60 } },
   { id: "welcome_guests_big", type: "dailyGuests", label: "Welcome %target% guests today", target: 800, reward: { money: 6000, xp: 100 } },
   { id: "high_mood", type: "avgMood", label: "Keep guest mood above %target%%", target: 75, reward: { money: 4000, xp: 80 } },

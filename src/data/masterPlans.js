@@ -48,7 +48,7 @@ export const MASTER_PLANS = [
     bonuses: { businessValueMult: 0.15 },
     goals: [
       { id: "day", label: "Reach day 100", test: ({ day }) => day >= 100 },
-      { id: "value", label: "Reach $500,000 business value", test: ({ businessValue }) => businessValue >= 500000 },
+      { id: "value", label: "Reach £500,000 business value", test: ({ businessValue }) => businessValue >= 500000 },
       { id: "peak", label: "Reach 500 peak guests", test: ({ peakGuests }) => peakGuests >= 500 },
       { id: "upgrades", label: "Complete 10 upgrades", test: ({ totalUpgrades }) => totalUpgrades >= 10 },
     ],

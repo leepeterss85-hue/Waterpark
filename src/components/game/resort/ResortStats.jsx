@@ -23,9 +23,9 @@ export default function ResortStats({ stats, hotelStats }) {
         <StatCard icon={Users} label="Occupancy" value={`${stats.resortOccupancy}%`} sub={`${totalGuests} guests total`} tone="text-cyan-600" bg="bg-cyan-50" />
         <StatCard icon={Bed} label="Hotel Guests" value={stats.hotelGuests} sub={`${hotelStats?.totalRooms || 0} rooms`} tone="text-indigo-600" />
         <StatCard icon={Waves} label="Park Guests" value={stats.parkGuests} sub="day visitors" tone="text-emerald-600" />
-        <StatCard icon={DollarSign} label="Room Revenue" value={`$${(hotelStats?.roomRevenue || 0).toLocaleString()}`} sub="per night" tone="text-emerald-600" bg="bg-emerald-50" />
-        <StatCard icon={TrendingUp} label="Park Spending" value={`$${(hotelStats?.parkSpend || 0).toLocaleString()}`} sub="hotel guests in park" tone="text-cyan-600" bg="bg-cyan-50" />
-        <StatCard icon={TrendingDown} label="Resort Costs" value={`$${(hotelStats?.hotelExpenses || 0).toLocaleString()}`} sub="maintenance" tone="text-rose-600" bg="bg-rose-50" />
+        <StatCard icon={DollarSign} label="Room Revenue" value={`£${(hotelStats?.roomRevenue || 0).toLocaleString()}`} sub="per night" tone="text-emerald-600" bg="bg-emerald-50" />
+        <StatCard icon={TrendingUp} label="Park Spending" value={`£${(hotelStats?.parkSpend || 0).toLocaleString()}`} sub="hotel guests in park" tone="text-cyan-600" bg="bg-cyan-50" />
+        <StatCard icon={TrendingDown} label="Resort Costs" value={`£${(hotelStats?.hotelExpenses || 0).toLocaleString()}`} sub="maintenance" tone="text-rose-600" bg="bg-rose-50" />
         <StatCard icon={Smile} label="Happiness" value={`${hotelStats?.avgHappiness || 0}%`} sub="avg guest satisfaction" tone="text-amber-600" bg="bg-amber-50" />
       </div>
       <div className={"rounded-xl p-2.5 text-center ring-1 " + (netIncome >= 0 ? "bg-emerald-50 ring-emerald-100" : "bg-rose-50 ring-rose-100")}>

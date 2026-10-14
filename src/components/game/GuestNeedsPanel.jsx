@@ -64,16 +64,16 @@ export default function GuestNeedsPanel({ visitorStats, grid, guests }) {
 
   const recommendations = [];
   if (needs.hunger >= 55 && foodCount === 0) {
-    recommendations.push({ icon: Utensils, tone: "amber", text: `Guests are hungry (${Math.round(needs.hunger)}% avg). Build a dining or burger shack to capture ~$${foodStake.toLocaleString()}/day in food spend.` });
+    recommendations.push({ icon: Utensils, tone: "amber", text: `Guests are hungry (${Math.round(needs.hunger)}% avg). Build a dining or burger shack to capture ~£${foodStake.toLocaleString()}/day in food spend.` });
   }
   if (needs.thirst >= 55 && drinkCount === 0) {
-    recommendations.push({ icon: Droplet, tone: "sky", text: `Guests are thirsty (${Math.round(needs.thirst)}% avg). Add a juice bar or drinking fountain to recover ~$${drinkStake.toLocaleString()}/day.` });
+    recommendations.push({ icon: Droplet, tone: "sky", text: `Guests are thirsty (${Math.round(needs.thirst)}% avg). Add a juice bar or drinking fountain to recover ~£${drinkStake.toLocaleString()}/day.` });
   }
   if (needs.fatigue >= 55 && restCount === 0) {
-    recommendations.push({ icon: BatteryCharging, tone: "violet", text: `Guests are exhausted (${Math.round(needs.fatigue)}% avg). Place benches, shade or a lounge to keep them spending longer (~$${restStake.toLocaleString()}/day at risk).` });
+    recommendations.push({ icon: BatteryCharging, tone: "violet", text: `Guests are exhausted (${Math.round(needs.fatigue)}% avg). Place benches, shade or a lounge to keep them spending longer (~£${restStake.toLocaleString()}/day at risk).` });
   }
   if (recommendations.length === 0 && totalStake > 0) {
-    recommendations.push({ icon: TrendingUp, tone: "emerald", text: `Needs are manageable, but ~$${totalStake.toLocaleString()}/day is still slipping away from guests leaving early. Add more capacity to capture it.` });
+    recommendations.push({ icon: TrendingUp, tone: "emerald", text: `Needs are manageable, but ~£${totalStake.toLocaleString()}/day is still slipping away from guests leaving early. Add more capacity to capture it.` });
   }
   if (recommendations.length === 0) {
     recommendations.push({ icon: TrendingUp, tone: "emerald", text: "Guest needs are well met. Your facility mix is keeping visitors happy and spending." });
@@ -110,9 +110,9 @@ export default function GuestNeedsPanel({ visitorStats, grid, guests }) {
       )}
 
       <div className="grid grid-cols-1 gap-2">
-        <NeedBar icon={Utensils} label="Hunger" value={needs.hunger} hint={foodCount > 0 ? `${foodCount} food venue${foodCount > 1 ? "s" : ""} on site` : "No food venues built yet"} />
-        <NeedBar icon={Droplet} label="Thirst" value={needs.thirst} hint={drinkCount > 0 ? `${drinkCount} drink spot${drinkCount > 1 ? "s" : ""} on site` : "No drink spots built yet"} />
-        <NeedBar icon={BatteryCharging} label="Fatigue" value={needs.fatigue} hint={restCount > 0 ? `${restCount} rest facility${restCount > 1 ? "ies" : "y"} on site` : "No rest facilities built yet"} />
+        <NeedBar icon={Utensils} label="Hunger" value={needs.hunger} hint={foodCount > 0 ? `£{foodCount} food venue£{foodCount > 1 ? "s" : ""} on site` : "No food venues built yet"} />
+        <NeedBar icon={Droplet} label="Thirst" value={needs.thirst} hint={drinkCount > 0 ? `£{drinkCount} drink spot£{drinkCount > 1 ? "s" : ""} on site` : "No drink spots built yet"} />
+        <NeedBar icon={BatteryCharging} label="Fatigue" value={needs.fatigue} hint={restCount > 0 ? `£{restCount} rest facility£{restCount > 1 ? "ies" : "y"} on site` : "No rest facilities built yet"} />
       </div>
 
       <div className="rounded-2xl border border-indigo-100 bg-indigo-50/60 p-3">

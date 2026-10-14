@@ -121,7 +121,7 @@ export default function StaffPanel({
               <div key={s.id} className="rounded-lg bg-white p-2 shadow-sm ring-1 ring-indigo-100">
                 <div className="truncate text-[10px] font-black text-slate-700">{s.name}</div>
                 <div className="mt-0.5 text-[9px] font-bold text-indigo-600">Lv {level} · +{efficiency}%</div>
-                <div className="mt-0.5 text-[9px] text-slate-400">{count} employed{nextCost ? " · Train $" + nextCost.toLocaleString() : " · MAX"}</div>
+                <div className="mt-0.5 text-[9px] text-slate-400">{count} employed{nextCost ? " · Train £" + nextCost.toLocaleString() : " · MAX"}</div>
               </div>
             );
           })}
