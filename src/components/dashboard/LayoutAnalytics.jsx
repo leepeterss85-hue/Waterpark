@@ -115,7 +115,7 @@ export default function LayoutAnalytics({
           <div className="min-w-0">
             <div className="text-sm font-bold text-slate-800">Best performing layout: {best.name}</div>
             <div className="text-xs text-slate-500">
-              ${best.avgIncome.toLocaleString()}/day avg · {best.peakGuests.toLocaleString()} peak guests · {best.reputation}% reputation
+              £{best.avgIncome.toLocaleString()}/day avg · {best.peakGuests.toLocaleString()} peak guests · {best.reputation}% reputation
             </div>
           </div>
         </div>
@@ -131,7 +131,7 @@ export default function LayoutAnalytics({
               <th className="py-2 px-3 text-right font-semibold">Avg Guests</th>
               <th className="py-2 px-3 text-right font-semibold">Avg Income</th>
               <th className="py-2 px-3 text-right font-semibold">Rep</th>
-              <th className="py-2 px-3 text-right font-semibold">Lifetime $</th>
+              <th className="py-2 px-3 text-right font-semibold">Lifetime £</th>
             </tr>
           </thead>
           <tbody>
@@ -159,13 +159,13 @@ export default function LayoutAnalytics({
                   {l.avgGuests.toLocaleString()}
                 </td>
                 <td className="py-2.5 px-3 text-right text-slate-600">
-                  ${l.avgIncome.toLocaleString()}
+                  £{l.avgIncome.toLocaleString()}
                 </td>
                 <td className="py-2.5 px-3 text-right text-slate-600">
                   {l.reputation}%
                 </td>
                 <td className="py-2.5 px-3 text-right text-slate-600">
-                  ${l.lifetimeEarnings.toLocaleString()}
+                  £{l.lifetimeEarnings.toLocaleString()}
                 </td>
               </tr>
               );
