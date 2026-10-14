@@ -45,7 +45,7 @@ export default function ChallengeBanner({ challenge }) {
           )}
           {challenge.resolve?.type === "vip" && (
             <div className="mt-2 rounded-lg bg-white/15 px-2.5 py-1 text-[11px] font-semibold">
-              Hold reputation ≥ {challenge.resolve.repRequired}% for $
+              Hold reputation ≥ {challenge.resolve.repRequired}% for £
               {challenge.resolve.success.money.toLocaleString()} +{" "}
               {challenge.resolve.success.rep} rep
             </div>
