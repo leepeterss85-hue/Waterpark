@@ -20,7 +20,7 @@ export default function PlayerProgressPanel({ level, xp, xpForNext, onCheat }) {
     {showCheats && <div className="border-t border-slate-100 bg-slate-50/80 p-3">
       <div className="mb-2 flex items-center gap-1.5 text-[9px] font-extrabold uppercase tracking-wider text-slate-500"><Sparkles className="h-3 w-3" /> Optional sandbox boosts</div>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <button onClick={() => onCheat("cash")} className="flex items-center justify-center gap-1.5 rounded-lg bg-white px-2 py-2 text-[10px] font-bold text-slate-700 ring-1 ring-slate-200 hover:bg-emerald-50"><Coins className="h-3.5 w-3.5 text-emerald-600" /> +$50k</button>
+        <button onClick={() => onCheat("cash")} className="flex items-center justify-center gap-1.5 rounded-lg bg-white px-2 py-2 text-[10px] font-bold text-slate-700 ring-1 ring-slate-200 hover:bg-emerald-50"><Coins className="h-3.5 w-3.5 text-emerald-600" /> +£50k</button>
         <button onClick={() => onCheat("xp")} className="flex items-center justify-center gap-1.5 rounded-lg bg-white px-2 py-2 text-[10px] font-bold text-slate-700 ring-1 ring-slate-200 hover:bg-amber-50"><Star className="h-3.5 w-3.5 text-amber-500" /> +500 XP</button>
         <button onClick={() => onCheat("reputation")} className="flex items-center justify-center gap-1.5 rounded-lg bg-white px-2 py-2 text-[10px] font-bold text-slate-700 ring-1 ring-slate-200 hover:bg-sky-50"><ShieldCheck className="h-3.5 w-3.5 text-sky-600" /> Max reputation</button>
         <button onClick={() => onCheat("boost")} className="flex items-center justify-center rounded-lg bg-amber-100 px-2 py-2 text-[10px] font-extrabold text-amber-900 ring-1 ring-amber-200 hover:bg-amber-200">Mega boost</button>
