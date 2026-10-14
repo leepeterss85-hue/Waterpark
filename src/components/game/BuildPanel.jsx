@@ -8,6 +8,16 @@ export default function BuildPanel({ money, level = 1, selectedBuild, onSelect, 
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState({ attraction: true, facility: false, hotel: true, environment: false });
   const allItems = useMemo(() => [...ATTRACTIONS, ...HOTELS, ...PARK_OBJECTS], []);
+  const itemIsUnlocked = (item) => {
+    const req = researchReqFor(item.id);
+    return (level >= unlockLevelFor(item) || sandbox) && !(req && !completedResearch.includes(req.id));
+  };
+  const categoryCounts = useMemo(() => Object.fromEntries(
+    ["attraction", "facility", "hotel"].map((category) => {
+      const items = allItems.filter((item) => item.category === category);
+      return [category, { total: items.length, unlocked: items.filter(itemIsUnlocked).length }];
+    })
+  ), [allItems, level, sandbox, completedResearch]);
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return allItems;
@@ -26,9 +36,9 @@ export default function BuildPanel({ money, level = 1, selectedBuild, onSelect, 
         />
       </div>
       <div className="grid grid-cols-3 gap-2">
-        <div className="rounded-xl bg-cyan-50 px-2 py-2 ring-1 ring-cyan-100"><div className="flex items-center gap-1 text-[9px] font-extrabold uppercase tracking-wider text-cyan-700"><Waves className="h-3 w-3 shrink-0" /> Attractions</div><div className="mt-1 text-[11px] font-bold text-slate-700">{allItems.filter((item) => item.category === "attraction").length} available</div></div>
-        <div className="rounded-xl bg-amber-50 px-2 py-2 ring-1 ring-amber-100"><div className="flex items-center gap-1 text-[9px] font-extrabold uppercase tracking-wider text-amber-700"><Utensils className="h-3 w-3 shrink-0" /> Facilities</div><div className="mt-1 text-[11px] font-bold text-slate-700">{allItems.filter((item) => item.category === "facility").length} available</div></div>
-        <div className="rounded-xl bg-violet-50 px-2 py-2 ring-1 ring-violet-100"><div className="flex items-center gap-1 text-[9px] font-extrabold uppercase tracking-wider text-violet-700"><Bed className="h-3 w-3 shrink-0" /> Hotels</div><div className="mt-1 text-[11px] font-bold text-slate-700">{allItems.filter((item) => item.category === "hotel").length} available</div></div>
+        <div className="rounded-xl bg-cyan-50 px-2 py-2 ring-1 ring-cyan-100"><div className="flex items-center gap-1 text-[9px] font-extrabold uppercase tracking-wider text-cyan-700"><Waves className="h-3 w-3 shrink-0" /> Attractions</div><div className="mt-1 text-[11px] font-bold text-slate-700">{categoryCounts.attraction.unlocked} / {categoryCounts.attraction.total} unlocked</div></div>
+        <div className="rounded-xl bg-amber-50 px-2 py-2 ring-1 ring-amber-100"><div className="flex items-center gap-1 text-[9px] font-extrabold uppercase tracking-wider text-amber-700"><Utensils className="h-3 w-3 shrink-0" /> Facilities</div><div className="mt-1 text-[11px] font-bold text-slate-700">{categoryCounts.facility.unlocked} / {categoryCounts.facility.total} unlocked</div></div>
+        <div className="rounded-xl bg-violet-50 px-2 py-2 ring-1 ring-violet-100"><div className="flex items-center gap-1 text-[9px] font-extrabold uppercase tracking-wider text-violet-700"><Bed className="h-3 w-3 shrink-0" /> Hotels</div><div className="mt-1 text-[11px] font-bold text-slate-700">{categoryCounts.hotel.unlocked} / {categoryCounts.hotel.total} unlocked</div></div>
       </div>
       {CATEGORIES.map((cat) => {
         const items = filtered.filter((a) => a.category === cat.id);
@@ -43,7 +53,7 @@ export default function BuildPanel({ money, level = 1, selectedBuild, onSelect, 
               {items.map((item) => {
                 const req = researchReqFor(item.id);
                 const researchLocked = req && !completedResearch.includes(req.id);
-                const unlocked = (level >= unlockLevelFor(item) || sandbox) && !researchLocked;
+                const unlocked = itemIsUnlocked(item);
                 return <BuildCard key={item.id} item={item} selected={selectedBuild === item.id} affordable={money >= item.cost} unlocked={unlocked} onSelect={onSelect} lockLabel={researchLocked ? `Research: ${req.name}` : null} />;
               })}
             </div>}
