@@ -1,7 +1,6 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { BookOpen, Sparkles, CheckCircle2, ArrowRight, Gamepad2, Wrench, Beaker, Target, Trophy, XCircle } from "lucide-react";
+import { BookOpen, Sparkles, CheckCircle2, Gamepad2, Wrench, Beaker, Target, Trophy, XCircle } from "lucide-react";
 import SandboxLabPanel from "@/components/game/SandboxLabPanel";
 
 export default function GameModePanel({ game }) {
