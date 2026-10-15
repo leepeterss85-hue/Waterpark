@@ -78,7 +78,7 @@ export default function DemandForecast({ day, forecast, seasonEvent, marketShare
           <div className="text-[10px] font-semibold text-slate-500">
             {summary.best.event ? summary.best.event.name : summary.best.weatherLabel} · {summary.best.index}% demand
           </div>
-          <div className="mt-1 text-[10px] font-bold text-emerald-700">Suggest ${summary.best.rec.suggest} ({summary.best.rec.label})</div>
+          <div className="mt-1 text-[10px] font-bold text-emerald-700">Suggest £{summary.best.rec.suggest} ({summary.best.rec.label})</div>
         </div>
         <div className="rounded-xl bg-sky-50 p-2.5 ring-1 ring-sky-100">
           <div className="flex items-center gap-1 text-[9px] font-black uppercase tracking-wide text-sky-700">
@@ -88,7 +88,7 @@ export default function DemandForecast({ day, forecast, seasonEvent, marketShare
           <div className="text-[10px] font-semibold text-slate-500">
             {summary.worst.event ? summary.worst.event.name : summary.worst.weatherLabel} · {summary.worst.index}% demand
           </div>
-          <div className="mt-1 text-[10px] font-bold text-sky-700">Suggest ${summary.worst.rec.suggest} ({summary.worst.rec.label})</div>
+          <div className="mt-1 text-[10px] font-bold text-sky-700">Suggest £{summary.worst.rec.suggest} ({summary.worst.rec.label})</div>
         </div>
       </div>
     </section>
