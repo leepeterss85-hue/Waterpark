@@ -41,7 +41,7 @@ export default function ParkOverviewPanel({ game, onOpen }) {
   const open = (sheet) => onOpen?.(sheet);
   return <div className="space-y-3">
     <div className="rounded-2xl bg-gradient-to-br from-cyan-700 via-cyan-600 to-blue-700 p-4 text-white shadow-lg">
-      <div className="flex items-start justify-between gap-3"><div><div className="text-[10px] font-black uppercase tracking-widest text-cyan-100">Park Command Dashboard</div><div className="mt-1 text-xl font-black">Month {monthNumber} • Day {dayOfMonth} • {game.gameMode === "story" ? "Story Mode" : game.gameMode === "sandbox" ? "Sandbox" : "Freeplay"}</div><div className="mt-1 text-xs text-cyan-50">Level {game.level} • Reputation {Math.round(game.reputation)}</div></div><div className="rounded-xl bg-white/15 px-3 py-2 text-right"><div className="text-[10px] font-bold text-cyan-100">Cash</div><div className="text-lg font-black">${Math.round(game.money).toLocaleString()}</div></div></div>
+      <div className="flex items-start justify-between gap-3"><div><div className="text-[10px] font-black uppercase tracking-widest text-cyan-100">Park Command Dashboard</div><div className="mt-1 text-xl font-black">Month {monthNumber} • Day {dayOfMonth} • {game.gameMode === "story" ? "Story Mode" : game.gameMode === "sandbox" ? "Sandbox" : "Freeplay"}</div><div className="mt-1 text-xs text-cyan-50">Level {game.level} • Reputation {Math.round(game.reputation)}</div></div><div className="rounded-xl bg-white/15 px-3 py-2 text-right"><div className="text-[10px] font-bold text-cyan-100">Cash</div><div className="text-lg font-black">£{Math.round(game.money).toLocaleString()}</div></div></div>
       <div className="mt-3 flex gap-2"><Button size="sm" className="bg-white text-cyan-700 hover:bg-cyan-50" onClick={()=>game.setPlaying?.(true)}><Play className="mr-1 h-3.5 w-3.5"/>Open Gates</Button><Button size="sm" variant="outline" className="border-white/50 bg-transparent text-white hover:bg-white/10" onClick={()=>open("gameModes")}>Change Mode</Button></div>
     </div>
 
@@ -76,7 +76,7 @@ export default function ParkOverviewPanel({ game, onOpen }) {
       <div className="text-sm font-black">Monthly targets</div>
       <div className="mt-1 text-[10px] text-slate-500">Keep the park growing each month. Targets scale as your empire develops.</div>
       <div className="mt-3 space-y-3">
-        <div><div className="flex justify-between text-[10px] font-bold"><span>Revenue</span><span>${Math.round(income).toLocaleString()} / ${monthlyIncomeTarget.toLocaleString()}</span></div><div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-cyan-500" style={{width: incomeProgress + "%"}} /></div></div>
+        <div><div className="flex justify-between text-[10px] font-bold"><span>Revenue</span><span>£{Math.round(income).toLocaleString()} / £{monthlyIncomeTarget.toLocaleString()}</span></div><div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-cyan-500" style={{width: incomeProgress + "%"}} /></div></div>
         <div><div className="flex justify-between text-[10px] font-bold"><span>Peak guests</span><span>{Math.round(game.peakGuests || 0)} / {monthlyGuestTarget.toLocaleString()}</span></div><div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-blue-500" style={{width: guestProgress + "%"}} /></div></div>
       </div>
     </CardContent></Card>
