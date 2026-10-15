@@ -102,7 +102,7 @@ export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0,
             className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-emerald-500 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600 disabled:opacity-40"
           >
             <ArrowUpCircle className="h-4 w-4" />
-            Upgrade · ${cost.toLocaleString()}
+            Upgrade · £{cost.toLocaleString()}
           </button>
         </div>
       ) : (
@@ -114,7 +114,7 @@ export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0,
         onClick={onSell}
         className="mt-4 w-full rounded-xl bg-rose-50 py-2 text-sm font-semibold text-rose-600 ring-1 ring-rose-100 transition hover:bg-rose-100"
       >
-        Sell (refund ${Math.floor(attr.cost * 0.5).toLocaleString()})
+        Sell (refund £{Math.floor(attr.cost * 0.5).toLocaleString()})
       </button>
     </div>
   );
