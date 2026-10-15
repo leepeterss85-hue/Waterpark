@@ -109,7 +109,7 @@ export default function ParkPhotoMode({ game }) {
         </div>
         <div className="rounded-lg bg-emerald-50 p-2 text-center ring-1 ring-emerald-100">
           <PoundSterling className="mx-auto h-4 w-4 text-emerald-500" />
-          <p className="mt-0.5 text-sm font-black text-slate-700">${(game.money / 1000).toFixed(1)}k</p>
+          <p className="mt-0.5 text-sm font-black text-slate-700">£{(game.money / 1000).toFixed(1)}k</p>
           <p className="text-[9px] font-semibold uppercase text-slate-400">Bank</p>
         </div>
         <div className="rounded-lg bg-amber-50 p-2 text-center ring-1 ring-amber-100">
