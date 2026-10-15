@@ -27,7 +27,7 @@ export default function GameModePanel({ game }) {
       <h3 className="mt-3 text-lg font-black">{story.title}</h3><p className="mt-1 text-sm leading-5 text-slate-600">{story.text}</p>
       <div className="mt-3 rounded-lg border bg-white p-2 text-xs font-semibold">{story.action}</div>
       <div className="mt-2 flex flex-wrap gap-2 text-[10px] font-bold text-slate-500"><span className="rounded-full bg-emerald-50 px-2 py-1 text-emerald-700">+£{(story.reward?.money||0).toLocaleString()}</span><span className="rounded-full bg-violet-50 px-2 py-1 text-violet-700">+{story.reward?.xp||0} XP</span><span className="rounded-full bg-cyan-50 px-2 py-1 text-cyan-700">+{story.reward?.research||0} research</span><span className="rounded-full bg-amber-50 px-2 py-1 text-amber-700">+{story.reward?.reputation||0} reputation</span></div>
-      <Button variant="outline" className="mt-3 w-full" onClick={game.advanceStory}>Skip objective <ArrowRight className="ml-1 h-4 w-4"/></Button>
+      <p className="mt-3 rounded-lg bg-cyan-50 px-3 py-2 text-xs leading-5 text-cyan-800">Complete this objective during normal play to earn the rewards above. Story progress advances automatically when the goal is reached.</p>
     </CardContent></Card>}
     {game.gameMode==="story" && game.storyCompleted && <Card className="border-emerald-200 bg-emerald-50"><CardContent className="p-4"><div className="font-black">Story campaign complete!</div><div className="mt-1 text-sm text-slate-600">You can now continue in Freeplay or experiment in Sandbox without losing your park.</div></CardContent></Card>}
     {game.gameMode==="sandbox" && <SandboxLabPanel game={game}/>}
