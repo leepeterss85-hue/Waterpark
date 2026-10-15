@@ -33,7 +33,7 @@ export default function ResortHotelList({ hotels, upgrades, hotelStats }) {
               </div>
               <div className="text-right">
                 <div className="text-[11px] font-black text-emerald-600">
-                  ${(guests * Math.round(h.def.roomPrice * (1 + level * 0.08))).toLocaleString()}
+                  £{(guests * Math.round(h.def.roomPrice * (1 + level * 0.08))).toLocaleString()}
                 </div>
                 <div className="text-[8px] text-slate-400">/night</div>
               </div>
