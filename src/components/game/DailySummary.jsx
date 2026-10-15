@@ -20,15 +20,15 @@ export default function DailySummary({ report, onClose }) {
           <div className="relative flex items-start justify-between">
             <div>
               <div className="text-[9px] font-black uppercase tracking-[0.22em] text-white/65">Monthly Operations Report</div>
-              <h2 className="mt-1 font-display text-2xl font-black">Month ${report.month || Math.ceil((report.day || 1) / 30)} complete</h2>
-              <p className="mt-1 text-[11px] font-semibold text-white/75">${report.weather || "Normal conditions"}${report.event ? " · " + report.event : ""}</p>
+              <h2 className="mt-1 font-display text-2xl font-black">Month {report.month || Math.ceil((report.day || 1) / 30)} complete</h2>
+              <p className="mt-1 text-[11px] font-semibold text-white/75">{report.weather || "Normal conditions"}{report.event ? " · " + report.event : ""}</p>
             </div>
             <button onClick={onClose} aria-label="Close daily report" className="rounded-xl bg-white/15 p-2 hover:bg-white/25"><X className="h-4 w-4" /></button>
           </div>
           <div className="relative mt-4 grid grid-cols-3 gap-2">
-            <div className="rounded-2xl bg-white/12 p-3"><Users className="h-4 w-4 text-white/80" /><div className="mt-1 text-lg font-black">${(report.guests || 0).toLocaleString()}</div><div className="text-[8px] font-bold uppercase text-white/60">Guests</div></div>
-            <div className="rounded-2xl bg-white/12 p-3"><Banknote className="h-4 w-4 text-white/80" /><div className={"mt-1 text-lg font-black " + ((report.net || 0) >= 0 ? "text-emerald-200" : "text-rose-200")}>${(report.net || 0) >= 0 ? "+" : ""}${(report.net || 0).toLocaleString()}</div><div className="text-[8px] font-bold uppercase text-white/60">Net profit</div></div>
-            <div className="rounded-2xl bg-white/12 p-3"><TrendingUp className="h-4 w-4 text-white/80" /><div className="mt-1 text-lg font-black">${Math.round(report.reputation || 0)}</div><div className="text-[8px] font-bold uppercase text-white/60">Reputation</div></div>
+            <div className="rounded-2xl bg-white/12 p-3"><Users className="h-4 w-4 text-white/80" /><div className="mt-1 text-lg font-black">{(report.guests || 0).toLocaleString()}</div><div className="text-[8px] font-bold uppercase text-white/60">Guests</div></div>
+            <div className="rounded-2xl bg-white/12 p-3"><Banknote className="h-4 w-4 text-white/80" /><div className={"mt-1 text-lg font-black " + ((report.net || 0) >= 0 ? "text-emerald-200" : "text-rose-200")}>£{(report.net || 0) >= 0 ? "+" : ""}{(report.net || 0).toLocaleString()}</div><div className="text-[8px] font-bold uppercase text-white/60">Net profit</div></div>
+            <div className="rounded-2xl bg-white/12 p-3"><TrendingUp className="h-4 w-4 text-white/80" /><div className="mt-1 text-lg font-black">{Math.round(report.reputation || 0)}</div><div className="text-[8px] font-bold uppercase text-white/60">Reputation</div></div>
           </div>
         </div>
         <div className="space-y-2 p-4">
@@ -41,12 +41,12 @@ export default function DailySummary({ report, onClose }) {
           <Row icon={UserRound} label="Staff wages" value={"-£" + (report.wages || 0).toLocaleString()} tone="text-rose-500" />
           <Row icon={Zap} label="Utilities" value={"-£" + (report.utilities || 0).toLocaleString()} tone="text-rose-500" />
           <Row icon={Megaphone} label="Marketing" value={"-£" + (report.marketing || 0).toLocaleString()} tone="text-rose-500" />
-          ${report.premium > 0 && <Row icon={Crown} label="Premium service" value={"-£" + report.premium.toLocaleString()} tone="text-rose-500" />}
+          {report.premium > 0 && <Row icon={Crown} label="Premium service" value={"-£" + report.premium.toLocaleString()} tone="text-rose-500" />}
           <div className="mt-3 flex items-center justify-between rounded-2xl bg-slate-900 px-4 py-3 text-white">
             <span className="text-[10px] font-black uppercase tracking-wider">Operating result</span>
-            <span className={(report.net || 0) >= 0 ? "font-black text-emerald-300" : "font-black text-rose-300"}>${(report.net || 0) >= 0 ? "+" : ""}${(report.net || 0).toLocaleString()}</span>
+            <span className={(report.net || 0) >= 0 ? "font-black text-emerald-300" : "font-black text-rose-300"}>£{(report.net || 0) >= 0 ? "+" : ""}{(report.net || 0).toLocaleString()}</span>
           </div>
-          <div className="flex items-center justify-center gap-2 pt-1 text-[9px] font-bold text-slate-400"><CloudSun className="h-3.5 w-3.5" /> ${report.weather || "Normal"} ${report.event ? "· " + report.event : ""}<Sparkles className="h-3.5 w-3.5 text-amber-400" /></div>
+          <div className="flex items-center justify-center gap-2 pt-1 text-[9px] font-bold text-slate-400"><CloudSun className="h-3.5 w-3.5" /> {report.weather || "Normal"} {report.event ? "· " + report.event : ""}<Sparkles className="h-3.5 w-3.5 text-amber-400" /></div>
           <button onClick={onClose} className="mt-1 w-full rounded-xl bg-cyan-500 py-3 text-sm font-black text-white shadow-sm hover:bg-cyan-600">Continue to park</button>
         </div>
       </div>
