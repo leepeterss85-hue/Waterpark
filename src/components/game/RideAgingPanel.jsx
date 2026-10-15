@@ -89,7 +89,7 @@ export default function RideAgingPanel({ grid, rideAges, money, onRefurbish }) {
                     disabled={!canAfford}
                     className={`mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-[10px] font-black transition ${canAfford ? "bg-gradient-to-r from-orange-400 to-red-500 text-white hover:from-orange-300 hover:to-red-400" : "bg-slate-100 text-slate-400"}`}
                   >
-                    <Wrench className="h-3 w-3" /> Refurbish · ${r.cost.toLocaleString()}
+                    <Wrench className="h-3 w-3" /> Refurbish · £{r.cost.toLocaleString()}
                   </button>
                 )}
               </div>
