@@ -68,12 +68,12 @@ export default function ParkManagementPanel({ admissionFee, marketingSpend, expr
       {latest && <div className="mt-3 rounded-xl bg-white/5 p-2.5 ring-1 ring-white/10">
         <div className="mb-2 text-[8px] font-black uppercase tracking-[0.14em] text-white/45">Latest day breakdown</div>
         <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[9px]">
-          <div className="flex justify-between gap-2"><span className="text-white/45">Tickets</span><b>${(latest.ticketRevenue || 0).toLocaleString()}</b></div>
-          <div className="flex justify-between gap-2"><span className="text-white/45">Rides</span><b>${(latest.rideIncome || 0).toLocaleString()}</b></div>
-          <div className="flex justify-between gap-2"><span className="text-white/45">Upkeep</span><b>-${(latest.upkeep || 0).toLocaleString()}</b></div>
-          <div className="flex justify-between gap-2"><span className="text-white/45">Wages</span><b>-${(latest.wages || 0).toLocaleString()}</b></div>
-          <div className="flex justify-between gap-2"><span className="text-white/45">Utilities</span><b>-${(latest.utilities || 0).toLocaleString()}</b></div>
-          <div className="flex justify-between gap-2"><span className="text-white/45">Marketing</span><b>-${(latest.marketing || 0).toLocaleString()}</b></div>
+          <div className="flex justify-between gap-2"><span className="text-white/45">Tickets</span><b>£{(latest.ticketRevenue || 0).toLocaleString()}</b></div>
+          <div className="flex justify-between gap-2"><span className="text-white/45">Rides</span><b>£{(latest.rideIncome || 0).toLocaleString()}</b></div>
+          <div className="flex justify-between gap-2"><span className="text-white/45">Upkeep</span><b>-£{(latest.upkeep || 0).toLocaleString()}</b></div>
+          <div className="flex justify-between gap-2"><span className="text-white/45">Wages</span><b>-£{(latest.wages || 0).toLocaleString()}</b></div>
+          <div className="flex justify-between gap-2"><span className="text-white/45">Utilities</span><b>-£{(latest.utilities || 0).toLocaleString()}</b></div>
+          <div className="flex justify-between gap-2"><span className="text-white/45">Marketing</span><b>-£{(latest.marketing || 0).toLocaleString()}</b></div>
         </div>
         {(latest.weather || latest.event) && <div className="mt-2 text-[8px] font-bold text-cyan-200">{latest.weather}{latest.event ? " · " + latest.event : ""}</div>}
       </div>}
