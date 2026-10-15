@@ -59,7 +59,7 @@ export default function ParkMasteryPanel({ game }) {
           const done=mastery.completed?.includes(g.id) || g.check(state);
           return <div key={g.id} className={"rounded-xl border p-2.5 "+(done?"border-emerald-200 bg-emerald-50":"border-slate-200 bg-white")}>
             <div className="flex items-center gap-2"><span className="text-xs font-black flex-1">{g.name}</span>{done?<CheckCircle2 className="h-4 w-4 text-emerald-600"/>:<span className="text-[9px] font-black text-slate-400">+{g.points} MP</span>}</div>
-            <div className="mt-0.5 text-[10px] text-slate-500">{g.text}</div><div className="mt-1 text-[9px] font-bold text-slate-400">Reward: ${g.reward.toLocaleString()} · +{g.xp} XP</div>
+            <div className="mt-0.5 text-[10px] text-slate-500">{g.text}</div><div className="mt-1 text-[9px] font-bold text-slate-400">Reward: £{g.reward.toLocaleString()} · +{g.xp} XP</div>
           </div>;
         })}
       </div>
