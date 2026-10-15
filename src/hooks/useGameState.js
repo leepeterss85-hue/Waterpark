@@ -1018,7 +1018,13 @@ export function useGameState() {
     { id: "signature", chapter: 10, title: "Create a Signature Skyline", text: "Build a destination people travel to see. Complete another mega project and make your park truly distinctive.", target: "advancedPark", action: "Complete two mega projects in total.", reward: { money: 55000, xp: 1600, reputation: 8, research: 4 } },
     { id: "legendary_operations", chapter: 10, title: "A Legendary Operation", text: "Prove you can manage a major resort at scale: strong earnings, high-level management and a park that keeps growing.", target: "manage", action: "Reach level 30 and earn £2,000,000 over your career.", reward: { money: 70000, xp: 2200, reputation: 10, research: 5 } },
     { id: "prestige", chapter: 11, title: "Leave a Legacy", text: "Reach the highest levels of park management, then decide whether to prestige and build an even stronger legacy.", target: "advancedPark", action: "Reach level 35 and £3,000,000 lifetime earnings.", reward: { money: 90000, xp: 3000, reputation: 15, research: 5 } },
-    { id: "finish", chapter: 11, title: "Waterpark Legend", text: "The campaign is complete. Your park is now ready for endless Freeplay, Sandbox experiments and the global park empire.", target: null, action: "Continue building your own legacy.", reward: { money: 150000, xp: 4000, reputation: 10, research: 8 } },
+    { id: "train_the_team", chapter: 12, title: "Develop Your Team", text: "A world-class resort grows its people as well as its rides. Invest in staff training so your team can keep standards high as visitor numbers climb.", target: "staff", action: "Train a member of staff at least once.", reward: { money: 25000, xp: 900, reputation: 5, research: 2 } },
+    { id: "guest_voices", chapter: 12, title: "Listen to Your Guests", text: "Read the feedback coming from the park. Use reviews to spot what visitors love and what needs attention before small problems become bad word of mouth.", target: "manage", action: "Collect at least five visitor reviews.", reward: { money: 28000, xp: 1000, reputation: 6, research: 2 } },
+    { id: "loyalty", chapter: 12, title: "Build a Loyal Following", text: "Turn one-off visits into repeat holidays with season passes, family memberships and VIP benefits.", target: "manage", action: "Grow your membership base to ten members.", reward: { money: 32000, xp: 1200, reputation: 7, research: 3 } },
+    { id: "crystal_water", chapter: 13, title: "Crystal-Clear Standards", text: "Water quality is part of the guest experience. Keep your water attractions clean, invest in treatment and protect your resort's reputation.", target: "manage", action: "Keep average water quality at 85 or higher across your water attractions.", reward: { money: 35000, xp: 1300, reputation: 8, research: 3 } },
+    { id: "signature_chain", chapter: 13, title: "Create a Signature District", text: "The strongest parks feel deliberately designed. Connect complementary attractions into a signature chain and earn its long-term bonuses.", target: "build", action: "Complete an attraction chain.", reward: { money: 45000, xp: 1600, reputation: 8, research: 4 } },
+    { id: "brand_builder", chapter: 13, title: "Become the Talk of the Country", text: "Give guests a reason to share their visit. Build your park's public profile and turn great experiences into lasting demand.", target: "manage", action: "Publish at least three social posts for your park.", reward: { money: 50000, xp: 1800, reputation: 10, research: 4 } },
+    { id: "finish", chapter: 13, title: "Waterpark Legend", text: "The campaign is complete. You have built a destination with great rides, a trained team, loyal guests and a recognised brand. Continue your legacy in Freeplay or experiment in Sandbox.", target: null, action: "Claim your place among the world's great waterpark tycoons.", reward: { money: 200000, xp: 6000, reputation: 15, research: 10 } },
   ];
 
   useEffect(() => {
@@ -1052,6 +1058,12 @@ export function useGameState() {
       signature: (megaProjects || []).filter((p) => p.status === "complete" || p.status === "completed" || p.completed).length >= 2,
       legendary_operations: level >= 30 && (lifetimeEarnings || 0) >= 2000000,
       prestige: level >= 35 && (lifetimeEarnings || 0) >= 3000000,
+      train_the_team: Object.values(staffXp || {}).reduce((sum, value) => sum + (Number(value) || 0), 0) >= 150,
+      guest_voices: (visitorReviews || []).length >= 5,
+      loyalty: Object.values(membershipCounts || {}).reduce((sum, value) => sum + (Number(value) || 0), 0) >= 10,
+      crystal_water: (() => { const waterTiles = (grid || []).map((id, index) => ({ id, index })).filter(({ id }) => id && isWaterAttraction(id)); return waterTiles.length > 0 && waterTiles.reduce((sum, tile) => sum + (Number(waterQuality?.[tile.index]) || 0), 0) / waterTiles.length >= 85; })(),
+      signature_chain: (completedChains || []).length >= 1,
+      brand_builder: (socialPosts || []).length >= 3,
       finish: level >= 35 && (lifetimeEarnings || 0) >= 3000000 && ((mastery?.points || 0) >= 12) && ((acquiredRivals || []).length > 0 || (franchiseMaps || []).length > 0),
     };
     const step = STORY_STEPS[storyStep];
@@ -1069,7 +1081,7 @@ export function useGameState() {
     const done = step.id === "finish";
     setStoryCompleted(done);
     saveSettings({ gameMode, storyStep: next, storyCompleted: done });
-  }, [gameMode, storyCompleted, storyStep, grid, staff, day, history, totalUpgrades, expansionsDone, completedResearch, hotelGuests, hotelStats, resortRating, incidents, emergencies, disastersSurvived, peakGuests, guests, marketShare, parkAppeal, reputation, level, mastery, megaProjects, acquiredRivals, franchiseMaps, lifetimeEarnings, awardStats]);
+  }, [gameMode, storyCompleted, storyStep, grid, staff, day, history, totalUpgrades, expansionsDone, completedResearch, hotelGuests, hotelStats, resortRating, incidents, emergencies, disastersSurvived, peakGuests, guests, marketShare, parkAppeal, reputation, level, mastery, megaProjects, acquiredRivals, franchiseMaps, lifetimeEarnings, awardStats, staffXp, visitorReviews, membershipCounts, waterQuality, completedChains, socialPosts]);
 
   const selectScenario = useCallback((id) => {
     const scenario = getScenario(id);
@@ -1129,10 +1141,11 @@ export function useGameState() {
 
   const advanceStory = useCallback(() => {
     if (gameMode !== "story" || storyCompleted) return;
+    const completing = STORY_STEPS[storyStep]?.id === "finish";
     const next = Math.min(STORY_STEPS.length - 1, storyStep + 1);
     setStoryStep(next);
-    setStoryCompleted(STORY_STEPS[storyStep]?.id === "finish");
-    saveSettings({ gameMode, storyStep: next, storyCompleted: next === STORY_STEPS.length - 1 });
+    setStoryCompleted(completing);
+    saveSettings({ gameMode, storyStep: next, storyCompleted: completing });
   }, [storyStep, gameMode, storyCompleted]);
 
   const updateSandboxSettings = useCallback((patch) => {
