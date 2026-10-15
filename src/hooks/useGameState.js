@@ -1131,7 +1131,7 @@ export function useGameState() {
           ? "📖 Story Mode campaign already complete. Continue in Freeplay or start a new park to replay it."
           : storyStep > 0
             ? `📖 Story Mode resumed at objective ${storyStep + 1} of ${STORY_STEPS.length}.`
-            : "📖 Story Mode started. Maya will guide you through nine chapters from your first splash to a full park empire."
+            : `📖 Story Mode started. Maya will guide you through ${Math.max(1, ...STORY_STEPS.map((step) => step.chapter || 1))} chapters from your first splash to a full park empire.`
       }, ...l].slice(0, 12));
       saveSettings({ gameMode: nextMode, sandbox: false, storyStep, storyCompleted });
     } else if (nextMode === "sandbox") {
