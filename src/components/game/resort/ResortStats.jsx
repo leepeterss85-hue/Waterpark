@@ -31,7 +31,7 @@ export default function ResortStats({ stats, hotelStats }) {
       <div className={"rounded-xl p-2.5 text-center ring-1 " + (netIncome >= 0 ? "bg-emerald-50 ring-emerald-100" : "bg-rose-50 ring-rose-100")}>
         <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Net Resort Income</span>
         <div className={"text-lg font-black " + (netIncome >= 0 ? "text-emerald-600" : "text-rose-600")}>
-          {netIncome >= 0 ? "+" : ""}${netIncome.toLocaleString()}
+          {netIncome >= 0 ? "+" : ""}£{netIncome.toLocaleString()}
         </div>
       </div>
     </>
