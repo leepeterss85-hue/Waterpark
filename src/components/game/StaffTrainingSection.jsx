@@ -96,7 +96,7 @@ export default function StaffTrainingSection({ staff, staffXp = {}, money, onTra
                   className="mt-2 flex w-full items-center justify-center gap-1 rounded-lg bg-indigo-600 px-2 py-1.5 text-[10px] font-bold text-white transition hover:bg-indigo-500 disabled:opacity-40"
                 >
                   <GraduationCap className="h-3 w-3" />
-                  Train · ${cost.toLocaleString()}
+                  Train · £{cost.toLocaleString()}
                 </button>
               )}
             </div>
