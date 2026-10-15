@@ -35,7 +35,7 @@ export default function EmergenciesPanel({ emergencies, emergencyStats }) {
 
       {totalCost > 0 && (
         <div className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-center text-xs font-bold text-rose-600">
-          Total emergency costs: ${totalCost.toLocaleString()}
+          Total emergency costs: £{totalCost.toLocaleString()}
         </div>
       )}
 
@@ -67,7 +67,7 @@ export default function EmergenciesPanel({ emergencies, emergencyStats }) {
                       </div>
                       {em.locationName && <p className="text-[11px] font-bold text-slate-500">📍 {em.locationName}</p>}
                       <p className="mt-0.5 text-[11px] text-slate-600">
-                        Cost: ${em.cost.toLocaleString()} · Rep impact: -{em.repImpact} · Day {em.day}
+                        Cost: £{em.cost.toLocaleString()} · Rep impact: -{em.repImpact} · Day {em.day}
                       </p>
                       {/* Progress bar */}
                       <div className="mt-2">
