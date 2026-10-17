@@ -38,11 +38,11 @@ export default function MembershipsCard({ counts, stats, level }) {
         </div>
         <div className="rounded-xl bg-slate-50 p-2.5 text-center">
           <div className="text-[9px] font-bold uppercase tracking-wide text-slate-400">Today</div>
-          <div className="text-lg font-black text-emerald-600">${(stats?.dailyRevenue || 0).toLocaleString()}</div>
+          <div className="text-lg font-black text-emerald-600">£{(stats?.dailyRevenue || 0).toLocaleString()}</div>
         </div>
         <div className="rounded-xl bg-slate-50 p-2.5 text-center">
           <div className="text-[9px] font-bold uppercase tracking-wide text-slate-400">Lifetime</div>
-          <div className="text-lg font-black text-slate-900">${(stats?.totalRevenue || 0).toLocaleString()}</div>
+          <div className="text-lg font-black text-slate-900">£{(stats?.totalRevenue || 0).toLocaleString()}</div>
         </div>
         <div className="rounded-xl bg-slate-50 p-2.5 text-center">
           <div className="text-[9px] font-bold uppercase tracking-wide text-slate-400">Retention</div>
