@@ -187,6 +187,23 @@ const ROCK_TRACKS = [
   { name: "Stormbreaker", tempo: 180, riff: [65.41,65.41,77.78,65.41,87.31,65.41,98,87.31,65.41,65.41,110,98,87.31,77.78,65.41,116.54], chords: [65.41,87.31,98,77.78], drums: "heavy", lead: [261.63,311.13,349.23,392,349.23,311.13,293.66,261.63] },
   { name: "Last Ride Home", tempo: 235, riff: [98,98,110,130.81,98,110,130.81,146.83,98,98,110,130.81,164.81,146.83,130.81,110], chords: [98,130.81,110,146.83], drums: "arena", lead: [392,440,493.88,523.25,587.33,523.25,493.88,440] },
   { name: "Concrete Thunder", tempo: 170, riff: [82.41,82.41,82.41,98,82.41,110,82.41,130.81,82.41,82.41,146.83,130.81,110,98,82.41,73.42], chords: [82.41,73.42,98,110], drums: "punk", lead: [329.63,329.63,392,440,493.88,440,392,349.23] },
+  { name: "Boardwalk Burnout", tempo: 188, riff: [110,130.81,146.83,130.81,110,98,110,146.83,164.81,146.83,130.81,110,98,110,130.81,98], chords: [110,146.83,98,130.81], drums: "punk", lead: [440,493.88,587.33,523.25,493.88,440,392,440] },
+  { name: "Sunset Switchback", tempo: 156, riff: [73.42,87.31,98,110,98,87.31,73.42,65.41,73.42,98,110,130.81,110,98,87.31,73.42], chords: [73.42,98,65.41,110], drums: "arena", lead: [293.66,349.23,392,440,392,349.23,329.63,293.66] },
+  { name: "Turbo Splash", tempo: 245, riff: [98,98,130.81,146.83,164.81,146.83,130.81,98,110,110,146.83,164.81,196,164.81,146.83,110], chords: [98,130.81,110,146.83], drums: "punk", lead: [392,493.88,587.33,659.25,587.33,523.25,493.88,392] },
+  { name: "Deep End Blues", tempo: 142, riff: [73.42,73.42,87.31,98,73.42,110,98,87.31,65.41,65.41,77.78,87.31,65.41,98,87.31,77.78], chords: [73.42,87.31,65.41,98], drums: "heavy", lead: [293.66,349.23,392,349.23,311.13,293.66,261.63,293.66] },
+  { name: "Neon Lifeguard", tempo: 202, riff: [98,123.47,146.83,123.47,98,123.47,164.81,146.83,110,138.59,164.81,138.59,110,138.59,185,164.81], chords: [98,123.47,110,138.59], drums: "arena", lead: [392,493.88,587.33,493.88,440,554.37,659.25,554.37] },
+  { name: "Concrete Carousel", tempo: 176, riff: [65.41,77.78,82.41,98,82.41,77.78,65.41,82.41,73.42,87.31,98,116.54,98,87.31,73.42,98], chords: [65.41,82.41,73.42,98], drums: "heavy", lead: [261.63,311.13,329.63,392,349.23,311.13,293.66,329.63] },
+  { name: "Wave Machine", tempo: 164, riff: [82.41,98,110,98,82.41,98,123.47,110,73.42,87.31,98,87.31,73.42,87.31,110,98], chords: [82.41,110,73.42,98], drums: "arena", lead: [329.63,392,440,493.88,440,392,349.23,392] },
+  { name: "After Hours Arcade", tempo: 192, riff: [55,82.41,110,82.41,55,82.41,123.47,110,65.41,98,130.81,98,65.41,98,146.83,130.81], chords: [55,110,65.41,130.81], drums: "heavy", lead: [220,329.63,440,493.88,440,392,329.63,293.66] },
+  { name: "Liftoff!", tempo: 214, riff: [98,110,130.81,164.81,146.83,130.81,110,98,110,130.81,146.83,196,164.81,146.83,130.81,110], chords: [98,130.81,110,146.83], drums: "arena", lead: [392,440,523.25,659.25,587.33,523.25,493.88,440] },
+  { name: "Rain on the Rapids", tempo: 150, riff: [73.42,98,110,98,73.42,87.31,98,110,65.41,87.31,98,87.31,65.41,77.78,87.31,98], chords: [73.42,110,65.41,98], drums: "heavy", lead: [293.66,392,440,392,261.63,349.23,392,349.23] },
+  { name: "Festival Frenzy", tempo: 228, riff: [110,130.81,164.81,146.83,110,130.81,185,164.81,123.47,146.83,185,164.81,123.47,146.83,207.65,185], chords: [110,164.81,123.47,185], drums: "punk", lead: [440,523.25,659.25,587.33,493.88,587.33,739.99,659.25] },
+  { name: "Last Light Lagoon", tempo: 148, riff: [65.41,82.41,98,82.41,73.42,87.31,110,87.31,55,73.42,87.31,73.42,65.41,82.41,98,110], chords: [65.41,98,73.42,110], drums: "arena", lead: [261.63,329.63,392,440,349.23,392,493.88,523.25] },
+  { name: "Rocket Slide", tempo: 238, riff: [98,98,123.47,146.83,185,146.83,123.47,98,110,110,138.59,164.81,207.65,164.81,138.59,110], chords: [98,146.83,110,164.81], drums: "punk", lead: [392,493.88,587.33,739.99,659.25,587.33,493.88,440] },
+  { name: "Tidal Force", tempo: 184, riff: [73.42,73.42,98,110,130.81,110,98,73.42,82.41,82.41,110,123.47,146.83,123.47,110,82.41], chords: [73.42,98,82.41,110], drums: "heavy", lead: [293.66,392,440,523.25,440,392,329.63,349.23] },
+  { name: "Summer Never Ends", tempo: 198, riff: [82.41,98,110,130.81,146.83,130.81,110,98,73.42,87.31,98,116.54,130.81,116.54,98,87.31], chords: [82.41,110,73.42,98], drums: "arena", lead: [329.63,392,440,523.25,493.88,440,392,349.23] },
+  { name: "Midnight Lifeguard", tempo: 172, riff: [55,73.42,82.41,98,82.41,73.42,55,82.41,65.41,87.31,98,116.54,98,87.31,65.41,98], chords: [55,82.41,65.41,98], drums: "heavy", lead: [220,293.66,329.63,392,349.23,329.63,261.63,293.66] },
+  { name: "Grand Finale", tempo: 208, riff: [98,130.81,146.83,164.81,196,164.81,146.83,130.81,110,146.83,164.81,185,220,185,164.81,146.83], chords: [98,146.83,110,164.81], drums: "arena", lead: [392,523.25,587.33,659.25,783.99,659.25,587.33,523.25] },
 ];
 let rockDrumNoise = null;
 let rockDistortion = null;
@@ -324,26 +341,36 @@ function startMusic() {
     const track = ROCK_TRACKS[currentRockTrack];
     const time = audioCtx.currentTime + 0.012;
     const step = rockTrackStep % 16;
-    const root = track.riff[step];
+    const section = Math.floor(rockTrackStep / 64); // intro, verse, chorus and finale
+    const sectionStep = rockTrackStep % 64;
+    const root = track.riff[(step + section * 3) % track.riff.length];
+    const chorus = section === 2;
+    const finale = section === 3;
+    const riffHits = chorus
+      ? [0, 1, 2, 4, 6, 8, 9, 10, 12, 14, 15]
+      : finale ? [0, 2, 3, 4, 6, 7, 8, 10, 11, 12, 14, 15]
+        : [0, 2, 3, 6, 8, 10, 11, 14, 15];
 
-    // Different guitar riffs, lead hooks, bass lines and drum feels per track.
-    if ([0, 2, 3, 6, 8, 10, 11, 14, 15].includes(step)) {
-      const longHit = step === 0 || step === 8;
-      rockGuitar(root, time, longHit ? 0.34 : 0.16, longHit ? 0.047 : 0.032, longHit);
+    // Each song runs through four 16-bar sections, with a lift in the chorus
+    // and a busier closing section rather than repeating one short loop.
+    if (riffHits.includes(step)) {
+      const longHit = step === 0 || step === 8 || (chorus && step === 4);
+      const octaveLift = chorus && step % 4 === 2 ? 2 : 1;
+      rockGuitar(root * octaveLift, time, longHit ? 0.42 : 0.17, longHit ? (chorus ? 0.052 : 0.047) : 0.032, longHit);
     }
     if (step % 4 === 0) {
-      const chord = track.chords[Math.floor(step / 4) % track.chords.length];
-      rockGuitar(chord * 1.5, time, 0.62, 0.025, true);
+      const chord = track.chords[(Math.floor(step / 4) + section) % track.chords.length];
+      rockGuitar(chord * (chorus ? 2 : 1.5), time, chorus ? 0.76 : 0.62, chorus ? 0.03 : 0.025, true);
       rockGuitar(chord * 1.25, time, 0.48, 0.018, true);
       rockBass(chord, time, 0.36);
     } else if (step % 2 === 0 || (track.drums === "punk" && step % 2 === 1)) {
       rockBass(root, time, 0.18);
     }
 
-    // A melodic hook on the upper register helps each tune feel different.
-    if ([2, 6, 10, 14].includes(step)) {
-      const lead = track.lead[Math.floor(step / 2) % track.lead.length];
-      rockGuitar(lead, time + 0.025, 0.2, 0.018, false);
+    // Lead melody evolves by section, with a brighter chorus and finale lift.
+    if ([2, 6, 10, 14].includes(step) || (finale && [3, 7, 11, 15].includes(step))) {
+      const lead = track.lead[(Math.floor(step / 2) + section) % track.lead.length];
+      rockGuitar(lead * (chorus || finale ? 2 : 1), time + 0.025, finale ? 0.28 : 0.2, chorus ? 0.023 : 0.018, false);
     }
 
     if (track.drums === "heavy") {
@@ -360,10 +387,14 @@ function startMusic() {
       if (step % 2 === 0) rockHat(time, step === 14);
     }
 
+    // Add occasional fills and a small section-change cymbal lift.
+    if (sectionStep === 63) { rockSnare(time); rockHat(time, true); }
+    if (finale && [7, 15].includes(step)) rockKick(time);
+
     rockTrackStep += 1;
     musicStep += 1;
-    // Four 4/4 bars per track, then move to the next song in the playlist.
-    if (rockTrackStep >= 64) {
+    // 256 steps gives each track a much longer arrangement before changing.
+    if (rockTrackStep >= 256) {
       rockTrackStep = 0;
       currentRockTrack = (currentRockTrack + 1) % ROCK_TRACKS.length;
       if (musicTimer !== null) window.clearInterval(musicTimer);
