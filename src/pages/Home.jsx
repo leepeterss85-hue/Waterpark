@@ -272,7 +272,7 @@ export default function Home() {
             </div>
             <div className="flex-1 overflow-y-auto bg-slate-50 p-3 sm:p-4">
               {selectedItem && (selectedItem.parkType === "zoo" ? (
-                <ZooDetailPanel itemId={selectedAttrId} level={game.upgrades[game.selectedTile] || 0} money={game.money} zookeepers={game.staff?.zookeeper || 0} onUpgrade={() => game.upgradeAttraction(game.selectedTile)} onSell={() => game.sellAttraction(game.selectedTile)} onClose={() => game.setSelectedTile(null)} />
+                <ZooDetailPanel itemId={selectedAttrId} tileIndex={game.selectedTile} animalState={game.zooAnimals?.[game.selectedTile]} level={game.upgrades[game.selectedTile] || 0} money={game.money} zookeepers={game.staff?.zookeeper || 0} onUpgrade={() => game.upgradeAttraction(game.selectedTile)} onSell={() => game.sellAttraction(game.selectedTile)} onClose={() => game.setSelectedTile(null)} onFeed={game.feedZooAnimal} onSchedule={game.setZooFeedingSchedule} onToggleBreeding={game.toggleZooBreeding} onTreat={game.treatZooAnimal} />
               ) : selectedItem.category === "environment" ? (
                 <ParkObjectDetail itemId={selectedAttrId} onSell={() => game.sellAttraction(game.selectedTile)} onClose={() => game.setSelectedTile(null)} />
               ) : selectedItem.category === "hotel" ? (
