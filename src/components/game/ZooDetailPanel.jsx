@@ -12,7 +12,7 @@ const Meter = ({ label, value, color = "bg-emerald-500" }) => (
 );
 
 export default function ZooDetailPanel({
-  itemId, tileIndex, animalState, level = 0, money = 0, zookeepers = 0,
+  itemId, tileIndex, animalState, level = 0, money = 0, zookeepers = 0, sandbox = false,
   onUpgrade, onSell, onClose, onFeed, onSchedule, onToggleBreeding, onTreat,
 }) {
   const item = getParkItem(itemId);
@@ -48,9 +48,9 @@ export default function ZooDetailPanel({
           <option value="daily">Daily · recommended</option>
           <option value="manual">Manual feeding · lowest cost, higher risk</option>
         </select>
-        <button onClick={() => onFeed?.(tileIndex)} disabled={money < Math.max(1, animal.population || 1) * 18} className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-amber-500 py-2 text-sm font-extrabold text-white disabled:opacity-40"><Utensils size={15}/> Feed animals now</button>
+        <button onClick={() => onFeed?.(tileIndex)} disabled={!sandbox && money < Math.max(1, animal.population || 1) * 18} className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-amber-500 py-2 text-sm font-extrabold text-white disabled:opacity-40"><Utensils size={15}/> Feed animals now</button>
         <button onClick={() => onToggleBreeding?.(tileIndex)} className={`mt-2 flex w-full items-center justify-center gap-2 rounded-lg py-2 text-sm font-bold ${animal.breeding === false ? "bg-slate-100 text-slate-700" : "bg-pink-50 text-pink-800"}`}><Baby size={15}/>{animal.breeding === false ? "Breeding paused" : "Breeding enabled"} · tap to change</button>
-        <button onClick={() => onTreat?.(tileIndex)} disabled={!animal.disease && (animal.health ?? 100) >= 90 || money < treatmentCost} className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-rose-600 py-2 text-sm font-extrabold text-white disabled:opacity-40"><Stethoscope size={15}/> Veterinary treatment · £{treatmentCost.toLocaleString()}</button>
+        <button onClick={() => onTreat?.(tileIndex)} disabled={(!animal.disease && (animal.health ?? 100) >= 90) || (!sandbox && money < treatmentCost)} className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-rose-600 py-2 text-sm font-extrabold text-white disabled:opacity-40"><Stethoscope size={15}/> Veterinary treatment · £{treatmentCost.toLocaleString()}</button>
       </div>
     </> : <div className="my-4 rounded-xl bg-teal-50 p-3 text-sm text-teal-900"><Leaf size={16} className="mr-1 inline"/> {itemId === "wildlife_vet" ? "Provides daily veterinary support, reduces illness risk and speeds recovery across every animal habitat." : "Improves animal welfare and conservation outcomes, helping breeding programmes and habitat care."}</div>}
     <div className="my-3 divide-y divide-slate-100 rounded-xl border border-slate-100 px-3">
