@@ -1097,7 +1097,20 @@ export function useGameState() {
     if (!scenario) return;
     const attractionCount = grid.filter((id) => getParkItem(id)?.category === "attraction").length;
     const familyAttractions = grid.filter((id) => getParkItem(id)?.category === "attraction" && ["family","family_raft","kiddie_pool","splash_pad","water_playground","wave_pool","lazy_river","rapid_rafting","water_volleyball"].includes(id)).length;
-    const metrics = { day, lifetimeEarnings, expansionsDone, resortRating, occupancy: hotelStats?.occupancy || 0, reputation, marketShare, acquiredRivals: acquiredRivals.length, appeal: parkAppeal?.score || 0, familyAttractions, attractionCount };
+    const waterTiles = (grid || []).map((id, index) => ({ id, index })).filter(({ id }) => id && isWaterAttraction(id));
+    const averageWaterQuality = waterTiles.length ? Math.round(waterTiles.reduce((sum, tile) => sum + (Number(waterQuality?.[tile.index]) || 0), 0) / waterTiles.length) : 100;
+    const metrics = {
+      day, level, lifetimeEarnings, expansionsDone, resortRating, occupancy: hotelStats?.occupancy || 0,
+      reputation, marketShare, acquiredRivals: acquiredRivals.length, appeal: parkAppeal?.score || 0,
+      familyAttractions, attractionCount, guestMood: visitorStats?.avgMood || 0,
+      researchCount: (completedResearch || []).length, averageWaterQuality,
+      staffCount: Object.values(staff || {}).reduce((sum, value) => sum + (Number(value) || 0), 0),
+      totalUpgrades, awardsWon: awardStats?.totalWon || awards?.length || 0,
+      memberships: Object.values(membershipCounts || {}).reduce((sum, value) => sum + (Number(value) || 0), 0),
+      themedZones: (parkAppeal?.zones || []).filter((zone) => zone.quality >= 60).length,
+      completedChains: (completedChains || []).length, socialPosts: (socialPosts || []).length,
+      megaProjectCount: (megaProjects || []).filter((project) => project.status === "complete" || project.status === "completed" || project.completed).length,
+    };
     if (activeScenario === "speed_builder" && day > 60 && attractionCount < 12) {
       setScenarioStatus("failed");
       setLog((l) => [{ day, text: "⏱️ Scenario failed: Speed Builder needed 12 attractions by day 60." }, ...l].slice(0, 12));
@@ -1114,7 +1127,7 @@ export function useGameState() {
     setXp((x) => x + (scenario.reward.xp || 0));
     if (scenario.reward.reputation) setReputation((r) => Math.min(100, r + scenario.reward.reputation));
     setLog((l) => [{ day, text: `🏆 Scenario complete: ${scenario.name}! +£${(scenario.reward.money || 0).toLocaleString()} · +${scenario.reward.xp || 0} XP.` }, ...l].slice(0, 12));
-  }, [activeScenario, scenarioStatus, day, lifetimeEarnings, expansionsDone, resortRating, hotelStats, reputation, marketShare, acquiredRivals, parkAppeal, grid, completedScenarios]);
+  }, [activeScenario, scenarioStatus, day, level, lifetimeEarnings, expansionsDone, resortRating, hotelStats, reputation, marketShare, acquiredRivals, parkAppeal, grid, completedScenarios, visitorStats, completedResearch, waterQuality, staff, totalUpgrades, awardStats, awards, membershipCounts, completedChains, socialPosts, megaProjects]);
 
   const setMode = useCallback((mode) => {
     const nextMode = ["story", "freeplay", "sandbox"].includes(mode) ? mode : "freeplay";
