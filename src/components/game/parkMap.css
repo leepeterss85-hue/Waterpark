@@ -99,5 +99,11 @@
 .scenery-flower { color:hsl(var(--park-sun)); opacity:.7; }
 .scenery-bench { color:hsl(var(--park-edge)); opacity:.42; }
 .scenery-lamp { color:hsl(var(--park-sun)); opacity:.52; }
+.scenery-bin { color:#475569; opacity:.65; }
+.scenery-parasol { color:hsl(var(--park-slide)); opacity:.72; }
+.scenery-sign { color:hsl(var(--park-deep)); opacity:.68; }
+.scenery-lifebuoy { color:#f97316; opacity:.78; }
+.park-scenery-item { transform:translateY(1px); }
+.park-scenery-item svg { filter:drop-shadow(0 1px 0 rgba(255,255,255,.22)); }
 @media (max-width:640px){.park-scenery-layer{gap:2px}.park-scenery-item svg{width:14px;height:14px}}
 @media (prefers-reduced-motion:reduce){.park-scenery-item{filter:none}}
