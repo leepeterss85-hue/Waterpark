@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Footprints, Users, Map as MapIcon, Sparkles } from "lucide-react";
 import { getParkItem } from "@/data/gameData";
 import { getHotelDef, hotelRooms } from "@/data/hotels";
@@ -24,7 +24,12 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
   const phase = ((day - 1) % 8);
   const timeOfDay = phase <= 1 ? "morning" : phase <= 5 ? "day" : phase === 6 ? "sunset" : "night";
   const weatherId = (typeof weather === "string" ? weather : weather?.id) || "clear";
+  const previousWeather = useRef(weatherId);
   useEffect(() => { sound.setAmbience(weatherId, timeOfDay); }, [weatherId, timeOfDay]);
+  useEffect(() => {
+    if (previousWeather.current !== weatherId) sound.weatherChange(weatherId);
+    previousWeather.current = weatherId;
+  }, [weatherId]);
   const attractionCount = grid.filter((id) => getParkItem(id)?.category === "attraction").length;
   const lifeguardStations = grid.filter((id) => id === "lifeguard_station").length;
   const toilets = grid.filter((id) => id === "toilets" || id === "lockers").length;
