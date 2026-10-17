@@ -812,3 +812,27 @@
   .scene-topspin-gondola, .scene-frisbee-disc, .scene-scooter-car, .scene-loopplane-cage,
   .scene-gravitron-panel, .scene-superloop-gondola, .scene-mouse-car { animation: none !important; }
 }
+
+/* === Final lighting polish: object grounding, glazed slide tubing and time-of-day mood === */
+.park-item-artwork > svg.aquatic-ride-art,
+.park-item-artwork > svg.park-facility-art,
+.park-item-artwork > svg.park-object-art {
+  filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.16)) !important;
+}
+.park-item-artwork .scene-building-shadow,
+.park-item-artwork .ride-depth-shadow { filter: blur(1.2px); opacity: .72; }
+.park-item-artwork .ride-water-slide { filter: drop-shadow(0 2px 2px hsl(var(--park-ink)/.28)) saturate(1.16); }
+.park-item-artwork .ride-slide-highlight { filter: drop-shadow(0 0 2px rgba(255,255,255,.58)); stroke-linecap: round; }
+.park-item-artwork .scene-glass,
+.park-item-artwork .scene-window-frame { stroke: rgba(255,255,255,.58); }
+.park-item-artwork .scene-metal { filter: drop-shadow(0 1px 1px hsl(var(--park-ink)/.22)); }
+.park-time-day .park-item-artwork > svg { filter: drop-shadow(1px 2px 2px hsl(var(--park-ink)/.17)) !important; }
+.park-time-sunset .park-item-artwork > svg { filter: drop-shadow(3px 4px 3px rgba(91,45,22,.22)) sepia(.055) saturate(1.08) !important; }
+.park-time-sunset .park-item-artwork .scene-building-shadow { fill: rgba(79,43,28,.3); }
+.park-time-night .park-item-artwork > svg { filter: brightness(.88) saturate(1.12) drop-shadow(0 3px 4px rgba(0,0,20,.38)) !important; }
+.park-time-night .park-item-artwork .scene-light,
+.park-time-night .park-item-artwork [class*="-light"] { filter: drop-shadow(0 0 3px currentColor); }
+.park-weather-rain .park-item-artwork > svg { filter: saturate(.92) brightness(.94) drop-shadow(0 2px 3px hsl(var(--park-ink)/.2)) !important; }
+@media (prefers-reduced-motion: reduce) {
+  .park-item-artwork *, .aquatic-ride-art * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; }
+}
