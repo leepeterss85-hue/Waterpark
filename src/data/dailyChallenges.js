@@ -14,6 +14,15 @@ const CHALLENGE_POOL = [
   { id: "spend_on_staff", type: "staffTotal", label: "Have %target%+ staff hired", target: 8, reward: { money: 3000, xp: 60 } },
   { id: "clean_park", type: "cleanliness", label: "Keep cleanliness above %target%%", target: 85, reward: { money: 3500, xp: 70 } },
   { id: "safe_park", type: "safety", label: "Keep safety above %target%%", target: 85, reward: { money: 3500, xp: 70 } },
+  { id: "earn_cash_stretch", type: "dailyNet", label: "Earn £%target% net today", target: 30000, reward: { money: 14000, xp: 180 } },
+  { id: "welcome_guests_stretch", type: "dailyGuests", label: "Welcome %target% guests today", target: 1500, reward: { money: 10000, xp: 160 } },
+  { id: "guest_delight", type: "avgMood", label: "Keep guest mood above %target%%", target: 90, reward: { money: 7000, xp: 140 } },
+  { id: "reputation_elite", type: "reputation", label: "Reach %target%% reputation", target: 95, reward: { money: 10000, xp: 160 } },
+  { id: "build_three", type: "buildToday", label: "Build at least %target% new items today", target: 3, reward: { money: 6000, xp: 100 } },
+  { id: "upgrade_three", type: "upgradeToday", label: "Upgrade at least %target% rides today", target: 3, reward: { money: 7000, xp: 120 } },
+  { id: "staff_team", type: "staffTotal", label: "Have %target%+ staff hired", target: 15, reward: { money: 8000, xp: 130 } },
+  { id: "clean_park_elite", type: "cleanliness", label: "Keep cleanliness above %target%%", target: 95, reward: { money: 6500, xp: 120 } },
+  { id: "safe_park_elite", type: "safety", label: "Keep safety above %target%%", target: 95, reward: { money: 6500, xp: 120 } },
 ];
 
 export const CHALLENGE_REFRESH_DAYS = 3;
