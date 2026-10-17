@@ -833,6 +833,33 @@
 .park-time-night .park-item-artwork .scene-light,
 .park-time-night .park-item-artwork [class*="-light"] { filter: drop-shadow(0 0 3px currentColor); }
 .park-weather-rain .park-item-artwork > svg { filter: saturate(.92) brightness(.94) drop-shadow(0 2px 3px hsl(var(--park-ink)/.2)) !important; }
+
+/* Clear glazed flume casing with a moving water ribbon inside each slide. */
+.park-item-artwork .ride-slide-glass {
+  fill: none;
+  stroke: rgba(235, 250, 255, .36);
+  stroke-width: 13;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.park-item-artwork .ride-slide-current {
+  fill: none;
+  stroke: rgba(224, 250, 255, .78);
+  stroke-width: 1.15;
+  stroke-linecap: round;
+  stroke-dasharray: 2.5 8;
+  animation: slide-water-current 2.4s linear infinite;
+  pointer-events: none;
+}
+.park-item-artwork .ride-slide-highlight {
+  stroke-width: 1.7;
+  opacity: .96;
+}
+@keyframes slide-water-current {
+  to { stroke-dashoffset: -21; }
+}
 @media (prefers-reduced-motion: reduce) {
   .park-item-artwork *, .aquatic-ride-art * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; }
+  .park-item-artwork .ride-slide-current { animation: none !important; }
 }
