@@ -5,7 +5,7 @@ let ambienceLevelGain = null;
 let musicGain = null;
 let muted = false;
 let volume = 0.7;
-let categoryVolumes = { effects: 0.8, ambience: 0.55, music: 0.18 };
+let categoryVolumes = { effects: 0.8, ambience: 0.42, music: 0.38 };
 let musicTimer = null;
 let lifeTimer = null;
 let musicStep = 0;
@@ -175,31 +175,158 @@ function addDrone(ctx, destination, frequency, gain, type = "sine") {
   ambienceNodes.push(osc, g);
 }
 
-const melody = [523.25, 659.25, 783.99, 659.25, 587.33, 698.46, 880, 698.46, 523.25, 659.25, 783.99, 1046.5, 880, 783.99, 659.25, 587.33];
+// Original, synthesised hard-rock backing: palm-muted power-chord guitar,
+ // melodic lead, bass and a punchy rock drum groove. No copied songs or recordings.
+const riffRoots = [82.41, 82.41, 98, 82.41, 110, 110, 98, 82.41, 82.41, 82.41, 130.81, 110, 98, 98, 110, 146.83];
+const chordRoots = [82.41, 110, 98, 73.42]; // E5, A5, G5, D5 power-chord movement
+let rockDrumNoise = null;
+let rockDistortion = null;
+
+function getRockNoise(ctx) {
+  if (rockDrumNoise) return rockDrumNoise;
+  const length = ctx.sampleRate;
+  const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < length; i++) data[i] = Math.random() * 2 - 1;
+  rockDrumNoise = buffer;
+  return buffer;
+}
+
+function getRockDistortion(ctx) {
+  if (rockDistortion) return rockDistortion;
+  const shaper = ctx.createWaveShaper();
+  const curve = new Float32Array(4096);
+  for (let i = 0; i < curve.length; i++) {
+    const x = (i * 2) / (curve.length - 1) - 1;
+    curve[i] = Math.tanh(5.5 * x);
+  }
+  shaper.curve = curve;
+  shaper.oversample = "2x";
+  rockDistortion = shaper;
+  return shaper;
+}
+
+function rockGuitar(freq, time, duration = 0.19, level = 0.035, sustain = false) {
+  const ctx = audioCtx;
+  if (!ctx || !musicGain) return;
+  const out = ctx.createGain();
+  const filter = ctx.createBiquadFilter();
+  filter.type = "lowpass";
+  filter.frequency.setValueAtTime(sustain ? 2100 : 1450, time);
+  filter.Q.value = 0.7;
+  const envelope = ctx.createGain();
+  envelope.gain.setValueAtTime(0.0001, time);
+  envelope.gain.linearRampToValueAtTime(level, time + 0.012);
+  envelope.gain.setTargetAtTime(level * (sustain ? 0.72 : 0.18), time + 0.035, sustain ? 0.12 : 0.045);
+  envelope.gain.setTargetAtTime(0.0001, time + duration * 0.62, sustain ? 0.22 : 0.055);
+  const oscA = ctx.createOscillator();
+  const oscB = ctx.createOscillator();
+  oscA.type = "sawtooth";
+  oscB.type = "sawtooth";
+  oscA.frequency.setValueAtTime(freq, time);
+  oscB.frequency.setValueAtTime(freq * 1.006, time);
+  const mix = ctx.createGain();
+  mix.gain.value = 0.55;
+  oscA.connect(mix);
+  oscB.connect(mix);
+  mix.connect(getRockDistortion(ctx));
+  getRockDistortion(ctx).connect(filter);
+  filter.connect(envelope);
+  envelope.connect(out);
+  out.connect(musicGain);
+  oscA.start(time); oscB.start(time);
+  oscA.stop(time + duration + 0.04); oscB.stop(time + duration + 0.04);
+  oscA.onended = () => { try { out.disconnect(); filter.disconnect(); envelope.disconnect(); mix.disconnect(); } catch {} };
+}
+
+function rockBass(freq, time, duration = 0.22) {
+  const ctx = audioCtx;
+  if (!ctx || !musicGain) return;
+  const osc = ctx.createOscillator();
+  const filter = ctx.createBiquadFilter();
+  const gain = ctx.createGain();
+  osc.type = "triangle";
+  osc.frequency.setValueAtTime(freq, time);
+  filter.type = "lowpass";
+  filter.frequency.value = 240;
+  gain.gain.setValueAtTime(0.0001, time);
+  gain.gain.linearRampToValueAtTime(0.055, time + 0.012);
+  gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
+  osc.connect(filter); filter.connect(gain); gain.connect(musicGain);
+  osc.start(time); osc.stop(time + duration + 0.02);
+}
+
+function rockKick(time) {
+  const ctx = audioCtx;
+  if (!ctx || !musicGain) return;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(135, time);
+  osc.frequency.exponentialRampToValueAtTime(48, time + 0.14);
+  gain.gain.setValueAtTime(0.12, time);
+  gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.18);
+  osc.connect(gain); gain.connect(musicGain);
+  osc.start(time); osc.stop(time + 0.2);
+}
+
+function rockSnare(time) {
+  const ctx = audioCtx;
+  if (!ctx || !musicGain) return;
+  const source = ctx.createBufferSource();
+  source.buffer = getRockNoise(ctx);
+  const filter = ctx.createBiquadFilter();
+  filter.type = "highpass"; filter.frequency.value = 1300;
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.0001, time);
+  gain.gain.linearRampToValueAtTime(0.075, time + 0.004);
+  gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.13);
+  source.connect(filter); filter.connect(gain); gain.connect(musicGain);
+  source.start(time); source.stop(time + 0.14);
+}
+
+function rockHat(time, open = false) {
+  const ctx = audioCtx;
+  if (!ctx || !musicGain) return;
+  const source = ctx.createBufferSource();
+  source.buffer = getRockNoise(ctx);
+  const filter = ctx.createBiquadFilter();
+  filter.type = "highpass"; filter.frequency.value = 6500;
+  const gain = ctx.createGain();
+  const end = open ? 0.12 : 0.045;
+  gain.gain.setValueAtTime(0.0001, time);
+  gain.gain.linearRampToValueAtTime(open ? 0.026 : 0.016, time + 0.003);
+  gain.gain.exponentialRampToValueAtTime(0.0001, time + end);
+  source.connect(filter); filter.connect(gain); gain.connect(musicGain);
+  source.start(time); source.stop(time + end + 0.01);
+}
+
 function startMusic() {
   if (musicTimer || !audioCtx || !hasUserGesture || muted) return;
   musicStep = 0;
   const playStep = () => {
     if (!audioCtx || audioCtx.state !== "running" || muted || !hasUserGesture) return;
-    const time = audioCtx.currentTime;
-    const notes = [melody[musicStep % melody.length], melody[(musicStep + 4) % melody.length] / 2];
-    notes.forEach((freq, index) => {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      const filter = audioCtx.createBiquadFilter();
-      osc.type = index === 0 ? "sine" : "triangle";
-      osc.frequency.setValueAtTime(freq, time);
-      filter.type = "lowpass"; filter.frequency.value = 1400;
-      gain.gain.setValueAtTime(0.0001, time);
-      gain.gain.linearRampToValueAtTime(index === 0 ? 0.035 : 0.018, time + 0.06);
-      gain.gain.exponentialRampToValueAtTime(0.0001, time + 1.05);
-      osc.connect(filter); filter.connect(gain); gain.connect(musicGain || masterGain);
-      osc.start(time); osc.stop(time + 1.08);
-    });
-    musicStep = (musicStep + 1) % melody.length;
+    const time = audioCtx.currentTime + 0.012;
+    const step = musicStep % 16;
+    const root = riffRoots[step];
+    // Driving, syncopated guitar riff with a sustained chord at each bar.
+    if ([0, 3, 6, 8, 11, 14, 15].includes(step)) {
+      rockGuitar(root, time, step % 4 === 0 ? 0.31 : 0.17, step % 4 === 0 ? 0.043 : 0.03, step % 4 === 0);
+    }
+    if (step % 4 === 0) {
+      const chord = chordRoots[Math.floor(step / 4) % chordRoots.length];
+      rockGuitar(chord * 1.5, time, 0.56, 0.022, true);
+      rockBass(chord, time, 0.38);
+    } else if (step % 2 === 0) {
+      rockBass(root, time, 0.17);
+    }
+    if ([0, 6, 8, 10].includes(step)) rockKick(time);
+    if (step === 4 || step === 12) rockSnare(time);
+    if (step % 2 === 0) rockHat(time, step === 14);
+    musicStep = (musicStep + 1) % 16;
   };
   playStep();
-  musicTimer = window.setInterval(playStep, 900);
+  musicTimer = window.setInterval(playStep, 220);
 }
 function stopMusic() {
   if (musicTimer !== null && typeof window !== "undefined") window.clearInterval(musicTimer);
