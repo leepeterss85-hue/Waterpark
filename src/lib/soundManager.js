@@ -13,6 +13,7 @@ let ambienceKey = "";
 let ambienceNodes = [];
 let ambienceGain = null;
 let ambienceWanted = { weather: "clear", timeOfDay: "day" };
+let zooSpecies = [];
 let hasUserGesture = false;
 
 function readMuted() {
@@ -399,11 +400,58 @@ function startParkLife() {
       toneGain.gain.setValueAtTime(0.0001, now); toneGain.gain.linearRampToValueAtTime(0.004, now + 0.04); toneGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
       osc.connect(toneGain); toneGain.connect(ambienceLevelGain); osc.start(now); osc.stop(now + 0.2);
     }
+    // Animal calls are occasional rather than constant, leaving space for music and park sounds.
+    if (zooSpecies.length && Math.random() < 0.72) {
+      const species = zooSpecies[Math.floor(Math.random() * zooSpecies.length)];
+      playAnimalCall(species);
+    }
   }, 14500);
 }
 function stopParkLife() {
   if (lifeTimer !== null && typeof window !== "undefined") window.clearInterval(lifeTimer);
   lifeTimer = null;
+}
+
+// Lightly layered, synthesised calls chosen from the habitats actually built.
+// They use the ambience bus, so existing mute and ambience-volume controls apply.
+function playAnimalCall(species) {
+  const ctx = audioCtx;
+  if (!ctx || ctx.state !== "running" || muted || !ambienceLevelGain) return;
+  const now = ctx.currentTime + 0.015;
+  const kind = String(species || "").toLowerCase();
+  const chirp = (freq, delay = 0, duration = 0.14, level = 0.018, type = "sine", endFreq = null) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, now + delay);
+    if (endFreq) osc.frequency.exponentialRampToValueAtTime(Math.max(1, endFreq), now + delay + duration);
+    gain.gain.setValueAtTime(0.0001, now + delay);
+    gain.gain.linearRampToValueAtTime(level, now + delay + 0.018);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + delay + duration);
+    osc.connect(gain); gain.connect(ambienceLevelGain);
+    osc.start(now + delay); osc.stop(now + delay + duration + 0.02);
+  };
+  const hiss = (delay = 0, duration = 0.24, level = 0.012, cutoff = 1800) => {
+    const length = Math.max(1, Math.floor(ctx.sampleRate * duration));
+    const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / length);
+    const src = ctx.createBufferSource(); src.buffer = buffer;
+    const filter = ctx.createBiquadFilter(); filter.type = "lowpass"; filter.frequency.value = cutoff;
+    const gain = ctx.createGain(); gain.gain.setValueAtTime(0.0001, now + delay); gain.gain.linearRampToValueAtTime(level, now + delay + 0.025); gain.gain.exponentialRampToValueAtTime(0.0001, now + delay + duration);
+    src.connect(filter); filter.connect(gain); gain.connect(ambienceLevelGain); src.start(now + delay); src.stop(now + delay + duration + 0.02);
+  };
+  if (/lion/.test(kind)) { chirp(115, 0, 0.55, 0.025, "sawtooth", 72); chirp(88, 0.25, 0.48, 0.018, "triangle", 58); hiss(0.1, 0.35, 0.008, 500); }
+  else if (/elephant/.test(kind)) { chirp(420, 0, 0.35, 0.025, "sawtooth", 950); chirp(880, 0.12, 0.42, 0.018, "triangle", 520); }
+  else if (/giraffe/.test(kind)) { chirp(190, 0, 0.42, 0.012, "triangle", 155); chirp(220, 0.5, 0.32, 0.01, "sine", 180); }
+  else if (/penguin/.test(kind)) { chirp(760, 0, 0.2, 0.018, "sawtooth", 420); chirp(580, 0.22, 0.24, 0.016, "sawtooth", 850); chirp(690, 0.52, 0.18, 0.014, "triangle", 460); }
+  else if (/bird|aviary|tropical/.test(kind)) { chirp(1550, 0, 0.09, 0.014, "sine", 2200); chirp(2050, 0.12, 0.11, 0.013, "sine", 1450); chirp(1750, 0.28, 0.1, 0.014, "sine", 2350); chirp(1280, 0.46, 0.13, 0.012, "sine", 1800); }
+  else if (/reptile|amphibian/.test(kind)) { hiss(0, 0.28, 0.012, 2400); chirp(310, 0.16, 0.12, 0.005, "sine", 260); }
+  else if (/meerkat/.test(kind)) { chirp(1250, 0, 0.07, 0.016, "sine", 980); chirp(1450, 0.11, 0.08, 0.015, "sine", 1150); chirp(1120, 0.25, 0.08, 0.014, "sine", 920); }
+  else if (/red panda/.test(kind)) { chirp(900, 0, 0.16, 0.014, "sine", 1250); chirp(680, 0.24, 0.2, 0.012, "triangle", 520); }
+  else if (/primate|monkey|ape/.test(kind)) { chirp(650, 0, 0.2, 0.018, "sawtooth", 1050); chirp(920, 0.17, 0.15, 0.014, "triangle", 540); chirp(760, 0.36, 0.22, 0.016, "sawtooth", 1200); }
+  else if (/marine|aquarium|fish/.test(kind)) { chirp(520, 0, 0.09, 0.01, "sine", 350); chirp(410, 0.18, 0.12, 0.009, "sine", 620); hiss(0.28, 0.2, 0.006, 850); }
+  else { chirp(740, 0, 0.12, 0.012, "sine", 980); chirp(620, 0.18, 0.14, 0.01, "triangle", 480); }
 }
 
 function applyAmbience() {
@@ -482,6 +530,10 @@ export const sound = {
   vip() { [784, 988, 1319, 1568].forEach((f, i) => tone(f, 0.12, "triangle", 0.1, i * 0.07)); },
   disaster() { tone(80, 0.4, "sawtooth", 0.12); tone(60, 0.5, "sawtooth", 0.1, 0.1); },
   milestone() { [523, 659, 784, 1047, 1319, 1568].forEach((f, i) => tone(f, 0.16, "triangle", 0.12, i * 0.09)); },
+  setZooHabitats(species = []) {
+    zooSpecies = Array.isArray(species) ? [...new Set(species.filter(Boolean))] : [];
+  },
+  animalCall(species) { playAnimalCall(species); },
   setAmbience(weather = "clear", timeOfDay = "day") {
     ambienceWanted = { weather: typeof weather === "string" ? weather : weather?.id || "clear", timeOfDay: timeOfDay || "day" };
     if (muted) { stopAmbience(); stopMusic(); stopParkLife(); return; }
