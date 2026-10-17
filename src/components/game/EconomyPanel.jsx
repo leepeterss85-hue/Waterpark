@@ -243,7 +243,7 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
                   <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-amber-100 text-[9px] font-black text-amber-700">{index + 1}</span>
                   <span className="min-w-0 flex-1 truncate text-xs font-black text-slate-700">{item.name}</span>
                   <span className={item.contribution >= 0 ? "text-[10px] font-black text-emerald-600" : "text-[10px] font-black text-rose-600"}>
-                    {item.contribution >= 0 ? "+" : ""}${item.contribution.toLocaleString()}/day
+                    {item.contribution >= 0 ? "+" : ""}£{item.contribution.toLocaleString()}/day
                   </span>
                 </div>
                 <div className="mt-1.5 flex items-center justify-between text-[9px] font-bold text-slate-400">
