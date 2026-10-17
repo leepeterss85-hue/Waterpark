@@ -101,3 +101,14 @@
 .scene-kart-checker { fill:none;stroke:hsl(var(--park-ink));stroke-width:1; }
 .scene-kart-body { fill:hsl(var(--park-slide));stroke:hsl(var(--park-rim));stroke-width:1; }
 .scene-kart-wheel { fill:hsl(var(--park-ink)); }
+
+/* Artwork finishing pass: finer materials, grounded props and glass highlights. */
+.park-item-artwork { isolation: isolate; }
+.park-item-artwork > svg { transform: translateZ(0); }
+.park-item-artwork .scene-wood-grain { opacity: .7; stroke-linecap: round; }
+.park-item-artwork .scene-glass { fill: rgba(186,230,253,.5); stroke: rgba(255,255,255,.7); stroke-width: .8; }
+.park-item-artwork .scene-water-jet,
+.park-item-artwork .scene-splash-arch { filter: drop-shadow(0 0 2px rgba(186,230,253,.48)); }
+.park-item-artwork .scene-queue-rope { filter: drop-shadow(0 1px 1px rgba(15,23,42,.22)); }
+.park-item-artwork .scene-path-pavers { stroke-linecap: round; }
+.park-item-artwork .scene-plant-bed { filter: drop-shadow(0 1px 1px rgba(15,23,42,.16)); }
