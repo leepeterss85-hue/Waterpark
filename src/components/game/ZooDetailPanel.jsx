@@ -8,7 +8,7 @@ export default function ZooDetailPanel({ itemId, level = 0, money = 0, zookeeper
   if (!item || item.parkType !== "zoo") return null;
   const Icon = getIcon(item.icon);
   const cost = upgradeCost(item.cost, level);
-  const care = Math.min(100, (item.welfare || 80) + level * 1.5 + zookeepers * 3);
+  const care = Math.max(35, Math.min(100, (item.welfare || 80) - (zookeepers === 0 ? 15 : 0) + level * 1.5 + zookeepers * 3));
   const careLabel = care >= 95 ? "Excellent" : care >= 85 ? "Good" : care >= 70 ? "Needs attention" : "At risk";
   return <section className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-emerald-100">
     <div className="mb-3 flex items-start justify-between gap-3">
