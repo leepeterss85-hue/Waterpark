@@ -11,7 +11,7 @@ export default function PlayerProgressPanel({ level, xp, xpForNext, onCheat }) {
     <div className="flex flex-wrap items-center gap-3 p-3 sm:p-4">
       <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-amber-300 to-orange-500 text-white shadow-sm"><Trophy className="h-5 w-5" /></div>
       <div className="min-w-[130px] flex-1">
-        <div className="flex items-center justify-between gap-2"><div className="text-[10px] font-extrabold uppercase tracking-wider text-amber-700">Tycoon progression</div><div className="text-xs font-black text-slate-800">Level {level} <span className="font-semibold text-slate-400">/ 30</span></div></div>
+        <div className="flex items-center justify-between gap-2"><div className="text-[10px] font-extrabold uppercase tracking-wider text-amber-700">Tycoon progression</div><div className="text-xs font-black text-slate-800">Level {level} <span className="font-semibold text-slate-400">/ {LEVEL_XP.length}</span></div></div>
         <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all" style={{ width: progress + "%" }} /></div>
         <div className="mt-1 text-[10px] font-semibold text-slate-500">{capped ? "Maximum level reached" : xp.toLocaleString() + " XP · " + Math.max(0, xpForNext - xp).toLocaleString() + " XP to next level"}</div>
       </div>
