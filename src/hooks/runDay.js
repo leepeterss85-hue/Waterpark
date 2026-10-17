@@ -283,6 +283,10 @@ export function runDay(stateRef, setters) {
     });
     income = sim.income;
     visitorStats = sim;
+    // Zoo management contributes to guest satisfaction only when the park invests in animal care.
+    const zooHabitatCount = attractions.filter((item) => item.attr.parkType === "zoo" && !["wildlife_vet", "conservation_centre"].includes(item.id)).length;
+    const zooCareBoost = Math.min(5, zooHabitatCount * 0.25 + (counts.zookeeper || 0) * 0.7 + facilities.filter((item) => item.id === "wildlife_vet").length * 0.8 + facilities.filter((item) => item.id === "conservation_centre").length * 0.5);
+    if (zooCareBoost > 0 && visitorStats.avgMood != null) visitorStats = { ...visitorStats, avgMood: Math.min(100, visitorStats.avgMood + zooCareBoost) };
     if (mascotMoodBoost > 0 && visitorStats.avgMood != null) {
       visitorStats = { ...visitorStats, avgMood: Math.min(100, visitorStats.avgMood + mascotMoodBoost) };
     }
