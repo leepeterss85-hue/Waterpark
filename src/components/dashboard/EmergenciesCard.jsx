@@ -34,7 +34,7 @@ export default function EmergenciesCard({ emergencies, emergencyStats }) {
         </div>
         <div className="rounded-xl bg-slate-50 p-2 text-center">
           <div className="text-[9px] font-bold uppercase tracking-wide text-slate-400">Costs</div>
-          <div className="text-lg font-black text-rose-600">${totalCost > 999 ? `${(totalCost / 1000).toFixed(1)}K` : totalCost}</div>
+          <div className="text-lg font-black text-rose-600">£{totalCost > 999 ? `${(totalCost / 1000).toFixed(1)}K` : totalCost}</div>
         </div>
       </div>
 
