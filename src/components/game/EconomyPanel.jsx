@@ -206,7 +206,7 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
         </div>
         <div className="mt-2 flex items-center justify-between rounded-lg bg-indigo-100/60 px-2.5 py-2 text-[10px] font-bold text-indigo-700">
           <span className="flex items-center gap-1"><Target className="h-3 w-3" /> {breakEvenDays ? `~${breakEvenDays} days to recover invested capital` : "Grow daily profit to accelerate expansion"}</span>
-          {outstandingDebt > 0 && <span>Debt ${outstandingDebt.toLocaleString()}</span>}
+          {outstandingDebt > 0 && <span>Debt £{outstandingDebt.toLocaleString()}</span>}
         </div>
       </div>
 
@@ -382,7 +382,7 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
                     disabled={money < remaining}
                     className="mt-2 w-full rounded-lg bg-violet-500 py-1.5 text-xs font-black text-white transition hover:bg-violet-600 disabled:opacity-40"
                   >
-                    Pay off ${remaining.toLocaleString()}
+                    Pay off £{remaining.toLocaleString()}
                   </button>
                 </div>
               );
@@ -422,7 +422,7 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
               </div>
             </div>
             <div className="mt-2 rounded-lg bg-slate-50 p-2 text-[10px] font-bold text-slate-500">
-              Interest: ${loanInterest.toLocaleString()} · Total: ${loanTotal.toLocaleString()} · Daily: ${loanDaily}
+              Interest: £{loanInterest.toLocaleString()} · Total: £{loanTotal.toLocaleString()} · Daily: £{loanDaily}
             </div>
             <button
               onClick={() => onTakeLoan(loanAmount, loanTerm)}
