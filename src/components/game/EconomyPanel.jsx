@@ -185,11 +185,11 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
       <div className={`rounded-2xl p-4 text-center £{net >= 0 ? "bg-emerald-50" : "bg-rose-50"}`}>
         <div className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Today's Profit / Loss</div>
         <div className={`text-2xl font-black ${net >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
-          {net >= 0 ? "+" : ""}${Math.round(net).toLocaleString()}
+          {net >= 0 ? "+" : ""}£{Math.round(net).toLocaleString()}
         </div>
         <div className="mt-1.5 flex justify-center gap-4 text-[11px] font-bold">
-          <span className="text-emerald-600">Income ${totalIncome.toLocaleString()}</span>
-          <span className="text-rose-600">Expenses ${totalExpenses.toLocaleString()}</span>
+          <span className="text-emerald-600">Income £{totalIncome.toLocaleString()}</span>
+          <span className="text-rose-600">Expenses £{totalExpenses.toLocaleString()}</span>
         </div>
       </div>
 
@@ -201,7 +201,7 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
         <div className="grid grid-cols-2 gap-2">
           <div className="rounded-xl bg-white p-2.5 shadow-sm"><div className="text-[9px] font-bold uppercase tracking-wide text-slate-400">Business Value</div><div className="text-base font-black text-indigo-600">${businessValue.toLocaleString()}</div></div>
           <div className="rounded-xl bg-white p-2.5 shadow-sm"><div className="text-[9px] font-bold uppercase tracking-wide text-slate-400">Park Assets</div><div className="text-base font-black text-slate-800">${assetValue.toLocaleString()}</div></div>
-          <div className="rounded-xl bg-white p-2.5 shadow-sm"><div className="text-[9px] font-bold uppercase tracking-wide text-slate-400">7-Day Avg Profit</div><div className={`text-base font-black ${averageDailyProfit >= 0 ? "text-emerald-600" : "text-rose-600"}`}>{averageDailyProfit >= 0 ? "+" : ""}${averageDailyProfit.toLocaleString()}</div></div>
+          <div className="rounded-xl bg-white p-2.5 shadow-sm"><div className="text-[9px] font-bold uppercase tracking-wide text-slate-400">7-Day Avg Profit</div><div className={`text-base font-black ${averageDailyProfit >= 0 ? "text-emerald-600" : "text-rose-600"}`}>{averageDailyProfit >= 0 ? "+" : ""}£{averageDailyProfit.toLocaleString()}</div></div>
           <div className="rounded-xl bg-white p-2.5 shadow-sm"><div className="text-[9px] font-bold uppercase tracking-wide text-slate-400">Operating Margin</div><div className={`text-base font-black ${operatingMargin >= 0 ? "text-emerald-600" : "text-rose-600"}`}>{operatingMargin}%</div></div>
         </div>
         <div className="mt-2 flex items-center justify-between rounded-lg bg-indigo-100/60 px-2.5 py-2 text-[10px] font-bold text-indigo-700">
@@ -222,7 +222,7 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
           const bestDay = current.reduce((best, h) => !best || (h.net || 0) > (best.net || 0) ? h : best, null);
           const advice = profit < 0 ? "Cash flow is negative. Stabilise operations and pricing before expanding." : profitChange != null && profitChange < -10 ? "Profit is slipping. Review queues, pricing and operating costs before investing." : guestChange != null && guestChange > 10 ? "Guest demand is accelerating. Upgrade your strongest attractions." : "Performance is stable. Keep a cash buffer and prioritise high-return investments.";
           return <><div className="grid grid-cols-2 gap-2">
-            <div className="rounded-xl bg-white p-2.5 ring-1 ring-slate-100"><div className="text-[8px] font-black uppercase text-slate-400">30-Day Profit</div><div className={"mt-0.5 text-sm font-black " + (profit >= 0 ? "text-emerald-600" : "text-rose-600")}>{profit >= 0 ? "+" : ""}${Math.round(profit).toLocaleString()}</div><div className="text-[8px] text-slate-400">{profitChange == null ? "Building baseline" : (profitChange >= 0 ? "+" : "") + profitChange + "% vs prior"}</div></div>
+            <div className="rounded-xl bg-white p-2.5 ring-1 ring-slate-100"><div className="text-[8px] font-black uppercase text-slate-400">30-Day Profit</div><div className={"mt-0.5 text-sm font-black " + (profit >= 0 ? "text-emerald-600" : "text-rose-600")}>{profit >= 0 ? "+" : ""}£{Math.round(profit).toLocaleString()}</div><div className="text-[8px] text-slate-400">{profitChange == null ? "Building baseline" : (profitChange >= 0 ? "+" : "") + profitChange + "% vs prior"}</div></div>
             <div className="rounded-xl bg-white p-2.5 ring-1 ring-slate-100"><div className="text-[8px] font-black uppercase text-slate-400">30-Day Guests</div><div className="mt-0.5 text-sm font-black text-slate-800">{Math.round(guestsNow).toLocaleString()}</div><div className="text-[8px] text-slate-400">{guestChange == null ? "Building baseline" : (guestChange >= 0 ? "+" : "") + guestChange + "% vs prior"}</div></div>
             <div className="rounded-xl bg-white p-2.5 ring-1 ring-slate-100"><div className="text-[8px] font-black uppercase text-slate-400">Best Day</div><div className="mt-0.5 text-sm font-black text-indigo-600">{bestDay ? "Day " + bestDay.day : "—"}</div><div className="text-[8px] text-slate-400">{bestDay ? "£" + Math.round(bestDay.net || 0).toLocaleString() + " profit" : "No history"}</div></div>
             <div className="rounded-xl bg-white p-2.5 ring-1 ring-slate-100"><div className="text-[8px] font-black uppercase text-slate-400">Period</div><div className="mt-0.5 text-sm font-black text-slate-800">{current.length} days</div><div className="text-[8px] text-slate-400">Current day {day}</div></div>
@@ -267,7 +267,7 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
                 <span className="truncate text-xs font-black text-slate-700">Next candidate: {expansionPlan.target.name}</span>
                 <span className="shrink-0 text-[10px] font-black text-emerald-600">ROI {expansionPlan.target.roi.toFixed(1)}%</span>
               </div>
-              <div className="mt-1 text-[10px] text-slate-500">Cost ${expansionPlan.target.cost.toLocaleString()} · estimated contribution ${expansionPlan.target.contribution.toLocaleString()}/day</div>
+              <div className="mt-1 text-[10px] text-slate-500">Cost £{expansionPlan.target.cost.toLocaleString()} · estimated contribution £{expansionPlan.target.contribution.toLocaleString()}/day</div>
             </div>
             <div className="mt-2 rounded-lg bg-emerald-100/70 px-2.5 py-2 text-[10px] font-bold text-emerald-800">
               {expansionPlan.affordable
@@ -327,7 +327,7 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
             ))}
             <div className="flex items-center justify-between rounded-lg bg-emerald-50 p-2 text-xs">
               <span className="font-black text-slate-700">Total Income</span>
-              <span className="font-black text-emerald-700">${totalIncome.toLocaleString()}</span>
+              <span className="font-black text-emerald-700">£{totalIncome.toLocaleString()}</span>
             </div>
           </div>
         </div>
@@ -348,7 +348,7 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
             ))}
             <div className="flex items-center justify-between rounded-lg bg-rose-50 p-2 text-xs">
               <span className="font-black text-slate-700">Total Expenses</span>
-              <span className="font-black text-rose-700">${totalExpenses.toLocaleString()}</span>
+              <span className="font-black text-rose-700">£{totalExpenses.toLocaleString()}</span>
             </div>
           </div>
         </div>
@@ -374,7 +374,7 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
                     <div className="h-full rounded-full bg-violet-500" style={{ width: `${progress}%` }} />
                   </div>
                   <div className="mt-1.5 flex items-center justify-between text-[10px] font-bold text-slate-500">
-                    <span>Daily: ${loan.dailyPayment}</span>
+                    <span>Daily: £{loan.dailyPayment}</span>
                     <span>Remaining: ${remaining.toLocaleString()}</span>
                   </div>
                   <button
@@ -396,7 +396,7 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
           <div className="mt-3 rounded-xl border border-slate-200 bg-white p-3">
             <h4 className="text-xs font-black text-slate-700">Take a Loan</h4>
             <div className="mt-2">
-              <label className="text-[10px] font-bold text-slate-400">Amount: ${loanAmount.toLocaleString()}</label>
+              <label className="text-[10px] font-bold text-slate-400">Amount: £{loanAmount.toLocaleString()}</label>
               <input
                 type="range"
                 min="5000"
@@ -428,7 +428,7 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
               onClick={() => onTakeLoan(loanAmount, loanTerm)}
               className="mt-2 w-full rounded-lg bg-violet-500 py-2 text-xs font-black text-white transition hover:bg-violet-600"
             >
-              Take Loan · +${loanAmount.toLocaleString()}
+              Take Loan · +£{loanAmount.toLocaleString()}
             </button>
           </div>
         )}
