@@ -15,6 +15,10 @@ function readMuted() {
 
 function init() {
   muted = readMuted();
+  try {
+    const savedVolume = Number(window.localStorage.getItem("waterpark-sound-volume"));
+    if (Number.isFinite(savedVolume) && window.localStorage.getItem("waterpark-sound-volume") !== null) volume = Math.max(0, Math.min(1, savedVolume));
+  } catch {}
 }
 
 function getCtx() {
@@ -212,6 +216,7 @@ export const sound = {
     const parsed = Number(nextVolume);
     if (!Number.isFinite(parsed)) return volume;
     volume = Math.max(0, Math.min(1, parsed));
+    try { if (typeof window !== "undefined") window.localStorage.setItem("waterpark-sound-volume", String(volume)); } catch {}
     updateMasterGain();
     return volume;
   },
