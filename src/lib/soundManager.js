@@ -309,32 +309,69 @@ function rockHat(time, open = false) {
   source.start(time); source.stop(time + end + 0.01);
 }
 
+let currentRockTrack = 0;
+let rockTrackStep = 0;
+
 function startMusic() {
   if (musicTimer || !audioCtx || !hasUserGesture || muted) return;
   musicStep = 0;
-  const playStep = () => {
+  currentRockTrack = 0;
+  rockTrackStep = 0;
+
+  const scheduleTrackStep = () => {
     if (!audioCtx || audioCtx.state !== "running" || muted || !hasUserGesture) return;
+    const track = ROCK_TRACKS[currentRockTrack];
     const time = audioCtx.currentTime + 0.012;
-    const step = musicStep % 16;
-    const root = riffRoots[step];
-    // Driving, syncopated guitar riff with a sustained chord at each bar.
-    if ([0, 3, 6, 8, 11, 14, 15].includes(step)) {
-      rockGuitar(root, time, step % 4 === 0 ? 0.31 : 0.17, step % 4 === 0 ? 0.043 : 0.03, step % 4 === 0);
+    const step = rockTrackStep % 16;
+    const root = track.riff[step];
+
+    // Different guitar riffs, lead hooks, bass lines and drum feels per track.
+    if ([0, 2, 3, 6, 8, 10, 11, 14, 15].includes(step)) {
+      const longHit = step === 0 || step === 8;
+      rockGuitar(root, time, longHit ? 0.34 : 0.16, longHit ? 0.047 : 0.032, longHit);
     }
     if (step % 4 === 0) {
-      const chord = chordRoots[Math.floor(step / 4) % chordRoots.length];
-      rockGuitar(chord * 1.5, time, 0.56, 0.022, true);
-      rockBass(chord, time, 0.38);
-    } else if (step % 2 === 0) {
-      rockBass(root, time, 0.17);
+      const chord = track.chords[Math.floor(step / 4) % track.chords.length];
+      rockGuitar(chord * 1.5, time, 0.62, 0.025, true);
+      rockGuitar(chord * 1.25, time, 0.48, 0.018, true);
+      rockBass(chord, time, 0.36);
+    } else if (step % 2 === 0 || (track.drums === "punk" && step % 2 === 1)) {
+      rockBass(root, time, 0.18);
     }
-    if ([0, 6, 8, 10].includes(step)) rockKick(time);
-    if (step === 4 || step === 12) rockSnare(time);
-    if (step % 2 === 0) rockHat(time, step === 14);
-    musicStep = (musicStep + 1) % 16;
+
+    // A melodic hook on the upper register helps each tune feel different.
+    if ([2, 6, 10, 14].includes(step)) {
+      const lead = track.lead[Math.floor(step / 2) % track.lead.length];
+      rockGuitar(lead, time + 0.025, 0.2, 0.018, false);
+    }
+
+    if (track.drums === "heavy") {
+      if ([0, 3, 6, 8, 11, 14].includes(step)) rockKick(time);
+      if (step === 4 || step === 12) rockSnare(time);
+      if (step % 2 === 0) rockHat(time, step === 14);
+    } else if (track.drums === "punk") {
+      if (step % 4 === 0 || step === 6 || step === 14) rockKick(time);
+      if (step === 4 || step === 12 || step === 15) rockSnare(time);
+      rockHat(time, step % 4 === 2);
+    } else {
+      if ([0, 6, 8, 10].includes(step)) rockKick(time);
+      if (step === 4 || step === 12) rockSnare(time);
+      if (step % 2 === 0) rockHat(time, step === 14);
+    }
+
+    rockTrackStep += 1;
+    musicStep += 1;
+    // Four 4/4 bars per track, then move to the next song in the playlist.
+    if (rockTrackStep >= 64) {
+      rockTrackStep = 0;
+      currentRockTrack = (currentRockTrack + 1) % ROCK_TRACKS.length;
+      if (musicTimer !== null) window.clearInterval(musicTimer);
+      musicTimer = window.setInterval(scheduleTrackStep, ROCK_TRACKS[currentRockTrack].tempo);
+    }
   };
-  playStep();
-  musicTimer = window.setInterval(playStep, 220);
+
+  scheduleTrackStep();
+  musicTimer = window.setInterval(scheduleTrackStep, ROCK_TRACKS[currentRockTrack].tempo);
 }
 function stopMusic() {
   if (musicTimer !== null && typeof window !== "undefined") window.clearInterval(musicTimer);
