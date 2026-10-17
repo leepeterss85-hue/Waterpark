@@ -178,8 +178,8 @@ function addDrone(ctx, destination, frequency, gain, type = "sine") {
 
 // Original, synthesised hard-rock backing: palm-muted power-chord guitar,
  // melodic lead, bass and a punchy rock drum groove. No copied songs or recordings.
-// Six original instrumental rock tracks. Each arrangement runs for four bars
-// before the next one begins, then the playlist repeats indefinitely.
+// Eighteen original instrumental rock tracks. Each track now follows a full-length
+// arrangement with three evolving passes through intro, verse, chorus and finale.
 const ROCK_TRACKS = [
   { name: "Riptide Riot", tempo: 220, riff: [82.41,82.41,98,82.41,110,110,98,82.41,82.41,82.41,130.81,110,98,98,110,146.83], chords: [82.41,110,98,73.42], drums: "arena", lead: [329.63,392,440,392,329.63,293.66,329.63,392] },
   { name: "Midnight Overdrive", tempo: 190, riff: [73.42,73.42,73.42,87.31,98,73.42,110,98,73.42,73.42,130.81,116.54,98,87.31,73.42,146.83], chords: [73.42,98,110,87.31], drums: "heavy", lead: [293.66,349.23,392,349.23,293.66,261.63,293.66,349.23] },
@@ -341,9 +341,11 @@ function startMusic() {
     const track = ROCK_TRACKS[currentRockTrack];
     const time = audioCtx.currentTime + 0.012;
     const step = rockTrackStep % 16;
-    const section = Math.floor(rockTrackStep / 64); // intro, verse, chorus and finale
+    const phrase = Math.floor(rockTrackStep / 64);
+    const section = phrase % 4; // intro, verse, chorus and finale, repeated with variations
+    const variation = Math.floor(phrase / 4);
     const sectionStep = rockTrackStep % 64;
-    const root = track.riff[(step + section * 3) % track.riff.length];
+    const root = track.riff[(step + section * 3 + variation * 5) % track.riff.length];
     const chorus = section === 2;
     const finale = section === 3;
     const riffHits = chorus
@@ -351,15 +353,15 @@ function startMusic() {
       : finale ? [0, 2, 3, 4, 6, 7, 8, 10, 11, 12, 14, 15]
         : [0, 2, 3, 6, 8, 10, 11, 14, 15];
 
-    // Each song runs through four 16-bar sections, with a lift in the chorus
-    // and a busier closing section rather than repeating one short loop.
+    // Each full-length song runs through three evolving intro/verse/chorus/finale
+    // cycles, with changing riff and chord offsets, a chorus lift and closing fills.
     if (riffHits.includes(step)) {
       const longHit = step === 0 || step === 8 || (chorus && step === 4);
       const octaveLift = chorus && step % 4 === 2 ? 2 : 1;
       rockGuitar(root * octaveLift, time, longHit ? 0.42 : 0.17, longHit ? (chorus ? 0.052 : 0.047) : 0.032, longHit);
     }
     if (step % 4 === 0) {
-      const chord = track.chords[(Math.floor(step / 4) + section) % track.chords.length];
+      const chord = track.chords[(Math.floor(step / 4) + section + variation) % track.chords.length];
       rockGuitar(chord * (chorus ? 2 : 1.5), time, chorus ? 0.76 : 0.62, chorus ? 0.03 : 0.025, true);
       rockGuitar(chord * 1.25, time, 0.48, 0.018, true);
       rockBass(chord, time, 0.36);
@@ -393,8 +395,8 @@ function startMusic() {
 
     rockTrackStep += 1;
     musicStep += 1;
-    // 256 steps gives each track a much longer arrangement before changing.
-    if (rockTrackStep >= 256) {
+    // 768 steps produces roughly 2–3 minutes per track at the selected tempos.
+    if (rockTrackStep >= 768) {
       rockTrackStep = 0;
       currentRockTrack = (currentRockTrack + 1) % ROCK_TRACKS.length;
       if (musicTimer !== null) window.clearInterval(musicTimer);
