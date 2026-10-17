@@ -71,7 +71,7 @@ export default function MissionsPanel({
 
               <div className="mt-2 flex items-center justify-between">
                 <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600">
-                  <Gift className="h-3 w-3" /> ${m.reward.money.toLocaleString()} · {m.reward.xp} XP
+                  <Gift className="h-3 w-3" /> £{m.reward.money.toLocaleString()} · {m.reward.xp} XP
                 </span>
                 {claimed ? (
                   <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-600">
