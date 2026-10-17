@@ -36,6 +36,7 @@ function Toggle({ on, onClick, onIcon: OnIcon, offIcon: OffIcon, onTone = "text-
 
 export default function SettingsPanel({ saves, onSave, onLoad, onDelete, onNewGame, onContinue, sandbox, onToggleSandbox, loadFromCloud, saveToCloud }) {
   const [soundOn, setSoundOn] = useState(!sound.isMuted());
+  const [soundVolume, setSoundVolume] = useState(sound.getVolume());
   const [vibrationOn, setVibrationOn] = useState(haptics.isEnabled());
   const [difficulty, setDifficulty] = useState(getSettings().difficulty);
   const [emailAlerts, setEmailAlerts] = useState(getSettings().emailAlerts !== false);
@@ -152,9 +153,14 @@ export default function SettingsPanel({ saves, onSave, onLoad, onDelete, onNewGa
           <SlidersHorizontal className="h-3.5 w-3.5" /> Audio & Feedback
         </div>
         <div className="flex flex-col gap-2">
-          <Row icon={soundOn ? Volume2 : VolumeX} title="Sound Effects" desc="Clicks, cash and splash cues">
+          <Row icon={soundOn ? Volume2 : VolumeX} title="Sound & Park Ambience" desc="Effects, water sounds and weather atmosphere">
             <Toggle on={soundOn} onClick={toggleSound} onIcon={Volume2} offIcon={VolumeX} />
           </Row>
+          <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+            <div className="mb-2 flex items-center justify-between text-[10px] font-extrabold text-slate-700"><label htmlFor="park-sound-volume">Audio volume</label><span>{Math.round(soundVolume * 100)}%</span></div>
+            <input id="park-sound-volume" aria-label="Audio volume" type="range" min="0" max="1" step="0.05" value={soundVolume} onChange={(event) => { const next = Number(event.target.value); setSoundVolume(next); sound.setVolume(next); }} className="w-full accent-cyan-600" />
+            <p className="mt-1 text-[9px] font-medium text-slate-500">Volume is saved on this device. Audio starts after your first interaction.</p>
+          </div>
           <Row icon={Vibrate} title="Vibration" desc="Haptic feedback on supported devices">
             <Toggle on={vibrationOn} onClick={toggleVibration} onIcon={Vibrate} offIcon={VibrateOff} />
           </Row>
