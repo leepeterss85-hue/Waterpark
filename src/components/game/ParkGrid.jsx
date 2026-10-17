@@ -27,6 +27,10 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
   const previousWeather = useRef(weatherId);
   useEffect(() => { sound.setAmbience(weatherId, timeOfDay); }, [weatherId, timeOfDay]);
   useEffect(() => {
+    const species = (grid || []).map((id) => getParkItem(id)).filter((item) => item?.parkType === "zoo" && item?.animal && !["All resident animals", "Conservation programmes"].includes(item.animal)).map((item) => item.animal);
+    sound.setZooHabitats(species);
+  }, [grid]);
+  useEffect(() => {
     if (previousWeather.current !== weatherId) sound.weatherChange(weatherId);
     previousWeather.current = weatherId;
   }, [weatherId]);
