@@ -6,7 +6,7 @@ import HotelArtwork from "@/components/game/HotelArtwork";
 import "@/components/game/graphicsEnhance.css";
 
 export default function ParkItemArtwork({ attr, grid, index, upgradeLevel = 0 }) {
-  return <div className="park-item-artwork" role="img" aria-label={attr.name} data-artwork={attr.id}>
+  return <div className="park-item-artwork" role="img" aria-label={attr.name} data-artwork={attr.id} data-artwork-category={attr.category}>
     {attr.category === "attraction" ? <WaterRideArtwork attr={attr} /> : attr.category === "facility" ? <FacilityArtwork attr={attr} /> : attr.category === "hotel" ? <HotelArtwork attr={attr} level={upgradeLevel} /> : <ParkObjectArtwork attr={attr} grid={grid} index={index} />}
   </div>;
 }
