@@ -322,7 +322,7 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
             {incomeItems.map((item) => (
               <div key={item.label} className="flex items-center justify-between rounded-lg bg-white p-2 text-xs shadow-sm">
                 <span className="font-bold text-slate-600">{item.label}</span>
-                <span className="font-black text-emerald-600">${item.value.toLocaleString()}</span>
+                <span className="font-black text-emerald-600">£{item.value.toLocaleString()}</span>
               </div>
             ))}
             <div className="flex items-center justify-between rounded-lg bg-emerald-50 p-2 text-xs">
@@ -343,7 +343,7 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
             {expenseItems.map((item) => (
               <div key={item.label} className="flex items-center justify-between rounded-lg bg-white p-2 text-xs shadow-sm">
                 <span className="font-bold text-slate-600">{item.label}</span>
-                <span className="font-black text-rose-600">${item.value.toLocaleString()}</span>
+                <span className="font-black text-rose-600">£{item.value.toLocaleString()}</span>
               </div>
             ))}
             <div className="flex items-center justify-between rounded-lg bg-rose-50 p-2 text-xs">
@@ -367,7 +367,7 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
               return (
                 <div key={loan.id} className="rounded-xl border border-violet-200 bg-violet-50 p-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-black text-slate-900">${loan.principal.toLocaleString()} loan</span>
+                    <span className="text-sm font-black text-slate-900">£{loan.principal.toLocaleString()} loan</span>
                     <span className="text-[10px] font-bold text-violet-600">{loan.daysRemaining}d left</span>
                   </div>
                   <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/60">
