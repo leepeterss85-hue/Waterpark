@@ -29,7 +29,7 @@ const RIDE_EFFECTS = {
 function EffectLayer({ type, count }) {
   switch (type) {
     case "spray":
-      return <>{Array.from({ length: count }, (_, i) => <span key={i} className="fx-spray" />)}</>;
+      return <><span className="fx-splash-foam" />{Array.from({ length: count }, (_, i) => <span key={i} className="fx-spray" />)}</>;
     case "streak":
       return <>{Array.from({ length: count }, (_, i) => <span key={i} className="fx-motion-streak" />)}</>;
     case "vortex":
