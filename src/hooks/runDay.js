@@ -920,7 +920,7 @@ export function runDay(stateRef, setters) {
   if ((d + 1) % 30 === 0) {
     const monthNumber = Math.floor((d + 1) / 30);
     const recentHistory = Array.isArray(stateRef.current.history) ? stateRef.current.history.slice(-29) : [];
-    const monthlyNet = Math.max(0, Math.round(recentHistory.reduce((sum, entry) => sum + Math.max(0, Number(entry?.net) || 0), 0) + Math.max(0, net)));
+    const monthlyNet = Math.max(0, Math.round(recentHistory.reduce((sum, entry) => sum + (Number(entry?.net) || 0), 0) + (Number(net) || 0)));
     const monthPeakGuests = Math.max(
       newGuests || 0,
       ...recentHistory.map((entry) => Math.max(0, Number(entry?.guests) || 0))
