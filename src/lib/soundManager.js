@@ -177,8 +177,16 @@ function addDrone(ctx, destination, frequency, gain, type = "sine") {
 
 // Original, synthesised hard-rock backing: palm-muted power-chord guitar,
  // melodic lead, bass and a punchy rock drum groove. No copied songs or recordings.
-const riffRoots = [82.41, 82.41, 98, 82.41, 110, 110, 98, 82.41, 82.41, 82.41, 130.81, 110, 98, 98, 110, 146.83];
-const chordRoots = [82.41, 110, 98, 73.42]; // E5, A5, G5, D5 power-chord movement
+// Six original instrumental rock tracks. Each arrangement runs for four bars
+// before the next one begins, then the playlist repeats indefinitely.
+const ROCK_TRACKS = [
+  { name: "Riptide Riot", tempo: 220, riff: [82.41,82.41,98,82.41,110,110,98,82.41,82.41,82.41,130.81,110,98,98,110,146.83], chords: [82.41,110,98,73.42], drums: "arena", lead: [329.63,392,440,392,329.63,293.66,329.63,392] },
+  { name: "Midnight Overdrive", tempo: 190, riff: [73.42,73.42,73.42,87.31,98,73.42,110,98,73.42,73.42,130.81,116.54,98,87.31,73.42,146.83], chords: [73.42,98,110,87.31], drums: "heavy", lead: [293.66,349.23,392,349.23,293.66,261.63,293.66,349.23] },
+  { name: "Neon Rebellion", tempo: 205, riff: [110,110,130.81,146.83,110,110,98,130.81,110,110,164.81,146.83,130.81,110,98,130.81], chords: [110,130.81,98,146.83], drums: "punk", lead: [440,493.88,523.25,587.33,523.25,493.88,440,392] },
+  { name: "Stormbreaker", tempo: 180, riff: [65.41,65.41,77.78,65.41,87.31,65.41,98,87.31,65.41,65.41,110,98,87.31,77.78,65.41,116.54], chords: [65.41,87.31,98,77.78], drums: "heavy", lead: [261.63,311.13,349.23,392,349.23,311.13,293.66,261.63] },
+  { name: "Last Ride Home", tempo: 235, riff: [98,98,110,130.81,98,110,130.81,146.83,98,98,110,130.81,164.81,146.83,130.81,110], chords: [98,130.81,110,146.83], drums: "arena", lead: [392,440,493.88,523.25,587.33,523.25,493.88,440] },
+  { name: "Concrete Thunder", tempo: 170, riff: [82.41,82.41,82.41,98,82.41,110,82.41,130.81,82.41,82.41,146.83,130.81,110,98,82.41,73.42], chords: [82.41,73.42,98,110], drums: "punk", lead: [329.63,329.63,392,440,493.88,440,392,349.23] },
+];
 let rockDrumNoise = null;
 let rockDistortion = null;
 
