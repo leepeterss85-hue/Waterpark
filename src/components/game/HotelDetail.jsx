@@ -80,7 +80,7 @@ export default function HotelDetail({ hotelDef, level, occupancy, guestsInHotel,
             onClick={onUpgrade}
             className={"flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-xs font-black text-white shadow-sm transition " + (canAfford ? "bg-gradient-to-b from-cyan-400 to-cyan-600 hover:from-cyan-300 hover:to-cyan-500" : "cursor-not-allowed bg-slate-300")}
           >
-            <ArrowUpCircle className="h-4 w-4" /> Upgrade · ${upgCost.toLocaleString()}
+            <ArrowUpCircle className="h-4 w-4" /> Upgrade · £{upgCost.toLocaleString()}
           </button>
         ) : (
           <div className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-amber-50 px-3 py-2.5 text-xs font-black text-amber-600 ring-1 ring-amber-100">
@@ -104,7 +104,7 @@ export default function HotelDetail({ hotelDef, level, occupancy, guestsInHotel,
       </div>
       {!maxed && (
         <p className="text-center text-[10px] font-semibold text-slate-400">
-          Next: {rooms + Math.round(rooms * 0.15)} rooms · ${Math.round(roomPrice * 1.08)}/night
+          Next: {rooms + Math.round(rooms * 0.15)} rooms · £{Math.round(roomPrice * 1.08)}/night
         </p>
       )}
     </div>
