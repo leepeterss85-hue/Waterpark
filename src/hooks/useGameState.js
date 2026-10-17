@@ -1113,7 +1113,7 @@ export function useGameState() {
     setMoney((m) => m + (scenario.reward.money || 0));
     setXp((x) => x + (scenario.reward.xp || 0));
     if (scenario.reward.reputation) setReputation((r) => Math.min(100, r + scenario.reward.reputation));
-    setLog((l) => [{ day, text: `🏆 Scenario complete: ${scenario.name}! +${(scenario.reward.money || 0).toLocaleString()} · +${scenario.reward.xp || 0} XP.` }, ...l].slice(0, 12));
+    setLog((l) => [{ day, text: `🏆 Scenario complete: ${scenario.name}! +£${(scenario.reward.money || 0).toLocaleString()} · +${scenario.reward.xp || 0} XP.` }, ...l].slice(0, 12));
   }, [activeScenario, scenarioStatus, day, lifetimeEarnings, expansionsDone, resortRating, hotelStats, reputation, marketShare, acquiredRivals, parkAppeal, grid, completedScenarios]);
 
   const setMode = useCallback((mode) => {
