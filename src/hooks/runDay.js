@@ -49,6 +49,7 @@ import { evaluateCampaigns } from "@/data/campaignChapters";
 import { empireBonuses } from "@/data/parkEmpire";
 import { MEGA_PROJECTS, DESTINATIONS, simulateMegaProjects, megaBonuses as calculateMegaBonuses, generateGuestStories, waterEngineering } from "@/data/advancedParkSystems";
 import { strategyFor, packageFor, masteryEffects, evaluateMastery } from "@/data/parkMastery";
+import { simulateZooDay } from "@/data/zooSimulation";
 
 const MILESTONE_DAYS = [25, 50, 75, 100, 150, 200];
 const MILESTONE_REWARDS = { 25: 25000, 50: 75000, 75: 150000, 100: 500000, 150: 750000, 200: 1000000 };
@@ -71,7 +72,7 @@ export function runDay(stateRef, setters) {
     setBuiltToday, setUpgradedToday, setTicketPrice, setLog, setLastNet, setHistory, setPeakGuests,
     setResearchPoints, setXp, setCompletedMasterPlans, setMasterPlanBonuses, setActiveStrikes,
     setGuestMemory, setRetailStock, setRetailStats, setCompletedChains, setCompletedCampaignChapters,
-    setMegaProjects, setGuestStories, setMastery, setResortMilestones,
+    setMegaProjects, setGuestStories, setMastery, setResortMilestones, setZooAnimals,
   } = setters;
 
   const { parkStrategy: currentParkStrategy = { strategy: "balanced", hotelPackage: "room_only" }, mastery: currentMastery = { points: 0, completed: [] }, grid: prevGrid, reputation: rep, day: d, sandboxSettings: sandboxTools = {}, staff: currentStaff, staffAssignments: currentAssignments, incidents: currentIncidents, upgrades: currentUpgrades, attractionCondition: currentCondition, challenge: currentChallenge, parkZones: currentZones, forecast: currentForecast, seasonEvent: currentSeasonEvent, parkAppeal: currentParkAppeal, ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass, vipVisit: currentVipVisit, completedResearch: currentResearch } = stateRef.current;
@@ -185,6 +186,9 @@ export function runDay(stateRef, setters) {
   const hasEntrance = environment.some((p) => p.id === "park_entrance");
   const pathCount = environment.filter((p) => p.id === "main_path" || p.id === "service_road").length;
   const scenicCount = environment.filter((p) => ["palm_tree", "bench", "shade_umbrella", "fountain", "wayfinding_sign"].includes(p.id)).length;
+  const zooDay = simulateZooDay(prevGrid, stateRef.current.zooAnimals || {}, counts, currentUpgrades || [], d + 1);
+  if (setZooAnimals) setZooAnimals(zooDay.animals);
+  if (zooDay.logs.length) setLog((l) => [...zooDay.logs, ...l].slice(0, 12));
   const capOf = (p) => p.attr.capacity * (1 + 0.2 * p.level);
   const upkeepOf = (p) => p.attr.maintenance * (1 + 0.1 * p.level);
 
@@ -545,7 +549,7 @@ export function runDay(stateRef, setters) {
   const retailRevenue = retailResult.revenue || 0;
   const retailRestockCost = retailResult.restockCost || 0;
   const expenses =
-    (placedItems.filter((p) => p.attr.category !== "hotel").reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) * upkeepResearchMult * agingUpkeepMult +
+    (placedItems.filter((p) => p.attr.category !== "hotel").reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) * upkeepResearchMult * agingUpkeepMult + zooDay.feedCost + zooDay.vetCost +
     wages * (eff.wageMult ?? 1) * (1 - (fx.wageReduction || 0)) * wageBoostMult + eventUtilityCost + currentAdBudget + (currentPriorityPass ? 120 : 0) + retailRestockCost) * diffUpkeepMult +
     hotelExpensesAmount;
   const eventRevenuePerDay = currentActiveEvents.reduce((s, e) => s + (e.revenuePerDay || 0), 0);
@@ -554,7 +558,7 @@ export function runDay(stateRef, setters) {
   const guestStoriesToday = generateGuestStories({ day: d + 1, guests: newGuests, visitorStats, hotelStats: stateRef.current.hotelStats, retailStats: retailResult, weather: dayWeather, megaProjects: megaState, activeEvents: currentActiveEvents, waterEngineering: engineering });
   if (guestStoriesToday.length) setGuestStories((prev) => [...guestStoriesToday, ...prev].slice(0, 80));
   const grossIncome = Math.round((ticketRevenue + rideIncome + hotelRoomRevenue + hotelParkSpend + retailRevenue + eventRevenuePerDay + membershipResult.totalRevenue + membershipResult.memberSpend + sponsorIncome) );
-  const upkeep = Math.round(placedItems.filter((p) => p.attr.category !== "hotel").reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) * upkeepResearchMult);
+  const upkeep = Math.round(placedItems.filter((p) => p.attr.category !== "hotel").reduce((s, p) => s + upkeepOf(p), 0) * (eff.upkeepMult ?? 1) * upkeepResearchMult + zooDay.feedCost + zooDay.vetCost);
   const wageCost = Math.round(wages * (eff.wageMult ?? 1) * (1 - (fx.wageReduction || 0)) * wageBoostMult);
   const marketingCost = currentAdBudget;
   const utilityCost = utilities;
