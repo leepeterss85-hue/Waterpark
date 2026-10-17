@@ -104,15 +104,15 @@ export default function GuestNeedsPanel({ visitorStats, grid, guests }) {
       {totalStake > 0 && (
         <div className="rounded-xl bg-rose-50 p-3 ring-1 ring-rose-100">
           <div className="text-[9px] font-black uppercase tracking-wide text-rose-500">Revenue slipping away today</div>
-          <div className="text-xl font-black text-rose-600">~${totalStake.toLocaleString()}/day</div>
+          <div className="text-xl font-black text-rose-600">~£{totalStake.toLocaleString()}/day</div>
           <div className="text-[9px] font-bold text-rose-400">from guests whose needs aren't being met</div>
         </div>
       )}
 
       <div className="grid grid-cols-1 gap-2">
-        <NeedBar icon={Utensils} label="Hunger" value={needs.hunger} hint={foodCount > 0 ? `£{foodCount} food venue£{foodCount > 1 ? "s" : ""} on site` : "No food venues built yet"} />
-        <NeedBar icon={Droplet} label="Thirst" value={needs.thirst} hint={drinkCount > 0 ? `£{drinkCount} drink spot£{drinkCount > 1 ? "s" : ""} on site` : "No drink spots built yet"} />
-        <NeedBar icon={BatteryCharging} label="Fatigue" value={needs.fatigue} hint={restCount > 0 ? `£{restCount} rest facility£{restCount > 1 ? "ies" : "y"} on site` : "No rest facilities built yet"} />
+        <NeedBar icon={Utensils} label="Hunger" value={needs.hunger} hint={foodCount > 0 ? `${foodCount} food venue${foodCount > 1 ? "s" : ""} on site` : "No food venues built yet"} />
+        <NeedBar icon={Droplet} label="Thirst" value={needs.thirst} hint={drinkCount > 0 ? `${drinkCount} drink spot${drinkCount > 1 ? "s" : ""} on site` : "No drink spots built yet"} />
+        <NeedBar icon={BatteryCharging} label="Fatigue" value={needs.fatigue} hint={restCount > 0 ? `${restCount} rest facilit${restCount > 1 ? "ies" : "y"} on site` : "No rest facilities built yet"} />
       </div>
 
       <div className="rounded-2xl border border-indigo-100 bg-indigo-50/60 p-3">
@@ -128,7 +128,7 @@ export default function GuestNeedsPanel({ visitorStats, grid, guests }) {
           </div>
           <div className="rounded-lg bg-white p-2">
             <div className="text-[8px] font-black uppercase text-slate-400">Avg Spend</div>
-            <div className="text-sm font-black text-slate-800">${Math.round(avgSpend)}</div>
+            <div className="text-sm font-black text-slate-800">£{Math.round(avgSpend)}</div>
           </div>
           <div className="rounded-lg bg-white p-2">
             <div className="text-[8px] font-black uppercase text-slate-400">Total Visits</div>
