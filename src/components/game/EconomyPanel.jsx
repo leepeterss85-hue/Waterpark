@@ -182,7 +182,7 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
   return (
     <div className="space-y-4">
       {/* Net P/L */}
-      <div className={`rounded-2xl p-4 text-center £{net >= 0 ? "bg-emerald-50" : "bg-rose-50"}`}>
+      <div className={`rounded-2xl p-4 text-center ${net >= 0 ? "bg-emerald-50" : "bg-rose-50"}`}>
         <div className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Today's Profit / Loss</div>
         <div className={`text-2xl font-black ${net >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
           {net >= 0 ? "+" : ""}£{Math.round(net).toLocaleString()}
@@ -199,8 +199,8 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
           <Building2 className="h-4 w-4 text-indigo-500" /> Business Overview
         </h3>
         <div className="grid grid-cols-2 gap-2">
-          <div className="rounded-xl bg-white p-2.5 shadow-sm"><div className="text-[9px] font-bold uppercase tracking-wide text-slate-400">Business Value</div><div className="text-base font-black text-indigo-600">${businessValue.toLocaleString()}</div></div>
-          <div className="rounded-xl bg-white p-2.5 shadow-sm"><div className="text-[9px] font-bold uppercase tracking-wide text-slate-400">Park Assets</div><div className="text-base font-black text-slate-800">${assetValue.toLocaleString()}</div></div>
+          <div className="rounded-xl bg-white p-2.5 shadow-sm"><div className="text-[9px] font-bold uppercase tracking-wide text-slate-400">Business Value</div><div className="text-base font-black text-indigo-600">£{businessValue.toLocaleString()}</div></div>
+          <div className="rounded-xl bg-white p-2.5 shadow-sm"><div className="text-[9px] font-bold uppercase tracking-wide text-slate-400">Park Assets</div><div className="text-base font-black text-slate-800">£{assetValue.toLocaleString()}</div></div>
           <div className="rounded-xl bg-white p-2.5 shadow-sm"><div className="text-[9px] font-bold uppercase tracking-wide text-slate-400">7-Day Avg Profit</div><div className={`text-base font-black ${averageDailyProfit >= 0 ? "text-emerald-600" : "text-rose-600"}`}>{averageDailyProfit >= 0 ? "+" : ""}£{averageDailyProfit.toLocaleString()}</div></div>
           <div className="rounded-xl bg-white p-2.5 shadow-sm"><div className="text-[9px] font-bold uppercase tracking-wide text-slate-400">Operating Margin</div><div className={`text-base font-black ${operatingMargin >= 0 ? "text-emerald-600" : "text-rose-600"}`}>{operatingMargin}%</div></div>
         </div>
@@ -375,7 +375,7 @@ export default function EconomyPanel({ history, money, day, grid, loans, onTakeL
                   </div>
                   <div className="mt-1.5 flex items-center justify-between text-[10px] font-bold text-slate-500">
                     <span>Daily: £{loan.dailyPayment}</span>
-                    <span>Remaining: ${remaining.toLocaleString()}</span>
+                    <span>Remaining: £{remaining.toLocaleString()}</span>
                   </div>
                   <button
                     onClick={() => onRepayLoan(loan.id)}
