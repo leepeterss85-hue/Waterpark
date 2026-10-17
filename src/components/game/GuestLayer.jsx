@@ -11,6 +11,7 @@ const STAFF_ROLES = [
   { id: "entertainer", color: "bg-pink-500", label: "Entertainer" },
   { id: "fitness_coach", color: "bg-violet-600", label: "Fitness coach" },
   { id: "gardener", color: "bg-lime-600", label: "Groundskeeper" },
+  { id: "zookeeper", color: "bg-emerald-700", label: "Zookeeper" },
 ];
 
 export default function GuestLayer({ grid, parkZones = [], guests = 0, movements = {}, queueStats = {}, staff = {}, staffAssignments = {}, incidents = [], attractionCondition = [], hotelGuests = [] }) {
@@ -44,7 +45,8 @@ export default function GuestLayer({ grid, parkZones = [], guests = 0, movements
     // Role-aware placement: staff gravitate to the things they actually work on,
     // so the map shows lifeguards by pools, mechanics at degrading rides, cleaners at facilities.
     if (!assignment) {
-      if (role.id === "lifeguard") positions = positions.filter(t => t.attr?.category === "attraction" && isWaterAttraction(t.id));
+      if (role.id === "zookeeper") positions = positions.filter(t => t.attr?.parkType === "zoo");
+      else if (role.id === "lifeguard") positions = positions.filter(t => t.attr?.category === "attraction" && isWaterAttraction(t.id));
       else if (role.id === "mechanic") positions = positions.filter(t => t.attr?.category === "attraction" && (attractionCondition[t.index] ?? 100) < 75);
       else if (role.id === "cleaner") positions = positions.filter(t => t.attr?.category === "facility" || (attractionCondition[t.index] ?? 100) < 50);
       // fall back to all targets if the role-specific set is empty (nothing to work on yet)
