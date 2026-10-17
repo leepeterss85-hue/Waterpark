@@ -459,3 +459,27 @@
 @keyframes fx-foam-bloom { 0%,100% { opacity: .18; transform: scale(.72,.65); } 35% { opacity: .9; transform: scale(1.12,1.2); } 72% { opacity: .45; transform: scale(1.3,.85); } }
 @keyframes fx-foam-rings { 0% { transform: scale(.35); opacity: .8; } 100% { transform: scale(2.8,1.7); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .fx-splash-foam,.fx-splash-foam::before,.fx-splash-foam::after { animation: none !important; } }
+
+/* === Dynamic map ambience: time of day + weather === */
+.map-ambience { isolation: isolate; border-radius: 15px; transition: background-color 1.2s ease, opacity 1.2s ease; }
+.map-ambience-grade,.map-ambience-sunset-glow,.map-ambience-night-vignette,.map-ambience-cloud-filter,.map-ambience-rain,.map-ambience-storm-flash,.map-ambience-neon-haze { position: absolute; inset: 0; pointer-events: none; }
+.map-ambience-grade { z-index: 0; transition: background 1.2s ease, opacity 1.2s ease; }
+.map-ambience > .ambient-sparkle,.map-ambience > .ambient-mote,.map-ambience > .ambient-sunray,.map-ambience > .ambient-flare { z-index: 1; }
+.park-ambience-time-morning .map-ambience-grade { background: linear-gradient(115deg, rgba(255,246,207,.08), transparent 42%, rgba(186,230,253,.06)); }
+.park-ambience-time-day .map-ambience-grade { background: linear-gradient(145deg, rgba(255,255,255,.055), transparent 48%, rgba(255,231,153,.035)); }
+.park-ambience-time-sunset .map-ambience-grade { background: linear-gradient(115deg, rgba(255,151,75,.18), rgba(255,202,115,.09) 38%, rgba(92,76,158,.13) 100%); mix-blend-mode: soft-light; }
+.map-ambience-sunset-glow { z-index: 0; inset: auto -12% -18% auto; width: 72%; height: 75%; border-radius: 50%; background: radial-gradient(ellipse, rgba(255,153,79,.24), rgba(255,190,116,.1) 36%, transparent 72%); filter: blur(15px); animation: sunset-glow-breathe 8s ease-in-out infinite; }
+.park-ambience-time-night .map-ambience-grade { background: linear-gradient(145deg, rgba(11,25,66,.26), rgba(18,32,78,.18) 45%, rgba(3,12,38,.4)); mix-blend-mode: multiply; }
+.map-ambience-night-vignette { z-index: 2; background: radial-gradient(ellipse at 50% 42%, transparent 36%, rgba(3,9,31,.13) 72%, rgba(2,7,24,.34) 100%); }
+.map-ambience-neon-haze { z-index: 2; background: radial-gradient(ellipse at 18% 80%, rgba(34,211,238,.08), transparent 42%), radial-gradient(ellipse at 82% 18%, rgba(167,139,250,.1), transparent 40%); mix-blend-mode: screen; }
+.park-ambience-weather-cloudy .map-ambience-cloud-filter,.park-ambience-weather-overcast .map-ambience-cloud-filter { z-index: 2; background: linear-gradient(180deg, rgba(100,116,139,.13), rgba(71,85,105,.04) 50%, rgba(51,65,85,.1)); }
+.park-ambience-weather-rain .map-ambience-grade,.park-ambience-weather-rainy .map-ambience-grade { background: rgba(30,64,95,.1); }
+.map-ambience-rain { z-index: 3; opacity: .52; background-image: repeating-linear-gradient(104deg, transparent 0 17px, rgba(218,239,255,.38) 18px, transparent 19px 29px); background-size: 100% 150%; animation: map-rain-fall .42s linear infinite; mask-image: linear-gradient(180deg, rgba(0,0,0,.85), rgba(0,0,0,.15)); }
+.park-ambience-weather-storm .map-ambience-grade,.park-ambience-weather-thunderstorm .map-ambience-grade { background: rgba(15,23,42,.2); }
+.park-ambience-weather-storm .map-ambience-rain,.park-ambience-weather-thunderstorm .map-ambience-rain { opacity: .72; }
+.map-ambience-storm-flash { z-index: 4; background: rgba(219,234,254,.38); opacity: 0; animation: map-lightning-flash 9s linear infinite; }
+@keyframes map-rain-fall { from { background-position: 0 -90px; } to { background-position: -24px 90px; } }
+@keyframes map-lightning-flash { 0%, 86%, 88%, 91%, 100% { opacity: 0; } 86.5%, 89% { opacity: .48; } 87.5%, 90% { opacity: .08; } }
+@keyframes sunset-glow-breathe { 0%,100% { opacity: .72; transform: scale(.96); } 50% { opacity: 1; transform: scale(1.04); } }
+.park-time-night .park-item-artwork [class*="-light"],.park-time-night .park-item-artwork .scene-light { filter: drop-shadow(0 0 5px rgba(125,211,252,.48)); }
+@media (prefers-reduced-motion: reduce) { .map-ambience *, .map-ambience *::before, .map-ambience *::after { animation: none !important; transition: none !important; } }
