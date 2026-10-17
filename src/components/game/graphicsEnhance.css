@@ -834,6 +834,20 @@
 .park-time-night .park-item-artwork [class*="-light"] { filter: drop-shadow(0 0 3px currentColor); }
 .park-weather-rain .park-item-artwork > svg { filter: saturate(.92) brightness(.94) drop-shadow(0 2px 3px hsl(var(--park-ink)/.2)) !important; }
 
+/* A soft specular sheen makes existing vector attractions feel less flat without replacing their artwork. */
+.park-item-artwork::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(145deg, rgba(255,255,255,.13) 0%, rgba(255,255,255,.035) 22%, transparent 48%, rgba(8,35,58,.045) 100%);
+  opacity: .72;
+}
+.park-item-artwork[data-artwork-category="attraction"]::after {
+  background: linear-gradient(150deg, rgba(255,255,255,.18) 0%, rgba(255,255,255,.045) 28%, transparent 55%, rgba(8,35,58,.07) 100%);
+}
+
 /* Clear glazed flume casing with a moving water ribbon inside each slide. */
 .park-item-artwork .ride-slide-glass {
   fill: none;
