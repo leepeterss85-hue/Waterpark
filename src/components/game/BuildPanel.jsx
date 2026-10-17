@@ -12,7 +12,6 @@ export default function BuildPanel({ money, level = 1, selectedBuild, onSelect, 
     const req = researchReqFor(item.id);
     return (level >= unlockLevelFor(item) || sandbox) && !(req && !completedResearch.includes(req.id));
   };
-  const zooItems = filteredZooItems(allItems, query);
   const categoryCounts = Object.fromEntries(
     ["attraction", "facility", "hotel"].map((category) => {
       const items = allItems.filter((item) => item.category === category && item.parkType !== "zoo");
