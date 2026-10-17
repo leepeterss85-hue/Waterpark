@@ -22,7 +22,7 @@ export default function FloatingRewards({ amount, trigger }) {
             transition={{ duration: 1.7, ease: "easeOut", times: [0, 0.15, 0.7, 1] }}
             className={"absolute whitespace-nowrap font-display text-2xl font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)] " + (item.amount >= 0 ? "text-emerald-400" : "text-rose-400")}
           >
-            {item.amount >= 0 ? "+" : ""}${Math.abs(item.amount).toLocaleString()}
+            {item.amount >= 0 ? "+" : ""}£{Math.abs(item.amount).toLocaleString()}
           </motion.div>
         ))}
       </AnimatePresence>
