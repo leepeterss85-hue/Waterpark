@@ -96,7 +96,7 @@ export default function PricingPanel({ pricing, ticketPrice, weather, seasonEven
           </div>
           <div className="flex items-center gap-2">
             <span className="rounded-full bg-emerald-200 px-2 py-0.5 text-[9px] font-black text-emerald-800">{tier}</span>
-            <span className="font-display text-lg font-extrabold text-slate-900">${ticketPrice}</span>
+            <span className="font-display text-lg font-extrabold text-slate-900">£{ticketPrice}</span>
           </div>
         </div>
         <div className="mt-2 flex flex-wrap gap-1.5">
