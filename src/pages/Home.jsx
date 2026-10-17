@@ -14,6 +14,7 @@ import MapMenuBar from "@/components/game/MapMenuBar";
 import GameMenuSheets from "@/components/game/GameMenuSheets";
 import { TileDetailPanel } from "@/components/game/TileDetail";
 import ParkObjectDetail from "@/components/game/ParkObjectDetail";
+import ZooDetailPanel from "@/components/game/ZooDetailPanel";
 import DailySummary from "@/components/game/DailySummary";
 import DayTransition from "@/components/game/DayTransition";
 import FloatingRewards from "@/components/game/FloatingRewards";
@@ -270,7 +271,9 @@ export default function Home() {
               <SheetTitle className="text-base font-black text-slate-900">{selectedItem?.name || "Tile"}</SheetTitle>
             </div>
             <div className="flex-1 overflow-y-auto bg-slate-50 p-3 sm:p-4">
-              {selectedItem && (selectedItem.category === "environment" ? (
+              {selectedItem && (selectedItem.parkType === "zoo" ? (
+                <ZooDetailPanel itemId={selectedAttrId} level={game.upgrades[game.selectedTile] || 0} money={game.money} zookeepers={game.staff?.zookeeper || 0} onUpgrade={() => game.upgradeAttraction(game.selectedTile)} onSell={() => game.sellAttraction(game.selectedTile)} onClose={() => game.setSelectedTile(null)} />
+              ) : selectedItem.category === "environment" ? (
                 <ParkObjectDetail itemId={selectedAttrId} onSell={() => game.sellAttraction(game.selectedTile)} onClose={() => game.setSelectedTile(null)} />
               ) : selectedItem.category === "hotel" ? (
                 <HotelDetail
