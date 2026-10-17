@@ -244,6 +244,18 @@ export const MISSIONS = [
     level: 50,
     reward: { money: 5000000, xp: 10000 },
   },
+  // Extended management missions for the mid-game and endgame.
+  { id: "innovation_leader", title: "Innovation Leader", desc: "Complete 5 research projects.", type: "research_projects", target: 5, level: 12, reward: { money: 25000, xp: 350 } },
+  { id: "crystal_clear", title: "Crystal-Clear Water", desc: "Keep average water quality at 95 or higher.", type: "water_quality", target: 95, level: 12, reward: { money: 22000, xp: 320 } },
+  { id: "membership_magnet", title: "Membership Magnet", desc: "Grow your membership base to 25 members.", type: "memberships", target: 25, level: 14, reward: { money: 30000, xp: 400 } },
+  { id: "industry_icon", title: "Industry Icon", desc: "Win 3 park awards.", type: "awards", target: 3, level: 16, reward: { money: 40000, xp: 500 } },
+  { id: "resort_occupancy", title: "Rooms with a View", desc: "Reach 80% hotel occupancy.", type: "hotel_occupancy", target: 80, level: 17, reward: { money: 45000, xp: 550 } },
+  { id: "viral_destination", title: "Viral Destination", desc: "Publish 5 social posts for your park.", type: "social_posts", target: 5, level: 18, reward: { money: 35000, xp: 450 } },
+  { id: "mega_engineer", title: "Mega Engineer", desc: "Complete 2 mega-projects.", type: "mega_projects", target: 2, level: 20, reward: { money: 75000, xp: 850 } },
+  { id: "master_of_connections", title: "Master of Connections", desc: "Complete 3 attraction chains.", type: "completed_chains", target: 3, level: 20, reward: { money: 50000, xp: 650 } },
+  { id: "team_of_experts", title: "Team of Experts", desc: "Hire at least 1 of 8 different staff types.", type: "staff_types", target: 8, level: 22, reward: { money: 45000, xp: 600 } },
+  { id: "district_master", title: "District Master", desc: "Create 6 strong themed districts.", type: "themed_zones", target: 6, level: 24, reward: { money: 65000, xp: 750 } },
+  { id: "resort_legacy", title: "Resort Legacy", desc: "Reach 95 resort rating and £2,000,000 lifetime earnings.", type: "resort_rating", target: 95, level: 28, reward: { money: 100000, xp: 1000 } },
 ];
 
 export function missionProgress(mission, state) {
@@ -278,6 +290,24 @@ export function missionProgress(mission, state) {
       return state.resortRating || 0;
     case "tiles_filled":
       return state.tilesFilled || 0;
+    case "research_projects":
+      return state.researchProjects || 0;
+    case "water_quality":
+      return state.waterQualityAvg || 0;
+    case "memberships":
+      return state.memberships || 0;
+    case "awards":
+      return state.awards || 0;
+    case "hotel_occupancy":
+      return state.hotelOccupancy || 0;
+    case "social_posts":
+      return state.socialPosts || 0;
+    case "mega_projects":
+      return state.megaProjects || 0;
+    case "completed_chains":
+      return state.completedChains || 0;
+    case "staff_types":
+      return state.staffTypesHired || 0;
     default:
       return 0;
   }
