@@ -23,6 +23,14 @@
 @keyframes person-stroke { from{transform:rotate(-4deg)}to{transform:rotate(4deg)} }
 @keyframes ride-splash-ring { 0%,100%{opacity:.3;transform:scale(.85)} 50%{opacity:.8;transform:scale(1.1)} }
 @media (prefers-reduced-motion:reduce) { .park-pedestrian{transition:none}.park-person *,.ride-swimmer,.ride-visitor-splash { animation:none!important; } }
+
+/* Staff movement and lifeguard rescue equipment are purely visual. */
+.park-staff { z-index: 2; animation: staff-shift 2.8s ease-in-out infinite; }
+.park-staff:nth-of-type(3n) { animation-delay: -1.2s; }
+.park-staff[data-role="lifeguard"]::after { content:""; position:absolute; right:-2px; bottom:7px; width:12px; height:12px; border:2.5px solid #fff; border-radius:50%; background:conic-gradient(#ef4444 0 25%,#fff 25% 50%,#ef4444 50% 75%,#fff 75%); box-shadow:0 1px 3px rgba(15,23,42,.45); pointer-events:none; }
+.park-staff[data-role="lifeguard"]::before { content:"+"; position:absolute; top:12px; right:-3px; z-index:2; color:#fff; font-size:9px; line-height:10px; font-weight:900; text-shadow:0 1px 2px #b91c1c; pointer-events:none; }
+@keyframes staff-shift { 0%,100%{translate:0 0} 50%{translate:0 -1.5px} }
+@media (prefers-reduced-motion:reduce) { .park-staff { animation:none!important; } }
 /* Guest activity tells a story at a glance. */
 .park-guest[data-guest-activity="eating"] { animation: guest-eat 1.5s ease-in-out infinite; }
 .park-guest[data-guest-activity="resting"] { animation: guest-rest 2.4s ease-in-out infinite; }
