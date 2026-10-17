@@ -37,6 +37,7 @@ function Toggle({ on, onClick, onIcon: OnIcon, offIcon: OffIcon, onTone = "text-
 export default function SettingsPanel({ saves, onSave, onLoad, onDelete, onNewGame, onContinue, sandbox, onToggleSandbox, loadFromCloud, saveToCloud }) {
   const [soundOn, setSoundOn] = useState(!sound.isMuted());
   const [soundVolume, setSoundVolume] = useState(sound.getVolume());
+  const [audioMix, setAudioMix] = useState({ effects: sound.getCategoryVolume("effects"), ambience: sound.getCategoryVolume("ambience"), music: sound.getCategoryVolume("music") });
   const [vibrationOn, setVibrationOn] = useState(haptics.isEnabled());
   const [difficulty, setDifficulty] = useState(getSettings().difficulty);
   const [emailAlerts, setEmailAlerts] = useState(getSettings().emailAlerts !== false);
@@ -159,7 +160,15 @@ export default function SettingsPanel({ saves, onSave, onLoad, onDelete, onNewGa
           <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
             <div className="mb-2 flex items-center justify-between text-[10px] font-extrabold text-slate-700"><label htmlFor="park-sound-volume">Audio volume</label><span>{Math.round(soundVolume * 100)}%</span></div>
             <input id="park-sound-volume" aria-label="Audio volume" type="range" min="0" max="1" step="0.05" value={soundVolume} onChange={(event) => { const next = Number(event.target.value); setSoundVolume(next); sound.setVolume(next); }} className="w-full accent-cyan-600" />
-            <p className="mt-1 text-[9px] font-medium text-slate-500">Volume is saved on this device. Audio starts after your first interaction.</p>
+            <p className="mt-1 text-[9px] font-medium text-slate-500">Master volume is saved on this device. Audio starts after your first interaction.</p>
+            <div className="mt-3 flex flex-col gap-3">
+              {[{ id: "effects", label: "Sound effects" }, { id: "ambience", label: "Water, weather & guests" }, { id: "music", label: "Background music" }].map((item) => (
+                <div key={item.id}>
+                  <div className="mb-1 flex items-center justify-between text-[10px] font-bold text-slate-600"><label htmlFor={`park-audio-${item.id}`}>{item.label}</label><span>{Math.round(audioMix[item.id] * 100)}%</span></div>
+                  <input id={`park-audio-${item.id}`} aria-label={item.label} type="range" min="0" max="1" step="0.05" value={audioMix[item.id]} onChange={(event) => { const next = Number(event.target.value); setAudioMix((current) => ({ ...current, [item.id]: next })); sound.setCategoryVolume(item.id, next); }} className="w-full accent-cyan-600" />
+                </div>
+              ))}
+            </div>
           </div>
           <Row icon={Vibrate} title="Vibration" desc="Haptic feedback on supported devices">
             <Toggle on={vibrationOn} onClick={toggleVibration} onIcon={Vibrate} offIcon={VibrateOff} />
