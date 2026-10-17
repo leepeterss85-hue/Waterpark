@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Search, Waves, Utensils, Bed } from "lucide-react";
+import { Search, Waves, Utensils, Bed, PawPrint } from "lucide-react";
 import { ATTRACTIONS, PARK_OBJECTS, HOTELS, CATEGORIES, unlockLevelFor } from "@/data/gameData";
 import { researchReqFor } from "@/data/research";
 import BuildCard from "@/components/game/BuildCard";
@@ -12,16 +12,21 @@ export default function BuildPanel({ money, level = 1, selectedBuild, onSelect, 
     const req = researchReqFor(item.id);
     return (level >= unlockLevelFor(item) || sandbox) && !(req && !completedResearch.includes(req.id));
   };
+  const zooItems = filteredZooItems(allItems, query);
   const categoryCounts = Object.fromEntries(
     ["attraction", "facility", "hotel"].map((category) => {
-      const items = allItems.filter((item) => item.category === category);
+      const items = allItems.filter((item) => item.category === category && item.parkType !== "zoo");
       return [category, { total: items.length, unlocked: items.filter(itemIsUnlocked).length }];
     })
   );
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return allItems;
-    return allItems.filter((item) => item.name.toLowerCase().includes(q) || item.description.toLowerCase().includes(q) || item.category.toLowerCase().includes(q));
+    if (!q) return allItems.filter((item) => item.parkType !== "zoo");
+    return allItems.filter((item) => item.parkType !== "zoo" && (item.name.toLowerCase().includes(q) || item.description.toLowerCase().includes(q) || item.category.toLowerCase().includes(q)));
+  }, [allItems, query]);
+  const filteredZoo = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return allItems.filter((item) => item.parkType === "zoo" && (!q || `${item.name} ${item.description} ${item.animal}`.toLowerCase().includes(q)));
   }, [allItems, query]);
 
   return (
@@ -40,8 +45,9 @@ export default function BuildPanel({ money, level = 1, selectedBuild, onSelect, 
         <div className="rounded-xl bg-amber-50 px-2 py-2 ring-1 ring-amber-100"><div className="flex items-center gap-1 text-[9px] font-extrabold uppercase tracking-wider text-amber-700"><Utensils className="h-3 w-3 shrink-0" /> Facilities</div><div className="mt-1 text-[11px] font-bold text-slate-700">{categoryCounts.facility.unlocked} / {categoryCounts.facility.total} unlocked</div></div>
         <div className="rounded-xl bg-violet-50 px-2 py-2 ring-1 ring-violet-100"><div className="flex items-center gap-1 text-[9px] font-extrabold uppercase tracking-wider text-violet-700"><Bed className="h-3 w-3 shrink-0" /> Hotels</div><div className="mt-1 text-[11px] font-bold text-slate-700">{categoryCounts.hotel.unlocked} / {categoryCounts.hotel.total} unlocked</div></div>
       </div>
+      {filteredZoo.length > 0 && <section className="rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-lime-50 p-3"><div className="mb-2 flex items-center gap-2"><span className="grid h-9 w-9 place-items-center rounded-xl bg-emerald-600 text-white"><PawPrint size={18}/></span><div><h3 className="text-sm font-black text-emerald-950">Zoo & Wildlife Park</h3><p className="text-[10px] font-semibold text-emerald-800">Habitats, animal care and conservation · every habitat upgrades to level 10</p></div></div><div className="grid grid-cols-2 gap-2">{filteredZoo.map((item) => { const req = researchReqFor(item.id); const researchLocked = req && !completedResearch.includes(req.id); return <BuildCard key={item.id} item={item} selected={selectedBuild === item.id} affordable={money >= item.cost} unlocked={itemIsUnlocked(item)} onSelect={onSelect} lockLabel={researchLocked ? `Research: ${req.name}` : null} />; })}</div></section>}
       {CATEGORIES.map((cat) => {
-        const items = filtered.filter((a) => a.category === cat.id);
+        const items = filtered.filter((a) => a.category === cat.id && a.parkType !== "zoo");
         if (!items.length) return null;
         return (
           <div key={cat.id}>
