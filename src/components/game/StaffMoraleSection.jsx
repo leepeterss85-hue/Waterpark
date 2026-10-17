@@ -76,7 +76,7 @@ export default function StaffMoraleSection({ morale, guests, staffTotal, wageBoo
           disabled={!canBonus}
           className="flex items-center gap-1 rounded-lg bg-slate-900 px-2.5 py-1.5 text-[10px] font-extrabold text-white transition hover:bg-slate-800 disabled:opacity-40"
         >
-          <PoundSterling className="h-3 w-3" /> Bonus ${cost.toLocaleString()}
+          <PoundSterling className="h-3 w-3" /> Bonus £{cost.toLocaleString()}
         </button>
       </div>
       <p className="mt-1.5 text-[9px] leading-3 text-slate-400">
