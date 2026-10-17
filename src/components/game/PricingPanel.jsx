@@ -106,7 +106,7 @@ export default function PricingPanel({ pricing, ticketPrice, weather, seasonEven
               onClick={() => onTicketChange(v)}
               className={`rounded-lg px-2.5 py-1.5 text-[10px] font-extrabold transition ${ticketPrice === v ? "bg-slate-900 text-white" : "bg-white text-slate-500 ring-1 ring-slate-200 hover:bg-slate-50"}`}
             >
-              ${v}
+              £{v}
             </button>
           ))}
         </div>
