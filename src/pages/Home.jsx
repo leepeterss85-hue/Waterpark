@@ -157,9 +157,12 @@ export default function Home() {
     const hadBuild = game.selectedBuild;
     game.handleTileClick(index);
     if (wasEmpty && hadBuild) {
+      const builtItem = getParkItem(hadBuild);
       sound.build();
+      if (builtItem?.category === "attraction" || /pool|fountain|waterfall|wave|river|slide|flume/i.test(`${hadBuild} ${builtItem?.name || ""}`)) {
+        setTimeout(() => sound.attraction({ id: hadBuild, ...builtItem }), 180);
+      }
       haptics.buzz(25);
-      setTimeout(() => sound.splash(), 200);
     } else {
       sound.click();
       haptics.buzz(10);
