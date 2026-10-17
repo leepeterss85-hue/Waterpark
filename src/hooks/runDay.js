@@ -927,9 +927,12 @@ export function runDay(stateRef, setters) {
     );
     const incomeTarget = 25000 + (monthNumber - 1) * 7500;
     const guestTarget = 500 + (monthNumber - 1) * 150;
-    const incomeRatio = monthlyNet / Math.max(1, incomeTarget);
+    const monthlyRevenue = Math.max(0, Math.round(recentHistory.reduce((sum, entry) => sum + Math.max(0, Number(entry?.income) || 0), 0) + Math.max(0, Number(grossIncome) || 0)));
+    const profitTarget = Math.max(1, Math.round(incomeTarget * 0.15));
+    const incomeRatio = monthlyRevenue / Math.max(1, incomeTarget);
+    const profitRatio = monthlyNet / profitTarget;
     const guestRatio = monthPeakGuests / Math.max(1, guestTarget);
-    const performance = Math.min(incomeRatio, guestRatio);
+    const performance = Math.min(incomeRatio, profitRatio, guestRatio);
     const grade = performance >= 1.25 ? "A+" : performance >= 1 ? "A" : performance >= 0.8 ? "B" : performance >= 0.6 ? "C" : "D";
     const tier = performance >= 1.25 ? { cash: 18000, xp: 300, rep: 3 } : performance >= 1 ? { cash: 10000, xp: 200, rep: 2 } : performance >= 0.8 ? { cash: 6000, xp: 120, rep: 1 } : performance >= 0.6 ? { cash: 3000, xp: 70, rep: 0 } : { cash: 1500, xp: 35, rep: 0 };
     const managementBonus = Math.min(75000, tier.cash + Math.round(Math.max(0, monthlyNet) * 0.04) + monthNumber * 500);
