@@ -23,7 +23,9 @@ export default function ZooDetailPanel({
   const cost = upgradeCost(item.cost, level);
   const care = animal.welfare ?? item.welfare ?? 80;
   const careLabel = care >= 90 ? "Excellent" : care >= 75 ? "Good" : care >= 55 ? "Needs attention" : "At risk";
-  const treatmentCost = 1200 + Math.max(1, animal.population || 1) * 120;\n  const habitat = getHabitatAssessment(itemId, animal, level, hasVet, hasConservation);\n  const features = Array.isArray(animal.habitatFeatures) ? animal.habitatFeatures : [];
+  const treatmentCost = 1200 + Math.max(1, animal.population || 1) * 120;
+  const habitat = getHabitatAssessment(itemId, animal, level, hasVet, hasConservation);
+  const features = Array.isArray(animal.habitatFeatures) ? animal.habitatFeatures : [];
   return <section className="rounded-2xl bg-white/90 p-4 shadow-sm ring-1 ring-emerald-100">
     <div className="mb-3 flex items-start justify-between gap-3">
       <div className="flex items-center gap-3"><div className={`grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br ${item.color}`}>{Icon && <Icon className="h-6 w-6 text-white" />}</div><div><h3 className="font-extrabold text-slate-900">{item.name}</h3><p className="text-xs font-semibold text-emerald-700">{item.animal || "Wildlife care facility"}</p></div></div>
