@@ -53,7 +53,7 @@ export default function StaffPanel({
           Staff
         </h3>
         <span className="rounded-full bg-rose-50 px-2.5 py-1 text-[11px] font-semibold text-rose-500">
-          ${staffWages}/day
+          £{staffWages}/day
         </span>
       </div>
 
@@ -143,7 +143,7 @@ export default function StaffPanel({
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-bold text-slate-700">{s.name}</span>
-                    <span className="text-xs font-semibold text-slate-400">${s.wage}/day</span>
+                    <span className="text-xs font-semibold text-slate-400">£{s.wage}/day</span>
                   </div>
                   <p className="truncate text-[11px] text-slate-400">{s.description}</p>
                 </div>
