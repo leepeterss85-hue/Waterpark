@@ -290,7 +290,7 @@ export function runDay(stateRef, setters) {
     visitorStats = sim;
     // Zoo management contributes to guest satisfaction only when the park invests in animal care.
     const zooHabitatCount = attractions.filter((item) => item.attr.parkType === "zoo" && !["wildlife_vet", "conservation_centre"].includes(item.id)).length;
-    const zooCareBoost = Math.min(5, zooHabitatCount * 0.25 + (counts.zookeeper || 0) * 0.7 + attractions.filter((item) => item.id === "wildlife_vet").length * 0.8 + attractions.filter((item) => item.id === "conservation_centre").length * 0.5);
+    const zooCareBoost = Math.max(-5, Math.min(5, (zooDay.averageWelfare - 70) * 0.08 + zooHabitatCount * 0.25 + (counts.zookeeper || 0) * 0.7 + attractions.filter((item) => item.id === "wildlife_vet").length * 0.8 + attractions.filter((item) => item.id === "conservation_centre").length * 0.5));
     if (zooCareBoost > 0 && visitorStats.avgMood != null) visitorStats = { ...visitorStats, avgMood: Math.min(100, visitorStats.avgMood + zooCareBoost) };
     if (mascotMoodBoost > 0 && visitorStats.avgMood != null) {
       visitorStats = { ...visitorStats, avgMood: Math.min(100, visitorStats.avgMood + mascotMoodBoost) };
@@ -417,6 +417,8 @@ export function runDay(stateRef, setters) {
   if (engineering.engineeringScore < 45 && visitorStats) visitorStats = { ...visitorStats, avgMood: Math.max(0, (visitorStats.avgMood || 0) - 3) };
   if (wqResult.moodPenalty !== 0 && visitorStats) visitorStats = { ...visitorStats, avgMood: Math.max(0, (visitorStats.avgMood || 0) - wqResult.moodPenalty) };
   if (wqResult.reputationRisk > 0) newReputation = Math.max(0, newReputation - wqResult.reputationRisk);
+  if (zooDay.habitatCount > 0 && zooDay.averageWelfare < 40) newReputation = Math.max(0, newReputation - 1);
+  if (zooDay.habitatCount > 0 && zooDay.averageWelfare >= 92) newReputation = Math.min(100, newReputation + 0.25);
 
   const newSocialPosts = generateSocialPosts({ day: d + 1, visitorStats, incidents: remaining, attractions, activeEvents: currentActiveEvents, popularity: stateRef.current.popularity });
   const viralRidePosts = newSocialPosts.filter((p) => p.viral && p.sentiment === "positive" && p.rideIdx != null);
