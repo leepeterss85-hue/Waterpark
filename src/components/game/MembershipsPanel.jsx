@@ -72,7 +72,7 @@ export default function MembershipsPanel({ counts, stats, level }) {
                   <div className="flex items-center justify-between gap-2">
                     <h3 className="text-sm font-black text-slate-900">{tier.name}</h3>
                     <span className="shrink-0 rounded-full bg-slate-900 px-2 py-0.5 text-xs font-black text-white">
-                      ${tier.price}
+                      £{tier.price}
                     </span>
                   </div>
                   <p className="mt-0.5 text-xs text-slate-600">{tier.description}</p>
