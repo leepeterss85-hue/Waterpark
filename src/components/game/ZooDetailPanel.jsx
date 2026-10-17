@@ -1,10 +1,9 @@
 import React from "react";
 import { X, PawPrint, ArrowUpCircle, HeartPulse, Sparkles, Users } from "lucide-react";
-import { MAX_UPGRADE, upgradeCost } from "@/data/gameData";
+import { MAX_UPGRADE, upgradeCost, getParkItem } from "@/data/gameData";
 import { getIcon } from "./icons";
 
 export default function ZooDetailPanel({ itemId, level = 0, money = 0, zookeepers = 0, onUpgrade, onSell, onClose }) {
-  const { getParkItem } = require("@/data/gameData");
   const item = getParkItem(itemId);
   if (!item || item.parkType !== "zoo") return null;
   const Icon = getIcon(item.icon);
