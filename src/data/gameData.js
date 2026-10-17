@@ -1626,6 +1626,19 @@ export const ATTRACTIONS = [
     color: "from-blue-400 to-indigo-500",
     description: "Collects rainwater for pool refills — cuts costs and boosts eco-score.",
   },
+  // --- Wildlife Park & Zoo Expansion: all habitats and animal experiences use the existing upgrade economy. ---
+  { id: "lion_savannah", name: "Lion Savannah Habitat", category: "attraction", parkType: "zoo", animal: "Lions", welfare: 82, cost: 26000, income: 2100, capacity: 90, fun: 9, maintenance: 420, icon: "PawPrint", color: "from-amber-500 to-orange-700", description: "A spacious, landscaped savannah with shaded dens, viewing glass and enrichment zones for lions." },
+  { id: "elephant_reserve", name: "Elephant Reserve", category: "attraction", parkType: "zoo", animal: "Elephants", welfare: 88, cost: 38000, income: 2600, capacity: 110, fun: 9, maintenance: 600, icon: "PawPrint", color: "from-stone-400 to-amber-700", description: "A large elephant habitat with mud wallows, bathing pool, feeding areas and keeper access." },
+  { id: "giraffe_plains", name: "Giraffe Plains", category: "attraction", parkType: "zoo", animal: "Giraffes", welfare: 86, cost: 22000, income: 1800, capacity: 100, fun: 8, maintenance: 320, icon: "Trees", color: "from-yellow-400 to-amber-700", description: "Open browse-rich plains with tall feeding stations and elevated guest viewing." },
+  { id: "penguin_coast", name: "Penguin Coast", category: "attraction", parkType: "zoo", animal: "Penguins", welfare: 90, cost: 24000, income: 2200, capacity: 120, fun: 9, maintenance: 480, icon: "Waves", color: "from-sky-400 to-indigo-700", description: "A chilled rocky shore with deep swimming water, nesting ledges and underwater viewing." },
+  { id: "tropical_aviary", name: "Tropical Aviary", category: "attraction", parkType: "zoo", animal: "Tropical birds", welfare: 88, cost: 16000, income: 1450, capacity: 100, fun: 8, maintenance: 220, icon: "Bird", color: "from-emerald-400 to-teal-700", description: "A walk-through rainforest aviary with lush planting, perches, waterfalls and nesting areas." },
+  { id: "reptile_house", name: "Reptile & Amphibian House", category: "attraction", parkType: "zoo", animal: "Reptiles and amphibians", welfare: 84, cost: 14000, income: 1350, capacity: 85, fun: 7, maintenance: 240, icon: "Bug", color: "from-lime-500 to-emerald-800", description: "Climate-controlled terrariums with carefully managed heat, humidity and hiding places." },
+  { id: "meerkat_dunes", name: "Meerkat Dunes", category: "attraction", parkType: "zoo", animal: "Meerkats", welfare: 85, cost: 11000, income: 1250, capacity: 90, fun: 7, maintenance: 170, icon: "PawPrint", color: "from-orange-300 to-amber-700", description: "A sandy burrow network with lookout mounds, tunnels and protected retreat spaces." },
+  { id: "red_panda_forest", name: "Red Panda Forest", category: "attraction", parkType: "zoo", animal: "Red pandas", welfare: 89, cost: 21000, income: 1750, capacity: 80, fun: 8, maintenance: 290, icon: "Trees", color: "from-rose-400 to-red-800", description: "A cool, tree-rich forest habitat with climbing routes, dens and quiet viewing areas." },
+  { id: "primate_island", name: "Primate Island", category: "attraction", parkType: "zoo", animal: "Primates", welfare: 87, cost: 28000, income: 2300, capacity: 105, fun: 9, maintenance: 450, icon: "Trees", color: "from-green-500 to-emerald-900", description: "A complex island habitat with climbing towers, ropes, social spaces and foraging enrichment." },
+  { id: "aquarium_dome", name: "Aquarium Dome", category: "attraction", parkType: "zoo", animal: "Marine life", welfare: 88, cost: 42000, income: 3400, capacity: 160, fun: 10, maintenance: 720, icon: "Fish", color: "from-cyan-400 to-blue-800", description: "A large aquarium experience with themed marine habitats, viewing tunnels and conservation displays." },
+  { id: "wildlife_vet", name: "Wildlife Veterinary Hospital", category: "attraction", parkType: "zoo", animal: "All resident animals", welfare: 5, cost: 18000, income: 0, capacity: 0, fun: 1, maintenance: 260, icon: "HeartPulse", color: "from-rose-400 to-red-700", description: "A veterinary and quarantine centre for health checks, treatment, recovery and biosecurity." },
+  { id: "conservation_centre", name: "Conservation & Breeding Centre", category: "attraction", parkType: "zoo", animal: "Conservation programmes", welfare: 4, cost: 25000, income: 350, capacity: 40, fun: 5, maintenance: 300, icon: "Leaf", color: "from-emerald-400 to-green-800", description: "Supports conservation education, carefully managed breeding programmes and species protection." },
 ];
 
 
@@ -1843,6 +1856,14 @@ export const STAFF = {
     icon: "Camera",
     color: "from-purple-400 to-indigo-500",
     description: "Captures memories — boosts photo kiosk and retail income.",
+  },
+  zookeeper: {
+    id: "zookeeper",
+    name: "Zookeeper",
+    wage: 230,
+    icon: "PawPrint",
+    color: "from-emerald-500 to-lime-700",
+    description: "Feeds animals, cleans habitats, provides enrichment and monitors animal welfare. Training improves zoo operations.",
   },
   event_coordinator: {
     id: "event_coordinator",
