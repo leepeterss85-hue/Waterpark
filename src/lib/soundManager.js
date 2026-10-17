@@ -249,6 +249,24 @@ export const sound = {
   cash() { tone(1318, 0.08, "sine", 0.1); tone(1760, 0.12, "sine", 0.08, 0.05); },
   build() { tone(523, 0.08, "triangle", 0.1); tone(659, 0.08, "triangle", 0.1, 0.07); tone(784, 0.12, "triangle", 0.1, 0.14); },
   splash() { noiseBurst(0.25, 0.08, 2000); },
+  attraction(item) {
+    const label = typeof item === "string" ? item.toLowerCase() : `${item?.id || ""} ${item?.name || ""} ${item?.category || ""}`.toLowerCase();
+    if (/wave|surf/.test(label)) { tone(95, 0.65, "sine", 0.1); noiseBurst(0.45, 0.11, 650); tone(220, 0.22, "sine", 0.06, 0.3); }
+    else if (/lazy|river|rapids/.test(label)) { noiseBurst(0.5, 0.055, 850); tone(440, 0.3, "sine", 0.025, 0.1); }
+    else if (/fountain|spray|splash|pool/.test(label)) { noiseBurst(0.32, 0.09, 2300); tone(880, 0.16, "sine", 0.035, 0.06); }
+    else if (/slide|flume|drop|coaster|thrill/.test(label)) { tone(330, 0.22, "sawtooth", 0.045); tone(220, 0.35, "triangle", 0.055, 0.12); noiseBurst(0.22, 0.065, 1800, 0.2); }
+    else { noiseBurst(0.22, 0.06, 1600); tone(659, 0.1, "sine", 0.04, 0.06); }
+  },
+  guestCheer() { noiseBurst(0.18, 0.025, 900); [659, 784, 988].forEach((f, i) => tone(f, 0.12, "triangle", 0.045, i * 0.07)); },
+  announcement() { [587, 784, 659].forEach((f, i) => tone(f, 0.16, "sine", 0.06, i * 0.18)); },
+  breakdown() { tone(220, 0.18, "square", 0.07); tone(164, 0.28, "square", 0.055, 0.2); },
+  hotel() { [392, 523, 659].forEach((f, i) => tone(f, 0.12, "sine", 0.055, i * 0.09)); },
+  weatherChange(weather) {
+    const kind = String(weather || "clear").toLowerCase();
+    if (/storm|thunder/.test(kind)) { tone(72, 0.7, "triangle", 0.11); noiseBurst(0.5, 0.045, 300); }
+    else if (/rain/.test(kind)) noiseBurst(0.45, 0.045, 1800);
+    else this.announcement();
+  },
   achievement() { [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.12, "triangle", 0.1, i * 0.07)); },
   incident() { tone(140, 0.25, "sawtooth", 0.1); },
   dayStart() { tone(440, 0.08, "sine", 0.07); tone(554, 0.08, "sine", 0.07, 0.06); tone(659, 0.12, "sine", 0.07, 0.12); },
