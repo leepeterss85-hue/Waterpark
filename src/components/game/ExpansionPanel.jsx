@@ -58,7 +58,7 @@ export default function ExpansionPanel({
           <Expand className="h-4 w-4" />
           Expand park · +{EXPAND_ROW} lots
           <span className="ml-1 text-xs font-semibold opacity-90">
-            ${cost.toLocaleString()}
+            £{cost.toLocaleString()}
           </span>
         </button>
       )}
@@ -70,7 +70,7 @@ export default function ExpansionPanel({
       )}
       {!maxed && levelOk && !canAfford && (
         <p className="mt-2 text-center text-[11px] font-semibold text-rose-500">
-          Need ${cost.toLocaleString()} to expand
+          Need £{cost.toLocaleString()} to expand
         </p>
       )}
       <p className="mt-1.5 text-center text-[10px] text-slate-400">
