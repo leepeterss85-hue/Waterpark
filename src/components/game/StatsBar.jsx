@@ -23,7 +23,7 @@ export default function StatsBar({ money, day, guests, reputation, lastNet, leve
       <Stat icon={Users} label="Guests" value={guests.toLocaleString()} helper="Visitors today" tone="bg-gradient-to-br from-cyan-400 to-teal-600" />
       <Stat icon={Star} label="Rep" value={reputation + "%"} helper="Guest happiness" tone="bg-gradient-to-br from-amber-400 to-orange-600" />
       <Stat icon={Trophy} label="Level" value={"Lv " + (level ?? 1)} helper="Park progression" tone="bg-gradient-to-br from-violet-400 to-fuchsia-600" />
-      <Stat icon={positive ? TrendingUp : TrendingDown} label="Daily" value={(positive ? "+" : "") + lastNet.toLocaleString()} helper="Profit / loss" valueClass={positive ? "text-emerald-600" : "text-rose-600"} tone={positive ? "bg-gradient-to-br from-emerald-400 to-green-600" : "bg-gradient-to-br from-rose-400 to-red-600"} />
+      <Stat icon={positive ? TrendingUp : TrendingDown} label="Daily" value={(positive ? "+" : "") + "£" + lastNet.toLocaleString()} helper="Profit / loss" valueClass={positive ? "text-emerald-600" : "text-rose-600"} tone={positive ? "bg-gradient-to-br from-emerald-400 to-green-600" : "bg-gradient-to-br from-rose-400 to-red-600"} />
     </div>
   );
 }
