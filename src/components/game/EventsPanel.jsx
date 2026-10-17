@@ -140,7 +140,7 @@ export default function EventsPanel({ money, level, day, activeEvents, grid, sta
           </div>
           <div className="mt-2 flex flex-wrap gap-2 text-[9px] font-extrabold text-emerald-700">
             <span>+{totalGuestBoost}% guests</span>
-            {totalEventRevenue > 0 && <span>+${totalEventRevenue}/day revenue</span>}
+            {totalEventRevenue > 0 && <span>+£{totalEventRevenue.toLocaleString()}/day revenue</span>}
           </div>
         </div>
       )}
