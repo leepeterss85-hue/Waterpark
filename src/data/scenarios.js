@@ -21,6 +21,8 @@ export const PARK_SCENARIOS = [
   { id:"chain_reaction", name:"Chain Reaction", icon:"GitBranch", description:"Connect attractions into a park-wide experience.", objective:"Complete 3 attraction chains and build 10 attractions.", check:s=>s.completedChains>=3 && s.attractionCount>=10, reward:{money:55000,xp:700,reputation:5} },
   { id:"social_star", name:"Social Star", icon:"Share2", description:"Turn excellent guest experiences into a recognisable park brand.", objective:"Publish 10 social posts and reach 85 reputation.", check:s=>s.socialPosts>=10 && s.reputation>=85, reward:{money:50000,xp:650,reputation:6} },
   { id:"world_builder", name:"World Builder", icon:"Globe2", description:"Create a thriving park empire with a signature attraction portfolio.", objective:"Complete 3 mega-projects and earn £2,000,000 lifetime income.", check:s=>s.megaProjectCount>=3 && s.lifetimeEarnings>=2000000, reward:{money:125000,xp:1200,reputation:10} },
+  { id:"wildlife_conservation", name:"Wildlife Conservation", icon:"PawPrint", description:"Build a thriving wildlife park with excellent animal care.", objective:"Build 5 zoo habitats and employ 3 zookeepers.", check:s=>s.zooHabitats>=5 && s.zookeepers>=3, reward:{money:85000,xp:900,reputation:8} },
+  { id:"zoo_education", name:"Wildlife Education", icon:"Leaf", description:"Make conservation a central part of the resort experience.", objective:"Build a conservation centre, aquarium and veterinary hospital.", check:s=>s.hasConservationCentre && s.hasAquarium && s.hasWildlifeVet, reward:{money:100000,xp:1000,reputation:10} },
 ];
 
 export function getScenario(id) {
