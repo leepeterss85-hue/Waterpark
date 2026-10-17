@@ -488,7 +488,7 @@ export function runDay(stateRef, setters) {
       setMoney((m) => m + cashReward);
       setXp((x) => x + xpReward);
       if (repReward) setReputation((rv) => Math.min(100, rv + repReward));
-      setLog((l) => [{ day: d + 1, text: `Day ${d + 1}: 🏨 Resort milestone unlocked — ${newlyUnlocked.map((m) => m.label).join(", ")}. +${cashReward.toLocaleString()} · +${xpReward} XP.` }, ...l].slice(0, 12));
+      setLog((l) => [{ day: d + 1, text: `Day ${d + 1}: 🏨 Resort milestone unlocked — ${newlyUnlocked.map((m) => m.label).join(", ")}. +£${cashReward.toLocaleString()} · +${xpReward} XP.` }, ...l].slice(0, 12));
     }
   }
   const hotelParkSpend = hotelResult?.parkSpend || 0;
