@@ -40,7 +40,11 @@
 .pool-paver { fill: none; stroke: hsl(var(--park-edge)); stroke-width: .7; }
 .pool-stop-light { stop-color: hsl(var(--park-water)); }
 .pool-stop-deep { stop-color: hsl(var(--park-deep)); }
-.pool-caustic { stroke: hsl(var(--park-rim)/.3); stroke-width: 1.2; fill: none; }
+.pool-caustic { stroke: hsl(var(--park-rim)/.3); stroke-width: 1.2; fill: none; stroke-dasharray: 7 5; animation: pool-ripple-drift 7s linear infinite; }
+.pool-river-glint { animation: pool-current-drift 9s linear infinite; }
+.pool-float { transform-box: fill-box; transform-origin: center; animation: pool-float-bob 3.2s ease-in-out infinite; }
+.pool-float:nth-of-type(2n) { animation-delay: -1.1s; }
+.pool-parasol { filter: drop-shadow(1px 2px 1px hsl(var(--park-ink)/.15)); }
 .pool-rim { fill: hsl(var(--park-rim)); stroke: hsl(var(--park-rim)); }
 .pool-lagoon { stroke: hsl(var(--park-deep)/.5); stroke-width: 2; }
 .scenery-shadow { fill: hsl(var(--park-ink)/.13); }
@@ -90,8 +94,11 @@
 .pool-slide-coral-fill { fill: hsl(var(--park-slide)); }
 .ride-fountain { fill: none; stroke: hsl(var(--park-rim)); stroke-width: 2; }
 @keyframes pool-spray { 0%,100% { transform: translateY(1px); opacity: .55; } 50% { transform: translateY(-4px); opacity: 1; } }
+@keyframes pool-ripple-drift { to { stroke-dashoffset: -48; } }
+@keyframes pool-current-drift { to { stroke-dashoffset: -82; } }
+@keyframes pool-float-bob { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-2px) rotate(2deg); } }
 @media (max-width:640px) { .aquatic-map .game-map-stage { padding: 5px; } .aquatic-map .game-map-grid { gap: 2px !important; } }
-@media (prefers-reduced-motion:reduce) { .pool-splash { animation: none; } }
+@media (prefers-reduced-motion:reduce) { .pool-splash,.pool-caustic,.pool-river-glint,.pool-float { animation: none !important; } }
 .park-scenery-layer { position:absolute; inset:0; z-index:3; display:grid; grid-template-rows:repeat(var(--map-rows),1fr); grid-template-columns:repeat(8,1fr); gap:3px; pointer-events:none; }
 .park-scenery-item { display:grid; place-items:center; pointer-events:none; opacity:.55; filter:drop-shadow(0 2px 2px rgba(20,50,30,.18)); }
 .park-scenery-item svg { width:clamp(13px,2vw,24px); height:clamp(13px,2vw,24px); }
