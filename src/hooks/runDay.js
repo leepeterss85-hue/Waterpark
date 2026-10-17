@@ -268,7 +268,8 @@ export function runDay(stateRef, setters) {
       Math.min(1.25, aggregatePriceReaction(currentTicketPrice) * socialPriceTolerance(stateRef.current.socialReputation)) *
       (stateRef.current.returnVisitorMult || 1) * (1 + empireTier.bonuses.demand)
     );
-    const safetyCoverage = Math.min(1, (effectiveStaff.lifeguard || 0) / Math.max(1, Math.ceil(attractions.length / 3)) + lifeguardStations * 0.12);
+    const waterParkAttractionCount = attractions.filter((item) => item.attr.parkType !== "zoo").length;
+    const safetyCoverage = Math.min(1, (effectiveStaff.lifeguard || 0) / Math.max(1, Math.ceil(waterParkAttractionCount / 3)) + lifeguardStations * 0.12);
     const guestSafetyMult = safetyCoverage < 0.45 ? 0.88 : safetyCoverage < 0.7 ? 0.96 : 1;
     const sandboxDemand = isSandbox ? Math.max(0.1, Number(sandboxTools.guestDemandMult || 1)) : 1;
     newGuests = Math.min(Math.round(demand * sandboxDemand), Math.round(totalCapacity * guestSafetyMult * sandboxDemand));
@@ -285,7 +286,7 @@ export function runDay(stateRef, setters) {
     visitorStats = sim;
     // Zoo management contributes to guest satisfaction only when the park invests in animal care.
     const zooHabitatCount = attractions.filter((item) => item.attr.parkType === "zoo" && !["wildlife_vet", "conservation_centre"].includes(item.id)).length;
-    const zooCareBoost = Math.min(5, zooHabitatCount * 0.25 + (counts.zookeeper || 0) * 0.7 + facilities.filter((item) => item.id === "wildlife_vet").length * 0.8 + facilities.filter((item) => item.id === "conservation_centre").length * 0.5);
+    const zooCareBoost = Math.min(5, zooHabitatCount * 0.25 + (counts.zookeeper || 0) * 0.7 + attractions.filter((item) => item.id === "wildlife_vet").length * 0.8 + attractions.filter((item) => item.id === "conservation_centre").length * 0.5);
     if (zooCareBoost > 0 && visitorStats.avgMood != null) visitorStats = { ...visitorStats, avgMood: Math.min(100, visitorStats.avgMood + zooCareBoost) };
     if (mascotMoodBoost > 0 && visitorStats.avgMood != null) {
       visitorStats = { ...visitorStats, avgMood: Math.min(100, visitorStats.avgMood + mascotMoodBoost) };
