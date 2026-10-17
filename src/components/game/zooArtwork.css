@@ -1,0 +1,16 @@
+.zoo-art-scene{position:absolute;inset:0;overflow:hidden;isolation:isolate;background:linear-gradient(180deg,#8dd9f2 0%,#d3f2df 53%,#6aa96a 54%,#3c7949 100%);border-radius:inherit}
+.zoo-art-sun{position:absolute;width:19%;aspect-ratio:1;right:12%;top:10%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff8c8,#f7c85a);box-shadow:0 0 15px #ffe7a877}
+.zoo-art-land{position:absolute;left:-10%;width:120%;border-radius:50%}
+.zoo-art-land-back{height:55%;bottom:19%;background:linear-gradient(160deg,#87b96c,#568a4c);transform:rotate(-8deg)}
+.zoo-art-land-front{height:45%;bottom:-13%;background:linear-gradient(160deg,#78ad5e,#2d6941);transform:rotate(5deg)}
+.zoo-art-foliage{position:absolute;z-index:2;font-size:clamp(14px,3.2vw,30px);filter:drop-shadow(0 2px 1px #16472d55)}
+.zoo-art-foliage-left{left:3%;bottom:21%}.zoo-art-foliage-right{right:2%;bottom:17%}
+.zoo-art-animal{position:absolute;z-index:3;left:50%;top:48%;transform:translate(-50%,-50%);font-size:clamp(25px,6vw,56px);filter:drop-shadow(0 4px 2px #123a304d);animation:zoo-animal-bob 3.6s ease-in-out infinite}
+.zoo-art-building{position:absolute;z-index:2;left:8%;top:12%;display:grid;place-items:center;width:23%;aspect-ratio:1.25;border:2px solid #ffffffa8;border-radius:7px 7px 3px 3px;background:linear-gradient(145deg,#f6e9c9,#ba9160);color:#765335;box-shadow:0 4px 6px #204b3b44}
+.zoo-art-building:before{content:"";position:absolute;left:-12%;right:-12%;top:-25%;height:35%;background:#b85b40;clip-path:polygon(50% 0,100% 100%,0 100%);filter:drop-shadow(0 2px 1px #593a29)}
+.zoo-art-upgrade{position:absolute;z-index:5;color:#fff5a7;font-size:17px;text-shadow:0 0 7px #fff8a8;animation:zoo-star-glow 1.7s ease-in-out infinite alternate}
+.zoo-art-upgrade-one{right:25%;top:25%}.zoo-art-upgrade-two{left:25%;top:35%}
+.zoo-art-premium{position:absolute;z-index:5;right:6%;top:5%;display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:#f9d66b;color:#74430d;font-size:11px;box-shadow:0 0 0 2px #fff9}
+@keyframes zoo-animal-bob{0%,100%{translate:0 0}50%{translate:0 -3px}}
+@keyframes zoo-star-glow{from{opacity:.45;scale:.85}to{opacity:1;scale:1.15}}
+@media(prefers-reduced-motion:reduce){.zoo-art-animal,.zoo-art-upgrade{animation:none}}
