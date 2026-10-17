@@ -185,7 +185,7 @@ export function useGameState() {
   const [vipHistory, setVipHistory] = useState([]);
   const [claimedLegendary, setClaimedLegendary] = useState([]);
   const [activeCalendarEvent, setActiveCalendarEvent] = useState(null);
-  const [dailyChallenges, setDailyChallenges] = useState([]);
+  const [dailyChallenges, setDailyChallenges] = useState(() => rollDailyChallenges());
   const [challengeDayCounter, setChallengeDayCounter] = useState(0);
   const [autoPricing, setAutoPricing] = useState(false);
   const [activeTheme, setActiveTheme] = useState("tropical");
@@ -316,7 +316,7 @@ export function useGameState() {
       setVipHistory(data.vipHistory ?? []);
       setClaimedLegendary(data.claimedLegendary ?? []);
       setActiveCalendarEvent(data.activeCalendarEvent ?? null);
-      setDailyChallenges(data.dailyChallenges ?? []);
+      setDailyChallenges(Array.isArray(data.dailyChallenges) && data.dailyChallenges.length > 0 ? data.dailyChallenges : rollDailyChallenges());
       if (data.challengeDayCounter != null) setChallengeDayCounter(data.challengeDayCounter);
       if (data.autoPricing != null) setAutoPricing(data.autoPricing);
       if (data.activeTheme) setActiveTheme(data.activeTheme);
@@ -831,7 +831,7 @@ export function useGameState() {
     setVipHistory(data.vipHistory ?? []);
     setClaimedLegendary(data.claimedLegendary ?? []);
     setActiveCalendarEvent(data.activeCalendarEvent ?? null);
-    setDailyChallenges(data.dailyChallenges ?? []);
+    setDailyChallenges(Array.isArray(data.dailyChallenges) && data.dailyChallenges.length > 0 ? data.dailyChallenges : rollDailyChallenges());
     if (data.challengeDayCounter != null) setChallengeDayCounter(data.challengeDayCounter);
     if (data.autoPricing != null) setAutoPricing(data.autoPricing);
     if (data.activeTheme) setActiveTheme(data.activeTheme);
