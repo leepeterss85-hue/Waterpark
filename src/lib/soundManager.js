@@ -7,6 +7,7 @@ let muted = false;
 let volume = 0.7;
 let categoryVolumes = { effects: 0.8, ambience: 0.55, music: 0.18 };
 let musicTimer = null;
+let lifeTimer = null;
 let musicStep = 0;
 let ambienceKey = "";
 let ambienceNodes = [];
@@ -204,6 +205,34 @@ function stopMusic() {
   if (musicTimer !== null && typeof window !== "undefined") window.clearInterval(musicTimer);
   musicTimer = null;
 }
+function startParkLife() {
+  if (lifeTimer !== null || !audioCtx || !hasUserGesture || muted || typeof window === "undefined") return;
+  lifeTimer = window.setInterval(() => {
+    if (!audioCtx || audioCtx.state !== "running" || muted || !ambienceLevelGain) return;
+    const now = audioCtx.currentTime;
+    // Tiny, infrequent synthetic water/guest accents sit under the main ambience.
+    const isSplash = Math.random() < 0.62;
+    const duration = isSplash ? 0.24 : 0.42;
+    const length = Math.max(1, Math.floor(audioCtx.sampleRate * duration));
+    const buffer = audioCtx.createBuffer(1, length, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / length);
+    const source = audioCtx.createBufferSource(); source.buffer = buffer;
+    const filter = audioCtx.createBiquadFilter(); filter.type = "bandpass"; filter.frequency.value = isSplash ? 1250 : 650; filter.Q.value = 0.55;
+    const gain = audioCtx.createGain(); gain.gain.setValueAtTime(0.0001, now); gain.gain.linearRampToValueAtTime(isSplash ? 0.012 : 0.006, now + 0.035); gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+    source.connect(filter); filter.connect(gain); gain.connect(ambienceLevelGain); source.start(now); source.stop(now + duration + 0.02);
+    if (!isSplash && Math.random() < 0.35) {
+      const osc = audioCtx.createOscillator(); const toneGain = audioCtx.createGain();
+      osc.type = "sine"; osc.frequency.value = 520 + Math.random() * 260;
+      toneGain.gain.setValueAtTime(0.0001, now); toneGain.gain.linearRampToValueAtTime(0.004, now + 0.04); toneGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+      osc.connect(toneGain); toneGain.connect(ambienceLevelGain); osc.start(now); osc.stop(now + 0.2);
+    }
+  }, 14500);
+}
+function stopParkLife() {
+  if (lifeTimer !== null && typeof window !== "undefined") window.clearInterval(lifeTimer);
+  lifeTimer = null;
+}
 
 function applyAmbience() {
   const ctx = audioCtx;
@@ -240,6 +269,7 @@ function applyAmbience() {
   }
   bus.gain.setTargetAtTime(isNight ? 0.38 : 0.55, ctx.currentTime, 0.9);
   startMusic();
+  startParkLife();
 }
 
 init();
@@ -282,7 +312,7 @@ export const sound = {
   milestone() { [523, 659, 784, 1047, 1319, 1568].forEach((f, i) => tone(f, 0.16, "triangle", 0.12, i * 0.09)); },
   setAmbience(weather = "clear", timeOfDay = "day") {
     ambienceWanted = { weather: typeof weather === "string" ? weather : weather?.id || "clear", timeOfDay: timeOfDay || "day" };
-    if (muted) { stopAmbience(); stopMusic(); return; }
+    if (muted) { stopAmbience(); stopMusic(); stopParkLife(); return; }
     // Setting a scene never starts audio until the player interacts/unlocks audio.
     if (hasUserGesture) applyAmbience();
   },
@@ -311,8 +341,8 @@ export const sound = {
     muted = !muted;
     try { if (typeof window !== "undefined") window.localStorage.setItem("splash-sound-muted", String(muted)); } catch {}
     updateMasterGain();
-    if (muted) { stopAmbience(); stopMusic(); }
-    else { unlockAudio(); applyAmbience(); startMusic(); }
+    if (muted) { stopAmbience(); stopMusic(); stopParkLife(); }
+    else { unlockAudio(); applyAmbience(); startMusic(); startParkLife(); }
     return muted;
   },
   isMuted() { return muted; },
