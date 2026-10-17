@@ -119,7 +119,7 @@ export default function CompetitorsPanel({ competitors, playerReputation, player
                   disabled={!canAfford}
                   className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg bg-rose-500 py-1.5 text-[10px] font-black text-white transition hover:bg-rose-600 disabled:opacity-40"
                 >
-                  <Swords className="h-3 w-3" /> Strike Back · ${cost.toLocaleString()}
+                  <Swords className="h-3 w-3" /> Strike Back · £{cost.toLocaleString()}
                 </button>
               );
             })()}
