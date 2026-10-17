@@ -31,7 +31,7 @@ import { rollDailyChallenges, CHALLENGE_REFRESH_DAYS } from "@/data/dailyChallen
 import { calculatePrestigePoints, prestigeMultiplier, PRESTIGE_LEVEL_REQ } from "@/data/prestige";
 import { getTheme as getVisualTheme } from "@/data/visualThemes";
 import { calculateEcoBonuses } from "@/data/ecoItems";
-import { createZooRecord, getZooFeedCost } from "@/data/zooSimulation";
+import { createZooRecord, getZooFeedCost, HABITAT_FEATURES } from "@/data/zooSimulation";
 import { getMascot } from "@/data/mascots";
 import { canClaimReward } from "@/data/dailyRewards";
 import { DEFAULT_MORALE, bonusCost, MORALE_RESTORE_TARGET } from "@/data/staffMorale";
@@ -1323,6 +1323,29 @@ export function useGameState() {
     const record = zooAnimals[tileIndex] || createZooRecord(itemId, day);
     setZooAnimals((all) => ({ ...all, [tileIndex]: { ...record, breeding: record.breeding === false } }));
   }, [grid, zooAnimals, day]);
+  const assignZooKeepers = useCallback((tileIndex, requestedCount) => {
+    const itemId = grid[tileIndex];
+    if (getParkItem(itemId)?.parkType !== "zoo" || ["wildlife_vet", "conservation_centre"].includes(itemId)) return;
+    const current = zooAnimals[tileIndex] || createZooRecord(itemId, day);
+    const otherAssigned = Object.entries(zooAnimals).reduce((sum, [tile, record]) => Number(tile) === Number(tileIndex) ? sum : sum + Math.max(0, Number(record?.keepersAssigned) || 0), 0);
+    const available = Math.max(0, (staff.zookeeper || 0) - otherAssigned);
+    const keepersAssigned = Math.max(0, Math.min(available, Math.floor(Number(requestedCount) || 0)));
+    setZooAnimals((all) => ({ ...all, [tileIndex]: { ...current, keepersAssigned } }));
+  }, [grid, zooAnimals, day, staff.zookeeper]);
+  const upgradeZooHabitatFeature = useCallback((tileIndex, featureId) => {
+    const itemId = grid[tileIndex];
+    const item = getParkItem(itemId);
+    const feature = HABITAT_FEATURES[featureId];
+    if (!item || item.parkType !== "zoo" || ["wildlife_vet", "conservation_centre"].includes(itemId) || !feature) return;
+    const current = zooAnimals[tileIndex] || createZooRecord(itemId, day);
+    const features = Array.isArray(current.habitatFeatures) ? current.habitatFeatures : [];
+    if (features.includes(featureId)) return;
+    if (!sandbox && money < feature.cost) return;
+    if (!sandbox) setMoney((m) => m - feature.cost);
+    setZooAnimals((all) => ({ ...all, [tileIndex]: { ...current, habitatFeatures: [...features, featureId] } }));
+    setXp((x) => x + 20);
+    setLog((all) => [{ day, text: `🏡 Improved ${item.name}: ${feature.label}. Cost £${feature.cost.toLocaleString()}.` }, ...all].slice(0, 12));
+  }, [grid, zooAnimals, day, sandbox, money]);
   const treatZooAnimal = useCallback((tileIndex) => {
     const itemId = grid[tileIndex];
     const item = getParkItem(itemId);
@@ -1421,7 +1444,7 @@ export function useGameState() {
     guestMemory, retailStock, retailStats, completedChains, completedCampaignChapters, acquiredRivals, franchiseMaps,
     acquisitionTargets: ACQUISITION_TARGETS, franchiseOptions: FRANCHISE_MAPS, empireExpansionBonuses: empireBonuses(acquiredRivals, franchiseMaps), acquireRival, openFranchise,
     completedMasterPlans, masterPlanBonuses,
-    zooAnimals, feedZooAnimal, setZooFeedingSchedule, toggleZooBreeding, treatZooAnimal,
+    zooAnimals, feedZooAnimal, setZooFeedingSchedule, toggleZooBreeding, treatZooAnimal, assignZooKeepers, upgradeZooHabitatFeature,
     annualReport: (() => { const rows=(history||[]).filter((h)=>h.day > Math.max(0, day-30)); const income=rows.reduce((s,h)=>s+(h.income||h.net||0),0); const expenses=rows.reduce((s,h)=>s+Math.max(0,(h.income||0)-(h.net||0)),0); const avgGuests=rows.length?Math.round(rows.reduce((s,h)=>s+(h.guests||0),0)/rows.length):guests; const peak=rows.reduce((m,h)=>Math.max(m,h.guests||0),0); const best=rows.reduce((b,h)=>((h.income||0)>(b?.income||-Infinity)?h:b),null); const worst=rows.reduce((b,h)=>((h.net||0)<(b?.net||Infinity)?h:b),null); const recommendations=[]; if ((parkAppeal?.score||0)<65) recommendations.push("Add scenery and themed zones to raise park appeal."); if ((visitorStats?.avgMood||0)<60) recommendations.push("Improve queues, cleanliness, safety and guest services."); if ((hotelStats?.totalRooms||0)>0 && (hotelStats?.occupancy||0)<60) recommendations.push("Improve resort rating or adjust your hotel package to lift occupancy."); if (!recommendations.length) recommendations.push("Operations are healthy — reinvest in upgrades and signature attractions."); return { period: Math.ceil(day/30), days: rows.length, income, expenses, avgGuests, peakGuests:Math.max(peakGuests,peak), reputation, appeal: parkAppeal?.score||0, resortRating, marketShare, lifetimeEarnings, bestDay:best?.day||null, bestIncome:best?.income||0, worstDay:worst?.day||null, worstNet:worst?.net||0, recommendations }; })(),
   };
 }
