@@ -48,7 +48,7 @@ export default function DailyChallengesPanel({ challenges, onClaim, daysUntilRef
                 <span className="text-[10px] font-bold text-slate-500">{Math.round(c.progress)}/{c.target}</span>
               </div>
               <p className="mt-1 text-[10px] text-slate-400">
-                Reward: ${c.reward.money.toLocaleString()} + {c.reward.xp} XP
+                Reward: £{c.reward.money.toLocaleString()} + {c.reward.xp} XP
               </p>
             </div>
           );
