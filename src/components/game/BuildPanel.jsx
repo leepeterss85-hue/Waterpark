@@ -35,7 +35,7 @@ export default function BuildPanel({ money, level = 1, selectedBuild, onSelect, 
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Find a pool, slide, hotel, path or facility..."
+          placeholder="Find a ride, animal, habitat, hotel or facility..."
           className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-xs font-semibold text-slate-700 outline-none transition focus:border-cyan-400 focus:bg-white focus:ring-2 focus:ring-cyan-100"
         />
       </div>
