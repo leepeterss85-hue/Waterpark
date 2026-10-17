@@ -22,7 +22,7 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
   const incidentMap = new Map((incidents || []).map((incident) => [incident.tileIndex, incident]));
   const phase = ((day - 1) % 8);
   const timeOfDay = phase <= 1 ? "morning" : phase <= 5 ? "day" : phase === 6 ? "sunset" : "night";
-  const weatherId = weather?.id || "clear";
+  const weatherId = (typeof weather === "string" ? weather : weather?.id) || "clear";
   const attractionCount = grid.filter((id) => getParkItem(id)?.category === "attraction").length;
   const lifeguardStations = grid.filter((id) => id === "lifeguard_station").length;
   const toilets = grid.filter((id) => id === "toilets" || id === "lockers").length;
