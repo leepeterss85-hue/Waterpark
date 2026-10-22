@@ -2,7 +2,7 @@
 export const STORY_CONTRACTS = Object.freeze([
   { id: "splash_starter", title: "The Big Splash", chapter: 1, goal: "Build three attractions", metric: "attractions", target: 3, reward: { money: 2500, xp: 130 } },
   { id: "happy_guests", title: "Five-Star Smiles", chapter: 2, goal: "Reach 75 guest happiness", metric: "guestMood", target: 75, reward: { money: 4500, xp: 220 } },
-  { id: "ride_engineer", title: "Ride Designer", chapter: 3, goal: "Upgrade three attractions", metric: "upgrades", target: 3, reward: { money: 6000, xp: 280 } },
+  { id: "ride_engineer", title: "Ride Designer", chapter: 3, goal: "Complete three park upgrades", metric: "upgrades", target: 3, reward: { money: 6000, xp: 280 } },
   { id: "guest_voice", title: "Word Gets Around", chapter: 8, goal: "Collect ten guest reviews", metric: "reviews", target: 10, reward: { money: 12000, xp: 420 } },
   { id: "resort_regulars", title: "Return for More", chapter: 12, goal: "Welcome twenty members", metric: "members", target: 20, reward: { money: 18000, xp: 600 } },
 ]);
