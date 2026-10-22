@@ -241,6 +241,8 @@ export default function Home() {
           selectedZone={game.selectedZone}
           incidents={game.incidents}
           guests={game.guests}
+          avgMood={game.visitorStats?.avgMood || 0}
+          waterQualityAvg={game.waterQualityAvg}
           visitorMovements={game.visitorStats?.movements}
           queueStats={game.visitorStats?.queueStats}
           attractionCondition={game.attractionCondition}
