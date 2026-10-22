@@ -10,7 +10,7 @@ export function challengeValue(def, game) {
  if(def.metric==="earnings") return Number(game.lifetimeEarnings)||0;
  if(def.metric==="guests") return Number(game.guests)||0;
  if(def.metric==="party") return (game.activeEvents||[]).some(e=>e.id==="evening_pool_party") ? 1 : 0;
- if(def.metric==="heatwave") return game.challenge?.id==="heatwave" ? Number(game.visitorStats?.avgMood)||0 : 0;
+ if(def.metric==="heatwave") return (game.challenge?.id==="heatwave" || game.seasonEvent?.id==="heatwave") ? Number(game.visitorStats?.avgMood)||0 : 0;
  return 0;
 }
 export function startTimedChallenge(def, game) {

@@ -1001,7 +1001,7 @@ export function useGameState() {
       if (previous !== updated) { next[def.id] = updated; changed = true; }
     }
     if (changed) { timedRef.current = next; setTimedChallenges(next); }
-  }, [day, totalUpgrades, lifetimeEarnings, guests, activeEvents, challenge, visitorStats]);
+  }, [day, totalUpgrades, lifetimeEarnings, guests, activeEvents, challenge, seasonEvent, visitorStats, timedChallenges]);
 
   const claimDailyChallenge = useCallback((challengeId) => {
     const ch = (stateRef.current.dailyChallenges || []).find((c) => c.id === challengeId);
