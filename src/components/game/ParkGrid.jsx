@@ -19,7 +19,7 @@ import "@/components/game/parkChrome.css";
 import "@/components/game/eventOverlay.css";
 import "@/components/game/resortFinish.css";
 
-export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, visitorMovements, queueStats = {}, attractionCondition = [], staff = {}, staffAssignments = {}, lifeguardTotal = 0, day = 1, weather, seasonEvent, hotelGuests = [], activeEvents = [], waterQuality = [], acceptedBookings = [], sponsorships = [], activeStrikes = [], money = 0, sandbox = false, graphicsQuality = "ultra", onGraphicsQualityChange, onOpenSettings, onCancelBuild, onChangeBuild, onTileClick, topControls, bottomMenu, statsBar, themeClass = "", mascot = null }) {
+export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, avgMood = 0, waterQualityAvg = 100, visitorMovements, queueStats = {}, attractionCondition = [], staff = {}, staffAssignments = {}, lifeguardTotal = 0, day = 1, weather, seasonEvent, hotelGuests = [], activeEvents = [], waterQuality = [], acceptedBookings = [], sponsorships = [], activeStrikes = [], money = 0, sandbox = false, graphicsQuality = "ultra", onGraphicsQualityChange, onOpenSettings, onCancelBuild, onChangeBuild, onTileClick, topControls, bottomMenu, statsBar, themeClass = "", mascot = null }) {
   const { zoom, setZoom, panX, panY, resetView, fitToWidth, containerRef, onMapClickCapture } = useTouchZoom(1, 0.35, 2.5);
   // Quality is controlled by Home so both the top bar and Settings stay in sync.
   const graphics = graphicsQuality;
@@ -103,7 +103,7 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
                 return <Tile key={index} index={index} grid={grid} zone={parkZones?.[index]} upgradeLevel={upgrades?.[index] || 0} value={value} selectedBuild={selectedBuild} expansionTheme={expansionTheme} isSelected={selectedTile === index} incident={incidentMap.get(index)} condition={attractionCondition?.[index]} queueWait={queueWait} queueConnected={queueConnected} movement={movement} guests={guests} facilityStatus={facilityStatus} timeOfDay={timeOfDay} nightSwim={seasonEvent?.id === "night_swim"} hotelOccupancy={hotelOcc} hotelRoomsTotal={hotelRm} waterQuality={waterQuality?.[index]} onClick={() => onTileClick(index)} />;
               })}
             </div>
-            <GuestLayer grid={grid} parkZones={parkZones} guests={guests} movements={visitorMovements} queueStats={queueStats} staff={staff} staffAssignments={staffAssignments} incidents={incidents || []} attractionCondition={attractionCondition} hotelGuests={hotelGuests} />
+            <GuestLayer grid={grid} parkZones={parkZones} guests={guests} avgMood={avgMood} waterQualityAvg={waterQualityAvg} movements={visitorMovements} queueStats={queueStats} staff={staff} staffAssignments={staffAssignments} incidents={incidents || []} attractionCondition={attractionCondition} hotelGuests={hotelGuests} />
             <GroupArrivalIndicator acceptedBookings={acceptedBookings} entranceIndex={entranceIndex} rows={Math.ceil(grid.length / 8)} />
             {mascot && <MascotSprite mascot={mascot} grid={grid} />}
           </div></div>
