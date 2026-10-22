@@ -189,3 +189,36 @@
 @media (prefers-reduced-motion:reduce) {
   .resort-finish[data-graphics="ultra"] .water-sun-sweep { animation:none !important; }
 }
+
+/* Illustrated slide troughs: visible channel depth, structural braces and a
+   very light stream of water, without changing collision or ride mechanics. */
+.resort-finish .ride-slide-channel {
+  fill:none; stroke:rgba(25,67,80,.55); stroke-width:13;
+  stroke-linejoin:round; stroke-linecap:round;
+}
+.resort-finish .ride-slide-edge-shimmer {
+  fill:none; stroke:rgba(255,255,255,.72); stroke-width:.75;
+  stroke-linecap:round; stroke-dasharray:5 10;
+  animation:resort-slide-water-flow 5s linear infinite;
+}
+.resort-finish .ride-slide-crossbrace {
+  fill:none; stroke:rgba(50,88,89,.58); stroke-width:2.6;
+  stroke-linecap:round; stroke-linejoin:round;
+}
+.resort-finish .ride-landing-foam {
+  fill:rgba(196,248,253,.4); stroke:rgba(255,255,255,.72); stroke-width:1;
+}
+.resort-finish .ride-landing-spray {
+  fill:none; stroke:rgba(236,253,255,.86); stroke-width:1.5;
+  stroke-linecap:round; stroke-linejoin:round;
+}
+.resort-finish.park-time-sunset .ride-slide-edge-shimmer { stroke:rgba(255,226,184,.78); }
+.resort-finish.park-time-night .ride-slide-edge-shimmer { stroke:rgba(136,240,255,.8); }
+.resort-finish[data-graphics="balanced"] .ride-slide-edge-shimmer {
+  animation:none!important; opacity:.35;
+}
+@keyframes resort-slide-water-flow { to { stroke-dashoffset:-45; } }
+@media(prefers-reduced-motion:reduce) {
+  .resort-finish .ride-slide-edge-shimmer { animation:none!important; }
+}
+
