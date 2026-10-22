@@ -3,6 +3,7 @@ import { X, ArrowUpCircle, Wrench, CheckCircle2, AlertTriangle, Users, Clock, Fl
 import { getAttraction, getAttractionProfile, MAX_UPGRADE, upgradeCost } from "@/data/gameData";
 import { popularityLabel } from "@/data/popularity";
 import { getIcon } from "./icons";
+import { RIDE_FOCUSES, rideFocusBonuses } from "@/data/rideSpecialties";
 
 function Row({ label, value }) {
   return (
@@ -13,7 +14,9 @@ function Row({ label, value }) {
   );
 }
 
-export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0, incident = null, condition = 100, guests = 0, queueWait = 0, lifeguards = 0, movementCount = 0, totalVisits = 0, popularityScore = null, trendBoost = 0, onUpgrade, onSell, onClose }) {
+export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0, incident = null, condition = 100, guests = 0, queueWait = 0, lifeguards = 0, movementCount = 0, totalVisits = 0, popularityScore = null, trendBoost = 0, rideFocus = null, sandbox = false, onUpgrade, onSell, onClose }) {
+  const [selectedFocus, setSelectedFocus] = React.useState("capacity");
+  React.useEffect(() => { setSelectedFocus(rideFocus || "capacity"); }, [rideFocus, attractionId, gridIndex]);
   if (gridIndex == null || !attractionId) return null;
   const attr = getAttraction(attractionId);
   const profile = getAttractionProfile(attractionId);
@@ -21,11 +24,12 @@ export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0,
   if (!attr) return null;
   const maxed = level >= MAX_UPGRADE;
   const cost = upgradeCost(attr.cost, level);
-  const canAfford = money >= cost;
+  const canAfford = sandbox || money >= cost;
   const status = incident?.type === "breakdown" ? "Broken down" : incident?.type === "maintenance" ? "Maintenance required" : "Operational";
   const statusClass = incident ? "bg-amber-50 text-amber-700 ring-amber-200" : "bg-emerald-50 text-emerald-700 ring-emerald-200";
   const statusIcon = incident ? <AlertTriangle className="h-3.5 w-3.5" /> : <CheckCircle2 className="h-3.5 w-3.5" />;
-  const effectiveCapacity = Math.round((attr.capacity || 0) * (1 + level * 0.2));
+  const activeBonuses = rideFocusBonuses(rideFocus, level);
+  const effectiveCapacity = Math.round((attr.capacity || 0) * (1 + level * 0.2) * (1 + activeBonuses.extraCapacity));
   const estimatedLoad = attr.capacity ? Math.min(100, Math.round((guests / Math.max(1, effectiveCapacity)) * 100)) : 0;
   const visitShare = totalVisits ? Math.min(100, Math.round((movementCount / totalVisits) * 100)) : 0;
   const popScore = popularityScore != null ? popularityScore : null;
@@ -88,21 +92,43 @@ export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0,
         {attr.capacity > 0 && <Row label="Safety" value={`${profile?.safety || "Medium"} · ${lifeguards}/${profile?.lifeguards || 1} guards`} />}
         {attr.fun > 0 && <Row label="Fun rating" value={`${attr.fun}/10`} />}
         <Row label="Upgrade level" value={<span className="font-semibold">{upgradeTier} · Lv {level}/{MAX_UPGRADE}</span>} />
+        {attr.category === "attraction" && rideFocus && <Row label="Specialisation" value={RIDE_FOCUSES.find((option) => option.id === rideFocus)?.title || "Standard"} />}
       </div>
 {guardGap > 0 && <div className="mb-3 flex items-center gap-2 rounded-xl bg-red-50 px-3 py-2 text-[10px] font-bold text-red-700 ring-1 ring-red-100"><AlertTriangle className="h-3.5 w-3.5" /> Add {guardGap} more lifeguard{guardGap > 1 ? "s" : ""} for full safety coverage.</div>}
             {incident && <div className="mb-3 flex items-center gap-2 rounded-xl bg-slate-950 px-3 py-2 text-[10px] font-bold text-white"><Wrench className="h-3.5 w-3.5 text-amber-300" /> Staff will restore this attraction during the next operating cycle.</div>}
       {!maxed ? (
         <div className="mt-3 rounded-xl bg-sky-50 p-3 ring-1 ring-sky-100">
           <div className="mb-2 text-xs text-slate-500">
-            Next level: <span className="font-semibold text-slate-700">+20% capacity · +15% income</span>
+            Next level: <span className="font-semibold text-slate-700">+20% base capacity · +15% base income</span>
           </div>
+          {attr.category === "attraction" && <div className="mb-3">
+            <p className="mb-2 text-[11px] font-black text-sky-900">Choose this upgrade's focus</p>
+            <div className="grid grid-cols-3 gap-1.5" role="group" aria-label="Ride upgrade focus">
+              {RIDE_FOCUSES.map((option) => {
+                const selected = selectedFocus === option.id;
+                const bonus = rideFocusBonuses(option.id, level + 1);
+                const detail = option.id === "capacity" ? `+${Math.round(bonus.extraCapacity * 100)}% capacity`
+                  : option.id === "revenue" ? `+${Math.round(bonus.extraRevenue * 100)}% revenue`
+                  : `+${bonus.extraMood.toFixed(1)} mood`;
+                return <button key={option.id} type="button" aria-pressed={selected}
+                  onClick={() => setSelectedFocus(option.id)}
+                  className={`min-w-0 rounded-lg border px-1.5 py-2 text-left transition ${selected ? "border-sky-500 bg-white ring-2 ring-sky-200" : "border-sky-100 bg-sky-50/70"}`}>
+                  <span className="block text-[10px] font-black leading-4 text-slate-800">{option.short}</span>
+                  <span className="block text-[9px] leading-4 text-slate-600">{detail}</span>
+                </button>;
+              })}
+            </div>
+            <p className="mt-2 text-[10px] text-sky-800">
+              {RIDE_FOCUSES.find((option) => option.id === selectedFocus)?.description}. Your current focus changes with this upgrade.
+            </p>
+          </div>}
           <button
-            onClick={onUpgrade}
+            onClick={() => onUpgrade?.(attr.category === "attraction" ? selectedFocus : undefined)}
             disabled={!canAfford}
             className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-emerald-500 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600 disabled:opacity-40"
           >
             <ArrowUpCircle className="h-4 w-4" />
-            Upgrade · £{cost.toLocaleString()}
+            Upgrade · {sandbox ? "Free in Sandbox" : `£${cost.toLocaleString("en-GB")}`}
           </button>
         </div>
       ) : (
