@@ -26,6 +26,21 @@ export default function PersonSprite({ activity = "walking", variant = 0, role, 
       <path d="M14 12Q16 13.5 18 12" className="person-mouth" />
     </g>
     {role && <><path d="M10 5H23M12 2H20V5" className="person-cap" /><path d="M15 22H18V25H15Z" className="person-badge" /></>}
+    {water && <g className="person-swim-gear">
+      <path d="M10.5 8.5Q16 5.5 21.5 8.5" className="person-goggle-strap" />
+      <rect x="10.1" y="7.2" width="5.1" height="4" rx="1.7" className="person-goggle-lens" />
+      <rect x="16.7" y="7.2" width="5.1" height="4" rx="1.7" className="person-goggle-lens" />
+      <path d="M15.1 9H16.7" className="person-goggle-bridge" />
+    </g>}
+    {!water && !role && variant % 5 === 0 && <g className="person-sun-visor">
+      <path d="M10 5Q16 1 22 5L23 8Q16 6 9 8Z" className="person-visor-band" />
+      <path d="M20 7Q27 6 29 9Q24 11 20 9" className="person-visor-brim" />
+    </g>}
+    {activity === "eating" && <g className="person-snack">
+      <path d="M24 22L29 20L28 28L25 29Z" className="person-drink-cup" />
+      <path d="M26.5 22L27 18" className="person-drink-straw" />
+    </g>}
+    {role === "lifeguard" && <path d="M20 19L25 22L23 25L19 23Z" className="person-lifeguard-whistle" />}
     {water && <path d="M2 37Q7 34 12 37T22 37T31 37M5 42Q10 40 15 42T27 42" className="person-ripple" />}
   </svg>;
 }
