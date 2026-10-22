@@ -1046,6 +1046,28 @@ export function useGameState() {
     { id: "finish", chapter: 13, title: "Waterpark Legend", text: "The campaign is complete. You have built a destination with great rides, a trained team, loyal guests and a recognised brand. Continue your legacy in Freeplay or experiment in Sandbox.", target: null, action: "Claim your place among the world's great waterpark tycoons.", reward: { money: 200000, xp: 6000, reputation: 15, research: 10 } },
   ];
 
+  // Side objectives never change the campaign's saved step number.
+  // Claiming is synchronous and guarded against rapid double-taps.
+  const claimStoryContract = useCallback((contractId) => {
+    if (gameMode !== "story" || claimedContractRef.current.has(contractId)) return false;
+    const contract = STORY_CONTRACTS.find((entry) => entry.id === contractId);
+    const chapter = STORY_STEPS[storyStep]?.chapter || 1;
+    if (!contract || chapter < contract.chapter) return false;
+    const progress = contractProgress(contract, {
+      missionState: { attractionCount: grid.filter((id) => getParkItem(id)?.category === "attraction").length },
+      visitorStats, totalUpgrades, visitorReviews, membershipCounts,
+    });
+    if (!progress.complete) return false;
+    claimedContractRef.current.add(contractId);
+    setClaimedStoryContracts((items) => items.includes(contractId) ? items : [...items, contractId]);
+    setMoney((amount) => amount + contract.reward.money);
+    setXp((amount) => amount + contract.reward.xp);
+    setLog((entries) => [{ day, text: `Maya's bonus challenge: ${contract.title}! +£${contract.reward.money.toLocaleString("en-GB")} and +${contract.reward.xp} XP.` }, ...entries].slice(0, 12));
+    sound.mission();
+    trackEvent("story_bonus_contract_claimed", { id: contractId });
+    return true;
+  }, [gameMode, storyStep, grid, visitorStats, totalUpgrades, visitorReviews, membershipCounts, day]);
+
   useEffect(() => {
     if (gameMode !== "story" || storyCompleted) return;
     const attractions = grid.filter((id) => getParkItem(id)?.category === "attraction").length;
