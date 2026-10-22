@@ -38,6 +38,12 @@ export default function PoolWaterSurface({ path, river = false }) {
         <path d="M13 32Q21 30 28 32M40 26L48 25M64 44Q71 43 77 45M51 73L58 72" className="water-reflection-bright" />
       </g>
       <path d="M24 50q5-3 10 0m-8 3q3-1 6 0M63 61q6-3 12 0m-10 3q4-2 8 0" className="water-surface-ripples" />
+      <g className="water-surface-highlights" aria-hidden="true">
+        <ellipse cx="27" cy="54" rx="14" ry="5" className="water-halo-ring" />
+        <ellipse cx="73" cy="39" rx="11" ry="4" className="water-halo-ring water-halo-ring-late" />
+        <path d="M10 19Q21 15 31 19M62 81Q75 76 88 80" className="water-crest-foam" />
+        <path d="M15 18Q22 16 27 18M67 79Q74 77 82 79" className="water-crest-highlight" />
+      </g>
     </g>
   </g>;
 }
