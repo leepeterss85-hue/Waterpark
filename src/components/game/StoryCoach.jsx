@@ -48,6 +48,8 @@ export default function StoryCoach({ game, setOpenSheet }) {
           {primaryGoal.current.toLocaleString("en-GB")}/{primaryGoal.target.toLocaleString("en-GB")} {primaryGoal.name}
         </span>}
         <span className="min-w-9 text-right text-xs font-black tabular-nums text-cyan-800">{progress.percent}%</span>
+        {target && <button type="button" className="story-coach-toggle" onClick={() => setOpenSheet?.(target.sheet)}
+          aria-label={target.label} title={target.label}><MapPin className="h-4 w-4" /></button>}
         <button type="button" className="story-coach-toggle" onClick={() => setExpanded(value => !value)}
           aria-label={expanded ? "Hide story instructions" : "Show story instructions"}
           aria-expanded={expanded} title={expanded ? "Less detail" : "Your next steps"}>
