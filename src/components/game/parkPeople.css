@@ -46,3 +46,18 @@
 .park-guest[data-guest-activity="walking"]:nth-child(2n) { animation-delay:-.45s; }
 @keyframes guest-walk-bob { 0%,100%{transform:translate(-50%,-90%) translateY(0)} 50%{transform:translate(-50%,-90%) translateY(-1px)} }
 @media (prefers-reduced-motion:reduce) { .park-guest[data-guest-activity] { animation:none; } }
+
+/* Guest personality: goggles for swimmers, occasional sun visors, snack cups
+   and lifeguard whistles. Pure SVG detail, no extra simulation timers. */
+.person-goggle-strap { fill:none; stroke:#164a59; stroke-width:1.1; }
+.person-goggle-lens { fill:#8be8ef; fill-opacity:.75; stroke:#165d70; stroke-width:1.1; }
+.person-goggle-bridge { fill:none; stroke:#165d70; stroke-width:1.2; }
+.person-visor-band { fill:#f5e4a5; stroke:#ad7652; stroke-width:.8; }
+.person-visor-brim { fill:#fdc76d; stroke:#af7a3b; stroke-width:.8; }
+.person-drink-cup { fill:#fef3c7; stroke:#0f766e; stroke-width:.9; }
+.person-drink-straw { fill:none; stroke:#ec4899; stroke-width:1.2; stroke-linecap:round; }
+.person-lifeguard-whistle { fill:#e5e7eb; stroke:#1f2937; stroke-width:.9; }
+.park-guest[data-guest-activity="walking"] .person-sun-visor,
+.ride-visitors .person-swim-gear { filter:drop-shadow(0 1px 1px rgba(9,34,45,.18)); }
+.resort-finish[data-graphics="balanced"] .park-guest,
+.resort-finish[data-graphics="balanced"] .park-staff { animation:none!important; }
