@@ -54,6 +54,7 @@
 .person-goggle-bridge { fill:none; stroke:#165d70; stroke-width:1.2; }
 .person-visor-band { fill:#f5e4a5; stroke:#ad7652; stroke-width:.8; }
 .person-visor-brim { fill:#fdc76d; stroke:#af7a3b; stroke-width:.8; }
+.person-snack { pointer-events:none; }
 .person-drink-cup { fill:#fef3c7; stroke:#0f766e; stroke-width:.9; }
 .person-drink-straw { fill:none; stroke:#ec4899; stroke-width:1.2; stroke-linecap:round; }
 .person-lifeguard-whistle { fill:#e5e7eb; stroke:#1f2937; stroke-width:.9; }
