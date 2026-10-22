@@ -196,13 +196,13 @@ export function runDay(stateRef, setters) {
   const hasEntrance = environment.some((p) => p.id === "park_entrance");
   const pathCount = environment.filter((p) => p.id === "main_path" || p.id === "service_road").length;
   const scenicCount = environment.filter((p) => ["palm_tree", "bench", "shade_umbrella", "fountain", "wayfinding_sign"].includes(p.id)).length;
+  const counts = currentStaff || {};
   const zooDay = simulateZooDay(prevGrid, stateRef.current.zooAnimals || {}, counts, currentUpgrades || [], d + 1);
   if (setZooAnimals) setZooAnimals(zooDay.animals);
   if (zooDay.logs.length) setLog((l) => [...zooDay.logs, ...l].slice(0, 12));
   const capOf = (p) => p.attr.capacity * (1 + 0.2 * p.level) * (1 + rideFocusBonuses(rideFocusFor(rideSpecialties, p.idx, p.id), p.level).extraCapacity);
   const upkeepOf = (p) => p.attr.maintenance * (1 + 0.1 * p.level);
 
-  const counts = currentStaff || {};
   const attractionZoneCoverage = (role) => {
     const assignedZone = currentAssignments?.[role] || "";
     if (!assignedZone) return 1;
@@ -472,10 +472,10 @@ export function runDay(stateRef, setters) {
     });
     if (hotelResult.totalGuests > 0) {
       const hotelParkSim = simulateVisits({
-        demand: Math.max(0, Math.round(hotelResult.totalGuests * selectedHotelPackage.guestMult * masteryFx.hotelGuestMult)), placedItems: [...attractions, ...facilities],
+        demand: Math.max(0, Math.round(hotelResult.totalGuests * selectedHotelPackage.guestMult * masteryFx.hotelGuestMult)), placedItems: [...enhancedAttractions, ...facilities],
         queuePaths: environment.filter((p) => p.id === "queue_path"), incidents: incidentByTile,
         uptime, safety, cleanliness, incomeMult: (eff.incomeMult ?? 1) * rideFocusEffects.incomeMult, entertainment, facilityBonus,
-        appealBonus: (calculatedAppeal.score - 50) * 0.025 + empireTier.bonuses.satisfaction * 10 + resortBonuses.moodBoost + districtBonuses.moodBoost,
+        appealBonus: (calculatedAppeal.score - 50) * 0.025 + empireTier.bonuses.satisfaction * 10 + resortBonuses.moodBoost + districtBonuses.moodBoost + rideFocusEffects.moodBoost,
         pricing: stateRef.current.pricing || DEFAULT_PRICING, weather: dayWeather, seasonEvent: currentSeasonEvent, popularity: stateRef.current.popularity,
       });
       hotelResult.parkSpend = hotelParkSim.income;
