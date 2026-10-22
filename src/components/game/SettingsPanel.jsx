@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Volume2, VolumeX, Vibrate, VibrateOff, Play, RotateCcw, Save, SlidersHorizontal, HardHat, ArrowLeft, Sparkles, Ban, Cloud, Mail, MailOpen, Bell, BellOff } from "lucide-react";
 import { sound } from "@/lib/soundManager";
-import { getSettings, saveSettings, haptics, DIFFICULTIES } from "@/lib/settings";
+import { getSettings, saveSettings, haptics, DIFFICULTIES, GRAPHICS_PRESETS } from "@/lib/settings";
 import SaveLoadPanel from "@/components/game/SaveLoadPanel";
 import CloudSavesPanel from "@/components/game/CloudSavesPanel";
 import StarterParkPicker from "@/components/game/StarterParkPicker";
@@ -34,7 +34,7 @@ function Toggle({ on, onClick, onIcon: OnIcon, offIcon: OffIcon, onTone = "text-
   );
 }
 
-export default function SettingsPanel({ saves, onSave, onLoad, onDelete, onNewGame, onContinue, sandbox, onToggleSandbox, loadFromCloud, saveToCloud }) {
+export default function SettingsPanel({ graphicsQuality = "ultra", onGraphicsQualityChange, saves, onSave, onLoad, onDelete, onNewGame, onContinue, sandbox, onToggleSandbox, loadFromCloud, saveToCloud }) {
   const [soundOn, setSoundOn] = useState(!sound.isMuted());
   const [soundVolume, setSoundVolume] = useState(sound.getVolume());
   const [audioMix, setAudioMix] = useState({ effects: sound.getCategoryVolume("effects"), ambience: sound.getCategoryVolume("ambience"), music: sound.getCategoryVolume("music") });
@@ -113,6 +113,30 @@ export default function SettingsPanel({ saves, onSave, onLoad, onDelete, onNewGa
 
   return (
     <div className="flex flex-col gap-4">
+      <section aria-label="Graphics quality settings" className="rounded-2xl border border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-blue-50 p-3">
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-xs font-black text-cyan-900">
+            <Sparkles className="h-4 w-4 text-cyan-600" /> Graphics quality
+          </div>
+          <span className="rounded-full bg-cyan-100 px-2 py-1 text-[10px] font-extrabold text-cyan-800">
+            {graphicsQuality === "ultra" ? "Maximum quality" : graphicsQuality === "rich" ? "High quality" : "Battery friendly"}
+          </span>
+        </div>
+        <p className="mb-3 text-[11px] leading-4 text-slate-600">
+          Ultra is the default for new players, with the richest water effects, ride lighting and scenery. Choose a lighter mode if your device gets slow.
+        </p>
+        <div className="grid grid-cols-3 gap-2">
+          {GRAPHICS_PRESETS.map((preset) => <button
+            key={preset.id} type="button"
+            aria-pressed={graphicsQuality === preset.id}
+            onClick={() => onGraphicsQualityChange?.(preset.id)}
+            className={`min-w-0 rounded-xl border-2 px-2 py-2.5 text-center transition focus-visible:outline-2 focus-visible:outline-cyan-600 ${graphicsQuality === preset.id ? "border-cyan-500 bg-cyan-100 text-cyan-900 shadow-sm" : "border-slate-200 bg-white text-slate-700"}`}>
+            <span className="block text-xs font-black">{preset.label}</span>
+            <span className="mt-1 block text-[9px] leading-3">{preset.id === "ultra" ? "All effects" : preset.id === "rich" ? "Detailed" : "Fastest"}</span>
+          </button>)}
+        </div>
+        <p className="mt-2 text-[10px] text-slate-500">Changes apply immediately and are saved on this device. You can also change quality from the park's top toolbar.</p>
+      </section>
       <div>
         <div className="mb-2 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-slate-500">
           <Play className="h-3.5 w-3.5" /> Game

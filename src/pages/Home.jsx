@@ -30,7 +30,7 @@ import { hotelRooms } from "@/data/hotels";
 import { getTheme } from "@/data/visualThemes";
 import { trackEvent } from "@/lib/gameAnalytics";
 import { sound } from "@/lib/soundManager";
-import { haptics } from "@/lib/settings";
+import { haptics, getGraphicsQuality, setGraphicsQuality } from "@/lib/settings";
 import confetti from "canvas-confetti";
 
 const StatPill = ({ icon: Icon, value, tone }) => (
@@ -63,6 +63,10 @@ export default function Home() {
   const prevLevel = useRef(game.level);
   const [dailyReport, setDailyReport] = useState(null);
   const [openSheet, setOpenSheet] = useState(null);
+  const [graphicsQuality, setGraphicsQualityState] = useState(getGraphicsQuality);
+  const changeGraphicsQuality = (value) => {
+    setGraphicsQualityState(setGraphicsQuality(value));
+  };
   const [dayTrigger, setDayTrigger] = useState(null);
   const [rewardTrigger, setRewardTrigger] = useState(null);
   const [shake, setShake] = useState(false);
@@ -225,6 +229,9 @@ export default function Home() {
           parkZones={game.parkZones}
           upgrades={game.upgrades}
           selectedBuild={game.selectedBuild}
+          graphicsQuality={graphicsQuality}
+          onGraphicsQualityChange={changeGraphicsQuality}
+          onOpenSettings={() => handleOpenMenu("settings")}
           money={game.money}
           sandbox={game.sandbox}
           onCancelBuild={() => game.setSelectedBuild(null)}
@@ -318,7 +325,8 @@ export default function Home() {
         </Sheet>
       </main>
 
-      <GameMenuSheets game={game} openSheet={openSheet} setOpenSheet={setOpenSheet} />
+      <GameMenuSheets game={game} openSheet={openSheet} setOpenSheet={setOpenSheet}
+        graphicsQuality={graphicsQuality} onGraphicsQualityChange={changeGraphicsQuality} />
 
       <DailySummary report={dailyReport} onClose={() => setDailyReport(null)} />
       <Tutorial game={game} />

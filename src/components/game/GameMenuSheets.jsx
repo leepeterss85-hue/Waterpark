@@ -76,7 +76,7 @@ function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-m
   );
 }
 
-export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
+export default function GameMenuSheets({ game, openSheet, setOpenSheet, graphicsQuality = "ultra", onGraphicsQualityChange }) {
   const close = () => setOpenSheet(null);
   const skipStory = () => { game.setMode("freeplay"); setOpenSheet(null); };
   const zones = [...new Set((game.parkZones || []).filter(Boolean))].map((id) => ({
@@ -179,6 +179,8 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
 
       <SheetShell open={openSheet === "settings"} onOpenChange={(v) => !v && close()} title="Settings" icon={SlidersHorizontal} width="sm:max-w-md">
         <SettingsPanel
+          graphicsQuality={graphicsQuality}
+          onGraphicsQualityChange={onGraphicsQualityChange}
           saves={game.saves}
           onSave={game.savePark}
           onLoad={game.loadPark}

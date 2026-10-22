@@ -1,7 +1,27 @@
 // Persistent game settings: vibration + difficulty. Sound is owned by soundManager.
 const KEY = "splash-settings";
 
-const DEFAULTS = { vibration: true, difficulty: "normal", sandbox: false, emailAlerts: true, pushAlerts: true };
+const DEFAULTS = { vibration: true, difficulty: "normal", sandbox: false, emailAlerts: true, pushAlerts: true, graphicsQuality: "ultra" };
+
+export const GRAPHICS_PRESETS = [
+  { id: "ultra", label: "Ultra", desc: "Maximum water detail, lighting, reflections, scenery and effects" },
+  { id: "rich", label: "High", desc: "Detailed graphics with slightly lighter effects" },
+  { id: "balanced", label: "Balanced", desc: "Battery-friendly graphics with fewer effects" },
+];
+
+export function normaliseGraphicsQuality(value) {
+  return GRAPHICS_PRESETS.some((preset) => preset.id === value) ? value : "ultra";
+}
+
+export function getGraphicsQuality() {
+  return normaliseGraphicsQuality(getSettings().graphicsQuality);
+}
+
+export function setGraphicsQuality(value) {
+  const graphicsQuality = normaliseGraphicsQuality(value);
+  saveSettings({ graphicsQuality });
+  return graphicsQuality;
+}
 
 export const DIFFICULTIES = [
   { id: "easy", label: "Easy", desc: "Generous starting budget, lighter upkeep", moneyMult: 1.6, upkeepMult: 0.85 },
@@ -16,7 +36,14 @@ export function getDifficulty(id) {
 export function getSettings() {
   if (typeof window === "undefined") return { ...DEFAULTS };
   try {
-    return { ...DEFAULTS, ...JSON.parse(localStorage.getItem(KEY) || "{}") };
+    const saved = JSON.parse(localStorage.getItem(KEY) || "{}");
+    // Preserve older user-selected Balanced/High settings while new installs
+    // begin at maximum graphics. Do not modify anyone's saved game state.
+    const legacy = localStorage.getItem("aqua-graphics");
+    const graphicsQuality = saved && Object.hasOwn(saved, "graphicsQuality")
+      ? normaliseGraphicsQuality(saved.graphicsQuality)
+      : legacy === "balanced" || legacy === "rich" ? legacy : "ultra";
+    return { ...DEFAULTS, ...(saved && typeof saved === "object" && !Array.isArray(saved) ? saved : {}), graphicsQuality };
   } catch {
     return { ...DEFAULTS };
   }
