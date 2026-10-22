@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ArrowRight, BookOpen, ChevronDown, ChevronUp, CircleCheck, MapPin, Sparkles } from "lucide-react";
 import { storyObjectiveProgress } from "@/data/storyObjectives";
+import { availableStoryContracts } from "@/data/storyContracts";
 
 const TARGETS = {
   build: { label: "Open Build", sheet: "build" },
@@ -23,6 +24,7 @@ export default function StoryCoach({ game, setOpenSheet }) {
   if (game.gameMode !== "story" || game.storyCompleted || !step) return null;
 
   const progress = storyObjectiveProgress(step, game);
+  const claimableBonuses = availableStoryContracts(game).filter(c => c.complete && !c.claimed).length;
   const target = TARGETS[step.target];
   const totalSteps = Math.max(1, game.STORY_STEPS.length);
   const current = game.storyStep + 1;
@@ -47,6 +49,10 @@ export default function StoryCoach({ game, setOpenSheet }) {
         {primaryGoal && <span className="hidden max-w-36 truncate rounded-lg bg-cyan-50 px-2 py-1 text-[10px] font-bold text-cyan-800 sm:inline">
           {primaryGoal.current.toLocaleString("en-GB")}/{primaryGoal.target.toLocaleString("en-GB")} {primaryGoal.name}
         </span>}
+        {claimableBonuses > 0 && <button type="button" onClick={() => setOpenSheet?.("gameModes")}
+          className="inline-flex min-h-8 items-center gap-1 rounded-lg bg-indigo-600 px-2 text-[10px] font-black text-white"
+          aria-label={`Claim ${claimableBonuses} Story Mode bonus reward${claimableBonuses === 1 ? "" : "s"}`}
+          title="Maya's bonus challenges"><Sparkles className="h-3.5 w-3.5" /><span>{claimableBonuses}</span></button>}
         <span className="min-w-9 text-right text-xs font-black tabular-nums text-cyan-800">{progress.percent}%</span>
         {target && <button type="button" className="story-coach-toggle" onClick={() => setOpenSheet?.(target.sheet)}
           aria-label={target.label} title={target.label}><MapPin className="h-4 w-4" /></button>}
