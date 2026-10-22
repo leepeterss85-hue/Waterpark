@@ -1,4 +1,3 @@
-import { getParkItem } from "./gameData.js";
 import { isWaterAttraction } from "./waterQuality.js";
 
 const number = value => Math.max(0, Number(value) || 0);
@@ -23,11 +22,11 @@ const badge = (name, met) => target(name, met ? 1 : 0, 1);
 export function storyObjectiveProgress(step, game = {}) {
   if (!step?.id) return { milestones: [], percent: 0, satisfied: false, alternative: false };
   const grid = Array.isArray(game.grid) ? game.grid : [];
-  const attractions = grid.filter(id => getParkItem(id)?.category === "attraction").length;
-  const hotelBuilt = grid.some(id => {
-    const item = getParkItem(id);
-    return item?.category === "hotel" || /hotel|resort/i.test(item?.name || id || "");
-  });
+  // The hook already computes the canonical attraction count using gameData.
+  // Reuse it to avoid a second, subtly different classification in the UI.
+  const attractions = number(game.missionState?.attractionCount);
+  const hotelBuilt = (game.hotels || []).length > 0 ||
+    grid.some(id => /hotel|resort/i.test(String(id || "")));
   const finishedProjects = (game.megaProjects || []).filter(project =>
     project?.status === "complete" || project?.status === "completed" || project?.completed).length;
   const peak = Math.max(number(game.peakGuests), number(game.guests));

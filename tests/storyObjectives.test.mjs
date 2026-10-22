@@ -1,22 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { build } from "esbuild";
-
-// Base44 source uses the Vite @ alias, so bundle the pure objective helper
-// exactly as the app would rather than asking Node to resolve Vite aliases.
-const compiled = await build({
-  entryPoints: ["src/data/storyObjectives.js"],
-  bundle: true, write: false, format: "esm", platform: "node",
-  alias: { "@": "./src" }, logLevel: "silent",
-});
-const moduleUrl = "data:text/javascript;base64," +
-  Buffer.from(compiled.outputFiles[0].text).toString("base64");
-const { storyObjectiveProgress } = await import(moduleUrl);
+import { storyObjectiveProgress } from "../src/data/storyObjectives.js";
 
 const step = id => ({ id, title: id, chapter: 1 });
 const game = overrides => ({
-  grid: [], staff: {}, day: 1, completedResearch: [], parkAppeal: { score: 50 },
+  grid: [], missionState: { attractionCount: 0 }, staff: {}, day: 1, completedResearch: [], parkAppeal: { score: 50 },
   reputation: 50, peakGuests: 0, totalUpgrades: 0, expansionsDone: 0,
   ...overrides,
 });
