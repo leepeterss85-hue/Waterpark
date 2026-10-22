@@ -1,0 +1,29 @@
+.aquatic-map.resort-finish { --resort-ink:#113b47; }
+.resort-finish .game-board-titlebar { background:linear-gradient(125deg,#123e4c,#126c78) !important; box-shadow:inset 0 1px #ffffff30,0 5px 16px #102e3920; }
+.resort-finish .game-map-toolbar { gap:8px; flex-wrap:wrap; background:#edf5ef; }
+.resort-finish .game-map-toolbar button { min-height:44px; min-width:44px; touch-action:manipulation; }
+.resort-quality-button { border-radius:10px; padding:0 10px; color:#15596a; font-size:11px; font-weight:800; background:#e0f3f2; }
+.resort-quality-button[aria-pressed="true"] { background:#e6edda; color:#405b2d; }
+.resort-finish .game-map-surface { background-color:#79a960 !important; background-image:radial-gradient(ellipse at 18% 16%,#bbd68b88,transparent 50%),radial-gradient(ellipse at 83% 88%,#305e4333,transparent 60%) !important; border-color:#426c50 !important; }
+.resort-finish .game-map-grid > button { border-radius:9px !important; border-width:1px; }
+.resort-finish .game-map-grid > button[data-kind="attraction"] { box-shadow:0 3px 0 #46674d,0 6px 9px #163f412c !important; }
+.resort-finish .game-map-grid > button[data-kind="empty"][data-buildable="false"] { background:radial-gradient(ellipse at 30% 20%,#a9c67e,#7fa35f) !important; border-color:#73995555 !important; box-shadow:inset 0 1px #d8e8a944 !important; }
+.resort-finish .game-map-grid > button:focus-visible { outline:3px solid #fff4ae !important; outline-offset:2px; z-index:30; }
+.resort-finish .pool-water-surface { filter:none !important; }
+.resort-finish .aquatic-ride-art .ride-water-slide { filter:drop-shadow(1px 3px 1px #17384955) !important; }
+.resort-finish .aquatic-ride-art .ride-slide-highlight { filter:none !important; opacity:.75; }
+.resort-finish .aquatic-ride-art .pool-rim { filter:drop-shadow(0 2px 1px #103c4944) !important; }
+.resort-finish .park-tile-caption { background:linear-gradient(transparent,#123b49e8) !important; text-shadow:0 1px 2px #102d37; letter-spacing:.01em; }
+.resort-finish .water-stop-shallow { stop-color:#a9f0df; }
+.resort-finish .water-stop-aqua { stop-color:hsl(var(--park-water)); }
+.resort-finish .water-stop-depth { stop-color:hsl(var(--park-deep)); }
+.resort-finish.park-time-night .aquatic-ride-art .pool-rim { filter:drop-shadow(0 0 2px #7df9ed88) !important; }
+.resort-finish[data-graphics="balanced"] .game-map-surface *,
+.resort-finish[data-graphics="balanced"] .game-map-surface *::before,
+.resort-finish[data-graphics="balanced"] .game-map-surface *::after { animation:none !important; filter:none !important; backdrop-filter:none !important; }
+.resort-finish[data-graphics="balanced"] .ambient-flare,
+.resort-finish[data-graphics="balanced"] .ambient-sparkle,
+.resort-finish[data-graphics="balanced"] .ambient-mote { display:none; }
+@media (prefers-reduced-motion:reduce) {
+ .resort-finish .game-map-surface *, .resort-finish .game-map-surface *::before, .resort-finish .game-map-surface *::after { animation:none !important; transition:none !important; }
+}
