@@ -6,8 +6,8 @@ export default function SlideStructure({ id, paths }) {
     <path d="M12 31L7 64M10 40H17M8 47H15M7 55H14" className="scene-slide-stairs" />
     {["bowl_slide", "tornado_bowl"].includes(id) && <><ellipse cx="61" cy="48" rx="26" ry="24" className="scene-bowl-rim" /><ellipse cx="61" cy="48" rx="18" ry="16" className="scene-bowl-water" /><circle cx="61" cy="49" r="5" className="scene-bowl-drain" /></>}
     {id === "halfpipe" && <path d="M31 53Q49 89 88 33L87 58Q54 94 32 75Z" className="scene-halfpipe" />}
-    {paths.map((path, i) => <g key={path} className="ride-channel-group"><path d={path} className="ride-slide-shadow" /><path d={path} className="ride-slide-channel" /><path d={path} className={"ride-water-slide " + ["pool-slide-coral", "pool-slide-gold", "pool-slide-blue", "scene-slide-green"][i % 4]} /><path d={path} className="ride-slide-glass" /><path d={path} className="ride-slide-current" /><path d={path} className="ride-slide-highlight" /><path d={path} className="ride-slide-edge-shimmer" /></g>)}
     <path d="M17 50L30 58L40 46M29 69L40 74L54 57" className="ride-slide-crossbrace" />
+    {paths.map((path, i) => <g key={path} className="ride-channel-group"><path d={path} className="ride-slide-shadow" /><path d={path} className="ride-slide-channel" /><path d={path} className={"ride-water-slide " + ["pool-slide-coral", "pool-slide-gold", "pool-slide-blue", "scene-slide-green"][i % 4]} /><path d={path} className="ride-slide-glass" /><path d={path} className="ride-slide-current" /><path d={path} className="ride-slide-highlight" /><path d={path} className="ride-slide-edge-shimmer" /></g>)}
     <g className="ride-slide-landing-splash" aria-hidden="true">
       <ellipse cx="49" cy="79" rx="11" ry="4" className="ride-landing-foam" />
       <path d="M42 77Q46 71 49 76M50 76Q55 67 59 77M45 80Q49 77 53 80" className="ride-landing-spray" />
