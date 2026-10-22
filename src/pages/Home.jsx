@@ -28,6 +28,7 @@ import DisasterBanner from "@/components/game/DisasterBanner";
 import HotelDetail from "@/components/game/HotelDetail";
 import { hotelRooms } from "@/data/hotels";
 import { getTheme } from "@/data/visualThemes";
+import { rideFocusFor } from "@/data/rideSpecialties";
 import { trackEvent } from "@/lib/gameAnalytics";
 import { sound } from "@/lib/soundManager";
 import { haptics, getGraphicsQuality, setGraphicsQuality } from "@/lib/settings";
@@ -315,7 +316,9 @@ export default function Home() {
                   totalVisits={game.visitorStats?.totalVisits || 0}
                   popularityScore={game.popularity?.[game.selectedTile] ?? null}
                   trendBoost={game.popularityTrend?.[game.selectedTile] ?? 0}
-                  onUpgrade={() => game.upgradeAttraction(game.selectedTile)}
+                  rideFocus={rideFocusFor(game.rideSpecialties, game.selectedTile, selectedAttrId)}
+                  sandbox={game.sandbox}
+                  onUpgrade={(focus) => game.upgradeAttraction(game.selectedTile, focus)}
                   onSell={() => game.sellAttraction(game.selectedTile)}
                   onClose={() => game.setSelectedTile(null)}
                 />
