@@ -22,10 +22,26 @@ test("map camera controls expose Fit, reset and a touch jitter threshold", () =>
   const hook = read("src/hooks/useTouchZoom.js");
   const map = read("src/components/game/ParkGrid.jsx");
   assert.match(hook, /const fitToWidth = useCallback/);
-  assert.match(hook, /return \{ zoom, setZoom, panX, panY, resetView, fitToWidth, containerRef \}/);
+  assert.match(hook, /return \{ zoom, setZoom, panX, panY, resetView, fitToWidth, containerRef, onMapClickCapture \}/);
   assert.match(hook, /Math\.hypot\(dx, dy\) < 8/);
   assert.match(map, /aria-label="Fit park to screen"/);
   assert.match(map, /useTouchZoom\(1, 0\.35, 2\.5\)/);
+});
+test("mobile camera auto-fits until the player zooms and blocks accidental building after a drag", () => {
+  const hook = read("src/hooks/useTouchZoom.js");
+  const map = read("src/components/game/ParkGrid.jsx");
+  const chrome = read("src/components/game/resortFinish.css");
+  const bar = read("src/components/game/parkChrome.css");
+  assert.match(hook, /const autoFitRef = useRef\(true\)/);
+  assert.match(hook, /const next = available < width/);
+  assert.match(hook, /new ResizeObserver\(fitNarrowScreen\)/);
+  assert.match(hook, /autoFitRef\.current = false/);
+  assert.match(hook, /suppressGestureClickRef\.current = true/);
+  assert.match(hook, /event\.preventDefault\(\);\s*event\.stopPropagation\(\);/);
+  assert.match(map, /onClickCapture=\{onMapClickCapture\}/);
+  assert.match(map, /className="game-map-toolbar park-camera-toolbar"/);
+  assert.match(chrome, /grid-template-columns:minmax\(0,1\.25fr\)/);
+  assert.match(bar, /grid-template-columns: repeat\(5, minmax\(0, 1fr\)\)/);
 });
 test("build catalogue returns to the park immediately and offers an accessible cancel and change", () => {
   const menu = read("src/components/game/GameMenuSheets.jsx");
