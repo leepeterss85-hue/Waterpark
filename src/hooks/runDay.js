@@ -50,6 +50,7 @@ import { empireBonuses } from "@/data/parkEmpire";
 import { MEGA_PROJECTS, DESTINATIONS, simulateMegaProjects, megaBonuses as calculateMegaBonuses, generateGuestStories, waterEngineering } from "@/data/advancedParkSystems";
 import { strategyFor, packageFor, masteryEffects, evaluateMastery } from "@/data/parkMastery";
 import { simulateZooDay } from "@/data/zooSimulation";
+import { rideFocusFor, rideFocusBonuses, parkRideFocusEffects } from "@/data/rideSpecialties";
 
 const MILESTONE_DAYS = [25, 50, 75, 100, 150, 200];
 const MILESTONE_REWARDS = { 25: 25000, 50: 75000, 75: 150000, 100: 500000, 150: 750000, 200: 1000000 };
@@ -179,6 +180,15 @@ export function runDay(stateRef, setters) {
     .map((id, idx) => (id ? { id, idx, attr: getParkItem(id), zone: currentZones?.[idx] || null, level: (currentUpgrades || [])[idx] || 0 } : null))
     .filter(Boolean);
   const attractions = placedItems.filter((p) => p.attr.category === "attraction");
+  const rideSpecialties = stateRef.current.rideSpecialties || {};
+  const rideFocusEffects = parkRideFocusEffects(attractions, rideSpecialties);
+  const enhancedAttractions = attractions.map((ride) => {
+    const focus = rideFocusFor(rideSpecialties, ride.idx, ride.id);
+    const bonus = rideFocusBonuses(focus, ride.level);
+    return bonus.extraCapacity
+      ? { ...ride, attr: { ...ride.attr, capacity: ride.attr.capacity * (1 + bonus.extraCapacity) } }
+      : ride;
+  });
   const facilities = placedItems.filter((p) => p.attr.category === "facility");
   const lifeguardStations = facilities.filter((p) => p.id === "lifeguard_station").length;
   const toilets = facilities.filter((p) => p.id === "toilets" || p.id === "lockers").length;
@@ -189,7 +199,7 @@ export function runDay(stateRef, setters) {
   const zooDay = simulateZooDay(prevGrid, stateRef.current.zooAnimals || {}, counts, currentUpgrades || [], d + 1);
   if (setZooAnimals) setZooAnimals(zooDay.animals);
   if (zooDay.logs.length) setLog((l) => [...zooDay.logs, ...l].slice(0, 12));
-  const capOf = (p) => p.attr.capacity * (1 + 0.2 * p.level);
+  const capOf = (p) => p.attr.capacity * (1 + 0.2 * p.level) * (1 + rideFocusBonuses(rideFocusFor(rideSpecialties, p.idx, p.id), p.level).extraCapacity);
   const upkeepOf = (p) => p.attr.maintenance * (1 + 0.1 * p.level);
 
   const counts = currentStaff || {};
@@ -280,10 +290,10 @@ export function runDay(stateRef, setters) {
 
     const currentPricing = stateRef.current.pricing || DEFAULT_PRICING;
     const sim = simulateVisits({
-      demand: newGuests, placedItems: [...attractions, ...facilities],
+      demand: newGuests, placedItems: [...enhancedAttractions, ...facilities],
       queuePaths: environment.filter((p) => p.id === "queue_path"), incidents: incidentByTile,
-      uptime, safety, cleanliness, incomeMult: eff.incomeMult ?? 1, entertainment, facilityBonus,
-      appealBonus: (calculatedAppeal.score - 50) * 0.025 + empireTier.bonuses.satisfaction * 10 + resortBonuses.moodBoost + (activeMasterPlanBonuses.satisfactionBonus || 0) * 10,
+      uptime, safety, cleanliness, incomeMult: (eff.incomeMult ?? 1) * rideFocusEffects.incomeMult, entertainment, facilityBonus,
+      appealBonus: (calculatedAppeal.score - 50) * 0.025 + empireTier.bonuses.satisfaction * 10 + resortBonuses.moodBoost + (activeMasterPlanBonuses.satisfactionBonus || 0) * 10 + rideFocusEffects.moodBoost,
       pricing: currentPricing, weather: dayWeather, seasonEvent: currentSeasonEvent, popularity: stateRef.current.popularity,
     });
     income = sim.income;
@@ -464,7 +474,7 @@ export function runDay(stateRef, setters) {
       const hotelParkSim = simulateVisits({
         demand: Math.max(0, Math.round(hotelResult.totalGuests * selectedHotelPackage.guestMult * masteryFx.hotelGuestMult)), placedItems: [...attractions, ...facilities],
         queuePaths: environment.filter((p) => p.id === "queue_path"), incidents: incidentByTile,
-        uptime, safety, cleanliness, incomeMult: eff.incomeMult ?? 1, entertainment, facilityBonus,
+        uptime, safety, cleanliness, incomeMult: (eff.incomeMult ?? 1) * rideFocusEffects.incomeMult, entertainment, facilityBonus,
         appealBonus: (calculatedAppeal.score - 50) * 0.025 + empireTier.bonuses.satisfaction * 10 + resortBonuses.moodBoost + districtBonuses.moodBoost,
         pricing: stateRef.current.pricing || DEFAULT_PRICING, weather: dayWeather, seasonEvent: currentSeasonEvent, popularity: stateRef.current.popularity,
       });
