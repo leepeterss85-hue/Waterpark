@@ -47,6 +47,8 @@ import { sound } from "@/lib/soundManager";
 import { MEGA_PROJECTS, DESTINATIONS, megaBonuses as calculateMegaBonuses, waterEngineering } from "@/data/advancedParkSystems";
 import { DEFAULT_PARK_STRATEGY, strategyFor, packageFor, masteryEffects } from "@/data/parkMastery";
 import { PARK_SCENARIOS, getScenario } from "@/data/scenarios";
+import { rideFocusFor, validRideFocus } from "@/data/rideSpecialties";
+import { STORY_CONTRACTS, contractProgress } from "@/data/storyContracts";
 
 const STORAGE_KEY = "waterpark-tycoon-save-v1";
 const FIRST_ATTRACTION_BONUS = 5000;
@@ -136,6 +138,7 @@ export function useGameState() {
   const [incidents, setIncidents] = useState([]);
   const [attractionCondition, setAttractionCondition] = useState(() => Array(GRID_SIZE).fill(100));
   const [upgrades, setUpgrades] = useState(() => Array(GRID_SIZE).fill(0));
+  const [rideSpecialties, setRideSpecialties] = useState({});
   const [xp, setXp] = useState(0);
   const [expansionsDone, setExpansionsDone] = useState(0);
   const [peakGuests, setPeakGuests] = useState(0);
@@ -155,6 +158,8 @@ export function useGameState() {
   const [gameMode, setGameMode] = useState(() => getSettings().gameMode || "freeplay");
   const [storyStep, setStoryStep] = useState(() => getSettings().storyStep || 0);
   const [storyCompleted, setStoryCompleted] = useState(() => getSettings().storyCompleted || false);
+  const [claimedStoryContracts, setClaimedStoryContracts] = useState([]);
+  const claimedContractRef = useRef(new Set());
   const [sandboxSettings, setSandboxSettings] = useState(() => ({ unlimitedCash: true, unlockAll: false, guestDemandMult: 1, instantConstruction: false, weatherLock: false, weather: null }));
   const [activeCampaigns, setActiveCampaigns] = useState([]);
   const [hotelGuests, setHotelGuests] = useState([]);
@@ -230,7 +235,7 @@ export function useGameState() {
 
   /** @type {import("react").MutableRefObject<Record<string, any>>} */
   const stateRef = useRef({});
-  stateRef.current = { parkStrategy, mastery, sandboxSettings, money, day, reputation, guests, grid, parkZones, history, log, lastNet, staff, staffAssignments, incidents, upgrades, attractionCondition, challenge, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, sandbox, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, builtToday, upgradedToday, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp, staffMorale, wageBoost, sponsorships, groupBookings, acceptedBookings, activeStrikes, completedMasterPlans, masterPlanBonuses, guestMemory, retailStock, retailStats, completedChains, completedCampaignChapters, acquiredRivals, franchiseMaps, megaProjects, guestStories, currentDestination, resortMilestones, activeScenario, scenarioStatus, completedScenarios, gameMode, storyStep, storyCompleted, zooAnimals };
+  stateRef.current = { parkStrategy, mastery, sandboxSettings, money, day, reputation, guests, grid, parkZones, history, log, lastNet, staff, staffAssignments, incidents, upgrades, rideSpecialties, claimedStoryContracts, attractionCondition, challenge, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, sandbox, activeCampaigns, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, builtToday, upgradedToday, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp, staffMorale, wageBoost, sponsorships, groupBookings, acceptedBookings, activeStrikes, completedMasterPlans, masterPlanBonuses, guestMemory, retailStock, retailStats, completedChains, completedCampaignChapters, acquiredRivals, franchiseMaps, megaProjects, guestStories, currentDestination, resortMilestones, activeScenario, scenarioStatus, completedScenarios, gameMode, storyStep, storyCompleted, zooAnimals };
 
   // Load saved game
   useEffect(() => {
@@ -347,6 +352,10 @@ export function useGameState() {
       setScenarioStatus(data.scenarioStatus ?? "idle");
       setCompletedScenarios(Array.isArray(data.completedScenarios) ? data.completedScenarios : []);
       setZooAnimals(data.zooAnimals && typeof data.zooAnimals === "object" ? data.zooAnimals : {});
+      setRideSpecialties(data.rideSpecialties && typeof data.rideSpecialties === "object" && !Array.isArray(data.rideSpecialties) ? data.rideSpecialties : {});
+      const contracts = Array.isArray(data.claimedStoryContracts) ? data.claimedStoryContracts.filter(x => STORY_CONTRACTS.some(c => c.id === x)) : [];
+      setClaimedStoryContracts(contracts);
+      claimedContractRef.current = new Set(contracts);
       if (data.gameMode) setGameMode(data.gameMode);
       if (data.storyStep != null) setStoryStep(data.storyStep);
       if (data.storyCompleted != null) setStoryCompleted(data.storyCompleted);
@@ -361,7 +370,7 @@ export function useGameState() {
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ saveVersion: SAVE_SCHEMA_VERSION, savedAt: Date.now(), ...stateRef.current })); } catch { /* ignore */ }
     }, 300);
     return () => clearTimeout(t);
-  }, [parkStrategy, mastery, money, day, reputation, guests, grid, parkZones, history, lastNet, builtToday, upgradedToday, staff, staffAssignments, incidents, attractionCondition, upgrades, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, sandboxSettings, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp, staffMorale, wageBoost, sponsorships,     groupBookings, acceptedBookings, activeStrikes, completedMasterPlans, masterPlanBonuses, sandbox, megaProjects, guestStories, currentDestination, resortMilestones, gameMode, storyStep, storyCompleted, activeScenario, scenarioStatus, completedScenarios, log, guestMemory, retailStock, retailStats, completedChains, completedCampaignChapters, acquiredRivals, franchiseMaps, zooAnimals]);
+  }, [parkStrategy, mastery, money, day, reputation, guests, grid, parkZones, history, lastNet, builtToday, upgradedToday, staff, staffAssignments, incidents, attractionCondition, upgrades, rideSpecialties, claimedStoryContracts, xp, expansionsDone, peakGuests, totalUpgrades, claimedMissions, challenge, lifetimeEarnings, builtAttractionIds, visitorStats, feedback, weather, forecast, seasonEvent, ticketPrice, adBudget, priorityPass, vipVisit, researchPoints, completedResearch, parkAppeal, disaster, disastersSurvived, activeCampaigns, sandboxSettings, hotelGuests, hotelStats, resortRating, pricing, popularity, popularityTrend, prevPopularity, activeEvents, membershipCounts, membershipTimers, membershipStats, awards, awardCeremonyTimer, awardStats, socialPosts, socialReputation, emergencies, emergencyStats, constructionProjects, loans, returnVisitorMult, empirePoints, competitors, marketShare, waterQuality, rideAges, vipHistory, claimedLegendary, activeCalendarEvent, dailyChallenges, challengeDayCounter, autoPricing, activeTheme, prestigeCount, synergyBonuses, mascot, lastRewardDay, rewardStreak, visitorReviews, staffXp, staffMorale, wageBoost, sponsorships,     groupBookings, acceptedBookings, activeStrikes, completedMasterPlans, masterPlanBonuses, sandbox, megaProjects, guestStories, currentDestination, resortMilestones, gameMode, storyStep, storyCompleted, activeScenario, scenarioStatus, completedScenarios, log, guestMemory, retailStock, retailStats, completedChains, completedCampaignChapters, acquiredRivals, franchiseMaps, zooAnimals]);
 
   // Flush save on background/close
   useEffect(() => {
@@ -429,6 +438,7 @@ export function useGameState() {
         setLog((l) => [{ day, text: `Day ${day}: 🎉 Grand Opening bonus! +£${FIRST_ATTRACTION_BONUS.toLocaleString()} for your first attraction.` }, ...l].slice(0, 12));
       }
     }
+    setRideSpecialties((current) => { const next = { ...current }; delete next[index]; return next; });
     setLastBuildAction({ index, id: selectedBuild, cost: attr.cost });
     setBuiltToday((b) => b + 1);
     trackEvent("attraction_built", { id: selectedBuild, category: attr.category, cost: attr.cost });
@@ -451,6 +461,7 @@ export function useGameState() {
       const attr = getParkItem(g[index]);
       setMoney((m) => m + Math.floor((attr?.cost || 0) * 0.5));
       setUpgrades((u) => { const nu = [...u]; nu[index] = 0; return nu; });
+      setRideSpecialties((current) => { const next = { ...current }; delete next[index]; return next; });
       setIncidents((items) => items.filter((item) => item.tileIndex !== index));
       setAttractionCondition((c) => { const next = [...c]; next[index] = 100; return next; });
       setRideAges((ages) => { const next = [...ages]; next[index] = 0; return next; });
@@ -471,6 +482,7 @@ export function useGameState() {
     setGrid((g) => { if (g[index] !== id) return g; const ng = [...g]; ng[index] = null; return ng; });
     setMoney((m) => m + cost);
     setUpgrades((u) => { const nu = [...u]; nu[index] = 0; return nu; });
+    setRideSpecialties((current) => { const next = { ...current }; delete next[index]; return next; });
     setIncidents((items) => items.filter((item) => item.tileIndex !== index));
     setAttractionCondition((c) => { const next = [...c]; next[index] = 100; return next; });
     setParkZones((z) => { const next = [...z]; next[index] = null; return next; });
@@ -479,7 +491,7 @@ export function useGameState() {
     trackEvent("build_undone", { id });
   }, [lastBuildAction]);
 
-  const upgradeAttraction = useCallback((index) => {
+  const upgradeAttraction = useCallback((index, requestedFocus = null) => {
     const id = grid[index];
     if (!id) return;
     const attr = getParkItem(id);
@@ -489,13 +501,17 @@ export function useGameState() {
     const cost = upgradeCost(attr.cost, lvl);
     if (!sandbox && money < cost) return;
     setUpgrades((u) => { const nu = [...u]; nu[index] = lvl + 1; return nu; });
+    if (attr.category === "attraction" && validRideFocus(requestedFocus || rideFocusFor(rideSpecialties, index, id) || "capacity")) {
+      const focus = requestedFocus || rideFocusFor(rideSpecialties, index, id) || "capacity";
+      setRideSpecialties((current) => ({ ...current, [index]: { attractionId: id, focus } }));
+    }
     if (!sandbox) setMoney((m) => m - cost);
     setTotalUpgrades((t) => t + 1);
     setXp((x) => x + 15);
     setUpgradedToday((u) => u + 1);
     sound.upgrade();
-    trackEvent("attraction_upgraded", { id, level: lvl + 1, cost });
-  }, [grid, upgrades, money, sandbox]);
+    trackEvent("attraction_upgraded", { id, level: lvl + 1, cost, focus: requestedFocus || rideFocusFor(rideSpecialties, index, id) || "capacity" });
+  }, [grid, upgrades, rideSpecialties, money, sandbox]);
 
   const hireStaff = useCallback((type) => { setStaff((s) => ({ ...s, [type]: (s[type] || 0) + 1 })); sound.hire(); trackEvent("staff_hired", { type }); }, []);
   const fireStaff = useCallback((type) => { setStaff((s) => ({ ...s, [type]: Math.max(0, (s[type] || 0) - 1) })); trackEvent("staff_fired", { type }); }, []);
@@ -1221,6 +1237,7 @@ export function useGameState() {
     setPrestigeCount((p) => p + points);
     setXp(0); setDay(1); setReputation(50); setGuests(0);
     setGrid(makeStartingGrid()); setParkZones(makeEmptyZones(GRID_SIZE));
+    setRideSpecialties({});
     setUpgrades(Array(GRID_SIZE).fill(0)); setAttractionCondition(Array(GRID_SIZE).fill(100));
     setIncidents([]); setStaff(DEFAULT_STAFF); setStaffAssignments({});
     setExpansionsDone(0); setPeakGuests(0); setBuiltAttractionIds([]);
@@ -1252,6 +1269,7 @@ export function useGameState() {
     setMoney(Math.round(baseMoney * diff.moneyMult));
     setDay(1); setReputation(park.reputation ?? 50); setGuests(0);
     setGrid(startGrid); setParkZones(startZones); setSelectedZone(null);
+    setRideSpecialties({}); setClaimedStoryContracts([]); claimedContractRef.current = new Set();
     setPlaying(false); setSelectedBuild(null); setSelectedTile(null); setLastNet(0);
     setWeather(WEATHER[0]); setForecast(WEATHER[1]); setSeasonEvent(null);
     setTicketPrice(park.ticketPrice ?? DEFAULT_TICKET_PRICE);
@@ -1362,9 +1380,9 @@ export function useGameState() {
     money, day, reputation, guests, grid, playing, speed, weather, forecast,
     season: getSeason(day), seasonEvent, ticketPrice, adBudget, priorityPass,
     parkZones, selectedZone, selectedBuild, selectedTile, lastNet, log, history,
-    staff, staffAssignments, assignStaff, incidents, attractionCondition, upgrades, upgradeAttraction,
+    staff, staffAssignments, assignStaff, incidents, attractionCondition, upgrades, rideSpecialties, upgradeAttraction,
     level, xp, xpForNext: xpForLevel(level), applyCheat,
-    gameMode, storyStep, storyCompleted, STORY_STEPS, setMode, advanceStory, sandboxSettings, updateSandboxSettings, sandboxAction,
+    gameMode, storyStep, storyCompleted, STORY_STEPS, claimedStoryContracts, claimStoryContract, setMode, advanceStory, sandboxSettings, updateSandboxSettings, sandboxAction,
     parkStrategy, setParkStrategy, mastery, masteryEffects: masteryEffects(mastery.points), activeScenario, scenarioStatus, completedScenarios, scenarios: PARK_SCENARIOS, selectScenario,
     expansionsDone, gridSize, maxGridSize: MAX_GRID_SIZE, expandPark,
     peakGuests, totalUpgrades, claimedMissions, claimMission,
