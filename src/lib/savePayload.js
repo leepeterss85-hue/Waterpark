@@ -3,7 +3,7 @@
 // local saves, cloud saves and the auto-persist spread.
 
 export const SAVE_FIELDS = [
-  "money", "day", "reputation", "guests", "grid", "parkZones", "history", "sandbox",
+  "timedChallenges", "money", "day", "reputation", "guests", "grid", "parkZones", "history", "sandbox",
   "staff", "staffAssignments", "attractionCondition", "log", "lastNet",
   "incidents", "upgrades", "rideSpecialties", "claimedStoryContracts", "xp", "expansionsDone", "peakGuests", "totalUpgrades",
   "claimedMissions", "challenge", "lifetimeEarnings", "builtAttractionIds",

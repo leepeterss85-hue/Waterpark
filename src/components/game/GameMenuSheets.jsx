@@ -1,3 +1,4 @@
+import TimedChallengesPanel from "@/components/game/TimedChallengesPanel";
 import React from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -347,7 +348,8 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet, graphics
         />
       </SheetShell>
 
-      <SheetShell open={openSheet === "challenges"} onOpenChange={(v) => !v && close()} title="Daily Challenges" icon={Target} width="sm:max-w-md">
+      <SheetShell open={openSheet === "challenges"} onOpenChange={(v) => !v && close()} title="Challenges" icon={Target} width="sm:max-w-md">
+        <TimedChallengesPanel game={game} />
         <DailyChallengesPanel challenges={game.dailyChallenges} onClaim={game.claimDailyChallenge} daysUntilRefresh={game.challengeDaysLeft} />
       </SheetShell>
 
