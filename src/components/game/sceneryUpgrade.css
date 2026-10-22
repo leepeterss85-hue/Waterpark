@@ -1,0 +1,76 @@
+/* Hand-illustrated scenery replaces tiny generic map icons. Art only on empty
+   grid cells, and the whole layer remains pointer-events:none. */
+.aquatic-map .park-scenery-layer { pointer-events:none; }
+.aquatic-map .park-scenery-item.park-scenery-illustrated {
+  opacity:.91; filter:none; transform:none; overflow:visible;
+  display:grid; place-items:center; isolation:isolate; pointer-events:none;
+}
+.aquatic-map .park-scenery-item svg.scenery-illustration {
+  width:min(89%,86px); height:auto; aspect-ratio:1;
+  max-height:88%; overflow:visible; filter:drop-shadow(1px 3px 2px rgba(19,60,46,.22));
+}
+.aquatic-map .park-scenery-layer[data-building="true"] .park-scenery-illustrated {
+  opacity:.12; /* make buildable plots and the actual ride preview unmistakable */
+}
+.scenery-ground-shadow { fill:rgba(22,63,49,.21); }
+.scenery-ground-grass { fill:none; stroke:#548950; stroke-width:4; stroke-linecap:round; }
+.scenery-palm-trunk-shadow { fill:none; stroke:#634020; stroke-width:11; stroke-linecap:round; }
+.scenery-palm-trunk { fill:none; stroke:#b78049; stroke-width:6.5; stroke-linecap:round; }
+.scenery-palm-leaves { fill:#319466; stroke:#11654d; stroke-width:1.4; stroke-linejoin:round; }
+.scenery-palm-veins { fill:none; stroke:#a2e3a5; stroke-width:1.5; stroke-linecap:round; }
+.scenery-coconut { fill:#a36a3f; stroke:#623a25; stroke-width:1; }
+.scenery-soil { fill:#ad875f; stroke:#f6d3a4; stroke-width:2; }
+.scenery-hedge-back { fill:#6da561; stroke:#3d834d; stroke-width:2; stroke-linejoin:round; }
+.scenery-flower-stem { fill:none; stroke:#35754d; stroke-width:2; }
+.scenery-flower-leaf { fill:#61a862; stroke:#28794f; stroke-width:1.2; }
+.scenery-flower-petal-pink { fill:#fa74a5; stroke:#e64781; stroke-width:1; }
+.scenery-flower-petal-gold { fill:#ffe078; stroke:#f5a732; stroke-width:1; }
+.scenery-flower-heart { fill:#fff8c3; stroke:#bc7640; stroke-width:.8; }
+.scenery-lamp-pole-shadow { fill:none; stroke:#344f53; stroke-width:7; stroke-linecap:round; }
+.scenery-lamp-pole,.scenery-sign-post { fill:none; stroke:#98b4a9; stroke-width:3.5; stroke-linecap:round; }
+.scenery-lamp-roof { fill:#355d58; stroke:#173d3c; stroke-width:2; }
+.scenery-lamp-pane { fill:#c7f9fb; stroke:#345d60; stroke-width:2; }
+.scenery-lamp-brace,.scenery-lamp-base { fill:none; stroke:#33524d; stroke-width:3.5; stroke-linecap:round; }
+.scenery-lamp-glass { fill:none; stroke:#f8ffff; stroke-width:2; stroke-linecap:round; }
+.scenery-lamp-bulb { fill:#fff4b4; stroke:#f7cf55; stroke-width:1; }
+.scenery-sand { fill:#f4d7a2; stroke:#c5a97c; stroke-width:1.5; }
+.scenery-parasol-pole,.scenery-lounger-legs { fill:none; stroke:#77523e; stroke-width:3; stroke-linecap:round; }
+.scenery-parasol-canopy { fill:#fa7875; stroke:#cb4658; stroke-width:2; }
+.scenery-parasol-seams { fill:none; stroke:#ffe2cc; stroke-width:1.8; }
+.scenery-lounger-frame { fill:#8f674f; stroke:#5b4437; stroke-width:2; }
+.scenery-lounger-cushion { fill:#ffefc2; stroke:#ffffff; stroke-width:1; }
+.scenery-lounger-stripes { fill:none; stroke:#5ecac0; stroke-width:3; }
+.scenery-shrub-shadow { fill:#2c7353; }
+.scenery-shrub { fill:#5c9a59; stroke:#2f784e; stroke-width:2; }
+.scenery-hedge-front { fill:#74b864; stroke:#39844a; stroke-width:1.5; }
+.scenery-hedge-highlight { fill:none; stroke:#d2f1a0; stroke-width:3; stroke-linecap:round; }
+.scenery-berry { fill:#fa8b78; }
+.scenery-stone-shadow { fill:#708c82; }
+.scenery-stone { fill:#b3c6b9; stroke:#7b9b8f; stroke-width:2.5; stroke-linejoin:round; }
+.scenery-stone-edge { fill:none; stroke:#f6fff0; stroke-width:2; stroke-linecap:round; }
+.scenery-rock-stream { fill:none; stroke:#6bd2d8; stroke-width:5; stroke-linecap:round; }
+.scenery-sign-board { fill:#25877c; stroke:#134c4d; stroke-width:3; stroke-linejoin:round; }
+.scenery-sign-board-secondary { fill:#f8c56a; stroke:#89582e; stroke-width:2.5; stroke-linejoin:round; }
+.scenery-sign-letters { fill:none; stroke:#fbffef; stroke-width:4; stroke-linecap:round; }
+
+/* Night-time garden lighting gives real landmarks to the resort. */
+.resort-finish.park-time-sunset .scenery-illustration { filter:sepia(.12) saturate(1.12) drop-shadow(2px 4px 2px rgba(89,47,28,.25)) !important; }
+.resort-finish.park-time-night .scenery-illustration { filter:brightness(.75) saturate(1.09) drop-shadow(1px 3px 3px rgba(0,20,34,.42)) !important; }
+.resort-finish.park-time-night .scenery-lamp-pane { fill:#fff6b0; }
+.resort-finish.park-time-night .scenery-lamp-bulb { fill:#fffdd2; stroke:#fff4a2; stroke-width:4; }
+.resort-finish.park-time-night .park-scenery-item[data-scenery-type="lamp"]::before {
+  content:""; position:absolute; top:16%; left:17%; width:66%; height:65%;
+  border-radius:50%; background:radial-gradient(ellipse,rgba(255,222,127,.33),transparent 69%);
+  pointer-events:none;
+}
+.resort-finish.park-time-night .park-scenery-item[data-scenery-type="lamp"]::after {
+  content:""; position:absolute; top:12%; left:28%; width:44%; height:45%;
+  border-radius:50%; background:radial-gradient(circle,rgba(255,240,160,.36),transparent 70%);
+  pointer-events:none;
+}
+@media(max-width:640px) {
+  .aquatic-map .park-scenery-item svg.scenery-illustration { width:90%; max-width:75px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .aquatic-map .park-scenery-item.park-scenery-illustrated { transition:none!important; }
+}
