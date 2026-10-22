@@ -1,10 +1,26 @@
-export const TIMED_CHALLENGES = [
+export const BASE_CHALLENGES = [
  {id:"quick_upgrades",title:"Upgrade Sprint",description:"Complete 3 new upgrades in 5 park days.",metric:"upgrades",target:3,days:5,reward:{money:4000,xp:200}},
  {id:"cash_dash",title:"Cash Dash",description:"Earn £15,000 in 4 park days.",metric:"earnings",target:15000,days:4,reward:{money:5000,xp:250}},
  {id:"weekend_rush",title:"Weekend Rush",description:"Welcome 150 guests in a single day within 3 park days.",metric:"guests",target:150,days:3,reward:{money:4500,xp:220}},
  {id:"pool_party",title:"Party Planner",description:"Launch an Evening Pool Party within 5 park days.",metric:"party",target:1,days:5,reward:{money:3500,xp:200}},
  {id:"heatwave_hero",title:"Heatwave Hero",description:"Reach 80 guest happiness during a heatwave within 7 park days.",metric:"heatwave",target:80,days:7,reward:{money:7500,xp:400}},
 ];
+export const MEDALS = ["bronze", "silver", "gold"];
+export const TIMED_CHALLENGES = BASE_CHALLENGES.flatMap(base => MEDALS.map((medal,index) => {
+ const id = index ? base.id+"_"+medal : base.id;
+ const target = base.metric==="party" ? 1 : base.metric==="heatwave" ? [80,88,95][index] : Math.ceil(base.target*[1,1.5,2][index]);
+ const days = base.metric==="party" ? [5,3,2][index] : base.days;
+ const goal = base.metric==="upgrades" ? "Complete "+target+" new upgrades" : base.metric==="earnings" ? "Earn £"+target.toLocaleString("en-GB") : base.metric==="guests" ? "Welcome "+target+" guests in one day" : base.metric==="heatwave" ? "Reach "+target+" happiness during a heatwave" : "Launch an Evening Pool Party";
+ return {...base,id,baseId:base.id,medal,target,days,title:base.title+" · "+medal[0].toUpperCase()+medal.slice(1),
+  description:goal+" within "+days+" park days.",
+  prerequisite:index ? (index===1 ? base.id : base.id+"_silver") : null,
+  reward:{money:Math.round(base.reward.money*[1,1.5,2][index]),xp:Math.round(base.reward.xp*[1,1.5,2][index])}};
+}));
+export function canStartTimedChallenge(def,runs={}) {
+ return Boolean(def && !Object.values(runs).some(r=>r.status==="active") &&
+ !["claimed","complete"].includes(runs[def.id]?.status) &&
+ (!def.prerequisite || runs[def.prerequisite]?.status==="claimed"));
+}
 export function challengeValue(def, game) {
  if(def.metric==="upgrades") return Number(game.totalUpgrades)||0;
  if(def.metric==="earnings") return Number(game.lifetimeEarnings)||0;

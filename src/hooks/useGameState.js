@@ -1,4 +1,4 @@
-import { TIMED_CHALLENGES, startTimedChallenge, evaluateTimedChallenge, sanitiseTimedChallenges } from "@/data/timedChallenges";
+import { TIMED_CHALLENGES, canStartTimedChallenge, startTimedChallenge, evaluateTimedChallenge, sanitiseTimedChallenges } from "@/data/timedChallenges";
 import { useState, useEffect, useCallback, useRef } from "react";
 import {
   getParkItem, STAFF, MAX_UPGRADE, upgradeCost,
@@ -976,8 +976,7 @@ export function useGameState() {
   const beginTimedChallenge = useCallback((id) => {
     const def = TIMED_CHALLENGES.find(c => c.id === id);
     const runs = timedRef.current;
-    if (!def || Object.values(runs).some(r => r.status === "active") ||
-        ["claimed", "complete"].includes(runs[id]?.status)) return false;
+    if (!canStartTimedChallenge(def, runs)) return false;
     const next = {...runs, [id]: startTimedChallenge(def, stateRef.current)};
     timedRef.current = next; setTimedChallenges(next);
     return true;
@@ -1095,7 +1094,7 @@ export function useGameState() {
     if (!contract || chapter < contract.chapter || (contract.prerequisite && !claimedContractRef.current.has(contract.prerequisite))) return false;
     const progress = contractProgress(contract, {
       missionState: { attractionCount: grid.filter((id) => getParkItem(id)?.category === "attraction").length },
-      visitorStats, totalUpgrades, visitorReviews, membershipCounts, grid, parkZones, upgrades, activeEvents,
+      visitorStats, totalUpgrades, visitorReviews, membershipCounts, grid, parkZones, upgrades, activeEvents, hotelStats,
       attractionIds: grid.filter(id => getParkItem(id)?.category === "attraction"),
     });
     if (!progress.complete) return false;
@@ -1107,7 +1106,7 @@ export function useGameState() {
     sound.mission();
     trackEvent("story_bonus_contract_claimed", { id: contractId });
     return true;
-  }, [gameMode, storyStep, grid, visitorStats, totalUpgrades, visitorReviews, membershipCounts, day, parkZones, upgrades, activeEvents]);
+  }, [gameMode, storyStep, grid, visitorStats, totalUpgrades, visitorReviews, membershipCounts, day, parkZones, upgrades, activeEvents, hotelStats]);
 
   useEffect(() => {
     if (gameMode !== "story" || storyCompleted) return;
