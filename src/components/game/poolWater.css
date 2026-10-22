@@ -95,3 +95,32 @@
   .pool-water-surface .water-caustic-drift,.pool-water-surface .water-reflections,
   .pool-water-surface .water-reflection-bright { animation: none !important; }
 }
+
+/* Park graphics upgrade: physically softer foam crests and surface ripples.
+   All decorations remain clipped to the shape of each pool or river. */
+.pool-water-surface .water-halo-ring {
+  fill:none; stroke:rgba(244,255,255,.48); stroke-width:1.1;
+  stroke-dasharray:4 6; opacity:.6;
+  transform-box:fill-box; transform-origin:center;
+  animation:water-halo-breathe 6s ease-in-out infinite;
+}
+.pool-water-surface .water-halo-ring-late { animation-delay:-3s; opacity:.4; }
+.pool-water-surface .water-crest-foam {
+  fill:none; stroke:rgba(236,253,255,.62); stroke-width:2.4;
+  stroke-linecap:round; opacity:.62;
+}
+.pool-water-surface .water-crest-highlight {
+  fill:none; stroke:rgba(255,255,255,.91); stroke-width:.9;
+  stroke-linecap:round;
+}
+.pool-water-surface[data-water-surface="river"] .water-halo-ring { opacity:.27; }
+@keyframes water-halo-breathe {
+  0%,100% { opacity:.35; transform:scale(.94); }
+  50% { opacity:.72; transform:scale(1.05); }
+}
+/* Lower CPU/battery load without disabling the actual water artwork. */
+.resort-finish[data-graphics="balanced"] .water-halo-ring,
+.resort-finish[data-graphics="balanced"] .water-crest-foam { animation:none!important; opacity:.4; }
+@media(prefers-reduced-motion:reduce) {
+  .pool-water-surface .water-halo-ring { animation:none!important; }
+}
