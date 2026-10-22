@@ -14,10 +14,14 @@ export function useTouchZoom(initialZoom = 1, minZoom = 0.8, maxZoom = 1.5) {
 
   const pinchRef = useRef(null);
   const dragRef = useRef(null);
+  // The camera starts fitted on narrow screens, but manual zoom stays manual.
+  const autoFitRef = useRef(true);
+  const suppressGestureClickRef = useRef(false);
   const stateRef = useRef({ zoom, panX, panY });
   stateRef.current = { zoom, panX, panY };
 
   const setZoom = useCallback((z) => {
+    autoFitRef.current = false;
     setZoomState((prev) => {
       const next = typeof z === "function" ? z(prev) : z;
       return Math.max(minZoom, Math.min(maxZoom, Number(next.toFixed(2))));
@@ -25,6 +29,7 @@ export function useTouchZoom(initialZoom = 1, minZoom = 0.8, maxZoom = 1.5) {
   }, [minZoom, maxZoom]);
 
   const resetView = useCallback(() => {
+    autoFitRef.current = false;
     setZoomState(initialZoom);
     setPanX(0);
     setPanY(0);
@@ -39,12 +44,47 @@ export function useTouchZoom(initialZoom = 1, minZoom = 0.8, maxZoom = 1.5) {
     if (!viewport) return;
     const playfield = viewport.querySelector(".park-playfield");
     const contentWidth = playfield?.offsetWidth || 704;
+    autoFitRef.current = true;
     setZoomState(calculateParkFitZoom(viewport.clientWidth, contentWidth, minZoom, maxZoom));
     setPanX(0);
     setPanY(0);
     viewport.scrollLeft = 0;
     viewport.scrollTop = 0;
   }, [minZoom, maxZoom]);
+
+  // Automatically show the whole eight-column park on a phone instead of
+  // beginning with most attractions off-screen. Refit on orientation changes,
+  // but never override a player's chosen camera magnification.
+  useEffect(() => {
+    const viewport = containerRef.current;
+    if (!viewport) return;
+    const fitNarrowScreen = () => {
+      if (!autoFitRef.current) return;
+      const width = viewport.querySelector('.park-playfield')?.offsetWidth || 704;
+      const available = viewport.clientWidth;
+      if (!available) return;
+      const next = available < width
+        ? calculateParkFitZoom(available, width, minZoom, maxZoom)
+        : initialZoom;
+      setZoomState((current) => current === next ? current : next);
+    };
+    fitNarrowScreen();
+    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(fitNarrowScreen) : null;
+    observer?.observe(viewport);
+    window.addEventListener('resize', fitNarrowScreen);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener('resize', fitNarrowScreen);
+    };
+  }, [initialZoom, minZoom, maxZoom]);
+
+  const onMapClickCapture = useCallback((event) => {
+    if (!suppressGestureClickRef.current) return;
+    suppressGestureClickRef.current = false;
+    // A drag/pinch must not purchase a ride on the plot underneath the finger.
+    event.preventDefault();
+    event.stopPropagation();
+  }, []);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -57,7 +97,9 @@ export function useTouchZoom(initialZoom = 1, minZoom = 0.8, maxZoom = 1.5) {
     };
 
     const onTouchStart = (e) => {
+      if (e.touches.length === 1) suppressGestureClickRef.current = false;
       if (e.touches.length === 2) {
+        suppressGestureClickRef.current = true;
         pinchRef.current = { dist: getDist(e.touches), zoom: stateRef.current.zoom };
         dragRef.current = null;
       } else if (e.touches.length === 1 && stateRef.current.zoom > 1) {
@@ -83,6 +125,8 @@ export function useTouchZoom(initialZoom = 1, minZoom = 0.8, maxZoom = 1.5) {
         // A small finger wobble must not steal a tap on a ride or empty plot.
         if (!dragRef.current.engaged && Math.hypot(dx, dy) < 8) return;
         dragRef.current.engaged = true;
+        suppressGestureClickRef.current = true;
+        autoFitRef.current = false;
         e.preventDefault();
         setPanX(dragRef.current.panX + dx);
         setPanY(dragRef.current.panY + dy);
@@ -106,5 +150,5 @@ export function useTouchZoom(initialZoom = 1, minZoom = 0.8, maxZoom = 1.5) {
     };
   }, [setZoom]);
 
-  return { zoom, setZoom, panX, panY, resetView, fitToWidth, containerRef };
+  return { zoom, setZoom, panX, panY, resetView, fitToWidth, containerRef, onMapClickCapture };
 }
