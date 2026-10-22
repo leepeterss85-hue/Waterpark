@@ -887,6 +887,10 @@ export function useGameState() {
       setMegaProjects(data.megaProjects ?? []);
       setGuestStories(data.guestStories ?? []);
       setCurrentDestination(data.currentDestination ?? "home_resort");
+    setRideSpecialties(data.rideSpecialties && typeof data.rideSpecialties === "object" && !Array.isArray(data.rideSpecialties) ? data.rideSpecialties : {});
+    const contractClaims = Array.isArray(data.claimedStoryContracts) ? data.claimedStoryContracts.filter(x => STORY_CONTRACTS.some(c => c.id === x)) : [];
+    setClaimedStoryContracts(contractClaims);
+    claimedContractRef.current = new Set(contractClaims);
     if (data.gameMode) setGameMode(data.gameMode);
     if (data.storyStep != null) setStoryStep(data.storyStep);
     if (data.storyCompleted != null) setStoryCompleted(data.storyCompleted);
