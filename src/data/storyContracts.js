@@ -1,15 +1,15 @@
 import { getHotelDef, hotelAmenities } from "./hotels.js";
 // Optional Story Mode objectives added without altering saved story-step indices.
 export const STORY_CONTRACTS = Object.freeze([
-  { id: "maya_family_bay", title: "Maya: Open Family Bay", chapter: 4, goal: "Place three attractions in Family zones", metric: "familyBay", target: 3, narrative: "Our next chapter starts with a welcoming new themed area. Use Zones to mark Family tiles, then build rides for the whole family.", reward: { money: 10000, xp: 450 } },
-  { id: "maya_bay_upgrade", title: "Maya: Make It Shine", chapter: 4, prerequisite: "maya_family_bay", goal: "Upgrade three attractions in Family Bay", metric: "familyUpgrades", target: 3, narrative: "The bay is open! Select its rides and improve their capacity before the next rush.", reward: { money: 14000, xp: 600 } },
-  { id: "maya_bay_holiday", title: "Maya: Stay for the Weekend", chapter: 4, prerequisite: "maya_bay_upgrade", goal: "Open a hotel with a restaurant", metric: "hotelRestaurant", target: 1, narrative: "Give families a reason to stay. Build Family Suites, or upgrade your Budget Inn to level 3.", reward: { money: 18000, xp: 800 } },
-  { id: "maya_bay_finale", title: "Maya: Family Bay Celebration", chapter: 4, prerequisite: "maya_bay_holiday", goal: "Launch an Evening Pool Party", metric: "bayParty", target: 1, narrative: "Celebrate the district opening with an evening pool party from Events. Keep your lifeguards on duty!", reward: { money: 22000, xp: 1000 } },
   { id: "splash_starter", title: "The Big Splash", chapter: 1, goal: "Build three attractions", metric: "attractions", target: 3, reward: { money: 2500, xp: 130 } },
   { id: "happy_guests", title: "Five-Star Smiles", chapter: 2, goal: "Reach 75 guest happiness", metric: "guestMood", target: 75, reward: { money: 4500, xp: 220 } },
   { id: "ride_engineer", title: "Ride Designer", chapter: 3, goal: "Complete three park upgrades", metric: "upgrades", target: 3, reward: { money: 6000, xp: 280 } },
   { id: "guest_voice", title: "Word Gets Around", chapter: 8, goal: "Collect ten guest reviews", metric: "reviews", target: 10, reward: { money: 12000, xp: 420 } },
   { id: "resort_regulars", title: "Return for More", chapter: 12, goal: "Welcome twenty members", metric: "members", target: 20, reward: { money: 18000, xp: 600 } },
+  { id: "maya_family_bay", title: "Maya: Open Family Bay", chapter: 4, goal: "Place three attractions in Family zones", metric: "familyBay", target: 3, narrative: "Our next chapter starts with a welcoming new themed area. Use Zones to mark Family tiles, then build rides for the whole family.", reward: { money: 10000, xp: 450 } },
+  { id: "maya_bay_upgrade", title: "Maya: Make It Shine", chapter: 4, prerequisite: "maya_family_bay", goal: "Upgrade three attractions in Family Bay", metric: "familyUpgrades", target: 3, narrative: "The bay is open! Select its rides and improve their capacity before the next rush.", reward: { money: 14000, xp: 600 } },
+  { id: "maya_bay_holiday", title: "Maya: Stay for the Weekend", chapter: 4, prerequisite: "maya_bay_upgrade", goal: "Open a hotel with a restaurant", metric: "hotelRestaurant", target: 1, narrative: "Give families a reason to stay. Build Family Suites, or upgrade your Budget Inn to level 3.", reward: { money: 18000, xp: 800 } },
+  { id: "maya_bay_finale", title: "Maya: Family Bay Celebration", chapter: 4, prerequisite: "maya_bay_holiday", goal: "Launch an Evening Pool Party", metric: "bayParty", target: 1, narrative: "Celebrate the district opening with an evening pool party from Events. Keep your lifeguards on duty!", reward: { money: 22000, xp: 1000 } },
 ]);
 
 export function contractProgress(contract, game = {}) {
