@@ -29,7 +29,7 @@
 .park-speed-picker button { min-height: 36px; padding: .375rem .625rem; border: 0; background: transparent; }
 .park-speed-picker button[aria-pressed="true"] { background: hsl(var(--park-rim)); color: hsl(var(--park-ink)); }
 .park-menu-bar { position: relative; width: 100%; flex-shrink: 0; background: linear-gradient(115deg, hsl(var(--park-ink)), hsl(var(--park-deep))); color: hsl(var(--park-rim)); border-top: 1px solid hsl(var(--park-rim) / .18); }
-.park-menu-row { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: .25rem; padding: .5rem .5rem max(.5rem, env(safe-area-inset-bottom)); }
+.park-menu-row { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .25rem; padding: .5rem .5rem max(.5rem, env(safe-area-inset-bottom)); }
 .park-menu-button { position: relative; display: flex; min-width: 0; min-height: 52px; flex-direction: column; align-items: center; justify-content: center; gap: .25rem; padding: .25rem .125rem; border-radius: .75rem; }
 .park-menu-icon { width: 1.5rem; height: 1.5rem; flex-shrink: 0; }
 .park-menu-label { font-size: .75rem; font-weight: 700; line-height: 1.25; white-space: nowrap; }
