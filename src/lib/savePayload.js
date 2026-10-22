@@ -5,7 +5,7 @@
 export const SAVE_FIELDS = [
   "money", "day", "reputation", "guests", "grid", "parkZones", "history", "sandbox",
   "staff", "staffAssignments", "attractionCondition", "log", "lastNet",
-  "incidents", "upgrades", "xp", "expansionsDone", "peakGuests", "totalUpgrades",
+  "incidents", "upgrades", "rideSpecialties", "claimedStoryContracts", "xp", "expansionsDone", "peakGuests", "totalUpgrades",
   "claimedMissions", "challenge", "lifetimeEarnings", "builtAttractionIds",
   "visitorStats", "feedback", "weather", "forecast", "seasonEvent",
   "ticketPrice", "adBudget", "priorityPass", "vipVisit", "researchPoints",
