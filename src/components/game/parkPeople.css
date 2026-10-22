@@ -62,3 +62,30 @@
 .ride-visitors .person-swim-gear { filter:drop-shadow(0 1px 1px rgba(9,34,45,.18)); }
 .resort-finish[data-graphics="balanced"] .park-guest,
 .resort-finish[data-graphics="balanced"] .park-staff { animation:none!important; }
+
+/* Real-time speech bubbles summarise today's measured satisfaction, queues and
+   safety. Limited to one simulated guest so the map stays legible on Android. */
+.guest-reaction-bubble {
+  position:absolute; left:50%; bottom:calc(100% - 9px);
+  transform:translateX(-50%);
+  z-index:35; display:block; width:max-content; max-width:115px;
+  white-space:normal; padding:5px 7px; border:1px solid #a5f3fc;
+  border-radius:10px 10px 10px 2px;
+  background:rgba(240,253,255,.97); color:#164e63;
+  font-size:8px; font-weight:850; line-height:1.35; text-align:center;
+  box-shadow:0 2px 5px rgba(8,47,73,.15);
+  pointer-events:none;
+}
+.guest-reaction-bubble[data-tone="delighted"],
+.guest-reaction-bubble[data-tone="happy"] {
+  background:rgba(236,253,245,.97); color:#065f46; border-color:#86efac;
+}
+.guest-reaction-bubble[data-tone="concerned"] {
+  background:rgba(255,251,235,.97); color:#92400e; border-color:#fcd34d;
+}
+@media(max-width:560px) {
+  .guest-reaction-bubble { max-width:86px; padding:3px 5px; font-size:7px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .guest-reaction-bubble { animation:none!important; transition:none!important; }
+}
