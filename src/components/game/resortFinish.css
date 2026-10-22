@@ -115,6 +115,49 @@
   color:#365314; border-color:#d9f99d; background:#ecfccb;
 }
 
+/* A five-button camera strip stays usable on narrow Android phones.
+   The map, not chrome, gets the available vertical space. */
+.resort-finish .park-camera-toolbar {
+  display:flex; align-items:center; justify-content:space-between; gap:.5rem;
+}
+.resort-finish .park-camera-actions > button { flex-shrink:0; }
+@media(max-width:560px) {
+  .resort-finish .park-camera-toolbar {
+    position:relative; display:flex; align-items:stretch; justify-content:stretch;
+    padding:5px 6px; gap:0; flex-wrap:nowrap;
+  }
+  .resort-finish .park-map-heading {
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip-path:inset(50%); white-space:nowrap;
+  }
+  .resort-finish .park-camera-actions {
+    width:100%; min-width:0; display:grid;
+    grid-template-columns:minmax(0,1.25fr) minmax(0,1fr) 38px 48px 38px;
+    justify-content:stretch; gap:3px; padding:3px;
+  }
+  .resort-finish .park-camera-actions > button {
+    min-width:0; min-height:40px; width:100%; padding:0 3px;
+    border-radius:9px; touch-action:manipulation;
+  }
+  .resort-finish .game-map-surface {
+    overscroll-behavior:contain; -webkit-overflow-scrolling:touch;
+  }
+}
+@media(max-width:350px) {
+  .resort-finish .park-camera-actions {
+    grid-template-columns:minmax(0,1fr) minmax(0,.85fr) 33px 44px 33px;
+    gap:2px;
+  }
+  .resort-finish .park-camera-actions > button { font-size:10px; }
+}
+.resort-finish .game-map-grid > button:focus-visible {
+  outline:3px solid #fef08a; outline-offset:-2px;
+  box-shadow:0 0 0 3px #0891b2aa !important;
+}
+.resort-finish[data-graphics="ultra"] .game-map-grid > button[data-buildable="true"] {
+  box-shadow:inset 0 0 0 2px #a5f3fc99,0 2px 9px #0891b255 !important;
+}
+
 /* Ultra enhances existing vector artwork without heavier 3D engines.
    Keep the highest-resolution SVG detail and layered lighting switched on. */
 .resort-finish[data-graphics="ultra"] .aquatic-ride-art {
