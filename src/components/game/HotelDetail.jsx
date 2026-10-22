@@ -72,6 +72,16 @@ export default function HotelDetail({ hotelDef, level, occupancy, guestsInHotel,
         <p className="mt-1 text-[10px] font-semibold text-slate-400">Base {hotelDef.baseHappiness} + amenities {amenityBonus} + upgrades {level * 3} = {Math.min(100, hotelDef.baseHappiness + amenityBonus + level * 3)}%</p>
       </div>
 
+      {!maxed && <div className="rounded-xl bg-cyan-50 p-3 text-xs text-cyan-950">
+        <h4 className="font-black">Next level · £{upgCost.toLocaleString("en-GB")}</h4>
+        <p>Rooms: {rooms} → {hotelRooms(hotelDef, level + 1)}</p>
+        <p>Base room rate: £{roomPrice} → £{hotelRoomPrice(hotelDef, level + 1)}/night</p>
+        <p>Daily upkeep: £{Math.round(hotelDef.maintenance * (1 + level * 0.1))} → £{Math.round(hotelDef.maintenance * (1 + (level + 1) * 0.1))}</p>
+        <p>New amenities: {hotelAmenities(hotelDef, level + 1).filter(a => !amenities.includes(a)).map(a => HOTEL_AMENITIES[a]?.name).join(", ") || "More rooms and improved room quality"}</p>
+        <p className="mt-2 font-bold">Hotel journey</p>
+        <p>{hotelDef.tier === "budget" ? "Level 2: pool · Level 3: restaurant · Level 4: gym · Level 6: luxury pool" : hotelDef.tier === "family" ? "Level 3: spa and gym · Level 6: luxury pool" : "Level 2: luxury pool"}</p>
+        <p className="mt-1 text-[10px]">Room revenue depends on occupancy and your pricing settings.</p>
+      </div>}
       <div className="flex gap-2">
         {!maxed ? (
           <button

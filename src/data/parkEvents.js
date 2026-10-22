@@ -12,6 +12,8 @@ export const EVENT_CATEGORIES = [
 ];
 
 export const MAJOR_EVENTS = [
+  { id: "busy_weekend", name: "Big Weekend", category: "promotion", icon: "Users", cost: 2000, duration: 2, guestMult: 1.30, incomeMult: 1.08, repDelta: 0.4, minLevel: 1, seasons: ["spring","summer","autumn","winter"], revenuePerDay: 0, description: "Welcome the weekend crowds. Pair with the Weekend Rush timed challenge.", requires: [], minAttractions: 2, downside: { rideWearMult: 1.25, label: "+25% ride wear from weekend crowds" } },
+  { id: "evening_pool_party", name: "Evening Pool Party", category: "night", icon: "Moon", cost: 2500, duration: 2, guestMult: 1.22, incomeMult: 1.18, repDelta: 0.6, minLevel: 1, seasons: ["spring","summer","autumn","winter"], revenuePerDay: 0, description: "Celebrate your new district with an evening pool party. Try the Party Planner timed challenge.", requires: ["wave_pool","kiddie_pool","lap_sports_pool","lazy_river"], requireMode: "any", downside: { minStaff: 2, minLifeguards: 2, label: "Needs 2 lifeguards for safe evening swimming" } },
   // Summer events
   { id: "summer_splash_festival", name: "Summer Splash Festival", category: "summer", icon: "Sun", cost: 8000, duration: 5, guestMult: 1.45, incomeMult: 1.15, repDelta: 1.2, minLevel: 2, seasons: ["summer"], revenuePerDay: 0, description: "A week-long celebration with music, games and special pool activities.", requires: ["wave_pool", "splash_pad"], requireMode: "any", downside: { rideWearMult: 1.5, label: "+50% ride wear from heavy use" } },
   { id: "tropical_weekend", name: "Tropical Paradise Weekend", category: "summer", icon: "Umbrella", cost: 5000, duration: 3, guestMult: 1.30, incomeMult: 1.10, repDelta: 0.8, minLevel: 1, seasons: ["summer", "spring"], revenuePerDay: 0, description: "Bring the island vibe with tropical decorations and themed drinks.", requires: ["dining", "beach_bar"], requireMode: "any", downside: { foodDepleteMult: 1.4, label: "Food stock depletes 40% faster" } },
@@ -102,6 +104,9 @@ export function checkEventRequirements(event, grid, staff = {}) {
     }
   }
 
+  if (event.downside?.minLifeguards && (staff.lifeguard || 0) < event.downside.minLifeguards) {
+    missing.push("Needs " + event.downside.minLifeguards + " lifeguards on duty");
+  }
   // Minimum staff
   if (event.downside?.minStaff) {
     const totalStaff = Object.values(staff).reduce((s, n) => s + (n || 0), 0);

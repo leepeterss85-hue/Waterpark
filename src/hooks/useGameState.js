@@ -1092,10 +1092,11 @@ export function useGameState() {
     if (gameMode !== "story" || claimedContractRef.current.has(contractId)) return false;
     const contract = STORY_CONTRACTS.find((entry) => entry.id === contractId);
     const chapter = STORY_STEPS[storyStep]?.chapter || 1;
-    if (!contract || chapter < contract.chapter) return false;
+    if (!contract || chapter < contract.chapter || (contract.prerequisite && !claimedContractRef.current.has(contract.prerequisite))) return false;
     const progress = contractProgress(contract, {
       missionState: { attractionCount: grid.filter((id) => getParkItem(id)?.category === "attraction").length },
-      visitorStats, totalUpgrades, visitorReviews, membershipCounts,
+      visitorStats, totalUpgrades, visitorReviews, membershipCounts, grid, parkZones, upgrades, activeEvents,
+      attractionIds: grid.filter(id => getParkItem(id)?.category === "attraction"),
     });
     if (!progress.complete) return false;
     claimedContractRef.current.add(contractId);
@@ -1106,7 +1107,7 @@ export function useGameState() {
     sound.mission();
     trackEvent("story_bonus_contract_claimed", { id: contractId });
     return true;
-  }, [gameMode, storyStep, grid, visitorStats, totalUpgrades, visitorReviews, membershipCounts, day]);
+  }, [gameMode, storyStep, grid, visitorStats, totalUpgrades, visitorReviews, membershipCounts, day, parkZones, upgrades, activeEvents]);
 
   useEffect(() => {
     if (gameMode !== "story" || storyCompleted) return;
@@ -1446,7 +1447,7 @@ export function useGameState() {
     parkZones, selectedZone, selectedBuild, selectedTile, lastNet, log, history,
     staff, staffAssignments, assignStaff, incidents, attractionCondition, upgrades, rideSpecialties, upgradeAttraction,
     level, xp, xpForNext: xpForLevel(level), applyCheat,
-    gameMode, storyStep, storyCompleted, STORY_STEPS, claimedStoryContracts, claimStoryContract, setMode, advanceStory, sandboxSettings, updateSandboxSettings, sandboxAction,
+    gameMode, storyStep, storyCompleted, STORY_STEPS, claimedStoryContracts, claimStoryContract, attractionIds: grid.filter(id => getParkItem(id)?.category === "attraction"), setMode, advanceStory, sandboxSettings, updateSandboxSettings, sandboxAction,
     parkStrategy, setParkStrategy, mastery, masteryEffects: masteryEffects(mastery.points), activeScenario, scenarioStatus, completedScenarios, scenarios: PARK_SCENARIOS, selectScenario,
     expansionsDone, gridSize, maxGridSize: MAX_GRID_SIZE, expandPark,
     peakGuests, totalUpgrades, claimedMissions, claimMission,

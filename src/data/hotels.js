@@ -58,6 +58,7 @@ export const HOTEL_TIERS = [
 ];
 
 export const HOTEL_AMENITIES = {
+  luxury_pool: { name: "Luxury Pool", icon: "Waves", happiness: 9 },
   wifi: { name: "WiFi", icon: "Wifi", happiness: 2 },
   parking: { name: "Parking", icon: "Car", happiness: 2 },
   pool: { name: "Pool Access", icon: "Waves", happiness: 5 },
@@ -89,13 +90,13 @@ export function hotelRoomPrice(hotel, level) {
 
 // Amenities available at a given upgrade level (budget/family unlock more as they upgrade)
 export function hotelAmenities(hotel, level) {
-  if (hotel.tier === "luxury") return hotel.amenities;
+  if (hotel.tier === "luxury") return [...new Set([...hotel.amenities, ...(level >= 2 ? ["luxury_pool"] : [])])];
   if (hotel.tier === "family") {
-    const extra = level >= 3 ? ["spa", "gym"] : [];
+    const extra = level >= 6 ? ["spa", "gym", "luxury_pool"] : level >= 3 ? ["spa", "gym"] : [];
     return [...new Set([...hotel.amenities, ...extra])];
   }
   if (hotel.tier === "budget") {
-    const extra = level >= 4 ? ["pool", "gym"] : level >= 2 ? ["pool"] : [];
+    const extra = [...(level >= 2 ? ["pool"] : []), ...(level >= 3 ? ["restaurant"] : []), ...(level >= 4 ? ["gym"] : []), ...(level >= 6 ? ["luxury_pool"] : [])];
     return [...new Set([...hotel.amenities, ...extra])];
   }
   return hotel.amenities;

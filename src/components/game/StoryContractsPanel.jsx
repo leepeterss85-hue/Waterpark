@@ -22,6 +22,7 @@ export default function StoryContractsPanel({ game }) {
           {c.claimed ? <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" /> : <Sparkles className="h-4 w-4 shrink-0 text-indigo-400" />}
         </div>
         <p className="mt-1 text-[11px] text-slate-600">{c.goal}</p>
+        {c.narrative && <p className="mt-1 text-[11px] text-indigo-700">{c.narrative}</p>}
         <div className="mt-2 flex items-center justify-between text-[10px] font-bold text-indigo-700">
           <span>{Math.min(c.current,c.target).toLocaleString("en-GB")} / {c.target.toLocaleString("en-GB")}</span>
           <span>{c.percent}%</span>
@@ -31,11 +32,11 @@ export default function StoryContractsPanel({ game }) {
         </div>
         <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
           <span className="text-[10px] font-bold text-emerald-700">+£{c.reward.money.toLocaleString("en-GB")} · +{c.reward.xp} XP</span>
-          <button type="button" disabled={!c.complete || c.claimed}
+          <button type="button" disabled={!c.complete || c.claimed || c.locked}
             onClick={() => game.claimStoryContract(c.id)}
             className="min-h-9 rounded-lg bg-indigo-600 px-3 text-[11px] font-black text-white disabled:bg-slate-100 disabled:text-slate-500"
             aria-label={c.claimed ? c.title+" claimed" : "Claim reward for "+c.title}>
-            {c.claimed ? "Claimed" : c.complete ? "Claim reward" : "In progress"}
+            {c.locked ? "Finish previous objective" : c.claimed ? "Claimed" : c.complete ? "Claim reward" : "In progress"}
           </button>
         </div>
       </div>)}

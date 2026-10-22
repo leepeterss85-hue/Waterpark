@@ -99,7 +99,13 @@ export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0,
       {!maxed ? (
         <div className="mt-3 rounded-xl bg-sky-50 p-3 ring-1 ring-sky-100">
           <div className="mb-2 text-xs text-slate-500">
-            Next level: <span className="font-semibold text-slate-700">+20% base capacity · +15% base income</span>
+            Next level: <span className="font-semibold text-slate-700">Lv {level + 1}</span>
+            <div className="mt-2 space-y-1 text-xs text-slate-700">
+              <p>Capacity: {effectiveCapacity} → {Math.round((attr.capacity || 0) * (1 + (level + 1) * 0.2) * (1 + rideFocusBonuses(selectedFocus, level + 1).extraCapacity))} riders/day</p>
+              <p>Base upkeep: £{Math.round(attr.maintenance * (1 + level * 0.1))} → £{Math.round(attr.maintenance * (1 + (level + 1) * 0.1))}/day</p>
+              <p>Cost: {sandbox ? "Free in Sandbox" : "£" + cost.toLocaleString("en-GB")} · Balance after: £{Math.round(sandbox ? money : money - cost).toLocaleString("en-GB")}</p>
+              <p className="text-[10px]">Actual income depends on visitors, prices and operating conditions.</p>
+            </div>
           </div>
           {attr.category === "attraction" && <div className="mb-3">
             <p className="mb-2 text-[11px] font-black text-sky-900">Choose this upgrade's focus</p>
