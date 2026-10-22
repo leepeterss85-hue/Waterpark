@@ -1,4 +1,5 @@
 import { useRef, useEffect, useCallback, useState } from "react";
+import { calculateParkFitZoom } from "@/lib/parkCamera";
 
 /**
  * Touch gesture hook for the park map: pinch-to-zoom and drag-to-pan.
@@ -27,7 +28,23 @@ export function useTouchZoom(initialZoom = 1, minZoom = 0.8, maxZoom = 1.5) {
     setZoomState(initialZoom);
     setPanX(0);
     setPanY(0);
+    if (containerRef.current) {
+      containerRef.current.scrollLeft = 0;
+      containerRef.current.scrollTop = 0;
+    }
   }, [initialZoom]);
+
+  const fitToWidth = useCallback(() => {
+    const viewport = containerRef.current;
+    if (!viewport) return;
+    const playfield = viewport.querySelector(".park-playfield");
+    const contentWidth = playfield?.offsetWidth || 704;
+    setZoomState(calculateParkFitZoom(viewport.clientWidth, contentWidth, minZoom, maxZoom));
+    setPanX(0);
+    setPanY(0);
+    viewport.scrollLeft = 0;
+    viewport.scrollTop = 0;
+  }, [minZoom, maxZoom]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -49,6 +66,7 @@ export function useTouchZoom(initialZoom = 1, minZoom = 0.8, maxZoom = 1.5) {
           y: e.touches[0].clientY,
           panX: stateRef.current.panX,
           panY: stateRef.current.panY,
+          engaged: false,
         };
       }
     };
@@ -60,9 +78,12 @@ export function useTouchZoom(initialZoom = 1, minZoom = 0.8, maxZoom = 1.5) {
         const scale = dist / pinchRef.current.dist;
         setZoom(pinchRef.current.zoom * scale);
       } else if (e.touches.length === 1 && dragRef.current) {
-        e.preventDefault();
         const dx = e.touches[0].clientX - dragRef.current.x;
         const dy = e.touches[0].clientY - dragRef.current.y;
+        // A small finger wobble must not steal a tap on a ride or empty plot.
+        if (!dragRef.current.engaged && Math.hypot(dx, dy) < 8) return;
+        dragRef.current.engaged = true;
+        e.preventDefault();
         setPanX(dragRef.current.panX + dx);
         setPanY(dragRef.current.panY + dy);
       }
@@ -85,5 +106,5 @@ export function useTouchZoom(initialZoom = 1, minZoom = 0.8, maxZoom = 1.5) {
     };
   }, [setZoom]);
 
-  return { zoom, setZoom, panX, panY, resetView, containerRef };
+  return { zoom, setZoom, panX, panY, resetView, fitToWidth, containerRef };
 }

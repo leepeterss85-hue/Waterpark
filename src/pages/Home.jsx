@@ -225,6 +225,10 @@ export default function Home() {
           parkZones={game.parkZones}
           upgrades={game.upgrades}
           selectedBuild={game.selectedBuild}
+          money={game.money}
+          sandbox={game.sandbox}
+          onCancelBuild={() => game.setSelectedBuild(null)}
+          onChangeBuild={() => handleOpenMenu("build")}
           selectedTile={game.selectedTile}
           selectedZone={game.selectedZone}
           incidents={game.incidents}

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Footprints, Users, Map as MapIcon, Sparkles } from "lucide-react";
+import { Footprints, Users, Map as MapIcon, Sparkles, Maximize2, Hammer, X, CheckCircle2 } from "lucide-react";
 import { getParkItem } from "@/data/gameData";
 import { getHotelDef, hotelRooms } from "@/data/hotels";
 import Tile from "@/components/game/Tile";
@@ -19,10 +19,12 @@ import "@/components/game/parkChrome.css";
 import "@/components/game/eventOverlay.css";
 import "@/components/game/resortFinish.css";
 
-export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, visitorMovements, queueStats = {}, attractionCondition = [], staff = {}, staffAssignments = {}, lifeguardTotal = 0, day = 1, weather, seasonEvent, hotelGuests = [], activeEvents = [], waterQuality = [], acceptedBookings = [], sponsorships = [], activeStrikes = [], onTileClick, topControls, bottomMenu, statsBar, themeClass = "", mascot = null }) {
-  const { zoom, setZoom, panX, panY, resetView, containerRef } = useTouchZoom(1, 0.8, 2.5);
+export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, visitorMovements, queueStats = {}, attractionCondition = [], staff = {}, staffAssignments = {}, lifeguardTotal = 0, day = 1, weather, seasonEvent, hotelGuests = [], activeEvents = [], waterQuality = [], acceptedBookings = [], sponsorships = [], activeStrikes = [], money = 0, sandbox = false, onCancelBuild, onChangeBuild, onTileClick, topControls, bottomMenu, statsBar, themeClass = "", mascot = null }) {
+  const { zoom, setZoom, panX, panY, resetView, fitToWidth, containerRef } = useTouchZoom(1, 0.35, 2.5);
   const [graphics, setGraphics] = useState(() => { try { return localStorage.getItem("aqua-graphics") === "balanced" ? "balanced" : "rich"; } catch { return "rich"; } });
   const toggleGraphics = () => { const next = graphics === "rich" ? "balanced" : "rich"; setGraphics(next); try { localStorage.setItem("aqua-graphics", next); } catch { /* Storage is optional. */ } };
+  const buildItem = selectedBuild ? getParkItem(selectedBuild) : null;
+  const canAffordBuild = !!buildItem && (sandbox || money >= buildItem.cost);
   const incidentMap = new Map((incidents || []).map((incident) => [incident.tileIndex, incident]));
   const phase = ((day - 1) % 8);
   const timeOfDay = phase <= 1 ? "morning" : phase <= 5 ? "day" : phase === 6 ? "sunset" : "night";
@@ -58,7 +60,19 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
       {(seasonEvent || weatherId === "storm") && <div className={"park-event-ribbon " + (weatherId === "storm" ? "storm" : "")}><Sparkles className="h-3.5 w-3.5" /><span>{weatherId === "storm" ? "THUNDERSTORM — SAFETY MODE" : seasonEvent?.name}</span><b>{weatherId === "storm" ? "Outdoor demand reduced" : seasonEvent?.description}</b></div>}
       {activeEvents.length > 0 && <div className="park-event-ribbon"><Sparkles className="h-3.5 w-3.5 text-amber-300" /><span>{activeEvents.map((e) => e.name).join(" · ")}</span><b>{activeEvents.length} active event{activeEvents.length > 1 ? "s" : ""} — bonuses applied</b></div>}
       <div className="game-board-frame flex flex-1 flex-col min-h-0">
-        <div className="game-map-toolbar"><div className="flex items-center gap-2"><span className="game-map-status"><span /> PARK MAP</span><span className="hidden text-[9px] font-extrabold uppercase tracking-wider text-slate-400 sm:inline">Tap a tile to build or inspect</span></div><div className="flex items-center gap-1 rounded-xl bg-white/95 p-1 shadow-md ring-1 ring-slate-200"><button aria-label="Reduce visual effects" aria-pressed={graphics === "balanced"} title="Toggle detailed or battery-friendly graphics" onClick={toggleGraphics} className="resort-quality-button">{graphics === "rich" ? "Rich" : "Balanced"}</button><button aria-label="Zoom out" onClick={() => setZoom((z) => Math.max(0.8, Number((z - 0.1).toFixed(1))))} className="grid h-7 w-7 place-items-center rounded-lg text-sm font-black text-slate-600 hover:bg-slate-100">−</button><button aria-label="Reset zoom" onClick={resetView} className="min-w-10 rounded-lg px-1.5 py-1 text-[9px] font-extrabold text-slate-500 hover:bg-slate-100">{Math.round(zoom * 100)}%</button><button aria-label="Zoom in" onClick={() => setZoom((z) => Math.min(2.5, Number((z + 0.1).toFixed(1))))} className="grid h-7 w-7 place-items-center rounded-lg text-sm font-black text-slate-600 hover:bg-slate-100">+</button></div></div>
+        <div className="game-map-toolbar"><div className="flex items-center gap-2"><span className="game-map-status"><span /> PARK MAP</span><span className="hidden text-[9px] font-extrabold uppercase tracking-wider text-slate-400 sm:inline">Tap a tile to build or inspect</span></div><div className="flex items-center gap-1 rounded-xl bg-white/95 p-1 shadow-md ring-1 ring-slate-200"><button aria-label="Reduce visual effects" aria-pressed={graphics === "balanced"} title="Toggle detailed or battery-friendly graphics" onClick={toggleGraphics} className="resort-quality-button">{graphics === "rich" ? "Rich" : "Balanced"}</button><button aria-label="Fit park to screen" title="Fit all eight columns to your screen" onClick={fitToWidth} className="resort-quality-button resort-fit-button"><Maximize2 className="h-3.5 w-3.5" />Fit</button><button aria-label="Zoom out" onClick={() => setZoom((z) => Math.max(0.35, Number((z - 0.1).toFixed(2))))} className="grid h-7 w-7 place-items-center rounded-lg text-sm font-black text-slate-600 hover:bg-slate-100">−</button><button aria-label="Reset zoom" onClick={resetView} className="min-w-10 rounded-lg px-1.5 py-1 text-[9px] font-extrabold text-slate-500 hover:bg-slate-100">{Math.round(zoom * 100)}%</button><button aria-label="Zoom in" onClick={() => setZoom((z) => Math.min(2.5, Number((z + 0.1).toFixed(1))))} className="grid h-7 w-7 place-items-center rounded-lg text-sm font-black text-slate-600 hover:bg-slate-100">+</button></div></div>
+        {buildItem && <div className="park-placement-tray" role="status" aria-live="polite">
+          <span className="park-placement-icon"><Hammer className="h-4 w-4" /></span>
+          <span className="min-w-0 flex-1">
+            <strong className="block truncate text-xs">{buildItem.name}</strong>
+            <span className="block truncate text-[10px] text-slate-600">
+              {canAffordBuild ? <>Tap an empty plot to place · {sandbox ? "Sandbox" : `£${buildItem.cost.toLocaleString("en-GB")}`}</> : `Need £${Math.max(0, buildItem.cost - money).toLocaleString("en-GB")} more`}
+            </span>
+          </span>
+          {canAffordBuild && <CheckCircle2 className="hidden h-4 w-4 shrink-0 text-emerald-600 sm:block" />}
+          <button type="button" className="park-placement-action" onClick={onChangeBuild} aria-label="Choose a different item">Change</button>
+          <button type="button" className="park-placement-cancel" onClick={onCancelBuild} aria-label="Cancel placement"><X className="h-4 w-4" /></button>
+        </div>}
         <div ref={containerRef} className="relative flex-1 min-h-0 overflow-auto rounded-[20px] border-[5px] border-[#315f47] bg-[#7aa966] p-2 shadow-[inset_0_0_0_2px_rgba(255,255,255,.15),inset_0_12px_35px_rgba(19,70,44,.18)] sm:p-3 game-map-surface">
           <div className="park-atmosphere" aria-hidden="true"><span className="park-sun" /><span className="park-cloud park-cloud-a" /><span className="park-cloud park-cloud-b" /><span className="park-rain" /><span className="park-lightning" /></div>
           <MapAmbience timeOfDay={timeOfDay} weather={weather} />

@@ -27,3 +27,31 @@
 @media (prefers-reduced-motion:reduce) {
  .resort-finish .game-map-surface *, .resort-finish .game-map-surface *::before, .resort-finish .game-map-surface *::after { animation:none !important; transition:none !important; }
 }
+
+/* Android-like camera and builder affordances. Kept in the board flow so
+   neither the map nor the bottom tabs are obscured by overlays. */
+.resort-fit-button { display:inline-flex; align-items:center; justify-content:center; gap:.3rem; }
+.park-placement-tray {
+  display:flex; flex-shrink:0; gap:.5rem; align-items:center; min-width:0;
+  padding:.45rem .6rem; background:linear-gradient(105deg,#e0fbf5,#f0fbfe);
+  border-top:1px solid #9edbd6; border-bottom:1px solid #b4e3e7; color:#123e4c;
+}
+.park-placement-icon {
+  display:grid; place-items:center; flex-shrink:0; width:34px; height:34px;
+  background:#0e7490; color:white; border-radius:11px; box-shadow:inset 0 1px #ffffff55;
+}
+.park-placement-action,.park-placement-cancel {
+  display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;
+  min-height:40px; border-radius:10px; font-size:11px; font-weight:850;
+  touch-action:manipulation;
+}
+.park-placement-action { padding:0 .65rem; color:white; background:#0e7490; }
+.park-placement-cancel { width:40px; color:#155e75; background:white; border:1px solid #b9dfe3; }
+.park-placement-action:focus-visible,.park-placement-cancel:focus-visible {
+  outline:2px solid #0891b2; outline-offset:2px;
+}
+@media(max-width:450px) {
+  .resort-finish .game-map-toolbar button { min-width:36px; min-height:38px; }
+  .resort-finish .game-map-toolbar { gap:3px; }
+  .resort-quality-button { padding:0 7px; }
+}
