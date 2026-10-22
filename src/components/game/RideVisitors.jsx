@@ -16,7 +16,7 @@ export default function RideVisitors({ attr, guests, movement, incident, queueWa
   return <svg className="ride-visitors" viewBox="0 0 100 100" aria-label={`Guests using ${attr.name}`} role="img" data-ride-visitors={attr.id}>
     {queueWait > 0 && <g data-activity="queueing">
       <path d="M8 87L8 63L18 63" fill="none" stroke="#e2e8f0" strokeWidth="2" />
-      {Array.from({length:Math.min(reduced ? 2 : 4,Math.ceil(queueWait/6))},(_,i)=><g key={i} transform={\`translate(8 \${83-i*7})\`}>
+      {Array.from({length:Math.min(reduced ? 2 : 4,Math.ceil(queueWait/6))},(_,i)=><g key={i} transform={`translate(8 ${83-i*7})`}>
         <PersonSprite activity="waiting" variant={i+5} x={-6} y={-10} width={12} height={17}/>
       </g>)}
     </g>}
@@ -33,13 +33,13 @@ export default function RideVisitors({ attr, guests, movement, incident, queueWa
         const start=coords.slice(0,2), end=coords.slice(-2);
         const cycle=10+i*2;
         // One rider waits at the gate, boards, rides, then exits at the splash pool.
-        const route=\`M8 87L8 63L\${start[0]} \${start[1]}\`+path.replace(/^M[-\d.]+[ ,]+[-\d.]+/,"");
+        const route=`M8 87L8 63L${start[0]} ${start[1]}`+path.replace(/^M[-\d.]+[ ,]+[-\d.]+/,"");
         return <React.Fragment key={path}>
-          <g className="ride-visitor" data-activity="boarding-and-sliding" transform={reduced ? \`translate(\${start[0]} \${start[1]})\` : undefined}>
+          <g className="ride-visitor" data-activity="boarding-and-sliding" transform={reduced ? `translate(${start[0]} ${start[1]})` : undefined}>
             {!reduced && <animateMotion path={route} dur={cycle+"s"} begin={-i*3+"s"} keyPoints="0;0;1;1" keyTimes="0;0.2;0.85;1" calcMode="linear" repeatCount="indefinite" />}
             <PersonSprite activity="sliding" variant={i} x={-8} y={-11} width={16} height={22}/>
           </g>
-          <g transform={\`translate(\${end[0]} \${end[1]})\`} data-activity="splashdown">
+          <g transform={`translate(${end[0]} ${end[1]})`} data-activity="splashdown">
             <ellipse rx="7" ry="3" fill="none" stroke="#fff" strokeWidth="1.6" opacity={reduced ? .6 : 0}>
               {!reduced && <animate attributeName="opacity" values="0;0;0.9;0" keyTimes="0;0.8;0.86;1" dur={cycle+"s"} begin={-i*3+"s"} repeatCount="indefinite"/>}
               {!reduced && <animate attributeName="rx" values="2;2;10;14" keyTimes="0;0.8;0.86;1" dur={cycle+"s"} begin={-i*3+"s"} repeatCount="indefinite"/>}
