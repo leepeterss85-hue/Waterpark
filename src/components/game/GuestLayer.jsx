@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { getParkItem } from "@/data/gameData";
 import { isWaterAttraction } from "@/data/waterQuality";
 import PersonSprite from "@/components/game/PersonSprite";
+import { parkGuestReaction } from "@/data/guestReactions";
 
 const STAFF_ROLES = [
   { id: "lifeguard", color: "bg-red-500", label: "Lifeguard" },
@@ -14,13 +15,15 @@ const STAFF_ROLES = [
   { id: "zookeeper", color: "bg-emerald-700", label: "Zookeeper" },
 ];
 
-export default function GuestLayer({ grid, parkZones = [], guests = 0, movements = {}, queueStats = {}, staff = {}, staffAssignments = {}, incidents = [], attractionCondition = [], hotelGuests = [] }) {
+export default function GuestLayer({ grid, parkZones = [], guests = 0, avgMood = 0, waterQualityAvg = 100, movements = {}, queueStats = {}, staff = {}, staffAssignments = {}, incidents = [], attractionCondition = [], hotelGuests = [] }) {
   const [tick, setTick] = useState(0);
   useEffect(() => { const timer = setInterval(() => setTick(value => value + 1), 1600); return () => clearInterval(timer); }, []);
   const rows = Math.max(1, Math.ceil(grid.length / 8));
   const targets = useMemo(() => grid.map((id, index) => id ? { index, id, attr: getParkItem(id) } : null).filter(Boolean), [grid]);
   const closed = new Set(incidents.filter(incident => incident.type === "breakdown").map(incident => incident.tileIndex));
   const destinations = targets.filter(target => target.attr?.category !== "environment" && !closed.has(target.index) && (movements[target.id] || 0) > 0);
+  const longestQueue = Object.values(queueStats || {}).reduce((best, candidate) => Number(candidate?.wait || 0) > Number(best?.wait || 0) ? candidate : best, null);
+  const guestReaction = parkGuestReaction({ guests, avgMood, longestQueue, waterQuality: waterQualityAvg, incidents: incidents.length });
   const entrance = targets.find(target => target.id === "park_entrance")?.index ?? Math.max(0, grid.length - 8);
   const entry = { x: entrance % 8 + .5, y: Math.floor(entrance / 8) + .65 };
   const position = (x, y) => ({ left: x / 8 * 100 + "%", top: y / rows * 100 + "%" });
@@ -37,7 +40,7 @@ export default function GuestLayer({ grid, parkZones = [], guests = 0, movements
       isFood && phase >= 4 && phase <= 7 ? "eating" :
       isRelax && phase >= 4 && phase <= 7 ? "resting" :
       phase >= 4 && phase <= 7 ? "waiting" : "walking";
-    return <span key={"g" + i} className="park-pedestrian park-guest" data-activity={activity} data-destination={target.id} data-guest-activity={activity} style={position(spot.x + (i % 3 - 1) * .18, spot.y)} title={`Guest ${activity === "waiting" ? "visiting" : "heading to"} ${target.attr.name}`}><PersonSprite activity={activity} variant={i} /></span>;
+    return <span key={"g" + i} className="park-pedestrian park-guest" data-activity={activity} data-destination={target.id} data-guest-activity={activity} style={position(spot.x + (i % 3 - 1) * .18, spot.y)} title={`Guest ${activity === "waiting" ? "visiting" : "heading to"} ${target.attr.name}`}><PersonSprite activity={activity} variant={i} />{i === 0 && guestReaction && <span className="guest-reaction-bubble" data-tone={guestReaction.tone} title={guestReaction.reason}>{guestReaction.text}</span>}</span>;
   });
   const personnel = STAFF_ROLES.flatMap((role, roleIndex) => {
     const assignment = staffAssignments[role.id] || "";
