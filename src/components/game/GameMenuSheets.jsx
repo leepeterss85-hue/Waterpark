@@ -55,7 +55,6 @@ import CampaignChaptersPanel from "@/components/game/CampaignChaptersPanel";
 import EmpireExpansionPanel from "@/components/game/EmpireExpansionPanel";
 import AdvancedParkPanel from "@/components/game/AdvancedParkPanel";
 import GameModePanel from "@/components/game/GameModePanel";
-import StoryCoach from "@/components/game/StoryCoach";
 import SandboxLabPanel from "@/components/game/SandboxLabPanel";
 import AnnualReportPanel from "@/components/game/AnnualReportPanel";
 import ParkMenuHub from "@/components/game/ParkMenuHub";
@@ -90,7 +89,6 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet }) {
 
   return (
     <>
-      <StoryCoach game={game} setOpenSheet={setOpenSheet} />
       <SheetShell open={openSheet === "mastery"} onOpenChange={(v) => !v && close()} title="Park Mastery" icon={Trophy} width="sm:max-w-xl"><ParkMasteryPanel game={game} /></SheetShell>
       <SheetShell open={openSheet === "overview"} onOpenChange={(v) => !v && close()} title="Park Overview" icon={BarChart3} width="sm:max-w-xl">
         <ParkOverviewPanel game={game} onOpen={setOpenSheet} />

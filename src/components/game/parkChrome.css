@@ -116,3 +116,36 @@
   0%, 100% { box-shadow: 0 0 0 3px rgba(34,211,238,.9), 0 0 18px 4px rgba(34,211,238,.5); }
   50% { box-shadow: 0 0 0 5px rgba(34,211,238,1), 0 0 28px 8px rgba(34,211,238,.7); }
 }
+/* Story Mode guidance is a compact integrated board row, never a screen-blocking overlay. */
+.aquatic-map .story-coach-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .35rem .65rem;
+  flex-shrink: 0;
+  min-width: 0;
+  padding: .5rem .75rem;
+  background: linear-gradient(105deg, rgba(240,253,250,.97), rgba(224,247,255,.98));
+  border-block: 1px solid rgba(14,116,144,.19);
+}
+.story-coach-toggle,
+.story-coach-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .35rem;
+  min-height: 36px;
+  border: 1px solid rgba(8,145,178,.28);
+  border-radius: .7rem;
+  color: #155e75;
+  background: #ffffff;
+  font-weight: 800;
+}
+.story-coach-toggle { min-width: 38px; padding: .4rem; }
+.story-coach-cta { padding: .45rem .7rem; font-size: .75rem; }
+.story-coach-toggle:focus-visible,
+.story-coach-cta:focus-visible { outline: 2px solid #0891b2; outline-offset: 2px; }
+@media (hover:hover) {
+  .story-coach-toggle:hover,
+  .story-coach-cta:hover { background: #ecfeff; }
+}

@@ -12,6 +12,7 @@ import GameControls from "@/components/game/GameControls";
 import ChallengeBanner from "@/components/game/ChallengeBanner";
 import MapMenuBar from "@/components/game/MapMenuBar";
 import GameMenuSheets from "@/components/game/GameMenuSheets";
+import StoryCoach from "@/components/game/StoryCoach";
 import { TileDetailPanel } from "@/components/game/TileDetail";
 import ParkObjectDetail from "@/components/game/ParkObjectDetail";
 import ZooDetailPanel from "@/components/game/ZooDetailPanel";
@@ -255,6 +256,7 @@ export default function Home() {
                 onAdvance={() => { trackEvent("day_advanced", { source: "manual" }); game.advanceDay(); }}
                 onReset={game.resetGame}
               />
+              <StoryCoach game={game} setOpenSheet={handleOpenMenu} />
               {game.challenge && <div className="park-game-notice"><ChallengeBanner challenge={game.challenge} /></div>}
               {game.vipVisit && <VipBanner vipVisit={game.vipVisit} />}
               {game.disaster && <DisasterBanner disaster={game.disaster} />}
