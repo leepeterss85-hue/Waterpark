@@ -55,3 +55,31 @@
   .resort-finish .game-map-toolbar { gap:3px; }
   .resort-quality-button { padding:0 7px; }
 }
+
+/* Resort lighting pass: clipping is owned by PoolWaterSurface. Lightweight
+   vector glints; only one grouped transform is animated in Rich mode. */
+.resort-finish .water-sun-sweep { opacity:.34; transform-box:fill-box; transform-origin:center; }
+.resort-finish .water-sun-ray { fill:#f8ffff; opacity:.28; }
+.resort-finish .water-sun-ray-main { opacity:.48; }
+.resort-finish .water-sun-ray-small { opacity:.2; }
+.resort-finish .water-sun-ray-tiny { opacity:.12; }
+.resort-finish[data-graphics="rich"] .water-sun-sweep { animation:resort-water-glide 10s ease-in-out infinite alternate; }
+.resort-finish.park-time-sunset .water-sun-ray { fill:#ffdfaa; }
+.resort-finish.park-time-night .water-sun-sweep { opacity:.09; }
+.resort-finish.park-time-night .aquatic-ride-art .pool-water-surface {
+  filter:saturate(1.05) brightness(.78) !important;
+}
+.resort-finish.park-time-night .aquatic-ride-art .ride-river-glint {
+  stroke:#83fff2; opacity:.8;
+}
+.resort-finish.park-time-night .game-map-grid > button[data-kind="attraction"] {
+  box-shadow:0 3px 0 #355467,0 5px 12px #10304066 !important;
+}
+.resort-finish[data-graphics="balanced"] .water-sun-sweep { display:none !important; }
+@keyframes resort-water-glide {
+  0% { transform:translate(-7px,-2px); opacity:.14; }
+  100% { transform:translate(8px,3px); opacity:.48; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .resort-finish .water-sun-sweep { animation:none !important; opacity:.2; }
+}

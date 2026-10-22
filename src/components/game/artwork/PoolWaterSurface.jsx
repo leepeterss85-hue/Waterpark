@@ -28,6 +28,11 @@ export default function PoolWaterSurface({ path, river = false }) {
       <rect x="-22" y="-18" width="144" height="136" fill={`url(#${id}-caustics)`} className="water-caustic-drift" />
       {!river && <path d={path} className="water-pool-wall" />}
       <rect width="100" height="100" fill={`url(#${id}-sky)`} />
+      <g className="water-sun-sweep" aria-hidden="true">
+        <path d="M-24 5L-13 5L42 104L30 104Z" className="water-sun-ray water-sun-ray-main" />
+        <path d="M-4 -12L2 -12L60 105L53 105Z" className="water-sun-ray water-sun-ray-small" />
+        <path d="M50 -15L55 -15L109 94L103 94Z" className="water-sun-ray water-sun-ray-tiny" />
+      </g>
       <g className="water-reflections">
         <path d="M8 33Q20 29 32 32M38 27Q47 24 56 26M59 45Q69 42 82 45M16 66Q24 64 32 66M48 74Q57 71 65 73" className="water-reflection-soft" />
         <path d="M13 32Q21 30 28 32M40 26L48 25M64 44Q71 43 77 45M51 73L58 72" className="water-reflection-bright" />
