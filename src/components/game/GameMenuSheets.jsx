@@ -1,3 +1,4 @@
+import ResortChapter from "@/components/game/ResortChapter";
 import TimedChallengesPanel from "@/components/game/TimedChallengesPanel";
 import React from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
@@ -151,6 +152,7 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet, graphics
       </SheetShell>
 
       <SheetShell open={openSheet === "resort"} onOpenChange={(v) => !v && close()} title="Resort" icon={Hotel} width="sm:max-w-md">
+        <ResortChapter game={game} onOpen={setOpenSheet} />
         <ResortPanel resortRating={game.resortRating} hotelStats={game.hotelStats} hotels={game.hotels} upgrades={game.upgrades} grid={game.grid} guests={game.guests} reputation={game.reputation} />
       </SheetShell>
 

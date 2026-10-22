@@ -103,7 +103,7 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
                 return <Tile graphicsQuality={graphics} key={index} index={index} grid={grid} zone={parkZones?.[index]} upgradeLevel={upgrades?.[index] || 0} value={value} selectedBuild={selectedBuild} expansionTheme={expansionTheme} isSelected={selectedTile === index} incident={incidentMap.get(index)} condition={attractionCondition?.[index]} queueWait={queueWait} queueConnected={queueConnected} movement={movement} guests={guests} facilityStatus={facilityStatus} timeOfDay={timeOfDay} nightSwim={seasonEvent?.id === "night_swim"} hotelOccupancy={hotelOcc} hotelRoomsTotal={hotelRm} waterQuality={waterQuality?.[index]} onClick={() => onTileClick(index)} />;
               })}
             </div>
-            <GuestLayer grid={grid} parkZones={parkZones} guests={guests} avgMood={avgMood} waterQualityAvg={waterQualityAvg} movements={visitorMovements} queueStats={queueStats} staff={staff} staffAssignments={staffAssignments} incidents={incidents || []} attractionCondition={attractionCondition} hotelGuests={hotelGuests} />
+            <GuestLayer graphicsQuality={graphics} grid={grid} parkZones={parkZones} guests={guests} avgMood={avgMood} waterQualityAvg={waterQualityAvg} movements={visitorMovements} queueStats={queueStats} staff={staff} staffAssignments={staffAssignments} incidents={incidents || []} attractionCondition={attractionCondition} hotelGuests={hotelGuests} />
             <GroupArrivalIndicator acceptedBookings={acceptedBookings} entranceIndex={entranceIndex} rows={Math.ceil(grid.length / 8)} />
             {mascot && <MascotSprite mascot={mascot} grid={grid} />}
           </div></div>

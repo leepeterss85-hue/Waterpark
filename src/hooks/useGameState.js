@@ -976,7 +976,7 @@ export function useGameState() {
   const beginTimedChallenge = useCallback((id) => {
     const def = TIMED_CHALLENGES.find(c => c.id === id);
     const runs = timedRef.current;
-    if (!canStartTimedChallenge(def, runs)) return false;
+    if (!canStartTimedChallenge(def, runs, stateRef.current)) return false;
     const next = {...runs, [id]: startTimedChallenge(def, stateRef.current)};
     timedRef.current = next; setTimedChallenges(next);
     return true;

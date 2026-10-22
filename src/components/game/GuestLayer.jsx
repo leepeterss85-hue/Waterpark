@@ -1,3 +1,5 @@
+import { guestJourney } from "@/data/guestJourney";
+import { useReducedMotion } from "framer-motion";
 import React, { useEffect, useMemo, useState } from "react";
 import { getParkItem } from "@/data/gameData";
 import { isWaterAttraction } from "@/data/waterQuality";
@@ -15,9 +17,10 @@ const STAFF_ROLES = [
   { id: "zookeeper", color: "bg-emerald-700", label: "Zookeeper" },
 ];
 
-export default function GuestLayer({ grid, parkZones = [], guests = 0, avgMood = 0, waterQualityAvg = 100, movements = {}, queueStats = {}, staff = {}, staffAssignments = {}, incidents = [], attractionCondition = [], hotelGuests = [] }) {
+export default function GuestLayer({ graphicsQuality = "ultra", grid, parkZones = [], guests = 0, avgMood = 0, waterQualityAvg = 100, movements = {}, queueStats = {}, staff = {}, staffAssignments = {}, incidents = [], attractionCondition = [], hotelGuests = [] }) {
   const [tick, setTick] = useState(0);
-  useEffect(() => { const timer = setInterval(() => setTick(value => value + 1), 1600); return () => clearInterval(timer); }, []);
+  const reducedMotion = useReducedMotion();
+  useEffect(() => { if(reducedMotion) return; const timer = setInterval(() => setTick(value => value + 1), graphicsQuality === "balanced" ? 3200 : 1600); return () => clearInterval(timer); }, [reducedMotion, graphicsQuality]);
   const rows = Math.max(1, Math.ceil(grid.length / 8));
   const targets = useMemo(() => grid.map((id, index) => id ? { index, id, attr: getParkItem(id) } : null).filter(Boolean), [grid]);
   const closed = new Set(incidents.filter(incident => incident.type === "breakdown").map(incident => incident.tileIndex));
@@ -25,22 +28,19 @@ export default function GuestLayer({ grid, parkZones = [], guests = 0, avgMood =
   const longestQueue = Object.values(queueStats || {}).reduce((best, candidate) => Number(candidate?.wait || 0) > Number(best?.wait || 0) ? candidate : best, null);
   const guestReaction = parkGuestReaction({ guests, avgMood, longestQueue, waterQuality: waterQualityAvg, incidents: incidents.length });
   const entrance = targets.find(target => target.id === "park_entrance")?.index ?? Math.max(0, grid.length - 8);
-  const entry = { x: entrance % 8 + .5, y: Math.floor(entrance / 8) + .65 };
   const position = (x, y) => ({ left: x / 8 * 100 + "%", top: y / rows * 100 + "%" });
-  const walkers = Array.from({ length: Math.min(40, guests > 0 ? Math.max(6, Math.ceil(Math.sqrt(guests) * 2.2)) : 0) }, (_, i) => {
-    const target = destinations[(i + Math.floor(tick / 10)) % Math.max(1, destinations.length)];
-    if (!target) return null;
-    const phase = (tick + i * 3) % 10, x = target.index % 8 + .3, y = Math.floor(target.index / 8) + .73;
-    const inWater = target.attr.category === "attraction" && !["soft_play", "gem_mining"].includes(target.id);
-    if (inWater && phase >= 4 && phase <= 7) return null;
-    const spot = phase === 0 || phase === 9 ? entry : phase === 1 ? { x, y: entry.y } : phase === 2 ? { x, y: (entry.y + y) / 2 } : { x, y };
-    const isFood = ["dining","burger_shack","pizza_stand","ice_cream","coffee_bar","beach_bar","smoothie_bar","juice_bar","sushi_bar"].includes(target.id);
-    const isRelax = ["sun_lounge","spa","hot_tub","sauna","beach_lounging","cabanas"].includes(target.id);
-    const activity = inWater && phase >= 4 && phase <= 7 ? (target.id === "lazy_river" ? "floating" : "swimming") :
-      isFood && phase >= 4 && phase <= 7 ? "eating" :
-      isRelax && phase >= 4 && phase <= 7 ? "resting" :
-      phase >= 4 && phase <= 7 ? "waiting" : "walking";
-    return <span key={"g" + i} className="park-pedestrian park-guest" data-activity={activity} data-destination={target.id} data-guest-activity={activity} style={position(spot.x + (i % 3 - 1) * .18, spot.y)} title={`Guest ${activity === "waiting" ? "visiting" : "heading to"} ${target.attr.name}`}><PersonSprite activity={activity} variant={i} />{i === 0 && guestReaction && <span className="guest-reaction-bubble" data-tone={guestReaction.tone} title={guestReaction.reason}>{guestReaction.text}</span>}</span>;
+  const openTargets=targets.filter(t=>!closed.has(t.index));
+  const home={index:entrance,id:"park_entrance",attr:{name:"Park entrance"}};
+  const walkers = Array.from({length:Math.min(graphicsQuality==="balanced"?16:40,guests>0?Math.max(6,Math.ceil(Math.sqrt(guests)*2.2)):0)},(_,i)=>{
+    const trip=guestJourney(openTargets,tick,i,home,destinations);
+    if(!trip) return null;
+    const {target,activity,x,y}=trip;
+    if(activity==="waiting" && isWaterAttraction(target.id)) return null;
+    return <span key={"g"+i} className="park-pedestrian park-guest" data-activity={activity} data-destination={target.id} data-guest-activity={activity}
+      style={position(x+(i%3-1)*.12,y)} title={activity+" · "+target.attr.name}>
+      <PersonSprite activity={activity} variant={i}/>
+      {i===0 && guestReaction && <span className="guest-reaction-bubble" data-tone={guestReaction.tone} title={guestReaction.reason}>{guestReaction.text}</span>}
+    </span>;
   });
   const personnel = STAFF_ROLES.flatMap((role, roleIndex) => {
     const assignment = staffAssignments[role.id] || "";
@@ -63,20 +63,15 @@ export default function GuestLayer({ grid, parkZones = [], guests = 0, avgMood =
   // Hotel guests: visible resort visitors with luggage travelling between
   // their hotel and park attractions, so occupancy isn't just a number.
   const hotelTiles = targets.filter((t) => t.attr?.category === "hotel");
-  const hotelSprites = hotelGuests.slice(0, 8).map((hg, i) => {
-    const hotel = hotelTiles.find((h) => h.index === hg.hotelTile);
-    if (!hotel) return null;
-    const dest = destinations[(i + tick) % Math.max(1, destinations.length)] || hotel;
-    const phase = (tick + i * 2) % 10;
-    // 0-2: at hotel, 3-6: walking to park, 7-9: returning
-    const hx = hotel.index % 8 + .5, hy = Math.floor(hotel.index / 8) + .5;
-    const dx = dest.index % 8 + .5, dy = Math.floor(dest.index / 8) + .7;
-    const t = phase < 3 ? 0 : phase < 7 ? (phase - 3) / 4 : 1 - (phase - 7) / 3;
-    const x = hx + (dx - hx) * t, y = hy + (dy - hy) * t;
-    const atHotel = phase < 3 || phase >= 7;
-    return <span key={"hg" + i} className="hotel-guest-sprite" style={position(x, y)} title={`Hotel guest (${hg.tier}) — ${atHotel ? "at hotel" : "visiting park"}`}>
-      <span className="hotel-guest-label">{atHotel ? "🏨" : "🏊"}</span>
-      <span className={"hotel-guest-body " + (hg.tier || "family")} />
+  const hotelSprites = hotelGuests.slice(0,graphicsQuality==="balanced"?3:8).map((hg,i)=>{
+    const hotel=hotelTiles.find(h=>h.index===hg.hotelTile);
+    if(!hotel) return null;
+    const trip=guestJourney(openTargets,tick,i,hotel,destinations);
+    if(!trip) return null;
+    return <span key={hg.id||"hg"+i} className="park-pedestrian park-guest" data-guest-activity={trip.activity} data-destination={trip.target.id}
+      style={position(trip.x,trip.y)} title={"Hotel guest · "+(trip.atHome?"back at "+hotel.attr.name:trip.activity+" · "+trip.target.attr.name)}>
+      <PersonSprite activity={trip.activity} variant={i+2}/>
+      <span className="hotel-guest-label">{trip.atHome?"🏨":trip.activity==="eating"?"🍽":trip.activity==="resting"?"☀":"🧳"}</span>
     </span>;
   });
 

@@ -16,8 +16,8 @@ export const TIMED_CHALLENGES = BASE_CHALLENGES.flatMap(base => MEDALS.map((meda
   prerequisite:index ? (index===1 ? base.id : base.id+"_silver") : null,
   reward:{money:Math.round(base.reward.money*[1,1.5,2][index]),xp:Math.round(base.reward.xp*[1,1.5,2][index])}};
 }));
-export function canStartTimedChallenge(def,runs={}) {
- return Boolean(def && !Object.values(runs).some(r=>r.status==="active") &&
+export function canStartTimedChallenge(def,runs={},game={}) {
+ return Boolean(def && !(def.metric==="party" && (game.activeEvents||[]).some(e=>e.id==="evening_pool_party")) && !Object.values(runs).some(r=>r.status==="active") &&
  !["claimed","complete"].includes(runs[def.id]?.status) &&
  (!def.prerequisite || runs[def.prerequisite]?.status==="claimed"));
 }

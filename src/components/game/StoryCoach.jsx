@@ -24,7 +24,7 @@ export default function StoryCoach({ game, setOpenSheet }) {
   if (game.gameMode !== "story" || game.storyCompleted || !step) return null;
 
   const progress = storyObjectiveProgress(step, game);
-  const claimableBonuses = availableStoryContracts(game).filter(c => c.complete && !c.claimed).length;
+  const claimableBonuses = availableStoryContracts(game).filter(c => c.complete && !c.claimed && !c.locked).length;
   const target = TARGETS[step.target];
   const totalSteps = Math.max(1, game.STORY_STEPS.length);
   const current = game.storyStep + 1;

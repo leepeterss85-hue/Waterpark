@@ -1,3 +1,4 @@
+import ObjectiveShortcuts from "@/components/game/ObjectiveShortcuts";
 import React, { useEffect, useRef, useState } from "react";
 import { Waves, BarChart3, Save, PoundSterling, CalendarDays, Users, Star, Trophy } from "lucide-react";
 import { getParkItem, levelTier } from "@/data/gameData";
@@ -270,6 +271,7 @@ export default function Home() {
                 onAdvance={() => { trackEvent("day_advanced", { source: "manual" }); game.advanceDay(); }}
                 onReset={game.resetGame}
               />
+              <ObjectiveShortcuts game={game} onOpen={handleOpenMenu} />
               <StoryCoach game={game} setOpenSheet={handleOpenMenu} />
               {game.challenge && <div className="park-game-notice"><ChallengeBanner challenge={game.challenge} /></div>}
               {game.vipVisit && <VipBanner vipVisit={game.vipVisit} />}
