@@ -33,6 +33,7 @@ export default function ConstructionPanel({ projects, money, day, sandbox, onSta
                       <span className="rounded-full bg-amber-500 px-2 py-0.5 text-[9px] font-black text-white">{daysLeft}d LEFT</span>
                     )}
                   </div>
+                  {Number.isInteger(p.targetTile) && (def.category === "ride" || def.category === "hotel") && <p className="mt-1 text-[10px] font-bold text-amber-900">Building site: Plot {p.targetTile + 1} · watch progress on the park map</p>}
                   <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/60">
                     <div className="h-full rounded-full bg-amber-500 transition-all" style={{ width: `${p.progress}%` }} />
                   </div>
@@ -77,6 +78,7 @@ export default function ConstructionPanel({ projects, money, day, sandbox, onSta
                         <span className="flex items-center gap-0.5 rounded-lg bg-amber-50 px-1.5 py-0.5 text-amber-600"><AlertTriangle className="h-3 w-3" /> -{Math.round((1 - def.disruption.guestMult) * 100)}%</span>
                         <span className="flex items-center gap-0.5 rounded-lg bg-emerald-50 px-1.5 py-0.5 text-emerald-600"><Star className="h-3 w-3" /> +{def.rewards.reputation} rep</span>
                       </div>
+                      <p className="mt-1.5 text-[10px] text-slate-600">Preview: {def.category === "ride" || def.category === "hotel" ? "reserves an empty park plot; new attraction opens after construction" : def.category === "renovation" ? "restores and upgrades an existing ride" : def.category === "expansion" ? "adds new empty park plots" : "improves park infrastructure"} · {def.rewards.xp || 0} XP on completion.</p>
                       <button
                         onClick={() => onStartProject(def.id)}
                         disabled={disabled}
