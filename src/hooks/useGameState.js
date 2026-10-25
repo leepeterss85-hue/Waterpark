@@ -426,6 +426,10 @@ export function useGameState() {
     const attr = getParkItem(selectedBuild);
     if (!attr) return;
     if (!sandbox && money < attr.cost) { sound.reject(); return; }
+    if (constructionProjects.some(p => p.status === "in_progress" && p.targetTile === index && (p.projectId.startsWith("ride_") || p.projectId.startsWith("hotel_")))) {
+      sound.reject(); return;
+    }
+    if (grid[index]) return;
     setGrid((g) => {
       if (g[index]) return g;
       const ng = [...g];
@@ -449,7 +453,7 @@ export function useGameState() {
     setLastBuildAction({ index, id: selectedBuild, cost: attr.cost });
     setBuiltToday((b) => b + 1);
     trackEvent("attraction_built", { id: selectedBuild, category: attr.category, cost: attr.cost });
-  }, [selectedBuild, money, parkZones, sandbox, builtAttractionIds, day]);
+  }, [selectedBuild, money, parkZones, sandbox, builtAttractionIds, day, constructionProjects, grid]);
 
   const paintZone = useCallback((index) => {
     if (!selectedZone) return;
@@ -660,6 +664,19 @@ export function useGameState() {
     if ((constructionProjects || []).some((p) => p.projectId === projectId && p.status === "in_progress")) return;
     if (!sandbox && money < def.cost) return;
     let finalTargetTile = targetTile;
+    // Reserve a plot as soon as a major ride/hotel starts: the player can
+    // watch a physical building site instead of a ride appearing elsewhere.
+    if ((def.category === "ride" || def.category === "hotel") && finalTargetTile == null) {
+      const held = new Set((constructionProjects || []).filter(p => p.status === "in_progress").map(p => p.targetTile));
+      finalTargetTile = grid.findIndex((tile, index) => !tile && !held.has(index));
+      if (finalTargetTile < 0) { sound.reject(); return; }
+    }
+    if ((def.category === "ride" || def.category === "hotel") &&
+      (!Number.isInteger(finalTargetTile) || finalTargetTile < 0 ||
+       finalTargetTile >= grid.length || grid[finalTargetTile] ||
+       constructionProjects.some(p => p.status === "in_progress" && p.targetTile === finalTargetTile))) {
+      sound.reject(); return;
+    }
     if (def.category === "renovation" && finalTargetTile == null) {
       let lowestCond = 100, lowestIdx = -1;
       for (let i = 0; i < grid.length; i++) {
