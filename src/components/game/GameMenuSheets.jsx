@@ -253,6 +253,7 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet, graphics
           sandbox={game.sandbox}
           onStartProject={game.startProject}
           attractionCount={game.missionState?.attractionCount || 0}
+          availableSites={game.grid.filter((id,index)=>!id && !(game.constructionProjects||[]).some(p=>p.status==="in_progress" && p.targetTile===index)).length}
         />
       </SheetShell>
 
