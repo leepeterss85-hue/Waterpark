@@ -316,6 +316,7 @@ export function simulateVisits({
   weather = null,
   seasonEvent = null,
   popularity = null,
+  queueWaitMult = 1,
 }) {
   const empty = {
     income: 0, avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0,
@@ -323,7 +324,7 @@ export function simulateVisits({
     spendingByCategory: { rides: 0, food: 0, retail: 0, premium: 0, other: 0 },
     guestExperience: { happy: 0, content: 0, unhappy: 0 },
     needs: { hunger: 0, thirst: 0, fatigue: 0 },
-    groupTypes: {},
+    groupTypes: {}, queueChoices: { rerouted: 0, leftQueue: 0 },
   };
   if (demand <= 0 || !placedItems?.length) return empty;
 
@@ -370,6 +371,7 @@ export function simulateVisits({
   const groupTypes = {};
   const spendingByCategory = { ...empty.spendingByCategory };
   const guestExperience = { happy: 0, content: 0, unhappy: 0 };
+  const queueChoices = { rerouted: 0, leftQueue: 0 };
 
   for (let agent = 0; agent < agentCount; agent += 1) {
     const guest = createGuest();
@@ -381,13 +383,29 @@ export function simulateVisits({
       for (const item of options) {
         item.overcrowded = item.load >= item.cap * 0.85;
         item.queueWait = item.attr.category === "attraction"
-          ? Math.max(0, Math.round((item.load / Math.max(1, item.cap)) * (item.attr.duration || 4) * 3 - item.queueSupport * 1.5))
+          ? Math.max(0, Math.round(((item.load / Math.max(1, item.cap)) * (item.attr.duration || 4) * 3 - item.queueSupport * 1.5) * Math.max(.4, Math.min(1, queueWaitMult))))
           : 0;
       }
       const available = options.filter((item) => !guest.visited.has(item.idx) && item.load < item.cap);
       if (!available.length || guest.energy < 12 || guest.mood < 8) break;
 
-      const pick = chooseDestination(guest, available);
+      let pick = chooseDestination(guest, available);
+      // Guests confronted with a queue longer than their personal tolerance
+      // try a different destination; when there is no alternative, some go
+      // home disappointed rather than unrealistically paying to ride.
+      if (pick.attr.category === "attraction" && pick.queueWait > Math.max(8, guest.patience * .36)) {
+        const shorter = available.filter(item => item.idx !== pick.idx &&
+          (item.attr.category !== "attraction" || item.queueWait <= Math.max(5, guest.patience * .24)));
+        if (shorter.length) {
+          pick = chooseDestination(guest, shorter);
+          queueChoices.rerouted += crowdScale;
+          guest.mood = clamp(guest.mood - 1.5);
+        } else if (pick.queueWait > guest.patience * .55) {
+          queueChoices.leftQueue += crowdScale;
+          guest.mood = clamp(guest.mood - 5);
+          break;
+        }
+      }
       const attr = pick.attr;
       let price = perVisitSpend(pick, pick.level) *
         (attr.category === "facility" ? facilityBonus : 1);
@@ -486,7 +504,7 @@ export function simulateVisits({
     if (item.attr.category !== "attraction") continue;
     const queuePressure = item.queueSupport > 0 ? 0.55 : 0.72;
     const guestsInQueue = Math.max(0, Math.round(item.load - item.cap * queuePressure));
-    const wait = Math.min(90, Math.max(0, Math.round((item.load / Math.max(1, item.cap)) * (item.attr.duration || 4) * 3 - item.queueSupport * 1.5)));
+    const wait = Math.min(90, Math.max(0, Math.round(((item.load / Math.max(1, item.cap)) * (item.attr.duration || 4) * 3 - item.queueSupport * 1.5) * Math.max(.4, Math.min(1, queueWaitMult)))));
     const queueCapacity = item.queueSupport > 0 ? item.queueSupport * 12 : Math.max(8, Math.round(item.cap * 0.18));
     queueStats[item.idx] = { id: item.attr.id, guests: guestsInQueue, wait, load: Math.round(item.load), capacity: Math.round(item.cap), queueCapacity, queueRails: item.queueSupport, overflow: Math.max(0, guestsInQueue - queueCapacity) };
     if (wait > longestQueue.wait) longestQueue = { id: item.attr.id, wait, guests: guestsInQueue };
@@ -505,6 +523,7 @@ export function simulateVisits({
     guestTypes,
     groupTypes,
     queueStats,
+    queueChoices: { rerouted: Math.round(queueChoices.rerouted), leftQueue: Math.round(queueChoices.leftQueue) },
     longestQueue,
     spendingByCategory,
     guestExperience,
