@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { BookOpen, Sparkles, CheckCircle2, Gamepad2, Wrench, Beaker, Target, Trophy, XCircle } from "lucide-react";
 import SandboxLabPanel from "@/components/game/SandboxLabPanel";
 import StoryContractsPanel from "@/components/game/StoryContractsPanel";
+import { STORY_CONTRACTS } from "@/data/storyContracts";
 
 export default function GameModePanel({ game }) {
   const story = game.STORY_STEPS?.[game.storyStep] || game.STORY_STEPS?.[0];
@@ -29,7 +30,7 @@ export default function GameModePanel({ game }) {
       <div className="mt-2 flex flex-wrap gap-2 text-[10px] font-bold text-slate-500"><span className="rounded-full bg-emerald-50 px-2 py-1 text-emerald-700">+£{(story.reward?.money||0).toLocaleString()}</span><span className="rounded-full bg-violet-50 px-2 py-1 text-violet-700">+{story.reward?.xp||0} XP</span><span className="rounded-full bg-cyan-50 px-2 py-1 text-cyan-700">+{story.reward?.research||0} research</span><span className="rounded-full bg-amber-50 px-2 py-1 text-amber-700">+{story.reward?.reputation||0} reputation</span></div>
       <p className="mt-3 rounded-lg bg-cyan-50 px-3 py-2 text-xs leading-5 text-cyan-800">Complete this objective during normal play to earn the rewards above. Story progress advances automatically when the goal is reached.</p>
     </CardContent></Card>}
-    {game.gameMode==="story" && game.storyCompleted && <Card className="border-emerald-200 bg-emerald-50"><CardContent className="p-4"><div className="font-black">Story campaign complete!</div><div className="mt-1 text-sm text-slate-600">You can now continue in Freeplay or experiment in Sandbox without losing your park.</div></CardContent></Card>}
+    {game.gameMode==="story" && game.storyCompleted && <Card className="border-emerald-200 bg-emerald-50"><CardContent className="p-4"><div className="font-black">Main campaign complete — Maya's Season Two is unlocked!</div><div className="mt-1 text-sm text-slate-600">Five optional epilogue quests take you from happy guests to a legendary resort. Your completed chapters, park and saved game are unchanged.</div><div className="mt-2 text-xs font-black text-emerald-800">{STORY_CONTRACTS.filter(c=>c.arc==="legacy" && (game.claimedStoryContracts||[]).includes(c.id)).length} / {STORY_CONTRACTS.filter(c=>c.arc==="legacy").length} legacy quests claimed</div></CardContent></Card>}
     {game.gameMode==="story" && <StoryContractsPanel game={game}/>}
     {game.gameMode==="sandbox" && <SandboxLabPanel game={game}/>}
     {game.gameMode==="freeplay" && <Card><CardContent className="p-4"><div className="flex items-center gap-2 font-black"><Beaker className="h-4 w-4 text-cyan-600"/>Full systems unlocked</div><p className="mt-1 text-xs text-slate-500">Use the management tools, districts, emergencies, destinations, mega-projects and empire systems in any order.</p></CardContent></Card>}
