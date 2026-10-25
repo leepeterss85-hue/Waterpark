@@ -8,6 +8,8 @@ const TIPS = {
  guests: "Improve capacity, guest happiness and advertising. Reach the target in one park day; guests from before you started do not count.",
  party: "Start this challenge before launching an Evening Pool Party from your events.",
  heatwave: "Keep guests happy with shade, facilities and well-maintained attractions. The happiness target must be reached during a heatwave.",
+ mood: "Maintain a happy crowd. Improve queues, amenities and staffing; a later park day must meet the target.",
+ water: "Build water attractions and maintain their average water quality with cleaning staff, filtration and treatment. A later park day must meet the target.",
 };
 const formatProgress = (def, value) => (def.metric === "earnings" ? "£" : "") + Math.round(value).toLocaleString("en-GB");
 
