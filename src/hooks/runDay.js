@@ -45,6 +45,7 @@ import { getMasterPlanMetrics, getCompletedMasterPlans, calculateMasterPlanBonus
 import { sound } from "@/lib/soundManager";
 import { simulateFoodRetail, buildGuestMemory, guestMemoryDemandBoost, GUEST_PERSONALITIES } from "@/data/livingPark";
 import { openingPlanFor } from "@/data/openingPlans";
+import { rollParkInspection } from "@/data/parkInspections";
 import { evaluateChains } from "@/data/attractionChains";
 import { evaluateCampaigns } from "@/data/campaignChapters";
 import { empireBonuses } from "@/data/parkEmpire";
@@ -434,6 +435,16 @@ export function runDay(stateRef, setters) {
   if (wqResult.reputationRisk > 0) newReputation = Math.max(0, newReputation - wqResult.reputationRisk);
   if (zooDay.habitatCount > 0 && zooDay.averageWelfare < 40) newReputation = Math.max(0, newReputation - 1);
   if (zooDay.habitatCount > 0 && zooDay.averageWelfare >= 92) newReputation = Math.min(100, newReputation + 0.25);
+  const waterRides = attractions.filter(ride => ride.attr.parkType !== "zoo");
+  const waterAverage = waterRides.length
+    ? waterRides.reduce((sum, ride) => sum + (wqResult.nextQuality?.[ride.idx] ?? 100), 0) / waterRides.length
+    : 100;
+  const inspection = !isSandbox ? rollParkInspection({
+    day: d + 1, attractionCount: attractions.length, safety, cleanliness, uptime,
+    waterQuality: waterAverage, incidentCount: remaining.length + newIncidents.length,
+  }, Math.random()) : null;
+  if (inspection) newReputation = Math.max(0, Math.min(100, newReputation + inspection.repDelta));
+  if (inspection?.xp) setXp(x => x + inspection.xp);
 
   const newSocialPosts = generateSocialPosts({ day: d + 1, visitorStats, incidents: remaining, attractions, activeEvents: currentActiveEvents, popularity: stateRef.current.popularity });
   const viralRidePosts = newSocialPosts.filter((p) => p.viral && p.sentiment === "positive" && p.rideIdx != null);
@@ -632,8 +643,10 @@ export function runDay(stateRef, setters) {
   }
   if (membershipResult.totalRevenue > 0 || membershipResult.memberVisits > 0) entries.push({ day: d + 1, text: `Day ${d + 1}: 🎫 Members: ${totalMemberCount(membershipResult.counts)} active · ${membershipResult.memberVisits} visits · +£${membershipResult.totalRevenue.toLocaleString()} revenue` });
   if (sponsorIncome > 0) entries.push({ day: d + 1, text: `Day ${d + 1}: 🤝 Sponsors paid +£${sponsorIncome.toLocaleString()} (appeal -${activeSponsorAppealCost(currentSponsorships)}).` });
+  if (openingPlan) entries.unshift({ day: d + 1, text: `Day ${d + 1}: 📋 Opening plan active — ${openingPlan.name}. ${openingPlan.benefit}.` });
+  if (inspection) entries.unshift({ day: d + 1, text: inspection.text });
 
-  setMoney((m) => m + net);
+  setMoney((m) => m + net - (inspection?.fine || 0));
   setDay((x) => x + 1);
   setWeather(dayWeather);
   setForecast(dayForecast);
@@ -643,6 +656,7 @@ export function runDay(stateRef, setters) {
   setPeakGuests((p) => Math.max(p, totalGuestsToday));
   setVisitorStats(visitorStats);
   setGuestMemory(buildGuestMemory(stateRef.current.guestMemory || {}, { day: d + 1, visitorStats, activeEvents: currentActiveEvents }));
+  if (inspection) dayFeedback = [{ day: d + 1, text: inspection.text, sentiment: inspection.passed ? "happy" : "unhappy", reason: "safety" }, ...dayFeedback];
   if (dayFeedback.length) setFeedback((prev) => [...dayFeedback, ...prev].slice(0, 40));
   setLifetimeEarnings((e) => e + grossIncome);
   if (newGuests >= 5) {
