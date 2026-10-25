@@ -32,7 +32,7 @@ test("guest journeys are still stable, reach home, and honour preferred rides",(
   ];
   const targets = [...rides,{id:"pizza_stand",index:20,attr:{category:"facility"}},{id:"cabanas",index:30,attr:{category:"facility"}}];
   const familyTrip=guestJourney(targets,3,0,home,rides,walkerProfile(0));
-  const teenTrip=guestJourney(targets,3,1,home,rides,walkerProfile(1));
+  const teenTrip=guestJourney(targets,0,1,home,rides,walkerProfile(1));
   assert.equal(familyTrip.target.id,"kiddie_pool");
   assert.equal(teenTrip.target.id,"speed_slide");
   assert.equal(guestJourney(targets,21,0,home,rides,walkerProfile(0)).atHome,true);
