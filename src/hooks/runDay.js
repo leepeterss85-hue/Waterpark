@@ -591,7 +591,7 @@ export function runDay(stateRef, setters) {
   const marketingCost = currentAdBudget;
   const utilityCost = utilities;
   const premiumCost = currentPriorityPass ? 120 : 0;
-  const net = isSandbox ? Math.round(grossIncome - emergencyCost - loanResult.loanPayment) : Math.round(grossIncome - expenses - emergencyCost - loanResult.loanPayment - engineering.energyCost);
+  const net = (isSandbox ? Math.round(grossIncome - emergencyCost - loanResult.loanPayment) : Math.round(grossIncome - expenses - emergencyCost - loanResult.loanPayment - engineering.energyCost)) - (inspection?.fine || 0);
 
   // Park mastery turns the long game into permanent progression.
   {
@@ -646,7 +646,7 @@ export function runDay(stateRef, setters) {
   if (openingPlan) entries.unshift({ day: d + 1, text: `Day ${d + 1}: 📋 Opening plan active — ${openingPlan.name}. ${openingPlan.benefit}.` });
   if (inspection) entries.unshift({ day: d + 1, text: inspection.text });
 
-  setMoney((m) => m + net - (inspection?.fine || 0));
+  setMoney((m) => m + net);
   setDay((x) => x + 1);
   setWeather(dayWeather);
   setForecast(dayForecast);
@@ -656,7 +656,7 @@ export function runDay(stateRef, setters) {
   setPeakGuests((p) => Math.max(p, totalGuestsToday));
   setVisitorStats(visitorStats);
   setGuestMemory(buildGuestMemory(stateRef.current.guestMemory || {}, { day: d + 1, visitorStats, activeEvents: currentActiveEvents }));
-  if (inspection) dayFeedback = [{ day: d + 1, text: inspection.text, sentiment: inspection.passed ? "happy" : "unhappy", reason: "safety" }, ...dayFeedback];
+  if (inspection) dayFeedback = [{ day: d + 1, text: inspection.text, quote: inspection.text, sentiment: inspection.passed ? "happy" : "unhappy", reason: "safety", reasonLabel: "Park inspection" }, ...dayFeedback];
   if (dayFeedback.length) setFeedback((prev) => [...dayFeedback, ...prev].slice(0, 40));
   setLifetimeEarnings((e) => e + grossIncome);
   if (newGuests >= 5) {
@@ -742,7 +742,7 @@ export function runDay(stateRef, setters) {
     event: currentSeasonEvent?.name || null, parkAppeal: calculatedAppeal.score,
     hotelRevenue: hotelRoomRevenue + hotelParkSpend, hotelExpenses: hotelExpensesAmount, eventRevenue: eventRevenuePerDay, retailRevenue, retailRestockCost,
     membershipRevenue: membershipResult.totalRevenue, memberSpend: membershipResult.memberSpend,
-    memberVisits: membershipResult.memberVisits, emergencyCost, loanPayment: loanResult.loanPayment, sponsorIncome,
+    memberVisits: membershipResult.memberVisits, emergencyCost, inspectionCost: inspection?.fine || 0, loanPayment: loanResult.loanPayment, sponsorIncome,
   }].slice(-60));
 
   if (MILESTONE_DAYS.includes(d + 1)) {
