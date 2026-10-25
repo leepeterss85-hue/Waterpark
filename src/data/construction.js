@@ -193,7 +193,9 @@ export function simulateConstruction(context) {
     if (progress >= 100) {
       // Try to complete
       if (def.category === "hotel" || def.category === "ride") {
-        const emptyTile = grid.findIndex((g, i) => !g && !claimedTiles.has(i));
+        const emptyTile = Number.isInteger(project.targetTile)
+          ? (!grid[project.targetTile] && !claimedTiles.has(project.targetTile) ? project.targetTile : -1)
+          : grid.findIndex((g, i) => !g && !claimedTiles.has(i));
         if (emptyTile === -1) {
           updatedProjects.push({ ...project, progress: 100, needsSpace: true });
           continue;
@@ -213,7 +215,7 @@ export function simulateConstruction(context) {
           updatedProjects.push({ ...project, status: "completed", progress: 100, completedDay: day });
           logEntries.push({
             day,
-            text: `Day ${day}: 🏗️ ${def.name} completed! +${def.rewards.reputation} reputation, +${def.rewards.xp} XP.`,
+            text: `Day ${day}: 🎉 ${def.category === "ride" || def.category === "hotel" ? "GRAND OPENING" : "PROJECT COMPLETE"}: ${def.name}! +${def.rewards.reputation} reputation, +${def.rewards.xp} XP.`,
           });
         } else {
           updatedProjects.push({ ...project, status: "cancelled", progress: 100, cancelledDay: day, cancelReason: "target_missing" });
@@ -229,7 +231,7 @@ export function simulateConstruction(context) {
       updatedProjects.push({ ...project, status: "completed", progress: 100, completedDay: day });
       logEntries.push({
         day,
-        text: `Day ${day}: 🏗️ ${def.name} completed! +${def.rewards.reputation} reputation, +${def.rewards.xp} XP.`,
+        text: `Day ${day}: 🎉 ${def.category === "ride" || def.category === "hotel" ? "GRAND OPENING" : "PROJECT COMPLETE"}: ${def.name}! +${def.rewards.reputation} reputation, +${def.rewards.xp} XP.`,
       });
     } else {
       updatedProjects.push({ ...project, progress });
