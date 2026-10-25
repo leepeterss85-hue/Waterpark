@@ -1,11 +1,13 @@
+import { preferredStops } from "./guestWayfinding.js";
+
 export const FOOD_STOPS = ["dining","burger_shack","pizza_stand","ice_cream","coffee_bar","beach_bar","smoothie_bar","juice_bar","sushi_bar","concessions"];
 export const REST_STOPS = ["bench","sun_lounge","beach_lounging","cabanas","spa","sauna"];
 // A stable destination for each leg; returning guests actually reach home.
-export function guestJourney(targets, tick, variant, home, rides=targets) {
+export function guestJourney(targets, tick, variant, home, rides=targets, profile=null) {
  const pick=list=>list.length ? list[variant%list.length] : null;
- const food=pick(targets.filter(t=>FOOD_STOPS.includes(t.id)));
- const rest=pick(targets.filter(t=>REST_STOPS.includes(t.id)));
- const ride=pick(rides.filter(t=>t.attr?.category==="attraction"));
+ const food=pick(preferredStops(targets.filter(t=>FOOD_STOPS.includes(t.id)),profile,"food"));
+ const rest=pick(preferredStops(targets.filter(t=>REST_STOPS.includes(t.id)),profile,"rest"));
+ const ride=pick(preferredStops(rides.filter(t=>t.attr?.category==="attraction"),profile,"ride"));
  const stops=[ride,food,rest,home].filter(Boolean);
  if(!stops.length) return null;
  const frame=(tick+variant*3)%(stops.length*6), leg=Math.floor(frame/6), phase=frame%6;
