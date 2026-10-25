@@ -49,6 +49,10 @@ test("reserved sites are not overwritten; legacy construction and sandbox still 
   const legacy={projectId:"ride_tornado",status:"in_progress",startedDay:2};
   const legacyResult=simulateConstruction({day:6,projects:[legacy],grid});
   assert.equal(legacyResult.completionActions[0].tileIndex,0);
+  const reserved={projectId:"ride_aqua_loop",status:"in_progress",startedDay:2,targetTile:0};
+  const coexist=simulateConstruction({day:6,projects:[legacy,reserved],grid});
+  assert.equal(coexist.completionActions[0].tileIndex,1);
+  assert.equal(coexist.completionActions[1].tileIndex,0);
   const instant=simulateConstruction({day:2,projects:[{...legacy,targetTile:15}],grid,instantConstruction:true});
   assert.deepEqual(instant.completionActions,[{type:"place",tileIndex:15,itemId:"tornado_bowl"}]);
   const completed=simulateConstruction({day:12,projects:instant.updatedProjects,grid});
