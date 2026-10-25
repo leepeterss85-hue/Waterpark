@@ -61,6 +61,7 @@ import SandboxLabPanel from "@/components/game/SandboxLabPanel";
 import AnnualReportPanel from "@/components/game/AnnualReportPanel";
 import ParkMenuHub from "@/components/game/ParkMenuHub";
 import ParkOverviewPanel from "@/components/game/ParkOverviewPanel";
+import OperationsBriefPanel from "@/components/game/OperationsBriefPanel";
 import ParkMasteryPanel from "@/components/game/ParkMasteryPanel";
 import { isWaterAttraction } from "@/data/waterQuality";
 
@@ -95,6 +96,7 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet, graphics
       <SheetShell open={openSheet === "overview"} onOpenChange={(v) => !v && close()} title="Park Overview" icon={BarChart3} width="sm:max-w-xl">
         <ParkOverviewPanel game={game} onOpen={setOpenSheet} />
       </SheetShell>
+      <SheetShell open={openSheet === "briefing"} onOpenChange={(v) => !v && close()} title="Next Park Day Briefing" icon={CalendarDays} width="sm:max-w-xl"><OperationsBriefPanel game={game} onOpen={setOpenSheet}/></SheetShell>
       <SheetShell open={openSheet === "menu"} onOpenChange={(v) => !v && close()} title="More Park Tools" icon={Grid3x3} width="sm:max-w-2xl"><ParkMenuHub onOpen={setOpenSheet} /></SheetShell>
       <SheetShell open={openSheet === "build"} onOpenChange={(v) => !v && close()} title="Build" icon={Hammer} width="sm:max-w-lg">
         <ExpansionPanel gridSize={game.gridSize} expansionsDone={game.expansionsDone} level={game.level} money={game.money} onExpand={game.expandPark} />
