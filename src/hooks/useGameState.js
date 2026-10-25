@@ -1091,10 +1091,10 @@ export function useGameState() {
     if (gameMode !== "story" || claimedContractRef.current.has(contractId)) return false;
     const contract = STORY_CONTRACTS.find((entry) => entry.id === contractId);
     const chapter = STORY_STEPS[storyStep]?.chapter || 1;
-    if (!contract || chapter < contract.chapter || (contract.prerequisite && !claimedContractRef.current.has(contract.prerequisite))) return false;
+    if (!contract || chapter < contract.chapter || (contract.requiresStoryComplete && !storyCompleted) || (contract.prerequisite && !claimedContractRef.current.has(contract.prerequisite))) return false;
     const progress = contractProgress(contract, {
       missionState: { attractionCount: grid.filter((id) => getParkItem(id)?.category === "attraction").length },
-      visitorStats, totalUpgrades, visitorReviews, membershipCounts, grid, parkZones, upgrades, activeEvents, hotelStats,
+      visitorStats, totalUpgrades, visitorReviews, membershipCounts, grid, parkZones, upgrades, activeEvents, hotelStats, completedChains, megaProjects, reputation,
       attractionIds: grid.filter(id => getParkItem(id)?.category === "attraction"),
     });
     if (!progress.complete) return false;
@@ -1106,7 +1106,7 @@ export function useGameState() {
     sound.mission();
     trackEvent("story_bonus_contract_claimed", { id: contractId });
     return true;
-  }, [gameMode, storyStep, grid, visitorStats, totalUpgrades, visitorReviews, membershipCounts, day, parkZones, upgrades, activeEvents, hotelStats]);
+  }, [gameMode, storyCompleted, storyStep, grid, visitorStats, totalUpgrades, visitorReviews, membershipCounts, day, parkZones, upgrades, activeEvents, hotelStats, completedChains, megaProjects, reputation]);
 
   useEffect(() => {
     if (gameMode !== "story" || storyCompleted) return;
