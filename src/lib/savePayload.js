@@ -14,7 +14,7 @@ export const SAVE_FIELDS = [
   "popularity", "popularityTrend", "prevPopularity", "activeEvents",
   "membershipCounts", "membershipTimers", "membershipStats", "awards",
   "awardCeremonyTimer", "awardStats", "socialPosts", "socialReputation",
-  "emergencies", "emergencyStats", "constructionProjects", "loans",
+  "emergencies", "emergencyStats", "constructionProjects", "openingPlan", "loans",
   "returnVisitorMult", "empirePoints", "competitors", "marketShare",
   "waterQuality", "rideAges", "vipHistory", "claimedLegendary",
   "activeCalendarEvent", "dailyChallenges", "challengeDayCounter",
