@@ -158,7 +158,7 @@ export function generateFeedback(sim, context = {}) {
 
   // --- Unhappy voices (proportional, up to 3) driven by real signals ---
   const unhappyReasons = [];
-  if (longest.wait > 25) unhappyReasons.push({ reason: "queues", ride: getAttraction(longest.id)?.name, wait: longest.wait });
+  if (longest.wait > 25 || (sim?.queueChoices?.leftQueue || 0) > 0) unhappyReasons.push({ reason: "queues", ride: getAttraction(longest.id)?.name, wait: longest.wait });
   if (needs.hunger > 55) unhappyReasons.push({ reason: "food" });
   if (needs.thirst > 55) unhappyReasons.push({ reason: "thirst" });
   if (cleanliness < 0.5) unhappyReasons.push({ reason: "cleanliness" });
@@ -168,7 +168,7 @@ export function generateFeedback(sim, context = {}) {
   if (weather?.id === "rain" || weather?.id === "storm") unhappyReasons.push({ reason: "weather" });
   if (exp.unhappy > total * 0.4 && !unhappyReasons.length) unhappyReasons.push({ reason: "overcrowded" });
 
-  const unhappyCount = Math.max(0, Math.round(unhappyShare * 3));
+  const unhappyCount = Math.max((sim?.queueChoices?.leftQueue || 0) > 0 ? 1 : 0, Math.round(unhappyShare * 3));
   for (let i = 0; i < unhappyCount && unhappyReasons.length; i += 1) {
     const signal = unhappyReasons[i % unhappyReasons.length];
     feedback.push(entry("unhappy", signal.reason, fill(pick(UNHAPPY[signal.reason] || UNHAPPY.queues), { ride: signal.ride, wait: signal.wait }), day));
