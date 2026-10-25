@@ -259,6 +259,7 @@ export default function Home() {
           acceptedBookings={game.acceptedBookings}
           sponsorships={game.sponsorships}
           activeStrikes={game.activeStrikes}
+          constructionProjects={game.constructionProjects}
           mascot={game.mascotDef}
           onTileClick={handleTileClickWithSound}
           topControls={
