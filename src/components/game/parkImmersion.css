@@ -1,0 +1,69 @@
+/* Immersion pass for high-quality park rendering. All effects are purely
+   cosmetic, clipped to their own plots and respect Balanced/reduced-motion. */
+.aquatic-map .game-map-grid > button[data-kind="construction"] {
+  border:2px dashed #fcd34d!important;
+  border-radius:9px!important;
+  background:repeating-linear-gradient(135deg,#fef3c7 0 9px,#fcd34d 9px 13px)!important;
+  box-shadow:inset 0 3px 8px rgba(120,53,15,.18),0 2px 6px rgba(78,50,18,.15)!important;
+}
+.park-construction-site {
+  position:absolute;inset:5%;z-index:25;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;gap:2px;pointer-events:none;
+  border:2px solid rgba(146,64,14,.6);border-radius:6px;
+  background:repeating-linear-gradient(90deg,rgba(180,83,9,.17) 0 3px,transparent 3px 13px);
+  color:#78350f;font-size:10px;font-weight:900;
+}
+.park-construction-crane {font-size:clamp(18px,2.4vw,27px);line-height:1.15;filter:drop-shadow(0 2px 2px rgba(120,53,15,.28));}
+.park-construction-site::before,.park-construction-site::after {
+  content:"";position:absolute;top:2px;bottom:2px;width:3px;background:#92400e;opacity:.55;
+}
+.park-construction-site::before {left:12%}
+.park-construction-site::after {right:12%}
+.park-construction-site > i {
+  position:absolute;left:6%;bottom:5px;height:5px;border-radius:10px;
+  max-width:88%;background:#059669;box-shadow:0 0 0 1px #fff;
+  transition:width .45s ease;
+}
+.park-new-opening {
+  position:absolute;top:4%;right:5%;z-index:26;display:grid;place-items:center;
+  width:24px;height:24px;font-size:16px;border-radius:50%;background:rgba(255,255,255,.85);
+  box-shadow:0 0 0 2px #fcd34d,0 0 14px rgba(245,158,11,.5);
+  pointer-events:none;animation:park-grand-opening 2.5s ease-in-out infinite;
+}
+@keyframes park-grand-opening {
+  0%,100% {transform:scale(.95) rotate(-8deg);box-shadow:0 0 0 2px #fcd34d,0 0 12px rgba(245,158,11,.4)}
+  50% {transform:scale(1.1) rotate(8deg);box-shadow:0 0 0 3px #fcd34d,0 0 22px rgba(245,158,11,.65)}
+}
+/* Sunlit caustics and shifting reflections: no extra sprites or JS timers. */
+.aquatic-map[data-graphics="ultra"] .game-map-grid > button[data-water="true"] .park-item-artwork::after,
+.aquatic-map[data-graphics="rich"] .game-map-grid > button[data-water="true"] .park-item-artwork::after {
+  content:"";position:absolute;inset:-30%;z-index:3;pointer-events:none;
+  background:repeating-linear-gradient(116deg,transparent 0 12px,rgba(255,255,255,.25) 13px 15px,transparent 17px 32px);
+  mix-blend-mode:soft-light;opacity:.55;
+  transform:translateX(-20%);animation:park-caustic-shift 10s ease-in-out infinite alternate;
+}
+.aquatic-map[data-graphics="ultra"] .park-item-artwork .ride-water-glint,
+.aquatic-map[data-graphics="ultra"] .park-item-artwork .ride-river-glint,
+.aquatic-map[data-graphics="rich"] .park-item-artwork .ride-water-glint {
+  animation:park-flume-glint 6s linear infinite;
+}
+.aquatic-map[data-graphics="ultra"] .game-map-grid > button[data-water="true"] {
+  box-shadow:inset 0 1px 2px rgba(255,255,255,.8),0 3px 8px rgba(9,78,110,.3)!important;
+}
+.aquatic-map[data-graphics="ultra"] .game-map-grid > button[data-water="true"] .park-item-artwork .scene-water-jet,
+.aquatic-map[data-graphics="ultra"] .game-map-grid > button[data-water="true"] .park-item-artwork .scene-splash-arch {
+  animation:park-fountain-sparkle 2.4s ease-in-out infinite alternate;
+}
+@keyframes park-caustic-shift {from {transform:translateX(-15%) translateY(-5%)}to {transform:translateX(12%) translateY(6%)}}
+@keyframes park-flume-glint {to {stroke-dashoffset:-52}}
+@keyframes park-fountain-sparkle {from {opacity:.5;filter:drop-shadow(0 0 1px rgba(255,255,255,.35))}to {opacity:1;filter:drop-shadow(0 0 3px rgba(255,255,255,.7))}}
+@media(max-width:640px) { .park-construction-site {font-size:8px} .park-new-opening {height:20px;width:20px;font-size:13px} }
+@media(prefers-reduced-motion:reduce) {
+  .park-new-opening,.park-construction-site > i,
+  .aquatic-map .park-item-artwork::after,
+  .aquatic-map .park-item-artwork .ride-water-glint,
+  .aquatic-map .park-item-artwork .ride-river-glint,
+  .aquatic-map .park-item-artwork .scene-water-jet,
+  .aquatic-map .park-item-artwork .scene-splash-arch {animation:none!important;transition:none!important}
+}
+.aquatic-map[data-graphics="balanced"] .game-map-grid > button[data-water="true"] .park-item-artwork::after {display:none}
