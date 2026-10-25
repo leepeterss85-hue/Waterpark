@@ -162,9 +162,19 @@ export default function Home() {
 
   const handleTileClickWithSound = (index) => {
     const wasEmpty = !game.grid[index];
+    const site = game.constructionProjects?.find(p => p.status === "in_progress" && p.targetTile === index &&
+      (p.projectId.startsWith("ride_") || p.projectId.startsWith("hotel_")));
+    if (wasEmpty && site && !game.selectedZone) {
+      sound.click();
+      handleOpenMenu("construction");
+      return;
+    }
     const hadBuild = game.selectedBuild;
+    const buildItem = hadBuild ? getParkItem(hadBuild) : null;
+    const allowedBuild = wasEmpty && !game.selectedZone && buildItem &&
+      (game.sandbox || game.money >= buildItem.cost);
     game.handleTileClick(index);
-    if (wasEmpty && hadBuild) {
+    if (allowedBuild) {
       const builtItem = getParkItem(hadBuild);
       sound.build();
       if (builtItem?.category === "attraction" || /pool|fountain|waterfall|wave|river|slide|flume/i.test(`${hadBuild} ${builtItem?.name || ""}`)) {
