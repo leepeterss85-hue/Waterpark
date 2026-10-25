@@ -100,7 +100,7 @@ test("new map visuals respect performance and saves",()=>{
   const mode=read("src/components/game/GameModePanel.jsx");
   const hook=read("src/hooks/useGameState.js");
   assert.match(map,/graphicsQuality!=="balanced"/);
-  assert.match(map,/walkerProfile\(i\)/);
+  assert.match(map,/walkerProfile\(party\)/);
   assert.match(people,/prefers-reduced-motion:reduce/);
   assert.match(mode,/Season Two/);
   assert.match(hook,/contract.requiresStoryComplete && !storyCompleted/);
