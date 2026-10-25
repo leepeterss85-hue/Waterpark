@@ -16,6 +16,7 @@ import "@/components/game/parkMap.css";
 import "@/components/game/parkArtwork.css";
 import "@/components/game/parkPeople.css";
 import "@/components/game/parkChrome.css";
+import "@/components/game/parkImmersion.css";
 import "@/components/game/eventOverlay.css";
 import "@/components/game/resortFinish.css";
 
