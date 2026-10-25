@@ -8,6 +8,10 @@ export default function OperationsBriefPanel({ game, onOpen, compact = false }) 
   const brief = getOperationsBrief(game);
   const top = compact ? brief.priorities.slice(0, 2) : brief.priorities.slice(0, 5);
   const tone = brief.score >= 85 ? "text-emerald-700" : brief.score >= 70 ? "text-cyan-700" : "text-amber-800";
+  const selected = (game.openingPlan?.targetDay === Number(game.day || 1) + 1)
+    ? (game.openingPlans || []).find(plan => plan.id === game.openingPlan.id) : null;
+  const rerouted = game.visitorStats?.queueChoices?.rerouted || 0;
+  const leftQueue = game.visitorStats?.queueChoices?.leftQueue || 0;
   return <section aria-label="Next park day briefing" className="space-y-3 rounded-2xl border border-cyan-200 bg-white p-3.5 shadow-sm sm:p-4">
     <div className="flex items-start justify-between gap-3">
       <div>
@@ -25,6 +29,28 @@ export default function OperationsBriefPanel({ game, onOpen, compact = false }) 
         <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-200"><div className={metric.value >= 80 ? "h-full rounded-full bg-emerald-500" : metric.value >= 60 ? "h-full rounded-full bg-amber-500" : "h-full rounded-full bg-rose-500"} style={{width: metric.value + "%"}} /></div>
       </div>)}
     </div>
+    {!compact && <div className="rounded-xl border border-indigo-200 bg-indigo-50/70 p-3">
+      <div className="text-xs font-black text-indigo-950">Choose tomorrow's opening plan</div>
+      <p className="mt-1 text-[11px] text-indigo-800">Pick one optional action before the next park day. The cost is paid once in fictional £ and the benefit lasts for that day only.</p>
+      {game.forecast && <p className="mt-1 text-[11px] font-bold text-indigo-900">Forecast: {game.forecast.name || game.forecast.id || "See Weather & Conditions"}</p>}
+      {selected && <div className="mt-2 rounded-lg border border-emerald-200 bg-emerald-50 p-2 text-xs font-bold text-emerald-800">Booked for day {game.day + 1}: {selected.name} — {selected.benefit}</div>}
+      <div className="mt-2 grid gap-2 sm:grid-cols-3">
+        {(game.openingPlans || []).map(plan => <button key={plan.id} type="button"
+          disabled={Boolean(selected) || (!game.sandbox && Number(game.money) < plan.cost)}
+          onClick={() => game.chooseOpeningPlan?.(plan.id)}
+          className={"min-h-28 rounded-xl border p-2.5 text-left transition focus-visible:outline-2 focus-visible:outline-indigo-600 " +
+            (selected?.id === plan.id ? "border-emerald-400 bg-emerald-100" : "border-indigo-200 bg-white hover:border-indigo-400 disabled:opacity-60")}>
+          <span className="block text-xs font-black text-slate-900">{plan.name}</span>
+          <span className="mt-1 block text-[10px] leading-4 text-slate-600">{plan.description}</span>
+          <span className="mt-2 block text-[10px] font-black text-indigo-700">{plan.benefit} · {game.sandbox ? "Sandbox" : formatMoney(plan.cost)}</span>
+          <span className="mt-1 block text-[10px] font-bold text-slate-500">{selected?.id === plan.id ? "Selected" : selected ? "Plan already chosen" : (!game.sandbox && Number(game.money) < plan.cost) ? "Not enough cash" : "Choose plan"}</span>
+        </button>)}
+      </div>
+    </div>}
+    {!compact && Number(game.day || 1) > 1 && <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-[11px] text-slate-600">
+      <b className="text-slate-900">Yesterday's queue decisions:</b> {rerouted.toLocaleString("en-GB")} guests tried another attraction; {leftQueue.toLocaleString("en-GB")} left an overlong queue.
+      {rerouted + leftQueue > 0 && <button type="button" onClick={() => onOpen?.("guestExperience")} className="ml-2 font-bold text-cyan-700 underline">Review guest feedback</button>}
+    </div>}
     <div className="space-y-2">
       {top.map((p, i) => <div key={p.id} className="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 p-2.5">
         {p.severity >= 70 ? <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600" /> : <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />}
