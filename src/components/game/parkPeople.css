@@ -63,6 +63,20 @@
 .resort-finish[data-graphics="balanced"] .park-guest,
 .resort-finish[data-graphics="balanced"] .park-staff { animation:none!important; }
 
+/* Personality badges share the existing sprite layer instead of adding
+   simulation loops, and disappear automatically in Balanced graphics mode. */
+.park-guest-profile-tag {
+  position:absolute; left:50%; bottom:calc(100% - 8px); transform:translateX(-50%);
+  display:grid; place-items:center; width:20px; height:20px; border-radius:9px;
+  font-size:11px; font-weight:900; color:#164e63;
+  border:1px solid rgba(165,243,252,.8); background:rgba(255,255,255,.9);
+  box-shadow:0 2px 4px rgba(8,47,73,.2); pointer-events:none;
+}
+.park-guest[data-guest-type="vip-guest"] .park-person { filter:drop-shadow(0 1px 2px rgba(245,158,11,.6)); }
+.park-guest[data-guest-type="thrill-seeker"] .park-person { filter:drop-shadow(0 1px 2px rgba(236,72,153,.36)); }
+@media(max-width:560px) { .park-guest-profile-tag { width:17px; height:17px; font-size:10px; } }
+@media(prefers-reduced-motion:reduce) { .park-guest-profile-tag { animation:none!important; } }
+
 /* Real-time speech bubbles summarise today's measured satisfaction, queues and
    safety. Limited to one simulated guest so the map stays legible on Android. */
 .guest-reaction-bubble {
