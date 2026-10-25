@@ -1,4 +1,3 @@
-import { getParkItem } from "./gameData.js";
 import { isWaterAttraction } from "./waterQuality.js";
 
 const clamp = (value, low = 0, high = 100) =>
@@ -16,7 +15,8 @@ const gbp = value => "£" + Math.round(Number(value) || 0).toLocaleString("en-GB
  */
 export function getOperationsBrief(game = {}) {
   const grid = Array.isArray(game.grid) ? game.grid : [];
-  const attractions = grid.filter(id => getParkItem(id)?.category === "attraction").length;
+  const attractions = Number.isFinite(game.missionState?.attractionCount)
+    ? Math.max(0, game.missionState.attractionCount) : grid.filter(isWaterAttraction).length;
   const hasWater = grid.some(id => isWaterAttraction(id));
   const incidentCount = Array.isArray(game.incidents) ? game.incidents.length : 0;
   const emergencyCount = (game.emergencies || []).filter(entry =>
