@@ -186,6 +186,7 @@ export function useGameState() {
   const [emergencyStats, setEmergencyStats] = useState({ totalEmergencies: 0, totalCost: 0, resolvedCount: 0 });
   const [constructionProjects, setConstructionProjects] = useState([]);
   const [openingPlan, setOpeningPlan] = useState(null);
+  const openingPlanRef = useRef(null);
   const [loans, setLoans] = useState([]);
   const [returnVisitorMult, setReturnVisitorMult] = useState(1.0);
   const [empirePoints, setEmpirePoints] = useState(0);
@@ -235,6 +236,7 @@ export function useGameState() {
   const [completedScenarios, setCompletedScenarios] = useState([]);
   const [zooAnimals, setZooAnimals] = useState({});
 
+  openingPlanRef.current = openingPlan;
   const level = levelFromXp(xp);
   const gridSize = grid.length;
 
@@ -696,10 +698,11 @@ export function useGameState() {
   }, [constructionProjects, money, sandbox, day, grid, attractionCondition]);
 
   const chooseOpeningPlan = useCallback((id) => {
-    if (!canChooseOpeningPlan(openingPlan, day, money, sandbox, id)) { sound.reject(); return false; }
+    if (!canChooseOpeningPlan(openingPlanRef.current, day, money, sandbox, id)) { sound.reject(); return false; }
     const def = OPENING_PLANS.find(p => p.id === id);
+    openingPlanRef.current = { id, targetDay: day + 1 };
     if (!sandbox) setMoney(m => m - def.cost);
-    setOpeningPlan({ id, targetDay: day + 1 });
+    setOpeningPlan(openingPlanRef.current);
     setLog(l => [{ day, text: "Day " + day + ": 📋 Opening plan booked for day " + (day + 1) + " — " + def.name + " · " + def.benefit + "." }, ...l].slice(0, 12));
     trackEvent("opening_plan_selected", { id });
     return true;
