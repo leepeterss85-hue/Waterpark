@@ -1,4 +1,5 @@
 import { guestJourney } from "@/data/guestJourney";
+import { walkerProfile } from "@/data/guestWayfinding";
 import { useReducedMotion } from "framer-motion";
 import React, { useEffect, useMemo, useState } from "react";
 import { getParkItem } from "@/data/gameData";
@@ -32,13 +33,15 @@ export default function GuestLayer({ graphicsQuality = "ultra", grid, parkZones 
   const openTargets=targets.filter(t=>!closed.has(t.index));
   const home={index:entrance,id:"park_entrance",attr:{name:"Park entrance"}};
   const walkers = Array.from({length:Math.min(graphicsQuality==="balanced"?16:40,guests>0?Math.max(6,Math.ceil(Math.sqrt(guests)*2.2)):0)},(_,i)=>{
-    const trip=guestJourney(openTargets,tick,i,home,destinations);
+    const profile=walkerProfile(i);
+    const trip=guestJourney(openTargets,tick,i,home,destinations,profile);
     if(!trip) return null;
     const {target,activity,x,y}=trip;
     if(activity==="waiting" && isWaterAttraction(target.id)) return null;
     return <span key={"g"+i} className="park-pedestrian park-guest" data-activity={activity} data-destination={target.id} data-guest-activity={activity}
-      style={position(x+(i%3-1)*.12,y)} title={activity+" · "+target.attr.name}>
+      data-guest-type={profile.type.replaceAll(" ","-").toLowerCase()} style={position(x+(i%3-1)*.12,y)} title={profile.label+" · "+activity+" · "+target.attr.name}>
       <PersonSprite activity={activity} variant={i}/>
+      {i>0 && i%9===0 && graphicsQuality!=="balanced" && <span className="park-guest-profile-tag" aria-hidden="true" title={profile.label}>{profile.badge}</span>}
       {i===0 && guestReaction && <span className="guest-reaction-bubble" data-tone={guestReaction.tone} title={guestReaction.reason}>{guestReaction.text}</span>}
     </span>;
   });
