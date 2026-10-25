@@ -887,9 +887,10 @@ export function runDay(stateRef, setters) {
 
   const constructionProjects = stateRef.current.constructionProjects || [];
   if (isSandbox && sandboxTools.instantConstruction && constructionProjects.length) {
-    setConstructionProjects(constructionProjects.map((p) => ({ ...p, daysLeft: 0 })));
+    // simulateConstruction receives the sandbox override below; avoid a
+    // conflicting state update based on an unused daysLeft field.
   }
-  const constructionResult = simulateConstruction({ day: d + 1, projects: constructionProjects, grid: prevGrid });
+  const constructionResult = simulateConstruction({ day: d + 1, projects: constructionProjects, grid: prevGrid, instantConstruction: Boolean(isSandbox && sandboxTools.instantConstruction) });
   setConstructionProjects(constructionResult.updatedProjects);
   for (const action of constructionResult.completionActions) {
     if (action.type === "place") {
