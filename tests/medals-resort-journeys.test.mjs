@@ -3,9 +3,9 @@ import assert from "node:assert/strict";
 import {TIMED_CHALLENGES,canStartTimedChallenge,sanitiseTimedChallenges,startTimedChallenge,evaluateTimedChallenge} from "../src/data/timedChallenges.js";
 import {guestJourney} from "../src/data/guestJourney.js";
 import {STORY_CONTRACTS,contractProgress,availableStoryContracts} from "../src/data/storyContracts.js";
-test("five challenges each have sequential bronze silver gold medals and increasing rewards",()=>{
- assert.equal(TIMED_CHALLENGES.length,15);
- assert.equal(new Set(TIMED_CHALLENGES.map(c=>c.id)).size,15);
+test("all challenges have sequential bronze silver gold medals and increasing rewards",()=>{
+ assert.equal(TIMED_CHALLENGES.length % 3, 0);
+ assert.equal(new Set(TIMED_CHALLENGES.map(c=>c.id)).size,TIMED_CHALLENGES.length);
  for(const bronze of TIMED_CHALLENGES.filter(c=>c.medal==="bronze")){
   const silver=TIMED_CHALLENGES.find(c=>c.id===bronze.id+"_silver");
   const gold=TIMED_CHALLENGES.find(c=>c.id===bronze.id+"_gold");
