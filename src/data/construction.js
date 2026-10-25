@@ -168,7 +168,7 @@ export function getConstructionDisruption(projects) {
  * Returns updated projects, completion actions, rewards, and log entries.
  */
 export function simulateConstruction(context) {
-  const { day, projects, grid } = context;
+  const { day, projects, grid, instantConstruction = false } = context;
   const updatedProjects = [];
   const completionActions = [];
   const logEntries = [];
@@ -188,7 +188,7 @@ export function simulateConstruction(context) {
     }
 
     const daysElapsed = day - project.startedDay;
-    const progress = Math.min(100, (daysElapsed / def.duration) * 100);
+    const progress = instantConstruction ? 100 : Math.min(100, (daysElapsed / def.duration) * 100);
 
     if (progress >= 100) {
       // Try to complete
