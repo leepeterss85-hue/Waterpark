@@ -15,6 +15,13 @@ export const STORY_CONTRACTS = Object.freeze([
   { id:"resort_happy", arc:"resort", title:"Maya: Happy Holidaymakers", chapter:4, prerequisite:"resort_dining", goal:"Reach 80 hotel happiness with occupied rooms", metric:"hotelHappiness", target:80, destination:"resort", narrative:"Run the park to welcome overnight guests. Add amenities and keep the park pleasant until hotel guests rate their stay at 80 or higher.", reward:{money:10000,xp:450}},
   { id:"resort_busy", arc:"resort", title:"Maya: A Popular Destination", chapter:4, prerequisite:"resort_happy", goal:"Reach 60% hotel occupancy", metric:"hotelOccupancy", target:60, destination:"resort", narrative:"Keep rooms appealing and review hotel pricing. Run more park days to attract guests and fill your rooms.", reward:{money:12000,xp:550}},
   { id:"resort_celebrate", arc:"resort", title:"Maya: The Resort Celebration", chapter:4, prerequisite:"resort_busy", goal:"Host an Evening Pool Party with occupied hotel rooms", metric:"resortParty", target:1, destination:"events", narrative:"Hire two lifeguards, build a suitable pool, then launch Evening Pool Party in Events to celebrate your resort.", reward:{money:16000,xp:750}},
+  // A second, optional campaign after the finale. Keeping these outside
+  // STORY_STEPS means completed parks and cloud saves retain their positions.
+  { id:"legacy_smiles", arc:"legacy", requiresStoryComplete:true, title:"Season Two: The Guest Promise", chapter:13, goal:"Reach 85 average visitor happiness", metric:"guestMood", target:85, narrative:"Maya invites you back for a victory tour. Show that success hasn't changed your standards: happy guests come first.", reward:{money:30000,xp:1500} },
+  { id:"legacy_resort", arc:"legacy", requiresStoryComplete:true, title:"Season Two: Holiday Season", chapter:13, prerequisite:"legacy_smiles", goal:"Fill 80% of your hotel rooms", metric:"hotelOccupancy", target:80, narrative:"Plan a proper holiday destination. Refresh the resort and keep rooms booked without relying on real-world purchases.", reward:{money:40000,xp:1800} },
+  { id:"legacy_chains", arc:"legacy", requiresStoryComplete:true, title:"Season Two: Ride Revolution", chapter:13, prerequisite:"legacy_resort", goal:"Complete two attraction chains", metric:"chains", target:2, narrative:"Connect complementary rides into distinct districts. Maya wants a park visitors will remember.", reward:{money:50000,xp:2200} },
+  { id:"legacy_megapark", arc:"legacy", requiresStoryComplete:true, title:"Season Two: Skyline Spectacular", chapter:13, prerequisite:"legacy_chains", goal:"Complete three signature mega-projects", metric:"megaProjects", target:3, narrative:"Your guests want a landmark. Finish an ambitious signature project portfolio to show them what's possible.", reward:{money:70000,xp:2900} },
+  { id:"legacy_finale", arc:"legacy", requiresStoryComplete:true, title:"Season Two: A Lasting Legacy", chapter:13, prerequisite:"legacy_megapark", goal:"Reach 95 park reputation", metric:"reputation", target:95, narrative:"Bring everything together: guest experience, attractions, events and an outstanding reputation. A new legend begins.", reward:{money:100000,xp:4500} },
 ]);
 
 export function contractProgress(contract, game = {}) {
@@ -35,6 +42,9 @@ export function contractProgress(contract, game = {}) {
     upgrades: Number(game.totalUpgrades) || 0,
     reviews: Array.isArray(game.visitorReviews) ? game.visitorReviews.length : 0,
     members: Object.values(game.membershipCounts || {}).reduce((sum, value) => sum + (Number(value) || 0), 0),
+    chains: (game.completedChains || []).length,
+    megaProjects: (game.megaProjects || []).filter(project => project && (project.status === "complete" || project.status === "completed" || project.completed)).length,
+    reputation: Number(game.reputation) || 0,
   };
   const current = Math.max(0, Math.floor(values[contract.metric] || 0));
   const target = Math.max(1, Number(contract.target) || 1);
@@ -44,7 +54,7 @@ export function contractProgress(contract, game = {}) {
 export function availableStoryContracts(game = {}) {
   const chapter = Number(game.STORY_STEPS?.[game.storyStep]?.chapter) || 1;
   const claimed = new Set(game.claimedStoryContracts || []);
-  return STORY_CONTRACTS.filter(c => chapter >= c.chapter).map(c => ({
+  return STORY_CONTRACTS.filter(c => chapter >= c.chapter && (!c.requiresStoryComplete || game.storyCompleted)).map(c => ({
     ...c, ...contractProgress(c, game), locked: Boolean(c.prerequisite && !claimed.has(c.prerequisite)), claimed: claimed.has(c.id),
   }));
 }
