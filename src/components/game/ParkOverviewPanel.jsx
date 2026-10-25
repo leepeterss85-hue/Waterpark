@@ -1,4 +1,5 @@
 import React from "react";
+import OperationsBriefPanel from "@/components/game/OperationsBriefPanel";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Banknote, Users, Star, TrendingUp, Hotel, AlertTriangle, Target, Hammer, UserPlus, Play, Trophy, CalendarDays, HeartPulse } from "lucide-react";
@@ -11,14 +12,14 @@ export default function ParkOverviewPanel({ game, onOpen }) {
   const appeal = Math.round(game.parkAppeal?.score || 0);
   const mood = Math.round(game.visitorStats?.avgMood || 0);
   const income = game.annualReport?.income || 0;
-  const occupancy = Math.round((game.hotelStats?.occupancy || 0) * 100);
+  const occupancy = Math.round(game.hotelStats?.occupancy || 0);
   const alerts = (game.incidents?.length || 0) + (game.emergencies?.filter(e => !e.resolved)?.length || 0);
   const construction = (game.constructionProjects || []).filter(p => !p.completed).length;
   const activeEvents = (game.activeEvents || []).length;
   const monthNumber = Math.max(1, Math.ceil((game.day || 1) / 30));
   const dayOfMonth = ((Math.max(1, game.day || 1) - 1) % 30) + 1;
   const weatherLabel = game.weather?.name || game.weather?.label || game.weather?.id || "Normal";
-  const operations = Math.round(((game.safety || 0) + (game.cleanliness || 0) + (game.entertainment || 0) + (game.uptime || 0)) / 4);
+  const operations = Math.round(((game.safety || 0) + (game.cleanliness || 0) + (game.uptime || 0)) / 3 * 100);
   const visitorMix = game.visitorStats?.guestExperience || game.visitorStats?.averageExperience || null;
   const monthlyIncomeTarget = 25000 + (monthNumber - 1) * 7500;
   const monthlyGuestTarget = 500 + (monthNumber - 1) * 150;
@@ -44,6 +45,8 @@ export default function ParkOverviewPanel({ game, onOpen }) {
       <div className="flex items-start justify-between gap-3"><div><div className="text-[10px] font-black uppercase tracking-widest text-cyan-100">Park Command Dashboard</div><div className="mt-1 text-xl font-black">Month {monthNumber} • Day {dayOfMonth} • {game.gameMode === "story" ? "Story Mode" : game.gameMode === "sandbox" ? "Sandbox" : "Freeplay"}</div><div className="mt-1 text-xs text-cyan-50">Level {game.level} • Reputation {Math.round(game.reputation)}</div></div><div className="rounded-xl bg-white/15 px-3 py-2 text-right"><div className="text-[10px] font-bold text-cyan-100">Cash</div><div className="text-lg font-black">£{Math.round(game.money).toLocaleString()}</div></div></div>
       <div className="mt-3 flex gap-2"><Button size="sm" className="bg-white text-cyan-700 hover:bg-cyan-50" onClick={()=>game.setPlaying?.(true)}><Play className="mr-1 h-3.5 w-3.5"/>Open Gates</Button><Button size="sm" variant="outline" className="border-white/50 bg-transparent text-white hover:bg-white/10" onClick={()=>open("gameModes")}>Change Mode</Button></div>
     </div>
+
+    <OperationsBriefPanel game={game} onOpen={open} compact />
 
     {objective && <Card className="border-cyan-200 bg-cyan-50"><CardContent className="p-4"><div className="flex items-center gap-2 text-xs font-black text-cyan-700"><Target className="h-4 w-4"/>CURRENT OBJECTIVE</div><div className="mt-1 text-base font-black">{objective.title}</div><p className="mt-1 text-xs leading-5 text-slate-600">{objective.text}</p><Button className="mt-3 w-full" size="sm" onClick={()=>open(next[0])}>{next[1]}</Button></CardContent></Card>}
 
