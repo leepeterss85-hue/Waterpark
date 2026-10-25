@@ -175,6 +175,13 @@ export function simulateConstruction(context) {
   let totalRepReward = 0;
   let totalXpReward = 0;
   const claimedTiles = new Set();
+  // Projects from older saves had no targetTile. They must not claim a plot
+  // already reserved by a newer project when both finish on the same day.
+  const reservedTiles = new Set((projects || [])
+    .filter(p => p.status === "in_progress" && Number.isInteger(p.targetTile)
+      && (PROJECT_TYPES.find(def => def.id === p.projectId)?.category === "ride" ||
+          PROJECT_TYPES.find(def => def.id === p.projectId)?.category === "hotel"))
+    .map(p => p.targetTile));
 
   for (const project of (projects || [])) {
     if (project.status !== "in_progress") {
@@ -195,7 +202,7 @@ export function simulateConstruction(context) {
       if (def.category === "hotel" || def.category === "ride") {
         const emptyTile = Number.isInteger(project.targetTile)
           ? (!grid[project.targetTile] && !claimedTiles.has(project.targetTile) ? project.targetTile : -1)
-          : grid.findIndex((g, i) => !g && !claimedTiles.has(i));
+          : grid.findIndex((g, i) => !g && !claimedTiles.has(i) && !reservedTiles.has(i));
         if (emptyTile === -1) {
           updatedProjects.push({ ...project, progress: 100, needsSpace: true });
           continue;
