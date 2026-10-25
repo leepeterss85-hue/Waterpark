@@ -4,7 +4,7 @@ import { PROJECT_TYPES, CATEGORY_LABELS } from "@/data/construction";
 
 const CATEGORY_ICONS = { hotel: Hotel, ride: Waves, expansion: Maximize2, renovation: Sparkles, infrastructure: DoorOpen };
 
-export default function ConstructionPanel({ projects, money, day, sandbox, onStartProject, attractionCount }) {
+export default function ConstructionPanel({ projects, money, day, sandbox, onStartProject, attractionCount, availableSites = 0 }) {
   const active = (projects || []).filter((p) => p.status === "in_progress");
   const completed = (projects || []).filter((p) => p.status === "completed").slice(-4).reverse();
 
@@ -67,7 +67,8 @@ export default function ConstructionPanel({ projects, money, day, sandbox, onSta
                   const isActive = active.some((p) => p.projectId === def.id);
                   const canAfford = sandbox || money >= def.cost;
                   const renovationBlocked = def.category === "renovation" && attractionCount === 0;
-                  const disabled = isActive || !canAfford || renovationBlocked;
+                  const siteBlocked = (def.category === "ride" || def.category === "hotel") && availableSites === 0;
+                  const disabled = isActive || !canAfford || renovationBlocked || siteBlocked;
                   return (
                     <div key={def.id} className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
                       <h5 className="text-sm font-bold text-slate-900">{def.name}</h5>
@@ -84,7 +85,7 @@ export default function ConstructionPanel({ projects, money, day, sandbox, onSta
                         disabled={disabled}
                         className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg bg-amber-500 py-2 text-xs font-black text-white transition hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-40"
                       >
-                        {isActive ? "In Progress" : renovationBlocked ? "No Rides to Renovate" : !canAfford ? "Insufficient Funds" : "Start Construction"}
+                        {isActive ? "In Progress" : siteBlocked ? "No Free Park Plot" : renovationBlocked ? "No Rides to Renovate" : !canAfford ? "Insufficient Funds" : "Start Construction"}
                       </button>
                     </div>
                   );
