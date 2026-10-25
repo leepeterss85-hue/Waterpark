@@ -44,6 +44,7 @@ import { rollGroupBooking } from "@/data/groupBookings";
 import { getMasterPlanMetrics, getCompletedMasterPlans, calculateMasterPlanBonuses } from "@/data/masterPlans";
 import { sound } from "@/lib/soundManager";
 import { simulateFoodRetail, buildGuestMemory, guestMemoryDemandBoost, GUEST_PERSONALITIES } from "@/data/livingPark";
+import { openingPlanFor } from "@/data/openingPlans";
 import { evaluateChains } from "@/data/attractionChains";
 import { evaluateCampaigns } from "@/data/campaignChapters";
 import { empireBonuses } from "@/data/parkEmpire";
@@ -78,6 +79,7 @@ export function runDay(stateRef, setters) {
 
   const { parkStrategy: currentParkStrategy = { strategy: "balanced", hotelPackage: "room_only" }, mastery: currentMastery = { points: 0, completed: [] }, grid: prevGrid, reputation: rep, day: d, sandboxSettings: sandboxTools = {}, staff: currentStaff, staffAssignments: currentAssignments, incidents: currentIncidents, upgrades: currentUpgrades, attractionCondition: currentCondition, challenge: currentChallenge, parkZones: currentZones, forecast: currentForecast, seasonEvent: currentSeasonEvent, parkAppeal: currentParkAppeal, ticketPrice: currentTicketPrice, adBudget: currentAdBudget, priorityPass: currentPriorityPass, vipVisit: currentVipVisit, completedResearch: currentResearch } = stateRef.current;
   const hasResearch = (id) => (currentResearch || []).includes(id);
+  const openingPlan = openingPlanFor(stateRef.current.openingPlan, d);
   const masterPlanContext = getMasterPlanMetrics({
     grid: prevGrid, money: stateRef.current.money || 0, reputation: rep,
     peakGuests: stateRef.current.peakGuests || 0, totalUpgrades: stateRef.current.totalUpgrades || 0,
@@ -133,6 +135,7 @@ export function runDay(stateRef, setters) {
     eff.incomeMult = (eff.incomeMult ?? 1) * eventFx.incomeMult;
     eff.repDelta = (eff.repDelta ?? 0) + eventFx.repDelta - eventDownsides.repPenalty;
   }
+  if (openingPlan?.demandMult) eff.guestMult = (eff.guestMult ?? 1) * openingPlan.demandMult;
   const constructionDisruption = getConstructionDisruption(stateRef.current.constructionProjects);
   eff.guestMult = (eff.guestMult ?? 1) * constructionDisruption.guestMult;
   eff.repDelta = (eff.repDelta ?? 0) + constructionDisruption.repPerDay;
@@ -237,7 +240,7 @@ export function runDay(stateRef, setters) {
   const moraleMult = moraleEffectMult(morale);
   const incidentMoraleMult = moraleIncidentMult(morale);
   const uptime = Math.min(1, fx.uptime * moraleMult);
-  const safety = Math.min(1, fx.safety * moraleMult);
+  const safety = Math.min(1, fx.safety * moraleMult + (openingPlan?.safetyBoost || 0));
   const trashCanCount = environment.filter((p) => p.id === "trash_can").length;
   const cleanliness = Math.min(1, (fx.cleanliness + Math.min(0.15, trashCanCount * 0.02)) * moraleMult);
   const entertainment = fx.entertainment * moraleMult;
@@ -295,6 +298,7 @@ export function runDay(stateRef, setters) {
       uptime, safety, cleanliness, incomeMult: (eff.incomeMult ?? 1) * rideFocusEffects.incomeMult, entertainment, facilityBonus,
       appealBonus: (calculatedAppeal.score - 50) * 0.025 + empireTier.bonuses.satisfaction * 10 + resortBonuses.moodBoost + (activeMasterPlanBonuses.satisfactionBonus || 0) * 10 + rideFocusEffects.moodBoost,
       pricing: currentPricing, weather: dayWeather, seasonEvent: currentSeasonEvent, popularity: stateRef.current.popularity,
+      queueWaitMult: openingPlan?.queueWaitMult || 1,
     });
     income = sim.income;
     visitorStats = sim;
@@ -305,6 +309,7 @@ export function runDay(stateRef, setters) {
     if (mascotMoodBoost > 0 && visitorStats.avgMood != null) {
       visitorStats = { ...visitorStats, avgMood: Math.min(100, visitorStats.avgMood + mascotMoodBoost) };
     }
+    if (openingPlan?.moodBoost) visitorStats = { ...visitorStats, avgMood: Math.min(100, (visitorStats.avgMood || 0) + openingPlan.moodBoost) };
     // Accepted group bookings arrive today: guaranteed guests + mood drag.
     const currentAccepted = stateRef.current.acceptedBookings || [];
     if (currentAccepted.length > 0) {
