@@ -886,10 +886,6 @@ export function runDay(stateRef, setters) {
   } else setAwardCeremonyTimer(ceremonyTimer - 1);
 
   const constructionProjects = stateRef.current.constructionProjects || [];
-  if (isSandbox && sandboxTools.instantConstruction && constructionProjects.length) {
-    // simulateConstruction receives the sandbox override below; avoid a
-    // conflicting state update based on an unused daysLeft field.
-  }
   const constructionResult = simulateConstruction({ day: d + 1, projects: constructionProjects, grid: prevGrid, instantConstruction: Boolean(isSandbox && sandboxTools.instantConstruction) });
   setConstructionProjects(constructionResult.updatedProjects);
   for (const action of constructionResult.completionActions) {
