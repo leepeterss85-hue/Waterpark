@@ -53,8 +53,12 @@ test("Story Mode bonus contracts are separate from canonical chapter progression
   assert.equal(contractProgress(contracts.find(c=>c.id==="guest_voice"), game).complete, false);
   game.STORY_STEPS = [{chapter:13}];
   available = availableStoryContracts(game);
-  assert.equal(available.length, contracts.length);
+  assert.equal(available.length, contracts.filter(c=>!c.requiresStoryComplete).length);
   assert.equal(available.find(c=>c.id==="happy_guests").percent, 100);
+  game.storyCompleted = true;
+  available = availableStoryContracts(game);
+  assert.equal(available.length, contracts.length);
+  assert.ok(available.some(c=>c.id==="legacy_smiles"));
 });
 
 test("guest reactions come from measured conditions and do not fabricate reactions in an empty park", () => {
