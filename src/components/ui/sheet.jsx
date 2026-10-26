@@ -59,7 +59,7 @@ const SheetContent = React.forwardRef(/** @param {React.ComponentPropsWithoutRef
 ))
 SheetContent.displayName = SheetPrimitive.Content.displayName
 
-const SheetHeader = ({
+const SheetHeader = (/** @type {React.HTMLAttributes<HTMLDivElement>} */ {
   className,
   ...props
 }) => (
@@ -69,7 +69,7 @@ const SheetHeader = ({
 )
 SheetHeader.displayName = "SheetHeader"
 
-const SheetFooter = ({
+const SheetFooter = (/** @type {React.HTMLAttributes<HTMLDivElement>} */ {
   className,
   ...props
 }) => (
@@ -87,7 +87,7 @@ const SheetTitle = React.forwardRef(({ className, ...props }, ref) => (
 ))
 SheetTitle.displayName = SheetPrimitive.Title.displayName
 
-const SheetDescription = React.forwardRef(({ className, ...props }, ref) => (
+const SheetDescription = React.forwardRef(/** @param {React.ComponentPropsWithoutRef<typeof SheetPrimitive.Description>} props */ ({ className, ...props }, ref) => (
   <SheetPrimitive.Description
     ref={ref}
     className={cn("text-sm text-muted-foreground", className)}

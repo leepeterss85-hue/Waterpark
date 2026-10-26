@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function PersonSprite({ activity = "walking", variant = 0, role, className = "", ...props }) {
+export default function PersonSprite({ activity = "walking", variant = 0, role = "", className = "", ...props }) {
   const swimming = activity === "swimming";
   const floating = activity === "floating";
   const seated = floating || activity === "sliding" || activity === "eating" || activity === "resting";

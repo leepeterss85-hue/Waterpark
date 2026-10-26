@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Waves, Map, Wrench, Users, Star, Zap } from "lucide-react";
 
-export default function AdvancedParkPanel({ megaProjects, megaBonuses, stories, destinations, currentDestination, level, money, sandbox, onBuildMega, onSelectDestination, water = {} }) {
+export default function AdvancedParkPanel(/** @type {{megaProjects:any[],megaBonuses:any,stories:any[],destinations:any[],currentDestination:any,level:number,money:number,sandbox:boolean,onBuildMega:any,onSelectDestination:any,water?:{engineeringScore?:number,filtration?:number,temperature?:number,targetTemperature?:number,pumps?:number,qualityAvg?:number,energyCost?:number}}} */ { megaProjects, megaBonuses, stories, destinations, currentDestination, level, money, sandbox, onBuildMega, onSelectDestination, water = {} }) {
   return <div className="space-y-3">
     <Card><CardHeader className="pb-2"><CardTitle className="flex items-center gap-2 text-sm"><Waves className="h-4 w-4 text-cyan-600"/>Signature Mega-Attractions</CardTitle></CardHeader><CardContent className="space-y-2">
       {megaProjects.map((p) => {

@@ -1,7 +1,7 @@
 import React from "react";
 import { Bed, Users, Waves, PoundSterling, TrendingUp, TrendingDown, Smile } from "lucide-react";
 
-function StatCard({ icon: Icon, label, value, sub, tone, bg }) {
+function StatCard({ icon: Icon, label, value, sub, tone, bg = "" }) {
   return (
     <div className={"rounded-xl p-2.5 ring-1 ring-slate-100 " + (bg || "bg-white")}>
       <div className="flex items-center gap-1 text-[9px] font-extrabold uppercase tracking-wider text-slate-400">

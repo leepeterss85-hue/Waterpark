@@ -6,7 +6,7 @@ import "@/components/game/particleFX.css";
  * The game clock and weather simulation remain the source of truth;
  * this component only changes the atmosphere of the rendered park.
  */
-export default function MapAmbience({ timeOfDay = "day", weather = "clear" }) {
+export default function MapAmbience(/** @type {{timeOfDay?:string, weather?:string | {id?:string}}} */ { timeOfDay = "day", weather = "clear" }) {
   const weatherId = typeof weather === "string" ? weather : weather?.id || "clear";
   const isNight = timeOfDay === "night";
   const isSunset = timeOfDay === "sunset";

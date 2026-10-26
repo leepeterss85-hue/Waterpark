@@ -11,7 +11,7 @@ const FOOD_IDS=["dining","burger_shack","pizza_stand","ice_cream","coffee_bar","
 const RETAIL_IDS=["retail","swimwear_shop","towel_rental"];
 const SERVICE_IDS=["lockers","guest_services","wifi_lounge","lost_found"];
 
-export function buildGuestMemory(previous={}, {day=1,visitorStats={},activeEvents=[]}={}){
+export function buildGuestMemory(previous={}, /** @type {{day?:number, visitorStats?:{guestTypes?:Record<string,number>, movements?:Record<string,number>, topAttraction?:string|null, avgMood?:number}, activeEvents?:any[]}} */ {day=1,visitorStats={},activeEvents=[]}={}){
  const memory={...(previous||{})}; const types=visitorStats.guestTypes||{}; const movements=visitorStats.movements||{}; const top=visitorStats.topAttraction||null;
  for(const [type,count] of Object.entries(types)){if(!count)continue;
   const key=type==="Thrill seeker"?"thrill_hunter":type==="Family"?"family_planner":type==="Couple"?"relaxer":type==="Tourist"?"explorer":type==="VIP guest"?"foodie":"value_seeker";
@@ -28,7 +28,7 @@ export function guestMemoryDemandBoost(memory={},personalityId,grid=[]){
  const loyalty=Math.min(.10,m.happyDays*.008)-Math.min(.08,m.unhappyDays*.01);
  return Math.max(.85,1+loyalty+Math.min(.06,matching*.015));
 }
-export function simulateFoodRetail({grid=[],guests=0,visitorStats={},weather={},activeEvents=[],stock={},staff={},pricing={}}={}){
+export function simulateFoodRetail(/** @type {{grid?:string[],guests?:number,visitorStats?:object,weather?:{id?:string},activeEvents?:any[],stock?:Record<string,number>,staff?:Record<string,number>,pricing?:{food?:{priceMult?:number},retail?:{priceMult?:number},services?:{priceMult?:number}}}} */ {grid=[],guests=0,visitorStats={},weather={},activeEvents=[],stock={},staff={},pricing={}}={}){
  const hasFood=grid.filter(id=>FOOD_IDS.includes(id)).length,hasRetail=grid.filter(id=>RETAIL_IDS.includes(id)).length,hasService=grid.filter(id=>SERVICE_IDS.includes(id)).length;
  const chef=staff.chef||0,photographer=staff.photographer||0;
  const eventBoost=activeEvents.reduce((s,e)=>s*(e.downside?.foodDepleteMult||1),1);

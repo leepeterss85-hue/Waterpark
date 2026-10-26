@@ -1,6 +1,6 @@
 import React from "react";
 import { Users, TrendingUp } from "lucide-react";
-export default function LivingParkPanel({ retailStats={}, retailStock={}, guestMemory={} }){
+export default function LivingParkPanel(/** @type {{retailStats?:{served?:Record<string,number>,stockHealth?:Record<string,number>,revenue?:number,restockCost?:number,unmetFood?:number},retailStock?:{food?:number},guestMemory?:Record<string, any>}} */ { retailStats={}, retailStock={}, guestMemory={} }){
  const served=retailStats.served||{}; const health=retailStats.stockHealth||{};
  const rows=[["Food & drink","food"],["Retail & swimwear","retail"],["Guest services","services"]];
  return <div className="space-y-3">

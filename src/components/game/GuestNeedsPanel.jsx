@@ -11,7 +11,7 @@ const REST_IDS = new Set([
   "wifi_lounge", "beach_lounging", "hot_tub", "sauna", "bench", "shade_umbrella",
 ]);
 
-function NeedBar({ icon: Icon, label, value, tone, hint }) {
+function NeedBar({ icon: Icon, label, value, tone = "", hint }) {
   const pct = Math.min(100, Math.max(0, value));
   const status = pct >= 70 ? "critical" : pct >= 50 ? "rising" : "ok";
   const statusColor = status === "critical" ? "text-rose-600" : status === "rising" ? "text-amber-600" : "text-emerald-600";

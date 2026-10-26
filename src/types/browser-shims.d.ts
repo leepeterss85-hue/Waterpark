@@ -1,2 +1,5 @@
-// Optional CommonJS wrapper for legacy canvas-confetti fallback in browser.
-declare var module: { exports: unknown };
+// Legacy CommonJS wrapper supplied by canvas-confetti in some builds.
+declare var module: any;
+// Vite import.meta.env provided at runtime.
+interface ImportMeta { readonly env: Record<string, string | boolean | undefined>; }
+interface Window { webkitAudioContext?: typeof AudioContext; }
