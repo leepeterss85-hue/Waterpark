@@ -86,7 +86,7 @@ export default function Register() {
           </div>
         )}
         <div className="flex justify-center mb-6">
-          <InputOTP
+          <OtpWithChildren
             maxLength={6}
             value={otpCode}
             onChange={setOtpCode}
