@@ -105,7 +105,7 @@ function pick(pool) {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-function fill(template, { ride, wait } = {}) {
+function fill(template, /** @type {{ride?:string,wait?:string | number}} */ { ride, wait } = {}) {
   return template
     .replace("{ride}", ride || "the slide")
     .replace("{wait}", wait || "");

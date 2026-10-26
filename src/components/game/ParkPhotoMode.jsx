@@ -14,7 +14,7 @@ export default function ParkPhotoMode({ game }) {
       const html2canvas = (await import("html2canvas")).default;
       // Find the park grid element
       const gridEl = document.querySelector(".game-map-surface") || document.querySelector(".game-board-shell");
-      if (!gridEl) {
+      if (!(gridEl instanceof HTMLElement)) {
         setError("Could not find the park map to capture.");
         setCapturing(false);
         return;

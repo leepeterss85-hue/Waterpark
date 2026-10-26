@@ -149,7 +149,7 @@ export function useGameState() {
   const [challenge, setChallenge] = useState(null);
   const [lifetimeEarnings, setLifetimeEarnings] = useState(0);
   const [builtAttractionIds, setBuiltAttractionIds] = useState([]);
-  const [visitorStats, setVisitorStats] = useState({ avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {}, guestTypes: {} });
+  const [visitorStats, setVisitorStats] = useState({ avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {}, guestTypes: {}, queueStats: {} });
   const [feedback, setFeedback] = useState([]);
   const [researchPoints, setResearchPoints] = useState(0);
   const [completedResearch, setCompletedResearch] = useState([]);
@@ -790,6 +790,7 @@ export function useGameState() {
     if (!district) return;
     const result = checkDistrictLegendary(district, grid, parkZones, getParkItem);
     if (!result.met) return;
+    /** @type {{money?:number,xp?:number,empirePoints?:number}} */
     const reward = district.legendary.reward || {};
     setMoney((m) => m + (reward.money || 0));
     setXp((x) => x + (reward.xp || 0));
@@ -849,7 +850,7 @@ export function useGameState() {
     setChallenge(data.challenge ?? null);
     setLifetimeEarnings(data.lifetimeEarnings ?? 0);
     setBuiltAttractionIds(data.builtAttractionIds ?? []);
-    setVisitorStats(data.visitorStats ?? { avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {}, guestTypes: {} });
+    setVisitorStats(data.visitorStats ?? { avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {}, guestTypes: {}, queueStats: {} });
     setFeedback(data.feedback ?? []);
     setVipVisit(data.vipVisit ?? null);
     setResearchPoints(data.researchPoints ?? 0);
@@ -1183,6 +1184,7 @@ export function useGameState() {
     };
     const step = STORY_STEPS[storyStep];
     if (!step || !completed[step.id]) return;
+    /** @type {{money?:number,xp?:number,reputation?:number,research?:number}} */
     const reward = step.reward || {};
     if (reward.money) setMoney((m) => m + reward.money);
     if (reward.xp) setXp((x) => x + reward.xp);
@@ -1377,7 +1379,7 @@ export function useGameState() {
     setAttractionCondition(startCondition); setUpgrades(startUpgrades);
     setXp(park.xp || 0); setExpansionsDone(0); setPeakGuests(0); setTotalUpgrades(0);
     setClaimedMissions([]); setChallenge(null); setLifetimeEarnings(0); setBuiltAttractionIds(builtIds);
-    setVisitorStats({ avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {}, guestTypes: {} });
+    setVisitorStats({ avgMood: 0, avgSpendPerVisit: 0, totalVisits: 0, topAttraction: null, movements: {}, guestTypes: {}, queueStats: {} });
     setFeedback([]); setResearchPoints(0); setCompletedResearch(starterResearch);
     setParkAppeal(calculateParkAppeal({ grid: startGrid, zones: startZones, getItem: getParkItem }));
     setDisaster(null); setDisastersSurvived(0); setActiveCampaigns([]); setActiveEvents([]);

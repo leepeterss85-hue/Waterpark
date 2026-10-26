@@ -11,6 +11,8 @@ import GoogleIcon from "@/components/GoogleIcon";
 import { toast } from "@/components/ui/use-toast";
 import { safeReturnTo } from "@/lib/authReturnTo";
 
+const OtpWithChildren = /** @type {React.ComponentType<any>} */ (InputOTP);
+
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -99,7 +101,7 @@ export default function Register() {
               <InputOTPSlot index={4} />
               <InputOTPSlot index={5} />
             </InputOTPGroup>
-          </InputOTP>
+          </OtpWithChildren>
         </div>
         <Button
           className="w-full h-12 font-medium"

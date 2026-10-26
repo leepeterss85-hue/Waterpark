@@ -537,7 +537,7 @@ export const sound = {
     if (/wave|surf/.test(label)) { tone(95, 0.65, "sine", 0.1); noiseBurst(0.45, 0.11, 650); tone(220, 0.22, "sine", 0.06, 0.3); }
     else if (/lazy|river|rapids/.test(label)) { noiseBurst(0.5, 0.055, 850); tone(440, 0.3, "sine", 0.025, 0.1); }
     else if (/fountain|spray|splash|pool/.test(label)) { noiseBurst(0.32, 0.09, 2300); tone(880, 0.16, "sine", 0.035, 0.06); }
-    else if (/slide|flume|drop|coaster|thrill/.test(label)) { tone(330, 0.22, "sawtooth", 0.045); tone(220, 0.35, "triangle", 0.055, 0.12); noiseBurst(0.22, 0.065, 1800, 0.2); }
+    else if (/slide|flume|drop|coaster|thrill/.test(label)) { tone(330, 0.22, "sawtooth", 0.045); tone(220, 0.35, "triangle", 0.055, 0.12); noiseBurst(0.22, 0.065, 1800); }
     else { noiseBurst(0.22, 0.06, 1600); tone(659, 0.1, "sine", 0.04, 0.06); }
   },
   guestCheer() { noiseBurst(0.18, 0.025, 900); [659, 784, 988].forEach((f, i) => tone(f, 0.12, "triangle", 0.045, i * 0.07)); },
@@ -567,7 +567,7 @@ export const sound = {
     zooSpecies = Array.isArray(species) ? [...new Set(species.filter(Boolean))] : [];
   },
   animalCall(species) { playAnimalCall(species); },
-  setAmbience(weather = "clear", timeOfDay = "day") {
+  setAmbience(/** @type {string|{id?:string}} */ weather = "clear", timeOfDay = "day") {
     ambienceWanted = { weather: typeof weather === "string" ? weather : weather?.id || "clear", timeOfDay: timeOfDay || "day" };
     if (muted) { stopAmbience(); stopMusic(); stopParkLife(); return; }
     // Setting a scene never starts audio until the player interacts/unlocks audio.

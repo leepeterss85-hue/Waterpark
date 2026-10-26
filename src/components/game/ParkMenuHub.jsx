@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { FlaskConical, Wallet, HardHat, CalendarDays, Droplets, Hotel, CloudSun, MapPin, Crown, Swords, Medal, Star, Ticket, Trophy, Clock, Siren, Activity, Target, Zap, Palette, Gift, PawPrint, MessageSquare, HeartPulse, Handshake, UsersRound, UtensilsCrossed, BookOpen, Globe2, Waves, Camera, RotateCcw, BarChart3, Settings, ChevronRight, ChevronDown, Search, X } from "lucide-react";
 
+/** @type {{title:string, items:[string,string,import("react").ComponentType<any>][]}[]} */
 const GROUPS = [
   { title: "Command", items: [["overview","Park Overview",BarChart3],["briefing","Next Day Briefing",CalendarDays],["mastery","Park Mastery",Crown],["annualReport","Management Report",BarChart3]] },
   { title: "Park Operations", items: [["research","Research",FlaskConical],["economy","Economy",Wallet],["construction","Projects",HardHat],["events","Events",CalendarDays],["waterQuality","Water Quality",Droplets],["resort","Resort",Hotel],["conditions","Weather & Conditions",CloudSun],["districts","Districts",MapPin]] },
