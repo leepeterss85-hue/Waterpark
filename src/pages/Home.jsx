@@ -240,6 +240,10 @@ export default function Home() {
           grid={game.grid}
           parkZones={game.parkZones}
           upgrades={game.upgrades}
+          tileRotations={game.tileRotations}
+          buildRotation={game.buildRotation}
+          onRotateBuildPreview={game.rotateBuildPreview}
+          onRotateSelectedTile={game.rotateSelectedTile}
           selectedBuild={game.selectedBuild}
           graphicsQuality={graphicsQuality}
           onGraphicsQualityChange={changeGraphicsQuality}

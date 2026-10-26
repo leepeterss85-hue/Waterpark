@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Footprints, Users, Map as MapIcon, Sparkles, Maximize2, Hammer, X, CheckCircle2, Settings2 } from "lucide-react";
+import { Footprints, Users, Map as MapIcon, Sparkles, Maximize2, Hammer, RotateCw, X, CheckCircle2, Settings2 } from "lucide-react";
 import { getParkItem } from "@/data/gameData";
 import { getHotelDef, hotelRooms } from "@/data/hotels";
 import Tile from "@/components/game/Tile";
@@ -22,7 +22,7 @@ import "@/components/game/parkImmersion.css";
 import "@/components/game/eventOverlay.css";
 import "@/components/game/resortFinish.css";
 
-export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, selectedTile, selectedZone, incidents, guests, avgMood = 0, waterQualityAvg = 100, visitorMovements, queueStats = {}, attractionCondition = [], staff = {}, staffAssignments = {}, lifeguardTotal = 0, day = 1, weather, seasonEvent, hotelGuests = [], activeEvents = [], waterQuality = [], acceptedBookings = [], sponsorships = [], activeStrikes = [], constructionProjects = [], money = 0, sandbox = false, graphicsQuality = "ultra", onGraphicsQualityChange, onOpenSettings, onCancelBuild, onChangeBuild, onTileClick, topControls, bottomMenu, statsBar, themeClass = "", mascot = null }) {
+export default function ParkGrid({ grid, parkZones, upgrades, tileRotations = [], buildRotation = 0, onRotateBuildPreview, onRotateSelectedTile, selectedBuild, selectedTile, selectedZone, incidents, guests, avgMood = 0, waterQualityAvg = 100, visitorMovements, queueStats = {}, attractionCondition = [], staff = {}, staffAssignments = {}, lifeguardTotal = 0, day = 1, weather, seasonEvent, hotelGuests = [], activeEvents = [], waterQuality = [], acceptedBookings = [], sponsorships = [], activeStrikes = [], constructionProjects = [], money = 0, sandbox = false, graphicsQuality = "ultra", onGraphicsQualityChange, onOpenSettings, onCancelBuild, onChangeBuild, onTileClick, topControls, bottomMenu, statsBar, themeClass = "", mascot = null }) {
   const { zoom, setZoom, panX, panY, resetView, fitToWidth, containerRef, onMapClickCapture } = useTouchZoom(1, 0.35, 2.5);
   // Quality is controlled by Home so both the top bar and Settings stay in sync.
   const graphics = graphicsQuality;
@@ -70,6 +70,12 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
       <ParkActivityPulse guests={guests} avgMood={avgMood} queueStats={queueStats} grid={grid} incidents={incidents} lifeguardTotal={lifeguardTotal} graphicsQuality={graphics} />
       <div className="game-board-frame flex flex-1 flex-col min-h-0">
         <div className="game-map-toolbar park-camera-toolbar"><div className="park-map-heading flex items-center gap-2"><span className="game-map-status"><span /> PARK MAP</span><span className="hidden text-[9px] font-extrabold uppercase tracking-wider text-slate-400 sm:inline">Tap a tile to build or inspect</span></div><div className="park-camera-actions flex items-center gap-1 rounded-xl bg-white/95 p-1 shadow-md ring-1 ring-slate-200"><button type="button" aria-label={`Graphics quality: ${graphicsLabel}. Tap to change`} title="Cycle Ultra, High or Balanced" onClick={toggleGraphics} className="resort-quality-button resort-quality-cycle" data-quality={graphics}><Sparkles className="h-3.5 w-3.5" />{graphicsLabel}</button><button aria-label="Fit park to screen" title="Fit all eight columns to your screen" onClick={fitToWidth} className="resort-quality-button resort-fit-button"><Maximize2 className="h-3.5 w-3.5" />Fit</button><button aria-label="Zoom out" onClick={() => setZoom((z) => Math.max(0.35, Number((z - 0.1).toFixed(2))))} className="grid h-10 w-10 place-items-center rounded-lg text-sm font-black text-slate-600 hover:bg-slate-100">−</button><button aria-label="Reset zoom" onClick={resetView} className="min-h-10 min-w-10 rounded-lg px-1.5 py-1.5 text-[9px] font-extrabold text-slate-500 hover:bg-slate-100">{Math.round(zoom * 100)}%</button><button aria-label="Zoom in" onClick={() => setZoom((z) => Math.min(2.5, Number((z + 0.1).toFixed(1))))} className="grid h-10 w-10 place-items-center rounded-lg text-sm font-black text-slate-600 hover:bg-slate-100">+</button></div></div>
+        {!buildItem && selectedTile != null && grid[selectedTile] && (
+          <div className="park-placement-tray" role="group" aria-label="Selected building orientation">
+            <span className="min-w-0 flex-1 truncate text-xs font-bold">{getParkItem(grid[selectedTile])?.name || "Selected building"} · {tileRotations[selectedTile] || 0}°</span>
+            <button type="button" className="park-placement-action" onClick={onRotateSelectedTile} aria-label="Rotate selected building clockwise"><RotateCw className="h-4 w-4" /> Rotate</button>
+          </div>
+        )}
         {buildItem && <div className="park-placement-tray" role="status" aria-live="polite">
           <span className="park-placement-icon"><Hammer className="h-4 w-4" /></span>
           <span className="min-w-0 flex-1">
@@ -79,6 +85,7 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
             </span>
           </span>
           {canAffordBuild && <CheckCircle2 className="hidden h-4 w-4 shrink-0 text-emerald-600 sm:block" />}
+          <button type="button" className="park-placement-action" onClick={onRotateBuildPreview} aria-label="Rotate building preview clockwise"><RotateCw className="h-3.5 w-3.5" /> Rotate {buildRotation}°</button>
           <button type="button" className="park-placement-action" onClick={onChangeBuild} aria-label="Choose a different item">Change</button>
           <button type="button" className="park-placement-cancel" onClick={onCancelBuild} aria-label="Cancel placement"><X className="h-4 w-4" /></button>
         </div>}
@@ -106,7 +113,7 @@ export default function ParkGrid({ grid, parkZones, upgrades, selectedBuild, sel
                 const hotelDef = value ? getHotelDef(value) : null;
                 const hotelOcc = hotelDef ? hotelGuests.filter((g) => g.hotelTile === index).length : 0;
                 const hotelRm = hotelDef ? hotelRooms(hotelDef, upgrades?.[index] || 0) : 0;
-                return <Tile graphicsQuality={graphics} key={index} index={index} grid={grid} zone={parkZones?.[index]} upgradeLevel={upgrades?.[index] || 0} value={value} selectedBuild={selectedBuild} expansionTheme={expansionTheme} isSelected={selectedTile === index} incident={incidentMap.get(index)} condition={attractionCondition?.[index]} queueWait={queueWait} queueConnected={queueConnected} movement={movement} guests={guests} facilityStatus={facilityStatus} canAffordBuild={canAffordBuild} timeOfDay={timeOfDay} nightSwim={seasonEvent?.id === "night_swim"} hotelOccupancy={hotelOcc} hotelRoomsTotal={hotelRm} constructionSite={site} openingCelebration={Boolean(opened)} waterQuality={waterQuality?.[index]} onClick={() => onTileClick(index)} />;
+                return <Tile graphicsQuality={graphics} key={index} index={index} grid={grid} zone={parkZones?.[index]} upgradeLevel={upgrades?.[index] || 0} value={value} selectedBuild={selectedBuild} expansionTheme={expansionTheme} isSelected={selectedTile === index} incident={incidentMap.get(index)} condition={attractionCondition?.[index]} queueWait={queueWait} queueConnected={queueConnected} movement={movement} guests={guests} facilityStatus={facilityStatus} canAffordBuild={canAffordBuild} artRotation={tileRotations[index] || 0} previewRotation={buildRotation} timeOfDay={timeOfDay} nightSwim={seasonEvent?.id === "night_swim"} hotelOccupancy={hotelOcc} hotelRoomsTotal={hotelRm} constructionSite={site} openingCelebration={Boolean(opened)} waterQuality={waterQuality?.[index]} onClick={() => onTileClick(index)} />;
               })}
             </div>
             <GuestLayer graphicsQuality={graphics} grid={grid} parkZones={parkZones} guests={guests} avgMood={avgMood} waterQualityAvg={waterQualityAvg} movements={visitorMovements} queueStats={queueStats} staff={staff} staffAssignments={staffAssignments} incidents={incidents || []} attractionCondition={attractionCondition} hotelGuests={hotelGuests} />
