@@ -1,5 +1,5 @@
 import { useRef, useEffect, useCallback, useState } from "react";
-import { calculateParkFitZoom } from "@/lib/parkCamera";
+import { calculateParkFitZoom, clampParkPan, zoomParkAtPoint } from "@/lib/parkCamera";
 
 /**
  * Touch gesture hook for the park map: pinch-to-zoom and drag-to-pan.
@@ -95,14 +95,29 @@ export function useTouchZoom(initialZoom = 1, minZoom = 0.8, maxZoom = 1.5) {
       const dy = touches[0].clientY - touches[1].clientY;
       return Math.hypot(dx, dy);
     };
-
-    const onTouchStart = (e) => {
-      if (e.touches.length === 1) suppressGestureClickRef.current = false;
-      if (e.touches.length === 2) {
-        suppressGestureClickRef.current = true;
-        pinchRef.current = { dist: getDist(e.touches), zoom: stateRef.current.zoom };
-        dragRef.current = null;
-      } else if (e.touches.length === 1 && stateRef.current.zoom > 1) {
+    const midpoint = touches => ({
+      x: (touches[0].clientX + touches[1].clientX) / 2,
+      y: (touches[0].clientY + touches[1].clientY) / 2,
+    });
+    const bounds = () => {
+      const playfield = el.querySelector(".park-playfield");
+      return {
+        width: el.clientWidth,
+        height: el.clientHeight,
+        contentWidth: playfield?.offsetWidth || 704,
+        contentHeight: playfield?.offsetHeight || el.clientHeight,
+      };
+    };
+    const relative = point => {
+      const rect = el.getBoundingClientRect();
+      return { x: point.x - rect.left - el.clientLeft, y: point.y - rect.top - el.clientTop };
+    };
+    const onTouchStart = e => {
+      if (e.touches.length === 1) {
+        suppressGestureClickRef.current = false;
+        pinchRef.current = null;
+        // Allow one-finger map exploration at ALL zoom levels, including the
+        // default auto-fit level below 100% on narrow Android screens.
         dragRef.current = {
           x: e.touches[0].clientX,
           y: e.touches[0].clientY,
@@ -110,15 +125,36 @@ export function useTouchZoom(initialZoom = 1, minZoom = 0.8, maxZoom = 1.5) {
           panY: stateRef.current.panY,
           engaged: false,
         };
+      } else if (e.touches.length >= 2) {
+        suppressGestureClickRef.current = true;
+        const center = relative(midpoint(e.touches));
+        pinchRef.current = {
+          dist: Math.max(1, getDist(e.touches)),
+          zoom: stateRef.current.zoom,
+          panX: stateRef.current.panX,
+          panY: stateRef.current.panY,
+          center,
+        };
+        dragRef.current = null;
       }
     };
-
-    const onTouchMove = (e) => {
-      if (e.touches.length === 2 && pinchRef.current) {
+    const onTouchMove = e => {
+      if (e.touches.length >= 2 && pinchRef.current) {
         e.preventDefault();
+        autoFitRef.current = false;
+        suppressGestureClickRef.current = true;
         const dist = getDist(e.touches);
         const scale = dist / pinchRef.current.dist;
-        setZoom(pinchRef.current.zoom * scale);
+        const nextZoom = Math.max(minZoom, Math.min(maxZoom, pinchRef.current.zoom * scale));
+        const currentCenter = relative(midpoint(e.touches));
+        const nextCamera = zoomParkAtPoint({
+          zoom: pinchRef.current.zoom,
+          panX: pinchRef.current.panX + currentCenter.x - pinchRef.current.center.x,
+          panY: pinchRef.current.panY + currentCenter.y - pinchRef.current.center.y,
+        }, nextZoom, currentCenter, bounds());
+        setZoomState(Number(nextCamera.zoom.toFixed(2)));
+        setPanX(nextCamera.panX);
+        setPanY(nextCamera.panY);
       } else if (e.touches.length === 1 && dragRef.current) {
         const dx = e.touches[0].clientX - dragRef.current.x;
         const dy = e.touches[0].clientY - dragRef.current.y;
@@ -128,14 +164,16 @@ export function useTouchZoom(initialZoom = 1, minZoom = 0.8, maxZoom = 1.5) {
         suppressGestureClickRef.current = true;
         autoFitRef.current = false;
         e.preventDefault();
-        setPanX(dragRef.current.panX + dx);
-        setPanY(dragRef.current.panY + dy);
+        const frame = bounds();
+        setPanX(clampParkPan(dragRef.current.panX + dx, frame.width, frame.contentWidth, stateRef.current.zoom));
+        setPanY(clampParkPan(dragRef.current.panY + dy, frame.height, frame.contentHeight, stateRef.current.zoom));
       }
     };
-
-    const onTouchEnd = (e) => {
+    const onTouchEnd = e => {
       if (e.touches.length < 2) pinchRef.current = null;
       if (e.touches.length === 0) dragRef.current = null;
+      // After a pinch ends with one finger, don't reinterpret the second half
+      // as a tile tap. The next independent touch starts normally.
     };
 
     el.addEventListener("touchstart", onTouchStart, { passive: true });
@@ -148,7 +186,7 @@ export function useTouchZoom(initialZoom = 1, minZoom = 0.8, maxZoom = 1.5) {
       el.removeEventListener("touchend", onTouchEnd);
       el.removeEventListener("touchcancel", onTouchEnd);
     };
-  }, [setZoom]);
+  }, [maxZoom, minZoom]);
 
   return { zoom, setZoom, panX, panY, resetView, fitToWidth, containerRef, onMapClickCapture };
 }
