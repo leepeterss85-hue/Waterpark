@@ -1,12 +1,12 @@
 import React from "react";
-import { Award, CheckCircle2, Sparkles } from "lucide-react";
+import { Award, CheckCircle2, Sparkles, GitFork } from "lucide-react";
 import { availableStoryContracts } from "@/data/storyContracts";
 
 // Optional Maya challenges with real one-time rewards. Existing chapter progress
 // and saved chapter indices are never changed by these side quests.
 export default function StoryContractsPanel({ game }) {
   if (game.gameMode !== "story") return null;
-  const contracts = availableStoryContracts(game).sort((a,b) => Number(b.arc === "legacy") - Number(a.arc === "legacy"));
+  const contracts = availableStoryContracts(game).sort((a,b) => Number(b.arc === "legacy") - Number(a.arc === "legacy") || Number(b.arc === "festival") - Number(a.arc === "festival"));
   return <section className="rounded-2xl border border-indigo-200 bg-gradient-to-br from-indigo-50 via-white to-cyan-50 p-3" aria-label="Maya's bonus challenges">
     <div className="flex items-center gap-2">
       <div className="grid h-9 w-9 place-items-center rounded-xl bg-indigo-600 text-white"><Award className="h-5 w-5" /></div>
@@ -22,7 +22,14 @@ export default function StoryContractsPanel({ game }) {
           {c.claimed ? <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" /> : <Sparkles className="h-4 w-4 shrink-0 text-indigo-400" />}
         </div>
         <p className="mt-1 text-[11px] text-slate-600">{c.goal}</p>
+        {c.alternative && <p className="mt-1 inline-flex items-center gap-1 text-[10px] font-black text-cyan-700"><GitFork className="h-3.5 w-3.5" /> Choose either route — one reward</p>}
         {c.narrative && <p className="mt-1 text-[11px] text-indigo-700">{c.narrative}</p>}
+        {c.alternative && <div className="mt-2 space-y-1 rounded-lg bg-cyan-50 p-2">
+          {c.routes.map(route=><div key={route.label} className="text-[10px] text-cyan-950">
+            <div className="flex justify-between gap-2"><span className="min-w-0">{route.complete ? "✓ " : ""}{route.label}</span><b className="shrink-0">{route.current}/{route.target}</b></div>
+            <div className="mt-0.5 h-1 overflow-hidden rounded-full bg-cyan-100"><div className="h-full bg-cyan-600" style={{width:route.percent+"%"}} /></div>
+          </div>)}
+        </div>}
         <div className="mt-2 flex items-center justify-between text-[10px] font-bold text-indigo-700">
           <span>{Math.min(c.current,c.target).toLocaleString("en-GB")} / {c.target.toLocaleString("en-GB")}</span>
           <span>{c.percent}%</span>

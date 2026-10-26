@@ -15,6 +15,33 @@ export const STORY_CONTRACTS = Object.freeze([
   { id:"resort_happy", arc:"resort", title:"Maya: Happy Holidaymakers", chapter:4, prerequisite:"resort_dining", goal:"Reach 80 hotel happiness with occupied rooms", metric:"hotelHappiness", target:80, destination:"resort", narrative:"Run the park to welcome overnight guests. Add amenities and keep the park pleasant until hotel guests rate their stay at 80 or higher.", reward:{money:10000,xp:450}},
   { id:"resort_busy", arc:"resort", title:"Maya: A Popular Destination", chapter:4, prerequisite:"resort_happy", goal:"Reach 60% hotel occupancy", metric:"hotelOccupancy", target:60, destination:"resort", narrative:"Keep rooms appealing and review hotel pricing. Run more park days to attract guests and fill your rooms.", reward:{money:12000,xp:550}},
   { id:"resort_celebrate", arc:"resort", title:"Maya: The Resort Celebration", chapter:4, prerequisite:"resort_busy", goal:"Host an Evening Pool Party with occupied hotel rooms", metric:"resortParty", target:1, destination:"events", narrative:"Hire two lifeguards, build a suitable pool, then launch Evening Pool Party in Events to celebrate your resort.", reward:{money:16000,xp:750}},
+  // Story side-quest: two valid routes per milestone. Players choose through
+  // NORMAL park building/management, not through extra currency or saves.
+  // All IDs are new, so existing story steps and claimed contracts remain valid.
+  { id:"festival_invitation", arc:"festival", title:"Maya: Festival Invitations", chapter:5,
+    goal:"Make the park inviting to all — choose your strategy",
+    metric:"guestMood", target:80,
+    routes:[{metric:"guestMood",target:80,label:"Reach 80 guest happiness"},{metric:"attractions",target:6,label:"Build 6 water park attractions"}],
+    narrative:"Maya is planning the splash festival! Delight your visitors OR expand the rides lineup. Either approach earns the same one-time reward.",
+    reward:{money:10000,xp:500} },
+  { id:"festival_preparation", arc:"festival", title:"Maya: The Festival Countdown", chapter:5, prerequisite:"festival_invitation",
+    goal:"Get the resort ready for the festival",
+    metric:"upgrades", target:6,
+    routes:[{metric:"upgrades",target:6,label:"Complete 6 ride upgrades"},{metric:"reviews",target:12,label:"Collect 12 genuine guest reviews"}],
+    narrative:"You decide: improve the hardware OR let happy guests spread the word. Both routes keep your park save and progress intact.",
+    reward:{money:16000,xp:700} },
+  { id:"festival_destination", arc:"festival", title:"Maya: Something for Everyone", chapter:6, prerequisite:"festival_preparation",
+    goal:"Turn the festival into a destination",
+    metric:"hotelCount", target:1,
+    routes:[{metric:"hotelCount",target:1,label:"Open a hotel"},{metric:"chains",target:1,label:"Complete an attraction chain"}],
+    narrative:"Families can stay overnight, or you can build a signature ride circuit. Pick the investment that suits your resort.",
+    reward:{money:23000,xp:950} },
+  { id:"festival_finale", arc:"festival", title:"Maya: Festival Headliner", chapter:6, prerequisite:"festival_destination",
+    goal:"Earn a festival-worthy reputation",
+    metric:"reputation", target:85,
+    routes:[{metric:"reputation",target:85,label:"Reach 85 park reputation"},{metric:"members",target:40,label:"Welcome 40 loyal members"}],
+    narrative:"The festival's big day is here. Become famous for excellence or build a loyal community. Maya has a celebration planned either way!",
+    reward:{money:32000,xp:1350} },
   // A second, optional campaign after the finale. Keeping these outside
   // STORY_STEPS means completed parks and cloud saves retain their positions.
   { id:"legacy_smiles", arc:"legacy", requiresStoryComplete:true, title:"Season Two: The Guest Promise", chapter:13, goal:"Reach 85 average visitor happiness", metric:"guestMood", target:85, narrative:"Maya invites you back for a victory tour. Show that success hasn't changed your standards: happy guests come first.", reward:{money:30000,xp:1500} },
@@ -46,7 +73,18 @@ export function contractProgress(contract, game = {}) {
     megaProjects: (game.megaProjects || []).filter(project => project && (project.status === "complete" || project.status === "completed" || project.completed)).length,
     reputation: Number(game.reputation) || 0,
   };
-  const current = Math.max(0, Math.floor(values[contract.metric] || 0));
+  // A player's chosen strategy is the better of the two measured paths.
+  // Do not add a saved selection or ever reward a single contract twice.
+  if (Array.isArray(contract.routes) && contract.routes.length) {
+    const routes = contract.routes.map(route=>{
+      const target=Math.max(1, Number(route.target)||1);
+      const current=Math.max(0, Math.floor(Number(values[route.metric])||0));
+      return {label:route.label,current,target,percent:Math.min(100,Math.round(current/target*100)),complete:current>=target};
+    });
+    const best=[...routes].sort((a,b)=>b.percent-a.percent)[0];
+    return {...best, routes, alternative:true, complete:routes.some(route=>route.complete)};
+  }
+  const current = Math.max(0, Math.floor(Number(values[contract.metric]) || 0));
   const target = Math.max(1, Number(contract.target) || 1);
   return { current, target, percent: Math.min(100, Math.round(current / target * 100)), complete: current >= target };
 }

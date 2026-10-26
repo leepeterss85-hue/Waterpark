@@ -10,6 +10,9 @@ const TIPS = {
  heatwave: "Keep guests happy with shade, facilities and well-maintained attractions. The happiness target must be reached during a heatwave.",
  mood: "Maintain a happy crowd. Improve queues, amenities and staffing; a later park day must meet the target.",
  water: "Build water attractions and maintain their average water quality with cleaning staff, filtration and treatment. A later park day must meet the target.",
+ reviews: "Keep guests happy so they leave fresh reviews. Only reviews received AFTER the challenge begins count.",
+ members: "Make visitors want to return with great attractions and customer service. Only new members count.",
+ occupancy: "Build a hotel and improve its appeal, comfort and value. Occupied rooms are required on a later park day.",
 };
 const formatProgress = (def, value) => (def.metric === "earnings" ? "£" : "") + Math.round(value).toLocaleString("en-GB");
 
