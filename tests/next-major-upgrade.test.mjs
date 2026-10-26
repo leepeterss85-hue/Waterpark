@@ -4,7 +4,8 @@ import { readFileSync } from "node:fs";
 import { clampParkPan, zoomParkAtPoint } from "../src/lib/parkCamera.js";
 import { STORY_CONTRACTS, contractProgress, availableStoryContracts } from "../src/data/storyContracts.js";
 import { TIMED_CHALLENGES, canStartTimedChallenge, startTimedChallenge, evaluateTimedChallenge, sanitiseTimedChallenges } from "../src/data/timedChallenges.js";
-import { buildSavePayload } from "../src/lib/savePayload.js";
+import { buildSavePayload, SAVE_FIELDS } from "../src/lib/savePayload.js";
+import { normaliseTileRotations, safeTileRotation, nextTileRotation } from "../src/lib/parkTileRotation.js";
 const read = path => readFileSync(new URL("../" + path, import.meta.url), "utf8");
 
 test("phone camera pans at auto-fit zoom, stays in bounds and preserves pinch focus", () => {
@@ -101,4 +102,45 @@ test("graphics activity is read-only, respects quality modes and building afford
   assert.match(css,/prefers-reduced-motion/);
   assert.match(css,/data-graphics="balanced"/);
   assert.match(read("src/components/game/GameModePanel.jsx"),/cannot buy game cash, upgrades or items with real money/);
+});
+
+test("cosmetic building rotation survives saves and remains backwards compatible", () => {
+  assert.equal(safeTileRotation(270),270);
+  assert.equal(safeTileRotation(45),0);
+  assert.equal(safeTileRotation(NaN),0);
+  assert.equal(safeTileRotation(null),0);
+  assert.deepEqual([0,90,180,270,360].map(nextTileRotation),[90,180,270,0,90]);
+  assert.deepEqual(normaliseTileRotations(undefined,5),[0,0,0,0,0]);
+  assert.deepEqual(normaliseTileRotations([90,270,-90,360,180],5),[90,270,0,0,180]);
+  assert.deepEqual(normaliseTileRotations([90],3),[90,0,0]);
+  assert.deepEqual(normaliseTileRotations([90,180,270],1),[90]);
+  const stored = buildSavePayload({grid:["park_entrance","wave_pool"],tileRotations:[0,270],money:12345,day:2});
+  assert.deepEqual(stored.tileRotations,[0,270]);
+  assert.ok(SAVE_FIELDS.includes("tileRotations"));
+  const fromLegacySave = normaliseTileRotations(JSON.parse(JSON.stringify({grid:["park_entrance","wave_pool"]})).tileRotations,2);
+  assert.deepEqual(fromLegacySave,[0,0]);
+});
+
+test("visual rotation is isolated from economy, tiles and old save formats", () => {
+  const state = read("src/hooks/useGameState.js");
+  const grid = read("src/components/game/ParkGrid.jsx");
+  const tile = read("src/components/game/Tile.jsx");
+  const artwork = read("src/components/game/ParkItemArtwork.jsx");
+  const home = read("src/pages/Home.jsx");
+  assert.match(state,/setTileRotations\(normaliseTileRotations\(data\.tileRotations, loadedGrid\.length\)\)/);
+  assert.match(state,/setTileRotations\(Array\(fallbackGrid\.length\)\.fill\(0\)\)/);
+  assert.match(state,/setTileRotations\(Array\(GRID_SIZE\)\.fill\(0\)\)/);
+  assert.match(state,/setTileRotations\(Array\(startGrid\.length\)\.fill\(0\)\)/);
+  assert.match(state,/setTileRotations\(\(angles\) => \[\.\.\.angles, \.\.\.Array\(EXPAND_ROW\)\.fill\(0\)\]\)/);
+  assert.match(state,/const rotateSelectedTile = useCallback/);
+  assert.match(state,/setTileRotations\(\(angles\) => \{ const next = \[\.\.\.angles\]; next\[index\] = 0; return next; \}\)/);
+  assert.match(grid,/aria-label="Rotate building preview clockwise"/);
+  assert.match(grid,/aria-label="Rotate selected building clockwise"/);
+  assert.match(home,/onRotateBuildPreview=\{game\.rotateBuildPreview\}/);
+  assert.match(home,/onRotateSelectedTile=\{game\.rotateSelectedTile\}/);
+  assert.match(tile,/artRotation=0|artRotation = 0/);
+  assert.match(tile,/rotation=\{artRotation\}/);
+  assert.match(tile,/rotation=\{previewRotation\}/);
+  assert.match(artwork,/style=\{\{ rotate: rotation \+ "deg" \}\}/);
+  assert.match(read("src/components/game/resortFinish.css"),/\.park-placement-tray \{ flex-wrap:wrap/);
 });

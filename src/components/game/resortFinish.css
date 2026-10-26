@@ -51,6 +51,11 @@
   outline:2px solid #0891b2; outline-offset:2px;
 }
 @media(max-width:450px) {
+  /* A narrow phone can have Build/Rotate/Change/Cancel at once. Keep them
+     accessible without covering the park or clipping the last button. */
+  .park-placement-tray { flex-wrap:wrap; column-gap:.35rem; row-gap:.3rem; padding:.4rem .5rem; }
+  .park-placement-tray > .min-w-0 { min-width:calc(100% - 50px); }
+  .park-placement-tray .park-placement-action { flex:1 1 auto; min-width:75px; }
   .resort-finish .game-map-toolbar button { min-width:36px; min-height:38px; }
   .resort-finish .game-map-toolbar { gap:3px; }
   .resort-quality-button { padding:0 7px; }
