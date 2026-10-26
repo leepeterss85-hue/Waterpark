@@ -222,7 +222,7 @@ export function simulateConstruction(context) {
           updatedProjects.push({ ...project, status: "completed", progress: 100, completedDay: day });
           logEntries.push({
             day,
-            text: `Day ${day}: 🎉 ${"RENOVATION COMPLETE"}: ${def.name}! +${def.rewards.reputation} reputation, +${def.rewards.xp} XP.`,
+            text: `Day ${day}: 🎉 RENOVATION COMPLETE: ${def.name}! +${def.rewards.reputation} reputation, +${def.rewards.xp} XP.`,
           });
         } else {
           updatedProjects.push({ ...project, status: "cancelled", progress: 100, cancelledDay: day, cancelReason: "target_missing" });
@@ -238,7 +238,7 @@ export function simulateConstruction(context) {
       updatedProjects.push({ ...project, status: "completed", progress: 100, completedDay: day });
       logEntries.push({
         day,
-        text: `Day ${day}: 🎉 ${"RENOVATION COMPLETE"}: ${def.name}! +${def.rewards.reputation} reputation, +${def.rewards.xp} XP.`,
+        text: `Day ${day}: 🎉 ${def.category === "ride" || def.category === "hotel" ? "GRAND OPENING" : "PROJECT COMPLETE"}: ${def.name}! +${def.rewards.reputation} reputation, +${def.rewards.xp} XP.`,
       });
     } else {
       updatedProjects.push({ ...project, progress });
