@@ -311,13 +311,14 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet, graphics
           expansionsDone={game.expansionsDone}
           parkZones={game.parkZones}
           grid={game.grid}
+          money={game.money}
           claimedLegendary={game.claimedLegendary}
           onClaimLegendary={game.claimLegendary}
         />
       </SheetShell>
 
       <SheetShell open={openSheet === "vipGuests"} onOpenChange={(v) => !v && close()} title="VIP Guests" icon={Star} width="sm:max-w-md">
-        <VipGuestsPanel vipVisit={game.vipVisit} vipHistory={game.vipHistory} reputation={game.reputation} />
+        <VipGuestsPanel activeVip={game.vipVisit} vipHistory={game.vipHistory} level={game.level} />
       </SheetShell>
 
       <SheetShell open={openSheet === "seasonalCalendar"} onOpenChange={(v) => !v && close()} title="Seasonal Calendar" icon={Clock} width="sm:max-w-lg">
@@ -325,7 +326,7 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet, graphics
       </SheetShell>
 
       <SheetShell open={openSheet === "rideAging"} onOpenChange={(v) => !v && close()} title="Ride Aging" icon={Wrench} width="sm:max-w-md">
-        <RideAgingPanel grid={game.grid} rideAges={game.rideAges} money={game.money} onRefurbish={game.refurbishRide} selectedTile={game.selectedTile} />
+        <RideAgingPanel grid={game.grid} rideAges={game.rideAges} money={game.money} onRefurbish={game.refurbishRide} />
       </SheetShell>
 
       <SheetShell open={openSheet === "leaderboard"} onOpenChange={(v) => !v && close()} title="Leaderboard" icon={Medal} width="sm:max-w-md">
@@ -454,7 +455,7 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet, graphics
           <div className="mt-1 text-lg font-black text-slate-900">How do you want to play?</div>
           <p className="mt-1 text-xs leading-5 text-slate-500">Choose a guided campaign, build freely, or experiment with the full park.</p>
         </div>
-        <GameModePanel game={game} onClose={close} />
+        <GameModePanel game={game} />
       </SheetShell>
 
       <SheetShell open={openSheet === "advancedPark"} onOpenChange={(v) => !v && close()} title="Park Life & Destinations" icon={Waves} width="sm:max-w-lg">

@@ -14,7 +14,7 @@ const COLORS = {
   violet: { bg: "bg-violet-50", border: "border-violet-200", text: "text-violet-700", icon: "bg-violet-100 text-violet-600" },
 };
 
-function StatCard({ icon: Icon, label, value, sublabel }) {
+function StatCard({ icon: Icon, label, value, sublabel = "" }) {
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-2.5 shadow-sm">
       <div className="flex items-center gap-2">

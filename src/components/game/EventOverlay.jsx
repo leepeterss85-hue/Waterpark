@@ -47,12 +47,12 @@ function EventFx({ fx, grid }) {
     return (
       <div className="event-fx-fireworks">
         {[0, 1, 2, 3].map((i) => (
-          <span key={i} className="firework-burst" style={{
+          <span key={i} className="firework-burst" style={/** @type {React.CSSProperties} */ ({
             left: `${15 + i * 22}%`,
             top: `${8 + (i % 2) * 12}%`,
             "--burst-color": fx.accent,
             animationDelay: `${i * 0.5}s`,
-          }}>
+          })}>
             {Array.from({ length: 8 }, (_, j) => (
               <i key={j} style={{ transform: `rotate(${j * 45}deg)` }} />
             ))}

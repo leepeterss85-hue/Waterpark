@@ -1,7 +1,7 @@
 import React from "react";
 import { AlertTriangle, X } from "lucide-react";
 
-export default function DisasterBanner({ disaster, onDismiss }) {
+export default function DisasterBanner({ disaster, onDismiss = undefined }) {
   if (!disaster) return null;
   const effects = disaster.effects || {};
   const effectParts = [];

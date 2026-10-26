@@ -7,7 +7,7 @@ import "@/components/game/sceneryUpgrade.css";
 // No building or pathfinding tiles are changed and no randomness enters saves.
 export default function ParkSceneryLayer({ grid, selectedBuild = null }) {
   const rows = Math.ceil((grid?.length || 0) / 8);
-  return <div className="park-scenery-layer" data-building={Boolean(selectedBuild)} style={{ "--map-rows": rows }} aria-hidden="true">
+  return <div className="park-scenery-layer" data-building={Boolean(selectedBuild)} style={/** @type {React.CSSProperties} */ ({ "--map-rows": rows })} aria-hidden="true">
     {(grid || []).map((value, index) => {
       if (value) return <span key={index} />;
       const type = getDecorativeScenery(index);

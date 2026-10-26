@@ -69,6 +69,7 @@ export const haptics = {
   setEnabled(v) {
     vibrationEnabled = !!v;
   },
+  /** @param {number | number[]} [pattern] */
   buzz(pattern = 18) {
     if (!vibrationEnabled) return;
     if (typeof navigator === "undefined" || !navigator.vibrate) return;

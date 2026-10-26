@@ -14,7 +14,7 @@ export default function UpgradeAura({ level = 0 }) {
   const tier = [...TIERS].reverse().find((t) => level >= t.min);
   const stars = Math.min(5, Math.ceil(level / 2));
   return (
-    <div className="upgrade-aura" data-tier={tier.name} aria-hidden="true" style={{ "--aura-color": tier.color, "--aura-glow": tier.glow }}>
+    <div className="upgrade-aura" data-tier={tier.name} aria-hidden="true" style={/** @type {React.CSSProperties} */ ({ "--aura-color": tier.color, "--aura-glow": tier.glow })}>
       <div className="upgrade-aura-ring" />
       <div className="upgrade-aura-stars">
         {Array.from({ length: stars }, (_, i) => <Star key={i} className="upgrade-star" />)}
