@@ -270,6 +270,15 @@
   background:linear-gradient(110deg,#f0fdfa,#e0f2fe); color:#164e63;
   box-shadow:0 -4px 12px rgba(8,47,73,.08);
 }
+.resort-finish .story-guide-chapter-notice {
+  position:absolute; right:10px; bottom:calc(100% + 8px);
+  z-index:20; max-width:min(96%,440px); padding:10px 14px;
+  border:2px solid #67e8f9; border-radius:13px;
+  background:rgba(8,47,73,.96); color:white;
+  font-size:13px; line-height:1.45; font-weight:900;
+  box-shadow:0 10px 24px rgba(8,47,73,.22);
+  pointer-events:none;
+}
 .resort-finish .story-guide-heading {
   display:flex; min-width:0; align-items:center; gap:7px; grid-column:1/-1;
   color:#0e7490; font-size:12px; font-weight:900;
