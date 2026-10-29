@@ -291,6 +291,28 @@
 .resort-finish .story-guide-copy p {
   margin:3px 0 0; color:#155e75; font-size:12px; line-height:1.35;
 }
+.resort-finish .story-guide-actions {
+  display:flex; align-items:center; justify-content:flex-end;
+  flex-wrap:wrap; gap:6px; min-width:0;
+}
+.resort-finish .story-guide-secondary {
+  display:inline-flex; justify-content:center; align-items:center;
+  min-height:38px; padding:6px 10px;
+  border:1px solid #7dd3fc; border-radius:9px;
+  background:#fff; color:#075985; font-size:12px; font-weight:900;
+}
+.resort-finish .story-guide-progress-track {
+  height:5px; margin-top:6px; overflow:hidden;
+  border-radius:99px; background:#bae6fd;
+}
+.resort-finish .story-guide-progress-track > div {
+  height:100%; border-radius:inherit; background:#0891b2;
+  transition:width .2s ease;
+}
+.resort-finish .story-coach-collapsed { grid-template-columns:minmax(0,1fr) auto; }
+.resort-finish .story-guide-actions button:focus-visible {
+  outline:3px solid #f59e0b; outline-offset:2px;
+}
 .resort-finish .story-guide-action {
   display:inline-flex; align-items:center; justify-content:center; gap:7px;
   min-height:44px; max-width:190px; padding:8px 12px;
@@ -307,5 +329,8 @@
   .resort-finish .story-guide-heading { font-size:11px; }
   .resort-finish .story-guide-copy h3 { font-size:12px; }
   .resort-finish .story-guide-copy p { font-size:11px; }
-  .resort-finish .story-guide-action { min-height:42px; max-width:125px; padding:6px 8px; font-size:11px; }
+  .resort-finish .story-guide-action { min-height:42px; max-width:150px; padding:6px 8px; font-size:12px; }
+  .resort-finish .story-guide-secondary { min-height:36px; padding:5px 8px; font-size:11px; }
+  .resort-finish .story-guide-actions { justify-content:flex-start; }
+  .resort-finish .story-coach-collapsed .story-guide-actions { justify-content:flex-end; }
 }
