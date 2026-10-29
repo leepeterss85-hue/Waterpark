@@ -18,6 +18,7 @@ export default function StoryCoach({ game, setOpenSheet, openSheet }) {
   }, [guide?.kind, guide?.target, openSheet, details, game.grid, active]);
   if (!active) return null;
   const progress = storyObjectiveProgress(step, game);
+  const nextMilestone = progress.milestones.find(goal => goal.current < goal.target) || progress.milestones[0];
   const act = () => {
     setDetails(false);
     if (guide.kind === 'clock') {
@@ -27,11 +28,16 @@ export default function StoryCoach({ game, setOpenSheet, openSheet }) {
       const tile = document.querySelector(selector);
       if (tile) tile.dispatchEvent(new CustomEvent('park-focus-tile', {bubbles:true}));
       else setOpenSheet('build');
-    } else setOpenSheet(guide.target);
+    } else {
+      // Leaving placement mode for staffing or management must not keep an
+      // old ride armed for accidental purchases when the player taps the map.
+      if (game.selectedBuild && guide.target !== 'build') game.setSelectedBuild(null);
+      setOpenSheet(guide.target);
+    }
   };
   return <aside className="story-play-guide story-coach-inline" aria-label="Story Mode objective" data-story-coach-step={step.id}>
-    <div className="story-guide-heading"><BookOpen size={18}/><span>Maya · Chapter {step.chapter || 1}</span><strong>{progress.percent}%</strong><button type="button" onClick={() => setDetails(true)} aria-label="Show story instructions"><HelpCircle size={20}/></button></div>
-    <div className="story-guide-copy" aria-live="polite" aria-atomic="true"><h3>{step.title}</h3><p>{guide.text}</p></div>
+    <div className="story-guide-heading"><BookOpen size={18}/><span>Maya · Chapter {step.chapter || 1} · Step {game.storyStep + 1} of {game.STORY_STEPS.length}</span><strong>{progress.percent}%</strong><button type="button" onClick={() => setDetails(true)} aria-label="Show story instructions"><HelpCircle size={20}/></button></div>
+    <div className="story-guide-copy" aria-live="polite" aria-atomic="true"><h3>{step.title}</h3><p>{guide.text}</p>{nextMilestone && <p className="story-guide-milestone">Progress: {nextMilestone.name} · {Math.min(nextMilestone.current, nextMilestone.target)} / {nextMilestone.target}{progress.alternative ? ' (either goal counts)' : ''}</p>}</div>
     <button type="button" className="story-guide-action" onClick={act}>{guide.label}<ArrowRight size={18}/></button>
     <Dialog open={details} onOpenChange={setDetails}>
       <DialogContent className="max-h-[85dvh] overflow-y-auto">
