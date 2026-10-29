@@ -234,7 +234,7 @@
 .resort-finish .park-guidance-content { max-height:25dvh; overflow-y:auto; overscroll-behavior:contain; }
 .resort-finish .game-board-frame { min-height:160px; }
 .resort-finish.park-view-expanded { position:fixed; inset:0; z-index:45; height:100dvh; border-radius:0; }
-.resort-finish.park-view-expanded > :not(.game-board-titlebar):not(.game-board-frame):not(.park-menu-bar):not(.game-board-statsbar) { display:none; }
+.resort-finish.park-view-expanded > :not(.game-board-titlebar):not(.park-workspace):not(.park-menu-bar):not(.game-board-statsbar) { display:none; }
 .resort-finish .park-tile-caption { font-size:10px; line-height:1.2; }
 @media(max-width:640px) {
  .resort-finish .game-board-titlebar { min-height:48px; padding:4px 8px; gap:4px; }
@@ -249,4 +249,62 @@
  .resort-finish .park-speed-picker button { min-height:44px; padding:4px 7px; }
  .resort-finish .game-board-legend { padding:3px 8px; }
  .resort-finish .game-board-frame { padding:4px; }
+}
+
+/* Story repair: the map and coach share remaining board height without squeezing
+   the map into a strip. The previous block workspace gave the flex child no height. */
+.resort-finish .park-workspace {
+  display:flex; flex:1 1 auto; flex-direction:column; min-height:0;
+  min-width:0; overflow:hidden;
+}
+.resort-finish .park-workspace > .game-board-frame {
+  display:flex; flex:1 1 auto; flex-direction:column; min-height:0; min-width:0;
+}
+.resort-finish .game-map-surface { flex:1 1 auto; min-height:0; }
+.resort-finish.park-view-expanded .park-workspace { flex:1 1 auto; min-height:0; }
+.resort-finish.park-view-expanded .story-coach-inline { display:none; }
+.resort-finish .story-coach-inline {
+  display:grid; grid-template-columns:minmax(0,1fr) auto;
+  align-items:center; gap:8px 12px; min-width:0; flex-shrink:0;
+  padding:9px 12px; border-top:2px solid rgba(8,145,178,.3);
+  background:linear-gradient(110deg,#f0fdfa,#e0f2fe); color:#164e63;
+  box-shadow:0 -4px 12px rgba(8,47,73,.08);
+}
+.resort-finish .story-guide-heading {
+  display:flex; min-width:0; align-items:center; gap:7px; grid-column:1/-1;
+  color:#0e7490; font-size:12px; font-weight:900;
+}
+.resort-finish .story-guide-heading > span { flex:1; min-width:0; }
+.resort-finish .story-guide-heading > strong {
+  border-radius:999px; background:#cffafe; padding:2px 8px;
+  color:#155e75; font-size:12px;
+}
+.resort-finish .story-guide-heading > button {
+  display:grid; place-items:center; min-width:34px; min-height:34px;
+  border-radius:9px; border:1px solid #a5f3fc; background:white;
+}
+.resort-finish .story-guide-copy { min-width:0; }
+.resort-finish .story-guide-copy h3 {
+  margin:0; color:#083344; font-size:14px; font-weight:900; line-height:1.25;
+}
+.resort-finish .story-guide-copy p {
+  margin:3px 0 0; color:#155e75; font-size:12px; line-height:1.35;
+}
+.resort-finish .story-guide-action {
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  min-height:44px; max-width:190px; padding:8px 12px;
+  border-radius:11px; background:#0e7490; color:white;
+  font-size:12px; line-height:1.2; font-weight:900; text-align:center;
+}
+.resort-finish .story-guide-action:focus-visible,
+.resort-finish .story-guide-heading > button:focus-visible {
+  outline:3px solid #f59e0b; outline-offset:2px;
+}
+.story-action-highlight { position:relative; z-index:8; outline:3px solid #f59e0b!important; outline-offset:-3px; box-shadow:0 0 0 4px rgba(251,191,36,.25)!important; }
+@media(max-width:640px) {
+  .resort-finish .story-coach-inline { gap:5px 8px; padding:6px 8px; }
+  .resort-finish .story-guide-heading { font-size:11px; }
+  .resort-finish .story-guide-copy h3 { font-size:12px; }
+  .resort-finish .story-guide-copy p { font-size:11px; }
+  .resort-finish .story-guide-action { min-height:42px; max-width:125px; padding:6px 8px; font-size:11px; }
 }
