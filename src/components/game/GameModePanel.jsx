@@ -5,7 +5,7 @@ import SandboxLabPanel from "@/components/game/SandboxLabPanel";
 import StoryContractsPanel from "@/components/game/StoryContractsPanel";
 import { STORY_CONTRACTS } from "@/data/storyContracts";
 
-export default function GameModePanel({ game }) {
+export default function GameModePanel({ game, onEnterPark }) {
   const story = game.STORY_STEPS?.[game.storyStep] || game.STORY_STEPS?.[0];
   const chapter = story?.chapter || 1;
   const chapterCount = Math.max(1, ...(game.STORY_STEPS || []).map((step) => step.chapter || 1));
@@ -14,7 +14,10 @@ export default function GameModePanel({ game }) {
     { id:"freeplay", title:"Freeplay", short:"Build your empire", text:"The full tycoon experience. Set your own goals and use every management system.", icon:Gamepad2 },
     { id:"sandbox", title:"Sandbox", short:"Experiment freely", text:"Unlimited creative tools, testing controls and instant experimentation.", icon:Wrench },
   ];
-  const select = (id) => game.setMode(id);
+  const select = (id) => {
+    game.setMode(id);
+    onEnterPark(id);
+  };
   return <div className="space-y-3">
     <div className="grid gap-3 sm:grid-cols-3">{modes.map(m=>{const I=m.icon; const active=game.gameMode===m.id; return <button key={m.id} type="button" onClick={()=>select(m.id)} aria-pressed={active} className={"group min-h-36 rounded-2xl border p-4 text-left transition "+(active?"border-cyan-500 bg-cyan-50 shadow-md ring-1 ring-cyan-200":"border-slate-200 bg-white hover:border-cyan-300 hover:shadow-sm")}><div className="flex items-start justify-between"><div className="grid h-10 w-10 place-items-center rounded-xl bg-slate-900 text-white"><I className="h-5 w-5"/></div>{active&&<CheckCircle2 className="h-5 w-5 text-cyan-600"/>}</div><div className="mt-3 text-sm font-black text-slate-900">{m.title}</div><div className="mt-0.5 text-[11px] font-bold text-cyan-700">{m.short}</div><div className="mt-1 text-[11px] leading-4 text-slate-500">{m.text}</div></button>})}</div>
     <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-[11px] font-semibold text-emerald-800">All prices are fictional in-game £ cash. You cannot buy game cash, upgrades or items with real money.</div>

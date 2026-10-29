@@ -81,7 +81,12 @@ function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-m
 
 export default function GameMenuSheets({ game, openSheet, setOpenSheet, graphicsQuality = "ultra", onGraphicsQualityChange }) {
   const close = () => setOpenSheet(null);
-  const skipStory = () => { game.setMode("freeplay"); setOpenSheet(null); };
+  const enterParkMode = (mode) => {
+    game.setSelectedBuild(null);
+    game.setSelectedTile(null);
+    setOpenSheet(mode === "story" ? "storyIntro" : null);
+  };
+  const story = game.STORY_STEPS?.[game.storyStep] || game.STORY_STEPS?.[0];
   const zones = [...new Set((game.parkZones || []).filter(Boolean))].map((id) => ({
     id,
     label: String(id).replace(/[-_]/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
@@ -455,7 +460,18 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet, graphics
           <div className="mt-1 text-lg font-black text-slate-900">How do you want to play?</div>
           <p className="mt-1 text-xs leading-5 text-slate-500">Choose a guided campaign, build freely, or experiment with the full park.</p>
         </div>
-        <GameModePanel game={game} />
+        <GameModePanel game={game} onEnterPark={enterParkMode} />
+      </SheetShell>
+
+      <SheetShell open={openSheet === "storyIntro"} onOpenChange={(v) => !v && close()} title={game.storyCompleted ? "Welcome back to Story Mode" : game.storyStep > 0 ? "Continue your story" : "Welcome to Story Mode"} icon={BookOpen}>
+        <div className="space-y-4 rounded-2xl border border-cyan-200 bg-white p-5">
+          <p className="text-xs font-black uppercase tracking-wide text-cyan-700">Maya's park guide</p>
+          <h3 className="text-xl font-black text-slate-900">{game.storyCompleted ? "Your campaign is complete!" : story?.title || "Your park adventure begins"}</h3>
+          <p className="text-sm leading-6 text-slate-600">{game.storyCompleted ? "Your park and completed chapters are ready to continue. Maya's bonus quests are available in Game Modes." : story?.text}</p>
+          {!game.storyCompleted && <div className="rounded-xl bg-cyan-50 p-4 text-sm font-bold text-cyan-900">{story?.action}</div>}
+          <p className="text-xs leading-5 text-slate-500">Your existing park and progress are preserved. Open Goals & park updates above the map whenever you need Maya's next objective.</p>
+          <button type="button" onClick={close} className="min-h-12 w-full rounded-xl bg-cyan-700 px-4 py-3 font-bold text-white">{game.storyStep > 0 || game.storyCompleted ? "Continue in my park" : "Enter my park"}</button>
+        </div>
       </SheetShell>
 
       <SheetShell open={openSheet === "advancedPark"} onOpenChange={(v) => !v && close()} title="Park Life & Destinations" icon={Waves} width="sm:max-w-lg">
