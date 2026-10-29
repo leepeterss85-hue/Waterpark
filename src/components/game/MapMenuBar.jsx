@@ -3,9 +3,9 @@ import { Hammer, Settings, Users, Grid3x3, ChevronUp, Gamepad2 } from "lucide-re
 
 const PRIMARY = [
   { key: "build", icon: Hammer, label: "Build", tutorialTarget: "build" },
-  { key: "manage", icon: Settings, label: "Manage" },
+  { key: "manage", icon: Settings, label: "Manage", tutorialTarget: "manage" },
   { key: "staff", icon: Users, label: "Staff", tutorialTarget: "staff" },
-  { key: "gameModes", icon: Gamepad2, label: "Modes" },
+  { key: "gameModes", icon: Gamepad2, label: "Modes", tutorialTarget: "gameModes" },
 ];
 
 export default function MapMenuBar({ openSheet, onOpen, missionsBadge = 0, incidentBadge = 0 }) {
