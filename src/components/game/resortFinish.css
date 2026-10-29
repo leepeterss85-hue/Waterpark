@@ -334,3 +334,10 @@
   .resort-finish .story-guide-actions { justify-content:flex-start; }
   .resort-finish .story-coach-collapsed .story-guide-actions { justify-content:flex-end; }
 }
+
+/* A mouse drag moves the park but a simple click still selects/builds. */
+.resort-finish .game-map-surface.park-camera-dragging,
+.resort-finish .game-map-surface.park-camera-dragging * {
+  cursor:grabbing!important;
+  user-select:none!important;
+}
