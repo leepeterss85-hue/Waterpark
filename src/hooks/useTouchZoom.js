@@ -17,6 +17,8 @@ export function useTouchZoom(initialZoom = 1, minZoom = 0.8, maxZoom = 1.5) {
   // Start at readable scale. Only the explicit Fit button enables overview.
   const autoFitRef = useRef(false);
   const suppressGestureClickRef = useRef(false);
+  const mouseDragRef = useRef(null);
+  const mouseClickClearRef = useRef(null);
   const stateRef = useRef({ zoom, panX, panY });
   stateRef.current = { zoom, panX, panY };
 
@@ -98,6 +100,78 @@ export function useTouchZoom(initialZoom = 1, minZoom = 0.8, maxZoom = 1.5) {
     };
     viewport.addEventListener('park-focus-tile', focusTile);
     return () => viewport.removeEventListener('park-focus-tile', focusTile);
+  }, []);
+
+  // Desktop play: drag the map with a mouse, just as touch users can pan
+  // with a finger. Suppress a click ONLY after a genuine drag, so ordinary
+  // clicks still select rides and buy buildings safely.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const down = (event) => {
+      if (event.pointerType !== "mouse" || event.button !== 0) return;
+      if (mouseClickClearRef.current != null) {
+        clearTimeout(mouseClickClearRef.current);
+        mouseClickClearRef.current = null;
+      }
+      suppressGestureClickRef.current = false;
+      mouseDragRef.current = {
+        id: event.pointerId,
+        x: event.clientX,
+        y: event.clientY,
+        panX: stateRef.current.panX,
+        panY: stateRef.current.panY,
+        engaged: false,
+      };
+    };
+    const move = (event) => {
+      const drag = mouseDragRef.current;
+      if (!drag || event.pointerId !== drag.id) return;
+      const dx = event.clientX - drag.x;
+      const dy = event.clientY - drag.y;
+      if (!drag.engaged && Math.hypot(dx, dy) < 7) return;
+      if (!drag.engaged) {
+        drag.engaged = true;
+        el.classList.add("park-camera-dragging");
+        try { el.setPointerCapture(event.pointerId); } catch { /* optional */ }
+      }
+      event.preventDefault();
+      suppressGestureClickRef.current = true;
+      autoFitRef.current = false;
+      const world = el.querySelector(".park-playfield");
+      const width = world?.offsetWidth || 704;
+      const height = world?.offsetHeight || el.clientHeight;
+      const z = stateRef.current.zoom;
+      setPanX(clampParkPan(drag.panX + dx, el.clientWidth, width, z));
+      setPanY(clampParkPan(drag.panY + dy, el.clientHeight, height, z));
+    };
+    const up = (event) => {
+      const drag = mouseDragRef.current;
+      if (!drag || event.pointerId !== drag.id) return;
+      mouseDragRef.current = null;
+      el.classList.remove("park-camera-dragging");
+      try { if (el.hasPointerCapture(event.pointerId)) el.releasePointerCapture(event.pointerId); } catch { /* optional */ }
+      // Pointerup precedes click. Keep the suppression in place until the
+      // browser has delivered that click, then clear it for the next tap.
+      if (drag.engaged) {
+        mouseClickClearRef.current = setTimeout(() => {
+          suppressGestureClickRef.current = false;
+          mouseClickClearRef.current = null;
+        }, 0);
+      }
+    };
+    el.addEventListener("pointerdown", down);
+    el.addEventListener("pointermove", move);
+    el.addEventListener("pointerup", up);
+    el.addEventListener("pointercancel", up);
+    return () => {
+      el.removeEventListener("pointerdown", down);
+      el.removeEventListener("pointermove", move);
+      el.removeEventListener("pointerup", up);
+      el.removeEventListener("pointercancel", up);
+      el.classList.remove("park-camera-dragging");
+      if (mouseClickClearRef.current != null) clearTimeout(mouseClickClearRef.current);
+    };
   }, []);
 
   const onMapClickCapture = useCallback((event) => {
