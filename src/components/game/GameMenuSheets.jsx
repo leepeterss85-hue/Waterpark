@@ -1,7 +1,8 @@
 import ResortChapter from "@/components/game/ResortChapter";
 import TimedChallengesPanel from "@/components/game/TimedChallengesPanel";
-import React from "react";
+import React, { useState } from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Hammer, Settings, Users, Grid3x3, Activity, BarChart3, Target, CloudSun, FlaskConical, SlidersHorizontal, Hotel, Flame, CalendarDays, Ticket, Trophy, Share2, Siren, HardHat, Wallet, Crown, Swords, Droplets, Medal, Link2, MapPin, Star, Clock, Wrench, Zap, Palette, RotateCcw, Gift, PawPrint, MessageSquare, Camera, HeartPulse, Handshake, UsersRound, UtensilsCrossed, BookOpen, Globe2, Waves } from "lucide-react";
 import { MISSIONS, missionProgress } from "@/data/missions";
@@ -80,11 +81,15 @@ function SheetShell({ open, onOpenChange, title, icon: Icon, width = "sm:max-w-m
 }
 
 export default function GameMenuSheets({ game, openSheet, setOpenSheet, graphicsQuality = "ultra", onGraphicsQualityChange }) {
+  const [storyIntroOpen, setStoryIntroOpen] = useState(false);
   const close = () => setOpenSheet(null);
   const enterParkMode = (mode) => {
     game.setSelectedBuild(null);
     game.setSelectedTile(null);
-    setOpenSheet(mode === "story" ? "storyIntro" : null);
+    // Close the mode picker before showing a separate welcome dialog. Switching
+    // directly between two Radix Sheets could close the destination sheet too.
+    setOpenSheet(null);
+    setStoryIntroOpen(mode === "story");
   };
   const story = game.STORY_STEPS?.[game.storyStep] || game.STORY_STEPS?.[0];
   const zones = [...new Set((game.parkZones || []).filter(Boolean))].map((id) => ({
@@ -464,16 +469,32 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet, graphics
         <GameModePanel game={game} onEnterPark={enterParkMode} />
       </SheetShell>
 
-      <SheetShell open={openSheet === "storyIntro"} onOpenChange={(v) => !v && close()} title={game.storyCompleted ? "Welcome back to Story Mode" : game.storyStep > 0 ? "Continue your story" : "Welcome to Story Mode"} icon={BookOpen}>
-        <div className="space-y-4 rounded-2xl border border-cyan-200 bg-white p-5">
-          <p className="text-xs font-black uppercase tracking-wide text-cyan-700">Maya's park guide</p>
-          <h3 className="text-xl font-black text-slate-900">{game.storyCompleted ? "Your campaign is complete!" : story?.title || "Your park adventure begins"}</h3>
-          <p className="text-sm leading-6 text-slate-600">{game.storyCompleted ? "Your park and completed chapters are ready to continue. Maya's bonus quests are available in Game Modes." : story?.text}</p>
-          {!game.storyCompleted && <div className="rounded-xl bg-cyan-50 p-4 text-sm font-bold text-cyan-900">{story?.action}</div>}
-          <p className="text-xs leading-5 text-slate-500">Your existing park and progress are preserved. Maya’s guide stays beside your park. Use its action button for your next step, or the question mark for full instructions.</p>
-          <button type="button" onClick={close} className="min-h-12 w-full rounded-xl bg-cyan-700 px-4 py-3 font-bold text-white">{game.storyStep > 0 || game.storyCompleted ? "Continue in my park" : "Enter my park"}</button>
-        </div>
-      </SheetShell>
+      <Dialog open={storyIntroOpen} onOpenChange={setStoryIntroOpen}>
+        <DialogContent className="w-[calc(100vw-24px)] max-w-lg max-h-[86dvh] overflow-y-auto rounded-2xl bg-white p-5">
+          <p className="text-xs font-black uppercase tracking-wide text-cyan-700">Maya · Story Mode</p>
+          <DialogTitle className="text-2xl font-black text-slate-900">
+            {game.storyCompleted ? "Welcome back to your park!" : game.storyStep > 0 ? "Continue your park adventure" : "Welcome to your Water Park!"}
+          </DialogTitle>
+          <DialogDescription className="text-sm leading-6 text-slate-700">
+            {game.storyCompleted ? "Your completed story and park are saved. Return to the park or try Maya's extra challenges." : story?.text || "Build your first attraction and bring your park to life."}
+          </DialogDescription>
+          {!game.storyCompleted && <>
+            <div className="rounded-xl bg-cyan-50 p-3">
+              <p className="text-sm font-black text-cyan-950">Current goal: {story?.title}</p>
+              <p className="mt-1 text-sm leading-5 text-cyan-900">{story?.action}</p>
+            </div>
+            <ol className="space-y-2 text-sm leading-5 text-slate-700">
+              <li><strong>1. Build:</strong> Tap Build in the bottom menu, select a pool or slide, then tap an empty plot on the park map.</li>
+              <li><strong>2. Staff:</strong> Tap Staff and hire a lifeguard or cleaner.</li>
+              <li><strong>3. Open:</strong> Tap Open Park above the map and advance a day to welcome your first guests.</li>
+            </ol>
+          </>}
+          <p className="text-xs leading-5 text-slate-600">Your existing park and campaign progress are preserved. Maya's objective panel stays visible with a button showing exactly what to do next.</p>
+          <button type="button" onClick={() => setStoryIntroOpen(false)} className="min-h-12 w-full rounded-xl bg-cyan-700 px-4 py-3 text-sm font-black text-white">
+            {game.storyStep > 0 || game.storyCompleted ? "Return to my park" : "Enter my park"}
+          </button>
+        </DialogContent>
+      </Dialog>
 
       <SheetShell open={openSheet === "advancedPark"} onOpenChange={(v) => !v && close()} title="Park Life & Destinations" icon={Waves} width="sm:max-w-lg">
         <AdvancedParkPanel
