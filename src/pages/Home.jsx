@@ -286,18 +286,11 @@ export default function Home() {
                 onAdvance={() => { trackEvent("day_advanced", { source: "manual" }); game.advanceDay(); }}
                 onReset={game.resetGame}
               />
-              <details className="park-guidance-panel">
-                <summary>Goals & park updates</summary>
-                <div className="park-guidance-content">
-              <ObjectiveShortcuts game={game} onOpen={handleOpenMenu} />
-              <StoryCoach game={game} setOpenSheet={handleOpenMenu} />
-              {game.challenge && <div className="park-game-notice"><ChallengeBanner challenge={game.challenge} /></div>}
-              {game.vipVisit && <VipBanner vipVisit={game.vipVisit} />}
-                </div>
-              </details>
-              {game.disaster && <DisasterBanner disaster={game.disaster} />}
+
             </>
           }
+          storyGuide={<StoryCoach game={game} setOpenSheet={handleOpenMenu} openSheet={openSheet} />}
+          parkUpdates={<><ObjectiveShortcuts game={game} onOpen={handleOpenMenu} />{game.challenge && <ChallengeBanner challenge={game.challenge} />}{game.vipVisit && <VipBanner vipVisit={game.vipVisit} />}{game.disaster && <DisasterBanner disaster={game.disaster} />}</>}
           bottomMenu={<MapMenuBar openSheet={openSheet} onOpen={handleOpenMenu} missionsBadge={claimableMissions} incidentBadge={incidentCount} />}
           statsBar={statsBar}
           themeClass={themeClass}
@@ -356,7 +349,7 @@ export default function Home() {
         graphicsQuality={graphicsQuality} onGraphicsQualityChange={changeGraphicsQuality} />
 
       <DailySummary report={dailyReport} onClose={() => setDailyReport(null)} />
-      <Tutorial game={game} />
+      {game.gameMode !== "story" && <Tutorial game={game} />}
     </div>
   );
 }

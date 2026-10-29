@@ -104,6 +104,7 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet, graphics
       <SheetShell open={openSheet === "briefing"} onOpenChange={(v) => !v && close()} title="Next Park Day Briefing" icon={CalendarDays} width="sm:max-w-xl"><OperationsBriefPanel game={game} onOpen={setOpenSheet}/></SheetShell>
       <SheetShell open={openSheet === "menu"} onOpenChange={(v) => !v && close()} title="More Park Tools" icon={Grid3x3} width="sm:max-w-2xl"><ParkMenuHub onOpen={setOpenSheet} /></SheetShell>
       <SheetShell open={openSheet === "build"} onOpenChange={(v) => !v && close()} title="Build" icon={Hammer} width="sm:max-w-lg">
+        {game.gameMode === "story" && <div role="status" className="mb-3 rounded-xl bg-cyan-50 p-4 text-sm leading-6 text-cyan-950"><strong>Choose, then place:</strong> select an affordable pool or slide below. The catalogue will close. Tap a glowing empty grass plot to build it.</div>}
         <ExpansionPanel gridSize={game.gridSize} expansionsDone={game.expansionsDone} level={game.level} money={game.money} onExpand={game.expandPark} />
         <BuildPanel money={game.money} level={game.level} selectedBuild={game.selectedBuild}
           onSelect={(id) => { game.setSelectedBuild(id); if (id) close(); }}
@@ -469,7 +470,7 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet, graphics
           <h3 className="text-xl font-black text-slate-900">{game.storyCompleted ? "Your campaign is complete!" : story?.title || "Your park adventure begins"}</h3>
           <p className="text-sm leading-6 text-slate-600">{game.storyCompleted ? "Your park and completed chapters are ready to continue. Maya's bonus quests are available in Game Modes." : story?.text}</p>
           {!game.storyCompleted && <div className="rounded-xl bg-cyan-50 p-4 text-sm font-bold text-cyan-900">{story?.action}</div>}
-          <p className="text-xs leading-5 text-slate-500">Your existing park and progress are preserved. Open Goals & park updates above the map whenever you need Maya's next objective.</p>
+          <p className="text-xs leading-5 text-slate-500">Your existing park and progress are preserved. Maya’s guide stays beside your park. Use its action button for your next step, or the question mark for full instructions.</p>
           <button type="button" onClick={close} className="min-h-12 w-full rounded-xl bg-cyan-700 px-4 py-3 font-bold text-white">{game.storyStep > 0 || game.storyCompleted ? "Continue in my park" : "Enter my park"}</button>
         </div>
       </SheetShell>

@@ -14,8 +14,8 @@ export function useTouchZoom(initialZoom = 1, minZoom = 0.8, maxZoom = 1.5) {
 
   const pinchRef = useRef(null);
   const dragRef = useRef(null);
-  // The camera starts fitted on narrow screens, but manual zoom stays manual.
-  const autoFitRef = useRef(true);
+  // Start at readable scale. Only the explicit Fit button enables overview.
+  const autoFitRef = useRef(false);
   const suppressGestureClickRef = useRef(false);
   const stateRef = useRef({ zoom, panX, panY });
   stateRef.current = { zoom, panX, panY };
@@ -77,6 +77,28 @@ export function useTouchZoom(initialZoom = 1, minZoom = 0.8, maxZoom = 1.5) {
       window.removeEventListener('resize', fitNarrowScreen);
     };
   }, [initialZoom, minZoom, maxZoom]);
+
+
+  useEffect(() => {
+    const viewport = containerRef.current;
+    if (!viewport) return;
+    const focusTile = event => {
+      const tile = event.target.closest('[data-park-tile]');
+      const world = viewport.querySelector('.park-playfield');
+      if (!tile || !world) return;
+      autoFitRef.current = false;
+      viewport.scrollLeft = 0;
+      viewport.scrollTop = 0;
+      const col = Number(tile.dataset.parkTile) % 8;
+      const row = Math.floor(Number(tile.dataset.parkTile) / 8);
+      const rows = world.querySelectorAll('[data-park-tile]').length / 8;
+      const z = stateRef.current.zoom;
+      setPanX(clampParkPan(viewport.clientWidth / 2 - (col + .5) * world.offsetWidth / 8 * z, viewport.clientWidth, world.offsetWidth, z));
+      setPanY(clampParkPan(viewport.clientHeight / 2 - (row + .5) * world.offsetHeight / rows * z, viewport.clientHeight, world.offsetHeight, z));
+    };
+    viewport.addEventListener('park-focus-tile', focusTile);
+    return () => viewport.removeEventListener('park-focus-tile', focusTile);
+  }, []);
 
   const onMapClickCapture = useCallback((event) => {
     if (!suppressGestureClickRef.current) return;

@@ -1,96 +1,46 @@
 import React, { useEffect, useState } from "react";
-import { ArrowRight, BookOpen, ChevronDown, ChevronUp, CircleCheck, MapPin, Sparkles } from "lucide-react";
+import { BookOpen, ArrowRight, HelpCircle } from "lucide-react";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { storyObjectiveProgress } from "@/data/storyObjectives";
-import { availableStoryContracts } from "@/data/storyContracts";
+import { getStoryGuide } from "@/lib/storyGuide";
 
-const TARGETS = {
-  build: { label: "Open Build", sheet: "build" },
-  staff: { label: "Open Staff", sheet: "staff" },
-  research: { label: "Open Research", sheet: "research" },
-  manage: { label: "Open Manage", sheet: "manage" },
-  resort: { label: "Open Resort", sheet: "resort" },
-  emergencies: { label: "Open Emergency Centre", sheet: "emergencies" },
-  competitors: { label: "Open Rival Parks", sheet: "competitors" },
-  advancedPark: { label: "Open Destinations", sheet: "advancedPark" },
-};
-
-const money = amount => `£${(Number(amount) || 0).toLocaleString("en-GB")}`;
-
-export default function StoryCoach({ game, setOpenSheet }) {
-  const [expanded, setExpanded] = useState(false);
+export default function StoryCoach({ game, setOpenSheet, openSheet }) {
+  const [details, setDetails] = useState(false);
   const step = game.STORY_STEPS?.[game.storyStep];
-  // A new objective starts compact, preserving map space on mobile.
-  useEffect(() => { setExpanded(false); }, [step?.id]);
-  if (game.gameMode !== "story" || game.storyCompleted || !step) return null;
-
+  const active = game.gameMode === 'story' && !game.storyCompleted && !!step;
+  const guide = active ? getStoryGuide(step, game) : null;
+  useEffect(() => {
+    if (!guide || openSheet || details) return;
+    const selector = guide.kind === 'plot' ? '[data-buildable="true"][data-build-affordable="true"]' : guide.kind === 'ride' ? '[data-kind="attraction"]' : `[data-tutorial-target="${guide.target}"]`;
+    const targets = [...document.querySelectorAll(selector)];
+    targets.forEach(el => el.classList.add('story-action-highlight'));
+    return () => targets.forEach(el => el.classList.remove('story-action-highlight'));
+  }, [guide?.kind, guide?.target, openSheet, details, game.grid, active]);
+  if (!active) return null;
   const progress = storyObjectiveProgress(step, game);
-  const claimableBonuses = availableStoryContracts(game).filter(c => c.complete && !c.claimed && !c.locked).length;
-  const target = TARGETS[step.target];
-  const totalSteps = Math.max(1, game.STORY_STEPS.length);
-  const current = game.storyStep + 1;
-  const chapter = step.chapter || 1;
-  const headline = `Chapter ${chapter}: ${step.title}`;
-  const primaryGoal = progress.milestones.find(item => item.current < item.target)
-    || progress.milestones[0];
-
-  return (
-    <section className="story-coach-inline" aria-label="Story Mode objective" data-story-coach-step={step.id}>
-      <div className="flex min-w-0 flex-1 items-center gap-2.5">
-        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-cyan-600 text-white shadow-sm">
-          <BookOpen className="h-4 w-4" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-black uppercase tracking-wider text-cyan-700">Maya's guide · Step {current}/{totalSteps}</p>
-          <p className="truncate text-xs font-black text-slate-900 sm:text-sm">{headline}</p>
-          <p className="truncate text-[11px] leading-4 text-slate-600">{step.action}</p>
-        </div>
-      </div>
-      <div className="flex shrink-0 items-center gap-1.5">
-        {primaryGoal && <span className="hidden max-w-36 truncate rounded-lg bg-cyan-50 px-2 py-1 text-[10px] font-bold text-cyan-800 sm:inline">
-          {primaryGoal.current.toLocaleString("en-GB")}/{primaryGoal.target.toLocaleString("en-GB")} {primaryGoal.name}
-        </span>}
-        {claimableBonuses > 0 && <button type="button" onClick={() => setOpenSheet?.("gameModes")}
-          className="inline-flex min-h-8 items-center gap-1 rounded-lg bg-indigo-600 px-2 text-[10px] font-black text-white"
-          aria-label={`Claim ${claimableBonuses} Story Mode bonus reward${claimableBonuses === 1 ? "" : "s"}`}
-          title="Maya's bonus challenges"><Sparkles className="h-3.5 w-3.5" /><span>{claimableBonuses}</span></button>}
-        <span className="min-w-9 text-right text-xs font-black tabular-nums text-cyan-800">{progress.percent}%</span>
-        {target && <button type="button" className="story-coach-toggle" onClick={() => setOpenSheet?.(target.sheet)}
-          aria-label={target.label} title={target.label}><MapPin className="h-4 w-4" /></button>}
-        <button type="button" className="story-coach-toggle" onClick={() => setExpanded(value => !value)}
-          aria-label={expanded ? "Hide story instructions" : "Show story instructions"}
-          aria-expanded={expanded} title={expanded ? "Less detail" : "Your next steps"}>
-          {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-        </button>
-      </div>
-      <div className="w-full overflow-hidden rounded-full bg-slate-200" style={{ height: 4 }} aria-hidden="true">
-        <div className="h-full rounded-full bg-cyan-500 transition-all" style={{ width: `${progress.percent}%` }} />
-      </div>
-      {expanded && <div className="w-full space-y-2 border-t border-cyan-100 pt-2">
-        <p className="text-xs leading-5 text-slate-700">{step.text}</p>
-        <p className="text-xs font-semibold text-cyan-900">{step.action}</p>
-        {progress.milestones.length > 0 && <div className="grid gap-1 sm:grid-cols-2" aria-label="Objective progress">
-          {progress.milestones.map(goal =>
-            <div key={goal.name} className="flex items-center justify-between gap-2 rounded-lg bg-white px-2 py-1.5 text-[11px] text-slate-700 ring-1 ring-cyan-100">
-              <span className="inline-flex items-center gap-1 truncate">
-                {goal.current >= goal.target ? <CircleCheck className="h-3.5 w-3.5 shrink-0 text-emerald-600" /> : <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-amber-400" />}
-                {goal.name}
-              </span>
-              <b className="shrink-0 tabular-nums">{Math.min(goal.current,goal.target).toLocaleString("en-GB")}/{goal.target.toLocaleString("en-GB")}</b>
-            </div>
-          )}
-        </div>}
-        {progress.alternative && <p className="text-[10px] text-slate-500">Reach any one of the targets above to complete this objective.</p>}
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex flex-wrap gap-1 text-[10px] font-bold text-slate-600">
-            <span className="rounded-full bg-emerald-50 px-2 py-1">+{money(step.reward?.money)}</span>
-            <span className="rounded-full bg-violet-50 px-2 py-1">+{step.reward?.xp || 0} XP</span>
-            {step.reward?.research ? <span className="rounded-full bg-sky-50 px-2 py-1">+{step.reward.research} research</span> : null}
-          </div>
-          {target ? <button className="story-coach-cta" type="button" onClick={() => setOpenSheet?.(target.sheet)}>
-            <MapPin className="h-3.5 w-3.5" />{target.label}<ArrowRight className="h-3.5 w-3.5" />
-          </button> : <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-cyan-800"><Sparkles className="h-3.5 w-3.5" /> Play to complete</span>}
-        </div>
-      </div>}
-    </section>
-  );
+  const act = () => {
+    setDetails(false);
+    if (guide.kind === 'clock') {
+      if (game.playing) game.advanceDay(); else game.setPlaying(true);
+    } else if (guide.kind === 'plot' || guide.kind === 'ride') {
+      const selector = guide.kind === 'plot' ? '[data-buildable="true"][data-build-affordable="true"]' : '[data-kind="attraction"]';
+      const tile = document.querySelector(selector);
+      if (tile) tile.dispatchEvent(new CustomEvent('park-focus-tile', {bubbles:true}));
+      else setOpenSheet('build');
+    } else setOpenSheet(guide.target);
+  };
+  return <aside className="story-play-guide story-coach-inline" aria-label="Story Mode objective" data-story-coach-step={step.id}>
+    <div className="story-guide-heading"><BookOpen size={18}/><span>Maya · Chapter {step.chapter || 1}</span><strong>{progress.percent}%</strong><button type="button" onClick={() => setDetails(true)} aria-label="Show story instructions"><HelpCircle size={20}/></button></div>
+    <div className="story-guide-copy" aria-live="polite" aria-atomic="true"><h3>{step.title}</h3><p>{guide.text}</p></div>
+    <button type="button" className="story-guide-action" onClick={act}>{guide.label}<ArrowRight size={18}/></button>
+    <Dialog open={details} onOpenChange={setDetails}>
+      <DialogContent className="max-h-[85dvh] overflow-y-auto">
+        <DialogTitle>{step.title}</DialogTitle><DialogDescription>{step.text}</DialogDescription>
+        <p className="text-base font-bold leading-6 text-cyan-900">{guide.text}</p>
+        <ul className="space-y-2 text-sm">{progress.milestones.map(goal => <li key={goal.name}>{goal.name}: <strong>{Math.min(goal.current, goal.target)} / {goal.target}</strong></li>)}</ul>
+        <p className="text-sm">{progress.alternative ? 'Complete either target to progress.' : 'Complete the objective to progress automatically.'} Reward: £{(step.reward?.money || 0).toLocaleString('en-GB')} and {step.reward?.xp || 0} XP.</p>
+        <button type="button" className="story-guide-action" onClick={act}>{guide.label}<ArrowRight size={18}/></button>
+      </DialogContent>
+    </Dialog>
+  </aside>;
 }
