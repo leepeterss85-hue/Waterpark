@@ -8,7 +8,7 @@ export default function GameControls({ playing, speed, onTogglePlay, onSpeed, on
         {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 fill-current" />}
         <span>{playing ? "Park Open" : "Open Park"}</span>
       </button>
-      <button type="button" onClick={onAdvance} className="park-control-button park-control-next">
+      <button type="button" onClick={onAdvance} data-tutorial-target="nextDay" className="park-control-button park-control-next">
         <SkipForward className="h-4 w-4" /><span>Next Day</span>
       </button>
       <div className="park-speed-picker" role="group" aria-label="Game speed">
