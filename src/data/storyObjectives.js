@@ -43,8 +43,8 @@ export function storyObjectiveProgress(step, game = {}) {
   const goals = {
     welcome: [target("Attractions built", attractions, 1)],
     staff: [target("Team members hired", sum(game.staff), 1)],
-    open: [target("Park day", game.day, 2)],
-    manage: [target("Park day", game.day, 2)],
+    open: [target("Park day", game.day, 2), target("Days completed", count(game.history), 1)],
+    manage: [target("Park day", game.day, 2), target("Days completed", count(game.history), 1)],
     upgrade: [target("Ride upgrades", game.totalUpgrades, 1)],
     guests: [target("Peak guests", peak, 100)],
     expand: [target("Attractions", attractions, 2), target("Land expansions", game.expansionsDone, 1)],
@@ -87,7 +87,7 @@ export function storyObjectiveProgress(step, game = {}) {
     ],
   };
   const milestones = goals[step.id] || [];
-  const alternative = ["expand", "emergency", "resort", "rival", "empire"].includes(step.id);
+  const alternative = ["open", "expand", "emergency", "resort", "rival", "empire"].includes(step.id);
   const ratios = milestones.map(goal => Math.min(1, goal.current / Math.max(1, goal.target)));
   const fraction = ratios.length ? alternative ? Math.max(...ratios) :
     ratios.reduce((total, ratio) => total + ratio, 0) / ratios.length : 0;
