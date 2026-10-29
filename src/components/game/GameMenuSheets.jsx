@@ -483,11 +483,11 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet, graphics
               <p className="text-sm font-black text-cyan-950">Current goal: {story?.title}</p>
               <p className="mt-1 text-sm leading-5 text-cyan-900">{story?.action}</p>
             </div>
-            <ol className="space-y-2 text-sm leading-5 text-slate-700">
+            {game.storyStep === 0 && <ol className="space-y-2 text-sm leading-5 text-slate-700">
               <li><strong>1. Build:</strong> Tap Build in the bottom menu, select a pool or slide, then tap an empty plot on the park map.</li>
               <li><strong>2. Staff:</strong> Tap Staff and hire a lifeguard or cleaner.</li>
               <li><strong>3. Open:</strong> Tap Open Park above the map and advance a day to welcome your first guests.</li>
-            </ol>
+            </ol>}
           </>}
           <p className="text-xs leading-5 text-slate-600">Your existing park and campaign progress are preserved. Maya's objective panel stays visible with a button showing exactly what to do next.</p>
           <button type="button" onClick={() => setStoryIntroOpen(false)} className="min-h-12 w-full rounded-xl bg-cyan-700 px-4 py-3 text-sm font-black text-white">
