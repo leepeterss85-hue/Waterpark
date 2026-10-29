@@ -116,7 +116,7 @@ export default function StoryCoach({ game, setOpenSheet, openSheet }) {
           <p className="text-sm">
             {progress.alternative ? "Either listed goal counts." : "Complete the listed goals to continue."} Rewards: £{(step.reward?.money || 0).toLocaleString("en-GB")} and {step.reward?.xp || 0} XP.
           </p>
-          <button type="button" className="story-guide-action w-full max-w-none" onClick={() => performAction(guide)}>
+          <button type="button" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-cyan-700 px-4 py-3 text-sm font-black text-white hover:bg-cyan-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-700" onClick={() => performAction(guide)}>
             {guide.label}<ArrowRight size={18} aria-hidden="true" />
           </button>
         </DialogContent>
