@@ -105,7 +105,7 @@ function readSlots() {
 }
 
 function writeSlots(obj) {
-  try { localStorage.setItem(SLOTS_KEY, JSON.stringify(obj)); } catch { /* ignore */ }
+  try { localStorage.setItem(SLOTS_KEY, JSON.stringify(obj)); return true; } catch { return false; }
 }
 
 function slotMeta(name, s) {
@@ -826,7 +826,7 @@ export function useGameState() {
     if (!trimmed) return false;
     const slots = readSlots();
     slots[trimmed] = { ...buildSavePayload(stateRef.current), savedAt: new Date().toISOString() };
-    writeSlots(slots);
+    if (!writeSlots(slots)) return false;
     setSaves(Object.entries(slots).map(([n, s]) => slotMeta(n, s)));
     trackEvent("park_saved", { name: trimmed });
     return true;
@@ -837,7 +837,8 @@ export function useGameState() {
     if (!trimmed) return false;
     const gameData = buildSavePayload(stateRef.current);
     try {
-      await base44.functions.invoke("cloudSaves", { action: "save", name: trimmed, gameData, day, money, reputation, guests });
+      const response = await base44.functions.invoke("cloudSaves", { action: "save", name: trimmed, gameData, day, money, reputation, guests });
+      if (response.data?.ok !== true) return false;
       trackEvent("park_saved_cloud", { name: trimmed });
       return true;
     } catch (e) { return false; }
@@ -848,6 +849,7 @@ export function useGameState() {
     setDay(data.day ?? 1);
     setReputation(data.reputation ?? 50);
     setGuests(data.guests ?? 0);
+    setZooAnimals(data.zooAnimals && typeof data.zooAnimals === "object" && !Array.isArray(data.zooAnimals) ? data.zooAnimals : {});
     const loadedGrid = Array.isArray(data.grid) && data.grid.length ? data.grid : makeStartingGrid();
     setGrid(loadedGrid);
     setTileRotations(normaliseTileRotations(data.tileRotations, loadedGrid.length));
@@ -980,8 +982,9 @@ export function useGameState() {
   const deleteSave = useCallback((name) => {
     const slots = readSlots();
     delete slots[name];
-    writeSlots(slots);
+    if (!writeSlots(slots)) return false;
     setSaves((prev) => prev.filter((s) => s.name !== name));
+    return true;
   }, []);
 
   const sendGameAlert = useCallback(async (alertType, title, message) => {
