@@ -227,3 +227,26 @@
   .resort-finish .ride-slide-edge-shimmer { animation:none!important; }
 }
 
+
+/* Keep the park world independent of the space left by the interface. */
+.resort-finish .park-guidance-panel { position:relative; flex-shrink:0; background:#e6f6f5; color:#155e75; }
+.resort-finish .park-guidance-panel > summary { min-height:40px; padding:10px 12px; cursor:pointer; font-size:12px; font-weight:800; }
+.resort-finish .park-guidance-content { max-height:25dvh; overflow-y:auto; overscroll-behavior:contain; }
+.resort-finish .game-board-frame { min-height:160px; }
+.resort-finish.park-view-expanded { position:fixed; inset:0; z-index:45; height:100dvh; border-radius:0; }
+.resort-finish.park-view-expanded > :not(.game-board-titlebar):not(.game-board-frame):not(.park-menu-bar):not(.game-board-statsbar) { display:none; }
+.resort-finish .park-tile-caption { font-size:10px; line-height:1.2; }
+@media(max-width:640px) {
+ .resort-finish .game-board-titlebar { min-height:48px; padding:4px 8px; gap:4px; }
+ .resort-finish .game-board-icon, .resort-finish .game-live-pill { display:none; }
+ .resort-finish .game-board-titlebar h2 { font-size:13px; }
+ .resort-finish .resort-top-settings { font-size:10px; gap:3px; padding:0 6px; }
+ .resort-finish .park-control-row { display:flex; flex-wrap:nowrap; justify-content:flex-start; overflow-x:auto; padding:4px 6px; gap:4px; }
+ .resort-finish .park-control-row > * { flex-shrink:0; }
+ .resort-finish .park-control-button { padding:6px; font-size:11px; }
+ .resort-finish .park-speed-picker { padding:0; gap:0; }
+ .resort-finish .park-speed-picker > svg { display:none; }
+ .resort-finish .park-speed-picker button { min-height:44px; padding:4px 7px; }
+ .resort-finish .game-board-legend { padding:3px 8px; }
+ .resort-finish .game-board-frame { padding:4px; }
+}

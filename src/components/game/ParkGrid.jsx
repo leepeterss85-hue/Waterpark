@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Footprints, Users, Map as MapIcon, Sparkles, Maximize2, Hammer, RotateCw, X, CheckCircle2, Settings2 } from "lucide-react";
 import { getParkItem } from "@/data/gameData";
 import { getHotelDef, hotelRooms } from "@/data/hotels";
@@ -26,6 +26,7 @@ export default function ParkGrid({ grid, parkZones, upgrades, tileRotations = []
   const { zoom, setZoom, panX, panY, resetView, fitToWidth, containerRef, onMapClickCapture } = useTouchZoom(1, 0.35, 2.5);
   // Quality is controlled by Home so both the top bar and Settings stay in sync.
   const graphics = graphicsQuality;
+  const [expanded, setExpanded] = useState(false);
   const toggleGraphics = () => {
     const options = ["ultra", "rich", "balanced"];
     onGraphicsQualityChange?.(options[(options.indexOf(graphics) + 1) % options.length]);
@@ -57,10 +58,10 @@ export default function ParkGrid({ grid, parkZones, upgrades, tileRotations = []
   const sponsorNames = (sponsorships || []).filter(Boolean).map((s) => s.name).join(" · ");
 
   return (
-    <section data-graphics={graphics} className={"game-board-shell aquatic-map resort-finish park-time-" + timeOfDay + " park-weather-" + weatherId + " flex h-full flex-col " + themeClass}>
+    <section data-graphics={graphics} className={"game-board-shell aquatic-map resort-finish park-time-" + timeOfDay + " park-weather-" + weatherId + " flex h-full flex-col " + themeClass + (expanded ? " park-view-expanded" : "")}>
       <div className="game-board-titlebar">
         <div className="flex min-w-0 items-center gap-3"><div className="game-board-icon"><MapIcon className="h-5 w-5" /></div><div className="min-w-0"><div className="flex items-center gap-2"><h2 className="font-display text-base font-black text-white sm:text-lg">Your Water Park</h2><span className="game-live-pill"><span /> LIVE</span></div><p className="hidden text-[10px] font-bold text-white/60 sm:block">Build, decorate and manage your resort.</p></div></div>
-        <div className="flex shrink-0 items-center gap-2 text-[9px] font-black uppercase tracking-wider text-white/75 sm:text-[10px]"><span className="hidden items-center gap-1.5 sm:flex"><Users className="h-3.5 w-3.5 text-cyan-200" />{guests.toLocaleString()}</span><span className="hidden h-4 w-px bg-white/20 sm:block" /><span className="hidden items-center gap-1.5 sm:flex"><Footprints className="h-3.5 w-3.5 text-amber-200" />GUESTS MOVING</span><button type="button" onClick={onOpenSettings} aria-label="Open park settings" title="Park settings and graphics" className="resort-top-settings"><Settings2 className="h-4 w-4" /><span>Settings</span></button></div>
+        <div className="flex shrink-0 items-center gap-2 text-[9px] font-black uppercase tracking-wider text-white/75 sm:text-[10px]"><span className="hidden items-center gap-1.5 sm:flex"><Users className="h-3.5 w-3.5 text-cyan-200" />{guests.toLocaleString()}</span><span className="hidden h-4 w-px bg-white/20 sm:block" /><span className="hidden items-center gap-1.5 sm:flex"><Footprints className="h-3.5 w-3.5 text-amber-200" />GUESTS MOVING</span><button type="button" className="resort-top-settings" aria-pressed={expanded} onClick={() => setExpanded(value => !value)}><Maximize2 className="h-4 w-4" /><span>{expanded ? "Exit park view" : "Expand park"}</span></button><button type="button" onClick={onOpenSettings} aria-label="Open park settings" title="Park settings and graphics" className="resort-top-settings"><Settings2 className="h-4 w-4" /><span>Settings</span></button></div>
       </div>
       {sponsorNames && <div className="sponsor-ribbon"><span className="sponsor-dot" />Sponsored by <span className="sponsor-names">{sponsorNames}</span></div>}
       <StrikeBanner activeStrikes={activeStrikes} />
@@ -94,8 +95,8 @@ export default function ParkGrid({ grid, parkZones, upgrades, tileRotations = []
           <MapAmbience timeOfDay={timeOfDay} weather={weather} />
           <EventOverlay activeEvents={activeEvents} grid={grid} />
           
-          <div className="relative h-full overflow-visible game-map-stage"><div className="relative h-full park-playfield" style={{ transform: `translate(${panX}px, ${panY}px) scale(${zoom})`, transformOrigin: "top left", width: "100%" }}>
-            <div className="relative grid h-full grid-rows-[repeat(var(--map-rows),1fr)] grid-cols-8 gap-1 sm:gap-1.5 game-map-grid" style={/** @type {React.CSSProperties} */ ({ "--map-rows": Math.ceil(grid.length / 8) })}><ParkSceneryLayer grid={grid} selectedBuild={selectedBuild} />
+          <div className="relative h-full overflow-visible game-map-stage"><div className="relative h-full park-playfield" style={{ transform: `translate(${panX}px, ${panY}px) scale(${zoom})`, transformOrigin: "top left", width: "100%", height: "auto", minHeight: `${Math.ceil(grid.length / 8) * 96}px`, aspectRatio: `8 / ${Math.ceil(grid.length / 8)}` }}>
+            <div className="relative grid h-full grid-rows-[repeat(var(--map-rows),1fr)] grid-cols-8 gap-1 sm:gap-1.5 game-map-grid" style={/** @type {React.CSSProperties} */ ({ "--map-rows": Math.ceil(grid.length / 8), position: "absolute", inset: 0 })}><ParkSceneryLayer grid={grid} selectedBuild={selectedBuild} />
               {grid.map((value, index) => {
                 const item = value ? getParkItem(value) : null;
                 const isWater = item?.category === "attraction" && item?.parkType !== "zoo";

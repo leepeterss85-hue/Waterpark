@@ -286,10 +286,15 @@ export default function Home() {
                 onAdvance={() => { trackEvent("day_advanced", { source: "manual" }); game.advanceDay(); }}
                 onReset={game.resetGame}
               />
+              <details className="park-guidance-panel">
+                <summary>Goals & park updates</summary>
+                <div className="park-guidance-content">
               <ObjectiveShortcuts game={game} onOpen={handleOpenMenu} />
               <StoryCoach game={game} setOpenSheet={handleOpenMenu} />
               {game.challenge && <div className="park-game-notice"><ChallengeBanner challenge={game.challenge} /></div>}
               {game.vipVisit && <VipBanner vipVisit={game.vipVisit} />}
+                </div>
+              </details>
               {game.disaster && <DisasterBanner disaster={game.disaster} />}
             </>
           }
