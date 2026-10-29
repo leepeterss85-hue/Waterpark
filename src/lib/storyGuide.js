@@ -1,7 +1,11 @@
 // Instructions follow real game state; they never advance or reward objectives.
 export function getStoryGuide(step, game) {
   if (!step) return null;
-  if (game.selectedBuild) return { label: 'Show a plot', text: 'Tap a glowing empty grass plot to place your building. Drag the park to explore; Change lets you choose another building.', kind: 'plot', target: 'plot' };
+  // The build tool remains selected after placing an item. Do not trap the
+  // player on "Show a plot" when Maya has advanced to hiring, opening or research.
+  const buildingObjectives = ['welcome', 'expand', 'resort', 'variety', 'signature_chain'];
+  if (game.selectedBuild && buildingObjectives.includes(step.id))
+    return { label: 'Show a plot', text: 'Tap a glowing empty plot to place your building. Drag the park to explore; Change lets you choose another building.', kind: 'plot', target: 'plot' };
   const guides = {
     welcome: ['Choose a ride', 'Tap Choose a ride, select an affordable pool or slide, then tap a glowing grass plot in the park.', 'build'],
     staff: ['Hire staff', 'Tap Hire staff. In the Staff panel, use Hire beside a lifeguard or cleaner.', 'staff'],
