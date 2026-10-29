@@ -25,7 +25,7 @@ export function getStoryGuide(step, game) {
     brand_builder: ['Social Activity', 'Open Social Activity to review posts. Improve guest experiences and run more days to generate posts.', 'social'],
   };
   const entry = guides[step.id];
-  if (entry) return {label: entry[0], text: entry[1], target: entry[2], kind: entry[2] === 'ride' ? 'ride' : entry[2] === 'open' ? 'clock' : 'menu'};
+  if (entry) return {label: entry[0], text: entry[1], target: entry[2] === 'open' && game.playing ? 'nextDay' : entry[2], kind: entry[2] === 'ride' ? 'ride' : entry[2] === 'open' ? 'clock' : 'menu'};
   const names = {build:'Build', staff:'Staff', research:'Research', manage:'Manage', resort:'Resort', emergencies:'Emergency Centre', competitors:'Rival Parks', advancedPark:'Destinations'};
   return {label: `Open ${names[step.target] || 'Goals'}`, text: `${step.action} ${step.target ? `Tap Open ${names[step.target] || 'Goals'} below to reach the relevant controls.` : 'Continue running your park to complete this goal.'}`, kind:'menu', target:step.target || 'gameModes'};
 }
