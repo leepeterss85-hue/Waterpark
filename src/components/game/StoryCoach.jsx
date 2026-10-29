@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { BookOpen, ArrowRight, HelpCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { storyObjectiveProgress } from "@/data/storyObjectives";
@@ -7,11 +7,35 @@ import { getStoryGuide } from "@/lib/storyGuide";
 export default function StoryCoach({ game, setOpenSheet, openSheet }) {
   const [details, setDetails] = useState(false);
   const [expanded, setExpanded] = useState(true);
+  const [chapterNotice, setChapterNotice] = useState(null);
+  const previousStepRef = useRef(game.storyStep);
   const step = game.STORY_STEPS?.[game.storyStep];
   const active = game.gameMode === "story" && !game.storyCompleted && !!step;
   const guide = active ? getStoryGuide(step, game) : null;
 
   useEffect(() => { setExpanded(true); }, [game.storyStep]);
+
+  useEffect(() => {
+    const previousStep = previousStepRef.current;
+    previousStepRef.current = game.storyStep;
+    if (!active || game.storyStep === previousStep) return;
+    // The old placement tool must not remain armed when Maya moves on to
+    // staffing, time controls or management; that causes accidental purchases.
+    const buildObjectives = new Set(["welcome", "expand", "variety", "resort"]);
+    if (game.selectedBuild && !buildObjectives.has(step?.id)) game.setSelectedBuild(null);
+    if (game.storyStep > previousStep) {
+      setChapterNotice({
+        previous: game.STORY_STEPS?.[previousStep]?.title || "Objective",
+        next: step?.title || "Next objective",
+      });
+    }
+  }, [game.storyStep, active]);
+
+  useEffect(() => {
+    if (!chapterNotice) return;
+    const timeout = setTimeout(() => setChapterNotice(null), 5500);
+    return () => clearTimeout(timeout);
+  }, [chapterNotice]);
 
   useEffect(() => {
     if (!guide || openSheet || details) return;
@@ -60,6 +84,7 @@ export default function StoryCoach({ game, setOpenSheet, openSheet }) {
       aria-label="Story Mode objective"
       data-story-coach-step={step.id}
     >
+      {chapterNotice && <div className="story-guide-chapter-notice" role="status">✓ {chapterNotice.previous} complete · Next: {chapterNotice.next}</div>}
       <div className="story-guide-heading">
         <BookOpen size={18} aria-hidden="true" />
         <span>Maya · Chapter {step.chapter || 1} · {step.title} · Step {game.storyStep + 1}/{game.STORY_STEPS.length}</span>
