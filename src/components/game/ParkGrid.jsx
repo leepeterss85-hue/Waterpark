@@ -21,6 +21,7 @@ import "@/components/game/parkChrome.css";
 import "@/components/game/parkImmersion.css";
 import "@/components/game/eventOverlay.css";
 import "@/components/game/resortFinish.css";
+import "@/components/game/tycoonLife.css";
 
 export default function ParkGrid({ playing = false, parkRadio, grid, parkZones, upgrades, tileRotations = [], buildRotation = 0, onRotateBuildPreview, onRotateSelectedTile, selectedBuild, selectedTile, selectedZone, incidents, guests, avgMood = 0, waterQualityAvg = 100, visitorMovements, queueStats = {}, attractionCondition = [], staff = {}, staffAssignments = {}, lifeguardTotal = 0, day = 1, weather, seasonEvent, hotelGuests = [], activeEvents = [], waterQuality = [], acceptedBookings = [], sponsorships = [], activeStrikes = [], constructionProjects = [], money = 0, sandbox = false, graphicsQuality = "ultra", onGraphicsQualityChange, onOpenSettings, onCancelBuild, onChangeBuild, onTileClick, topControls, storyGuide, parkUpdates, bottomMenu, statsBar, themeClass = "", mascot = null }) {
   const { zoom, setZoom, panX, panY, resetView, fitToWidth, containerRef, onMapClickCapture } = useTouchZoom(1, 0.35, 2.5);
