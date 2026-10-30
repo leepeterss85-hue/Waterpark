@@ -5,6 +5,31 @@ import { getParkItem } from "./gameData";
 
 export const DISTRICTS = [
   {
+    id: "pirate_cove",
+    name: "Pirate Cove",
+    icon: "Compass",
+    color: "from-amber-700 to-sky-900",
+    tone: "text-amber-700",
+    minExpansions: 0,
+    desc: "A pirate-themed waterfront full of rapids, rafts, and high-seas adventures.",
+    bonus: {guestMult: 1.05, moodBoost: 4, desc: "+5% guests, +4 mood"},
+    legendary: {id:"pirate_legend", name:"Captain of the Flumes", desc:"Build 3 pirate-friendly water attractions here.",reward:{money:25000,empirePoints:250},requiredCount:3},
+    matchItems: ["adventure_river","family_raft","splash_battle","wave_pool","rapid_rafting","lazy_river"],
+  },
+  {
+    id: "wildlife_adventure",
+    name: "Wildlife Adventure",
+    icon: "PawPrint",
+    color: "from-emerald-700 to-lime-600",
+    tone: "text-emerald-700",
+    minExpansions: 2,
+    desc: "A conservation-first district with animal habitats and nature trails.",
+    bonus: {guestMult: 1.05, moodBoost: 5, desc: "+5% visitors, +5 mood"},
+    legendary: {id:"wildlife_legend", name:"Creature Comforts", desc:"Build 3 animal habitats in this district.", reward:{money:35000,empirePoints:350}, requiredCount:3},
+    matchItems: ["lion_savannah","elephant_reserve","giraffe_plains","penguin_coast","tropical_aviary","reptile_house","meerkat_dunes","red_panda_forest","primate_island","aquarium_dome"],
+  },
+
+  {
     id: "family_bay",
     name: "Family Bay",
     icon: "Baby",
