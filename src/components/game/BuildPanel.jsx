@@ -48,7 +48,7 @@ export default function BuildPanel({ money, level = 1, selectedBuild, onSelect, 
         <h3 className="text-sm font-black text-cyan-950">Maya's starter picks</h3>
         <p className="mb-3 text-xs leading-5 text-cyan-900">Start small, leave room for staff and paths. Choose a ride below, then tap a glowing plot. The empire can wait until after lunch.</p>
         <div className="grid grid-cols-2 gap-2">{allItems.filter(item => item.category === "attraction" && item.parkType !== "zoo" && itemIsUnlocked(item) && (sandbox || money >= item.cost)).sort((a,b) => a.cost - b.cost).slice(0,4).map(item =>
-          <BuildCard key={item.id} item={item} selected={selectedBuild === item.id} affordable={sandbox || money >= item.cost} unlocked onSelect={onSelect}/>
+          <BuildCard key={item.id} item={item} selected={selectedBuild === item.id} affordable={sandbox || money >= item.cost} unlocked lockLabel={null} onSelect={onSelect}/>
         )}</div>
         {!allItems.some(item => item.category === "attraction" && itemIsUnlocked(item) && (sandbox || money >= item.cost)) && <p className="text-sm">No affordable rides yet. Keep running your existing park and review spending in Manage.</p>}
       </section>}
