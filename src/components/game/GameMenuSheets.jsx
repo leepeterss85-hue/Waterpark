@@ -61,6 +61,7 @@ import GameModePanel from "@/components/game/GameModePanel";
 import SandboxLabPanel from "@/components/game/SandboxLabPanel";
 import AnnualReportPanel from "@/components/game/AnnualReportPanel";
 import ParkMenuHub from "@/components/game/ParkMenuHub";
+import ParkLifePanel from "@/components/game/ParkLifePanel";
 import ParkOverviewPanel from "@/components/game/ParkOverviewPanel";
 import OperationsBriefPanel from "@/components/game/OperationsBriefPanel";
 import ParkMasteryPanel from "@/components/game/ParkMasteryPanel";
@@ -102,6 +103,7 @@ export default function GameMenuSheets({ game, openSheet, setOpenSheet, graphics
 
   return (
     <>
+      <SheetShell open={openSheet === "parkLife"} onOpenChange={(v) => !v && close()} title="Park Life & Inspections" icon={Activity} width="sm:max-w-xl"><ParkLifePanel game={game}/></SheetShell>
       <SheetShell open={openSheet === "mastery"} onOpenChange={(v) => !v && close()} title="Park Mastery" icon={Trophy} width="sm:max-w-xl"><ParkMasteryPanel game={game} /></SheetShell>
       <SheetShell open={openSheet === "overview"} onOpenChange={(v) => !v && close()} title="Park Overview" icon={BarChart3} width="sm:max-w-xl">
         <ParkOverviewPanel game={game} onOpen={setOpenSheet} />
