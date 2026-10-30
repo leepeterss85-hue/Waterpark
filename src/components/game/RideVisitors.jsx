@@ -3,9 +3,9 @@ import { useReducedMotion } from "framer-motion";
 import PersonSprite from "@/components/game/PersonSprite";
 import { getRideScene } from "@/components/game/artwork/rideScenes";
 
-export default function RideVisitors({ attr, guests, movement, incident, queueWait = 0, graphicsQuality = "ultra" }) {
+export default function RideVisitors({ playing = true, attr, guests, movement, incident, queueWait = 0, graphicsQuality = "ultra" }) {
   const prefersReduced = useReducedMotion();
-  const reduced = prefersReduced || graphicsQuality === "balanced";
+  const reduced = !playing || prefersReduced || graphicsQuality === "balanced";
   const scene = getRideScene(attr.id);
   if (guests <= 0 || movement <= 0 || incident?.type === "breakdown" || scene.kind === "dry") return null;
   const count = Math.min(graphicsQuality === "balanced" ? 3 : 6, Math.max(0, Math.ceil(movement / 14) + Math.ceil(queueWait / 12)));
@@ -16,9 +16,10 @@ export default function RideVisitors({ attr, guests, movement, incident, queueWa
   return <svg className="ride-visitors" viewBox="0 0 100 100" aria-label={`Guests using ${attr.name}`} role="img" data-ride-visitors={attr.id}>
     {queueWait > 0 && <g data-activity="queueing">
       <path d="M8 87L8 63L18 63" fill="none" stroke="#e2e8f0" strokeWidth="2" />
-      {Array.from({length:Math.min(reduced ? 2 : 4,Math.ceil(queueWait/6))},(_,i)=><g key={i} transform={`translate(8 ${83-i*7})`}>
+      {Array.from({length:Math.min(reduced ? 2 : 4,Math.ceil(queueWait/6))},(_,i)=><g key={i} transform={`translate(8 ${83-i*7})`}><g>
+        {!reduced && <animateTransform attributeName="transform" type="translate" values="0 0;0 -3;0 0" dur="4s" begin={`${-i}s`} repeatCount="indefinite"/>}
         <PersonSprite activity="waiting" variant={i+5} x={-6} y={-10} width={12} height={17}/>
-      </g>)}
+      </g></g>)}
     </g>}
     {scene.kind === "river" ? Array.from({ length: Math.min(4, count) }, (_, i) => <g key={i} className="ride-visitor" data-activity="floating" transform={reduced ? `translate(${[22, 78, 35, 65][i]} ${[31, 36, 76, 60][i]})` : undefined}>
       {!reduced && <animateMotion path={scene.paths[0]} dur="16s" begin={`${-i * 4}s`} repeatCount="indefinite" />}

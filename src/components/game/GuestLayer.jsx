@@ -18,10 +18,10 @@ const STAFF_ROLES = [
   { id: "zookeeper", color: "bg-emerald-700", label: "Zookeeper" },
 ];
 
-export default function GuestLayer({ graphicsQuality = "ultra", grid, parkZones = [], guests = 0, avgMood = 0, waterQualityAvg = 100, movements = {}, queueStats = {}, staff = {}, staffAssignments = {}, incidents = [], attractionCondition = [], hotelGuests = [] }) {
+export default function GuestLayer({ playing = true, graphicsQuality = "ultra", grid, parkZones = [], guests = 0, avgMood = 0, waterQualityAvg = 100, movements = {}, queueStats = {}, staff = {}, staffAssignments = {}, incidents = [], attractionCondition = [], hotelGuests = [] }) {
   const [tick, setTick] = useState(0);
   const reducedMotion = useReducedMotion();
-  useEffect(() => { if(reducedMotion) return; const timer = setInterval(() => setTick(value => value + 1), graphicsQuality === "balanced" ? 3200 : 1600); return () => clearInterval(timer); }, [reducedMotion, graphicsQuality]);
+  useEffect(() => { if(reducedMotion || !playing) return; const timer = setInterval(() => setTick(value => document.hidden ? value : value + 1), graphicsQuality === "balanced" ? 3200 : 1600); return () => clearInterval(timer); }, [reducedMotion, graphicsQuality, playing]);
   const rows = Math.max(1, Math.ceil(grid.length / 8));
   const targets = useMemo(() => grid.map((id, index) => id ? { index, id, attr: getParkItem(id) } : null).filter(Boolean), [grid]);
   const closed = new Set(incidents.filter(incident => incident.type === "breakdown").map(incident => incident.tileIndex));
@@ -84,6 +84,6 @@ export default function GuestLayer({ graphicsQuality = "ultra", grid, parkZones 
 
   return <div className="pointer-events-none absolute inset-0 z-30 overflow-hidden" data-people-layer>
     {walkers}{personnel}{hotelSprites}
-    {guests > 0 && Object.entries(queueStats).filter(([, queue]) => queue.guests > 0).flatMap(([tileIndex, queue]) => Array.from({ length: Math.min(3, Math.max(1, Math.ceil(queue.guests / 5))) }, (_, i) => <span key={`q${tileIndex}-${i}`} className="park-pedestrian park-queue-guest" data-activity="waiting" title={`Queue: ${queue.guests} guests · ${queue.wait}m wait · rail capacity ${queue.queueCapacity ?? 8}${queue.overflow > 0 ? " · overflow " + queue.overflow : ""}`} style={position(Number(tileIndex) % 8 + .18 + i * .31, Math.floor(Number(tileIndex) / 8) + .76)}><PersonSprite activity="waiting" variant={i + 1} /></span>))}
+    {guests > 0 && Object.entries(queueStats).filter(([tile, queue]) => queue.guests > 0 && !closed.has(Number(tile))).slice(0, graphicsQuality === "balanced" ? 8 : 20).flatMap(([tileIndex, queue]) => Array.from({ length: Math.min(3, Math.max(1, Math.ceil(queue.guests / 5))) }, (_, i) => <span key={`q${tileIndex}-${i}`} className="park-pedestrian park-queue-guest" data-activity="waiting" title={`Queue: ${queue.guests} guests · ${queue.wait}m wait · rail capacity ${queue.queueCapacity ?? 8}${queue.overflow > 0 ? " · overflow " + queue.overflow : ""}`} style={position(Number(tileIndex) % 8 + .18 + i * .31, Math.floor(Number(tileIndex) / 8) + .76)}><PersonSprite activity="waiting" variant={(i + tick) % 8} /></span>))}
   </div>;
 }

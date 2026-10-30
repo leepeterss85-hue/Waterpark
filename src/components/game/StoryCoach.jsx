@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { BookOpen, ArrowRight, HelpCircle, ChevronDown, ChevronUp, ChevronDown, ChevronUp } from "lucide-react";
+import { BookOpen, ArrowRight, HelpCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { storyObjectiveProgress } from "@/data/storyObjectives";
 import { getStoryGuide } from "@/lib/storyGuide";
 
 export default function StoryCoach({ game, setOpenSheet, openSheet }) {
   const [details, setDetails] = useState(false);
-  const [compact, setCompact] = useState(true);
   const [expanded, setExpanded] = useState(true);
   const [chapterNotice, setChapterNotice] = useState(null);
   const previousStepRef = useRef(game.storyStep);
@@ -88,7 +87,7 @@ export default function StoryCoach({ game, setOpenSheet, openSheet }) {
       {chapterNotice && <div className="story-guide-chapter-notice" role="status">✓ {chapterNotice.previous} complete · Next: {chapterNotice.next}</div>}
       <div className="story-guide-heading">
         <BookOpen size={18} aria-hidden="true" />
-        <span>Maya · Chapter {step.chapter || 1} · {step.title} · Step {game.storyStep + 1}/{game.STORY_STEPS.length}</span>
+        <span>Maya · {step.title}</span>
         <strong>{progress.percent}%</strong>
         <button
           type="button"
@@ -131,6 +130,7 @@ export default function StoryCoach({ game, setOpenSheet, openSheet }) {
           <DialogTitle>{step.title}</DialogTitle>
           <DialogDescription>{step.text}</DialogDescription>
           <p className="text-base font-bold leading-6 text-cyan-900">{guide.text}</p>
+          <p className="text-sm font-bold">Your opening journey: Build → Staff → Open → Upgrade → Expand. Follow the highlighted action at your own pace.</p>
           <ul className="space-y-2 text-sm">
             {progress.milestones.map((goal) => (
               <li key={goal.name} className="flex items-center justify-between gap-2 rounded-lg bg-cyan-50 p-2">

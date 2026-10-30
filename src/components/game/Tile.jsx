@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Wrench, Sparkles, Umbrella, CircleDot, MapPin, Users, Bed } from "lucide-react";
 import { getParkItem, getAttractionTier } from "@/data/gameData";
 import ParkItemArtwork from "@/components/game/ParkItemArtwork";
@@ -28,7 +28,19 @@ function ExpansionDecor({ theme, night, nightSwim }) {
 }
 
 
-export default function Tile({ graphicsQuality = "ultra", value, index, grid, zone, expansionTheme = "starter", upgradeLevel = 0, selectedBuild, isSelected, incident, canAffordBuild = true, artRotation = 0, previewRotation = 0, queueWait, queueConnected, movement = 0, guests = 0, condition = 100, facilityStatus, timeOfDay = "day", nightSwim = false, hotelOccupancy = null, hotelRoomsTotal = 0, constructionSite = null, openingCelebration = false, waterQuality = 100, onClick }) {
+export default function Tile({ playing = true, graphicsQuality = "ultra", value, index, grid, zone, expansionTheme = "starter", upgradeLevel = 0, selectedBuild, isSelected, incident, canAffordBuild = true, artRotation = 0, previewRotation = 0, queueWait, queueConnected, movement = 0, guests = 0, condition = 100, facilityStatus, timeOfDay = "day", nightSwim = false, hotelOccupancy = null, hotelRoomsTotal = 0, constructionSite = null, openingCelebration = false, waterQuality = 100, onClick }) {
+  const previous = useRef({value, upgradeLevel});
+  const [celebration, setCelebration] = useState(null);
+  useEffect(() => {
+    const before = previous.current;
+    previous.current = {value, upgradeLevel};
+    if ((!before.value && value) || (before.value === value && upgradeLevel > before.upgradeLevel)) {
+      setCelebration(!before.value ? 'Built!' : 'Upgraded!');
+      const timer = setTimeout(() => setCelebration(null), 2400);
+      return () => clearTimeout(timer);
+    }
+    setCelebration(null);
+  }, [value, upgradeLevel]);
   const attr = value ? getParkItem(value) : null;
   const canPlace = !attr && !constructionSite && selectedBuild;
   const ghostAttr = canPlace ? getParkItem(selectedBuild) : null;
@@ -37,7 +49,8 @@ export default function Tile({ graphicsQuality = "ultra", value, index, grid, zo
   const zoneTint = zone ? ZONE_TINT[zone] : "";
 
   return <button onClick={onClick} data-park-tile={index} data-item={value || undefined} data-kind={constructionSite ? "construction" : attr?.category || "empty"} data-water={Boolean(isWater)} data-buildable={Boolean(canPlace)} data-build-affordable={Boolean(canPlace && canAffordBuild)} title={constructionSite ? `Construction in progress: ${constructionSite.name || "new attraction"} ${Math.round(constructionSite.progress || 0)}%` : attr ? attr.name : canPlace ? (canAffordBuild ? "Tap to build here" : "Insufficient funds to build") : zone ? "Park zone" : "Open land"} className={"group relative h-full w-full overflow-hidden rounded-[17px] border-2 transition-all duration-200 park-expansion-theme-" + expansionTheme + " " + (attr ? (isSelected ? "scale-[.97] border-white ring-4 ring-cyan-300/80 shadow-[0_10px_24px_rgba(15,23,42,.24)]" : "border-white/75 shadow-[0_6px_15px_rgba(15,23,42,.13)] hover:-translate-y-0.5 hover:shadow-[0_10px_20px_rgba(15,23,42,.18)]") : canPlace ? (canAffordBuild ? "border-dashed border-cyan-300 bg-cyan-50 hover:bg-white" : "border-dashed border-rose-500 bg-rose-50/90") : "border-white/70 bg-[#e8d8a8] hover:bg-[#f0e3b8]")}>
-    {attr && <><div className="ride-depth-shadow" />{isWater && guests > 0 && movement > 0 && !incident && <RideParticles rideId={attr.id} />}<ParkItemArtwork attr={attr} grid={grid} index={index} upgradeLevel={upgradeLevel} rotation={artRotation} />{upgradeLevel > 0 && attr.category !== "environment" && <UpgradeAura level={upgradeLevel} />}{isWater && <RideVisitors graphicsQuality={graphicsQuality} attr={attr} guests={guests} movement={movement} incident={incident} queueWait={queueWait} />}{attr.category !== "environment" && <span className="park-tile-caption">{attr.name}{attr.parkType === "zoo" ? ` · ${attr.animal}` : isWater && upgradeLevel > 0 ? ` · ${getAttractionTier(upgradeLevel).name}` : ""}</span>}</>}
+    {celebration && <span className="park-build-celebration" role="status">★ {celebration}</span>}
+    {attr && <><div className="ride-depth-shadow" />{isWater && guests > 0 && movement > 0 && !incident && <RideParticles rideId={attr.id} />}<ParkItemArtwork attr={attr} grid={grid} index={index} upgradeLevel={upgradeLevel} rotation={artRotation} />{upgradeLevel > 0 && attr.category !== "environment" && <UpgradeAura level={upgradeLevel} />}{isWater && <RideVisitors playing={playing} graphicsQuality={graphicsQuality} attr={attr} guests={guests} movement={movement} incident={incident} queueWait={queueWait} />}{attr.category !== "environment" && <span className="park-tile-caption">{attr.name}{attr.parkType === "zoo" ? ` · ${attr.animal}` : isWater && upgradeLevel > 0 ? ` · ${getAttractionTier(upgradeLevel).name}` : ""}</span>}</>}
     {constructionSite && <div className="park-construction-site" aria-label={`Construction: ${constructionSite.name || "attraction"} ${Math.round(constructionSite.progress || 0)} percent complete`}>
       <span className="park-construction-crane" aria-hidden="true">🏗️</span>
       <strong>{Math.round(constructionSite.progress || 0)}%</strong>
