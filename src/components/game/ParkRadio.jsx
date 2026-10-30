@@ -10,7 +10,7 @@ export default function ParkRadio({ game, onOpenParkLife }) {
     return () => clearInterval(timer);
   }, [game.playing]);
   const message = parkAnnouncement({guests:game.guests, queueStats:game.visitorStats?.queueStats, incidents:game.incidents,
-    waterQuality:game.waterQualityAvg, avgMood:game.visitorStats?.avgMood, weather:typeof game.weather === "string" ? game.weather : game.weather?.id || ""}, turn);
+    staff:game.staff, staffMorale:game.staffMorale, waterQuality:game.waterQualityAvg, avgMood:game.visitorStats?.avgMood, weather:typeof game.weather === "string" ? game.weather : game.weather?.id || ""}, turn);
   const event = game.parkLife?.pendingEvent;
   const inspection = game.parkLife?.pendingInspection;
   const actionNeeded = !!(event || inspection);

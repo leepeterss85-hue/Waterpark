@@ -1,6 +1,7 @@
 import React from "react";
 import { Plus, Minus, Users } from "lucide-react";
 import { STAFF } from "@/data/gameData";
+import { staffCharacter, staffNotice } from "@/data/staffPersonalities";
 import { getIcon } from "./icons";
 import StaffTrainingSection from "./StaffTrainingSection";
 import StaffMoraleSection from "./StaffMoraleSection";
@@ -46,6 +47,7 @@ export default function StaffPanel({
 }) {
   const types = Object.values(STAFF);
   const staffTotal = Object.values(staff).reduce((s, n) => s + (n || 0), 0);
+  const notice = staffNotice({ morale: staffMorale, guests, total: staffTotal });
   return (
     <div>
       <div className="mb-3 flex items-center justify-between">
@@ -55,6 +57,12 @@ export default function StaffPanel({
         <span className="rounded-full bg-rose-50 px-2.5 py-1 text-[11px] font-semibold text-rose-500">
           £{staffWages}/day
         </span>
+      </div>
+
+      <div className="mb-3 rounded-xl border border-cyan-100 bg-cyan-50 p-3">
+        <p className="text-xs font-bold text-cyan-900">Staff noticeboard</p>
+        <p className="mt-1 text-sm text-slate-700">{notice.joke}</p>
+        <p className="mt-1 text-xs text-slate-600">{notice.advice}</p>
       </div>
 
       <StaffMoraleSection
@@ -134,6 +142,7 @@ export default function StaffPanel({
           const count = staff[s.id] || 0;
           const Icon = getIcon(s.icon);
           const canHire = money >= s.wage;
+          const candidate = staffCharacter(s.id, count);
           return (
             <div key={s.id} className="rounded-xl bg-slate-50 p-3 ring-1 ring-slate-100">
               <div className="flex items-center gap-3">
@@ -145,9 +154,26 @@ export default function StaffPanel({
                     <span className="text-sm font-bold text-slate-700">{s.name}</span>
                     <span className="text-xs font-semibold text-slate-400">£{s.wage}/day</span>
                   </div>
-                  <p className="truncate text-[11px] text-slate-400">{s.description}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-600">{s.description}</p>
                 </div>
               </div>
+              <div className="mt-3 rounded-lg border border-cyan-100 bg-white p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-cyan-700">Next applicant · {s.name}</p>
+                <p className="mt-1 text-sm font-bold text-slate-800">{candidate.name}</p>
+                <p className="mt-1 text-xs leading-relaxed text-slate-600">{candidate.note}</p>
+                <p className="mt-2 text-[11px] text-slate-500">Joins your role team at its current training level. Character notes are just for fun.</p>
+              </div>
+              {count > 0 && <details className="mt-2 rounded-lg bg-white p-2 text-xs text-slate-600">
+                <summary className="cursor-pointer py-1 font-semibold">Meet the team ({count}) · Level {staffLevelFromXp(staffXp[s.id] || 0)}</summary>
+                <ul className="mt-2 space-y-2">
+                  {Array.from({ length: Math.min(count, 12) }, (_, index) => {
+                    const member = staffCharacter(s.id, index);
+                    return <li key={member.id} className="border-t border-slate-100 pt-2"><strong>{member.name}</strong><p className="mt-1 leading-relaxed">{member.note}</p></li>;
+                  })}
+                </ul>
+                {count > 12 && <p className="mt-2">Plus {count - 12} more team members.</p>}
+                <p className="mt-2 text-[11px] text-slate-500">Training and assignments apply to the whole team. Removing staff releases the most recent hire.</p>
+              </details>}
               <div className="mt-2.5 flex items-center justify-between">
                 <span className="flex items-center gap-1 text-xs font-semibold text-slate-500">
                   <Users className="h-3.5 w-3.5" /> {count} hired
@@ -155,15 +181,17 @@ export default function StaffPanel({
                 <div className="flex items-center gap-1.5">
                   <button
                     onClick={() => onFire(s.id)}
+                    aria-label={`Release last hired ${s.name}`}
                     disabled={count === 0}
-                    className="grid h-7 w-7 place-items-center rounded-lg bg-white text-slate-500 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-100 disabled:opacity-40"
+                    className="grid h-11 w-11 place-items-center rounded-lg bg-white text-slate-500 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-100 disabled:opacity-40"
                   >
                     <Minus className="h-3.5 w-3.5" />
                   </button>
                   <button
                     onClick={() => onHire(s.id)}
+                    aria-label={`Hire ${candidate.name} as ${s.name} for £${s.wage} per day before wage modifiers`}
                     disabled={!canHire}
-                    className="flex h-7 items-center gap-1 rounded-lg bg-slate-900 px-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-40"
+                    className="flex min-h-11 items-center gap-1 rounded-lg bg-slate-900 px-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-40"
                   >
                     <Plus className="h-3.5 w-3.5" /> Hire
                   </button>
