@@ -1,0 +1,45 @@
+/* Park-first chrome: keep all controls in normal flow, never over build targets. */
+.resort-finish .game-board-titlebar { min-height:44px; padding:4px 10px; }
+.resort-finish .game-board-titlebar p { display:none; }
+.park-command-deck { display:flex; align-items:center; flex-shrink:0; background:#e5f4f0; min-width:0; }
+.park-command-deck .park-control-row { flex-shrink:0; padding:3px 6px; }
+.park-radio { min-width:0; flex:1; color:#164e63; }
+.park-radio button { display:flex; align-items:center; gap:8px; width:100%; padding:6px 10px; min-height:44px; text-align:left; font-size:12px; }
+.park-radio svg,.park-radio strong { flex-shrink:0; }
+.park-radio button span { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.park-radio[data-expanded="true"] button span { white-space:normal; }
+.park-radio button:focus-visible { outline:3px solid #f59e0b; outline-offset:-3px; }
+.resort-finish .story-coach-collapsed { display:flex; flex-wrap:wrap; gap:4px 10px; }
+.resort-finish .story-coach-collapsed .story-guide-heading { flex:1; }
+.resort-finish .story-guide-heading > button { min-width:44px; min-height:44px; }
+.resort-finish .story-guide-copy p { font-size:13px; line-height:1.45; }
+.park-build-celebration { position:absolute; inset:12% 5% auto; z-index:40; padding:8px 4px; border:2px solid #fff; border-radius:12px; background:#047857; color:white; font-size:14px; font-weight:900; box-shadow:0 6px 18px #064e3b66; pointer-events:none; animation:park-build-pop .45s ease-out both; }
+@keyframes park-build-pop { from { opacity:0; transform:translateY(12px) scale(.75); } to { opacity:1; transform:none; } }
+.resort-finish[data-playing="false"] .game-map-surface * { animation-play-state:paused!important; }
+.resort-finish[data-playing="false"] .park-build-celebration { animation-play-state:running!important; }
+@media(min-width:1000px) {
+  .resort-finish .park-workspace:has(.story-coach-inline:not(.story-coach-collapsed)) { flex-direction:row; }
+  .resort-finish .story-coach-inline:not(.story-coach-collapsed) { width:250px; display:flex; flex-direction:column; align-items:stretch; justify-content:center; border-top:0; border-left:2px solid #a5f3fc; }
+  .resort-finish .story-guide-heading { flex-wrap:wrap; }
+}
+@media(max-width:700px) {
+  .park-command-deck { flex-wrap:wrap; }
+  .park-command-deck .park-control-row { width:100%; }
+  .park-radio { flex-basis:100%; }
+  .park-radio button { padding:3px 8px; min-height:32px; font-size:11px; }
+  .park-radio strong { display:none; }
+  .resort-finish .game-board-legend { display:none; }
+  .resort-finish .story-guide-heading { font-size:12px; gap:4px; }
+}
+@media(max-height:500px) and (orientation:landscape) {
+  .park-radio { display:none; }
+  .resort-finish .park-workspace { flex-direction:row; }
+  .resort-finish .story-coach-inline { width:230px; display:flex; flex-direction:column; overflow-y:auto; align-items:stretch; padding:5px 8px; }
+  .resort-finish .story-guide-heading { flex-wrap:wrap; }
+  .resort-finish .game-board-titlebar { min-height:36px; }
+  .resort-finish .game-board-legend { display:none; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .park-build-celebration { animation:none; }
+  .resort-finish .game-map-surface * { animation:none!important; transition:none!important; }
+}
