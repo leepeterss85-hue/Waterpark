@@ -14,7 +14,7 @@ function Row({ label, value }) {
   );
 }
 
-export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0, incident = null, condition = 100, guests = 0, queueWait = 0, lifeguards = 0, movementCount = 0, totalVisits = 0, popularityScore = null, trendBoost = 0, rideFocus = null, sandbox = false, onUpgrade, onSell, onClose }) {
+export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0, incident = null, condition = 100, guests = 0, queueWait = 0, lifeguards = 0, movementCount = 0, totalVisits = 0, popularityScore = null, trendBoost = 0, rideFocus = null, sandbox = false, onUpgrade, onSell, onClose, onWatchRide }) {
   const [selectedFocus, setSelectedFocus] = React.useState("capacity");
   React.useEffect(() => { setSelectedFocus(rideFocus || "capacity"); }, [rideFocus, attractionId, gridIndex]);
   if (gridIndex == null || !attractionId) return null;
@@ -59,6 +59,7 @@ export function TileDetailPanel({ gridIndex, attractionId, level = 0, money = 0,
         </button>
       </div>
       <p className="mb-3 text-sm text-slate-500">{attr.description}</p>
+      {onWatchRide && <button type="button" onClick={onWatchRide} className="mb-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-cyan-800 px-3 py-2 text-sm font-black text-white hover:bg-cyan-900">🎥 Watch Ride · Focus camera</button>}
       <div className={`mb-3 flex items-center justify-between rounded-xl px-3 py-2 text-xs font-extrabold ring-1 ${statusClass}`}>
         <div className="flex items-center gap-1.5">{statusIcon}{status}</div>
         {incident?.type === "breakdown" ? <span>Needs mechanic</span> : incident?.type === "maintenance" ? <span>Needs cleaning</span> : <span>Ready for guests</span>}
