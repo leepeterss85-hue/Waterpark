@@ -255,6 +255,7 @@ export default function Home() {
           money={game.money}
           sandbox={game.sandbox}
           ticketPrice={game.ticketPrice}
+          inspectionPending={!!game.parkLife?.pendingInspection}
           spotlightTile={spotlightTile}
           onExitSpotlight={() => setSpotlightTile(null)}
           onCancelBuild={() => game.setSelectedBuild(null)}
