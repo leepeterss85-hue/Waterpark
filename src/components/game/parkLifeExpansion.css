@@ -59,3 +59,5 @@
 .park-radio[data-action-needed="true"] { background:#fef3c7; color:#78350f; }
 .park-radio[data-action-needed="true"] button { font-weight:900; }
 .park-radio[data-action-needed="true"] .park-radio-action-label { flex-shrink:0; border-radius:6px; padding:5px 9px; background:#92400e; color:white; font-size:11px; }
+.resort-finish [data-zone="pirate_cove"] { box-shadow:inset 0 0 0 2px rgba(180,83,9,.8); }
+.resort-finish [data-zone="wildlife_adventure"] { box-shadow:inset 0 0 0 2px rgba(22,163,74,.8); }
