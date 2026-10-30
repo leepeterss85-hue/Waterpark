@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Footprints, Users, Map as MapIcon, Sparkles, Maximize2, Hammer, RotateCw, X, CheckCircle2, Settings2 } from "lucide-react";
+import { Footprints, Users, Map as MapIcon, Sparkles, Maximize2, Hammer, RotateCw, X, CheckCircle2, Settings2, Camera } from "lucide-react";
 import { getParkItem } from "@/data/gameData";
 import { getHotelDef, hotelRooms } from "@/data/hotels";
 import Tile from "@/components/game/Tile";
@@ -22,8 +22,9 @@ import "@/components/game/parkImmersion.css";
 import "@/components/game/eventOverlay.css";
 import "@/components/game/resortFinish.css";
 import "@/components/game/tycoonLife.css";
+import "@/components/game/parkLifeExpansion.css";
 
-export default function ParkGrid({ playing = false, parkRadio, grid, parkZones, upgrades, tileRotations = [], buildRotation = 0, onRotateBuildPreview, onRotateSelectedTile, selectedBuild, selectedTile, selectedZone, incidents, guests, avgMood = 0, waterQualityAvg = 100, visitorMovements, queueStats = {}, attractionCondition = [], staff = {}, staffAssignments = {}, lifeguardTotal = 0, day = 1, weather, seasonEvent, hotelGuests = [], activeEvents = [], waterQuality = [], acceptedBookings = [], sponsorships = [], activeStrikes = [], constructionProjects = [], money = 0, sandbox = false, graphicsQuality = "ultra", onGraphicsQualityChange, onOpenSettings, onCancelBuild, onChangeBuild, onTileClick, topControls, storyGuide, parkUpdates, bottomMenu, statsBar, themeClass = "", mascot = null }) {
+export default function ParkGrid({ playing = false, parkRadio, grid, parkZones, upgrades, tileRotations = [], buildRotation = 0, onRotateBuildPreview, onRotateSelectedTile, selectedBuild, selectedTile, selectedZone, incidents, guests, avgMood = 0, waterQualityAvg = 100, visitorMovements, queueStats = {}, attractionCondition = [], staff = {}, staffAssignments = {}, lifeguardTotal = 0, day = 1, weather, seasonEvent, hotelGuests = [], activeEvents = [], waterQuality = [], acceptedBookings = [], sponsorships = [], activeStrikes = [], constructionProjects = [], money = 0, sandbox = false, ticketPrice = 28, spotlightTile = null, onExitSpotlight, graphicsQuality = "ultra", onGraphicsQualityChange, onOpenSettings, onCancelBuild, onChangeBuild, onTileClick, topControls, storyGuide, parkUpdates, bottomMenu, statsBar, themeClass = "", mascot = null }) {
   const { zoom, setZoom, panX, panY, resetView, fitToWidth, containerRef, onMapClickCapture } = useTouchZoom(1, 0.35, 2.5);
   // Quality is controlled by Home so both the top bar and Settings stay in sync.
   const graphics = graphicsQuality;
@@ -57,6 +58,16 @@ export default function ParkGrid({ playing = false, parkRadio, grid, parkZones, 
   const facilityStatus = { toilets: guests <= Math.max(1, toilets) * 80 ? "COVERED" : "OVERLOADED", lifeguard_station: guardCoverage >= 0.7 ? "COVERED" : "OVERLOADED" };
   const entranceIndex = grid.indexOf("park_entrance") >= 0 ? grid.indexOf("park_entrance") : Math.max(0, grid.length - 8);
   const sponsorNames = (sponsorships || []).filter(Boolean).map((s) => s.name).join(" · ");
+  const spotlightAttr = spotlightTile != null ? getParkItem(grid[spotlightTile]) : null;
+  useEffect(() => {
+    if (spotlightTile == null) return;
+    setZoom(z => Math.max(z, 1.7));
+    const task = setTimeout(() => {
+      const tile = containerRef.current?.querySelector(`[data-park-tile="${spotlightTile}"]`);
+      tile?.dispatchEvent(new CustomEvent("park-focus-tile", {bubbles:true}));
+    }, 80);
+    return () => clearTimeout(task);
+  }, [spotlightTile]);
 
   return (
     <section data-playing={playing} data-graphics={graphics} className={"game-board-shell aquatic-map resort-finish park-time-" + timeOfDay + " park-weather-" + weatherId + " flex h-full flex-col " + themeClass + (expanded ? " park-view-expanded" : "")}>
@@ -75,6 +86,12 @@ export default function ParkGrid({ playing = false, parkRadio, grid, parkZones, 
       <div className="park-workspace">
       <div className="game-board-frame flex flex-1 flex-col min-h-0">
         <div className="game-map-toolbar park-camera-toolbar"><div className="park-map-heading flex items-center gap-2"><span className="game-map-status"><span /> PARK MAP</span><span className="hidden text-[9px] font-extrabold uppercase tracking-wider text-slate-400 sm:inline">Tap a tile to build or inspect</span></div><div className="park-camera-actions flex items-center gap-1 rounded-xl bg-white/95 p-1 shadow-md ring-1 ring-slate-200"><button type="button" aria-label={`Graphics quality: ${graphicsLabel}. Tap to change`} title="Cycle Ultra, High or Balanced" onClick={toggleGraphics} className="resort-quality-button resort-quality-cycle" data-quality={graphics}><Sparkles className="h-3.5 w-3.5" />{graphicsLabel}</button><button aria-label="Fit park to screen" title="Overview: zoom out to see all eight columns" onClick={fitToWidth} className="resort-quality-button resort-fit-button"><Maximize2 className="h-3.5 w-3.5" />Fit</button><button aria-label="Zoom out" onClick={() => setZoom((z) => Math.max(0.35, Number((z - 0.1).toFixed(2))))} className="grid h-10 w-10 place-items-center rounded-lg text-sm font-black text-slate-600 hover:bg-slate-100">−</button><button aria-label="Reset zoom" onClick={resetView} className="min-h-10 min-w-10 rounded-lg px-1.5 py-1.5 text-[9px] font-extrabold text-slate-500 hover:bg-slate-100">{Math.round(zoom * 100)}%</button><button aria-label="Zoom in" onClick={() => setZoom((z) => Math.min(2.5, Number((z + 0.1).toFixed(1))))} className="grid h-10 w-10 place-items-center rounded-lg text-sm font-black text-slate-600 hover:bg-slate-100">+</button></div></div>
+        {spotlightAttr && <div className="park-life-spotlight" role="region" aria-label="Ride spotlight camera">
+          <Camera size={20} aria-hidden="true"/>
+          <div className="min-w-0 flex-1"><strong className="block truncate text-sm">{spotlightAttr.name} · Ride camera</strong>
+            <span className="block text-[11px]">Watching guests board and enjoy your ride · {guests.toLocaleString("en-GB")} park visitors</span></div>
+          <button type="button" onClick={onExitSpotlight} aria-label="Exit ride camera">Exit view</button>
+        </div>}
         {!buildItem && selectedTile != null && grid[selectedTile] && (
           <div className="park-placement-tray" role="group" aria-label="Selected building orientation">
             <span className="min-w-0 flex-1 truncate text-xs font-bold">{getParkItem(grid[selectedTile])?.name || "Selected building"} · {tileRotations[selectedTile] || 0}°</span>
@@ -121,7 +138,7 @@ export default function ParkGrid({ playing = false, parkRadio, grid, parkZones, 
                 return <Tile playing={playing} graphicsQuality={graphics} key={index} index={index} grid={grid} zone={parkZones?.[index]} upgradeLevel={upgrades?.[index] || 0} value={value} selectedBuild={selectedBuild} expansionTheme={expansionTheme} isSelected={selectedTile === index} incident={incidentMap.get(index)} condition={attractionCondition?.[index]} queueWait={queueWait} queueConnected={queueConnected} movement={movement} guests={guests} facilityStatus={facilityStatus} canAffordBuild={canAffordBuild} artRotation={tileRotations[index] || 0} previewRotation={buildRotation} timeOfDay={timeOfDay} nightSwim={seasonEvent?.id === "night_swim"} hotelOccupancy={hotelOcc} hotelRoomsTotal={hotelRm} constructionSite={site} openingCelebration={Boolean(opened)} waterQuality={waterQuality?.[index]} onClick={() => onTileClick(index)} />;
               })}
             </div>
-            <GuestLayer playing={playing} graphicsQuality={graphics} grid={grid} parkZones={parkZones} guests={guests} avgMood={avgMood} waterQualityAvg={waterQualityAvg} movements={visitorMovements} queueStats={queueStats} staff={staff} staffAssignments={staffAssignments} incidents={incidents || []} attractionCondition={attractionCondition} hotelGuests={hotelGuests} />
+            <GuestLayer playing={playing} graphicsQuality={graphics} ticketPrice={ticketPrice} grid={grid} parkZones={parkZones} guests={guests} avgMood={avgMood} waterQualityAvg={waterQualityAvg} movements={visitorMovements} queueStats={queueStats} staff={staff} staffAssignments={staffAssignments} incidents={incidents || []} attractionCondition={attractionCondition} hotelGuests={hotelGuests} />
             <GroupArrivalIndicator acceptedBookings={acceptedBookings} entranceIndex={entranceIndex} rows={Math.ceil(grid.length / 8)} />
             {mascot && <MascotSprite mascot={mascot} grid={grid} />}
           </div></div>
