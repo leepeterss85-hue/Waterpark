@@ -1,3 +1,4 @@
+import ParkRadio from "@/components/game/ParkRadio";
 import ObjectiveShortcuts from "@/components/game/ObjectiveShortcuts";
 import React, { useEffect, useRef, useState } from "react";
 import { Waves, BarChart3, Save, PoundSterling, CalendarDays, Users, Star, Trophy } from "lucide-react";
@@ -237,6 +238,8 @@ export default function Home() {
       <main className="relative flex-1 min-h-0 overflow-hidden p-1.5 sm:p-2">
         <UndoButton onUndo={game.lastBuildAction ? game.undoLastBuild : null} />
         <ParkGrid
+          playing={game.playing}
+          parkRadio={<ParkRadio game={game} />}
           grid={game.grid}
           parkZones={game.parkZones}
           upgrades={game.upgrades}

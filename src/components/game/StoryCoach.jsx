@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { BookOpen, ArrowRight, HelpCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { BookOpen, ArrowRight, HelpCircle, ChevronDown, ChevronUp, ChevronDown, ChevronUp } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { storyObjectiveProgress } from "@/data/storyObjectives";
 import { getStoryGuide } from "@/lib/storyGuide";
 
 export default function StoryCoach({ game, setOpenSheet, openSheet }) {
   const [details, setDetails] = useState(false);
+  const [compact, setCompact] = useState(true);
   const [expanded, setExpanded] = useState(true);
   const [chapterNotice, setChapterNotice] = useState(null);
   const previousStepRef = useRef(game.storyStep);
