@@ -9,7 +9,7 @@ const lines = {
   general: ["Please use the bins. The seagulls are not on the cleaning rota.", "Lost property has acquired one flip-flop and several ambitious hats.", "Please keep your dignity with you. Management cannot retrieve it from the flume.", "The lazy river has declined an invitation to work harder.", "Running by the pool is prohibited. Enthusiastic waddling is under review.", "Please do not feed the lifeguards. They have a staff room.", "A reminder: the wave pool is not accepting requests for an encore.", "Our rubber ducks are decorative. Their management advice is not binding."]
 };
 export function parkAnnouncement({guests = 0, queueStats = {}, incidents = [], waterQuality = 100, avgMood = 0, weather = ""} = {}, turn = 0) {
-  const wet = /rain|storm/.test(typeof weather === "string" ? weather : weather?.id || "");
+  const wet = /rain|storm/.test(String(weather || ""));
   const category = incidents.length ? "repair" : guests <= 0 ? "quiet" : waterQuality < 45 ? "water" :
     Object.values(queueStats).some(q => Number(q?.wait) >= 18) ? "busy" :
     wet ? "rain" : avgMood >= 82 ? "happy" : "general";
