@@ -18,7 +18,7 @@ const STAFF_ROLES = [
   { id: "zookeeper", color: "bg-emerald-700", label: "Zookeeper" },
 ];
 
-export default function GuestLayer({ playing = true, graphicsQuality = "ultra", grid, parkZones = [], guests = 0, avgMood = 0, waterQualityAvg = 100, movements = {}, queueStats = {}, staff = {}, staffAssignments = {}, incidents = [], attractionCondition = [], hotelGuests = [], ticketPrice = 28 }) {
+export default function GuestLayer({ playing = true, graphicsQuality = "ultra", grid, parkZones = [], guests = 0, avgMood = 0, waterQualityAvg = 100, movements = {}, queueStats = {}, staff = {}, staffAssignments = {}, incidents = [], attractionCondition = [], hotelGuests = [], ticketPrice = 28, inspectionPending = false }) {
   const [tick, setTick] = useState(0);
   const reducedMotion = useReducedMotion();
   useEffect(() => { if(reducedMotion || !playing) return; const timer = setInterval(() => setTick(value => document.hidden ? value : value + 1), graphicsQuality === "balanced" ? 3200 : 1600); return () => clearInterval(timer); }, [reducedMotion, graphicsQuality, playing]);
@@ -83,8 +83,13 @@ export default function GuestLayer({ playing = true, graphicsQuality = "ultra", 
     </span>;
   });
 
+  const inspectionTrip = inspectionPending ? guestJourney(openTargets, tick, 3, home, openTargets) : null;
   return <div className="pointer-events-none absolute inset-0 z-30 overflow-hidden" data-people-layer>
     {walkers}{personnel}{hotelSprites}
+    {inspectionTrip && <span className="park-pedestrian park-inspector" role="img" aria-label="Park inspector visiting" style={position(inspectionTrip.x, inspectionTrip.y)}>
+      <span className="park-inspector-avatar" aria-hidden="true">🕵️</span>
+      <span className="park-inspector-label" aria-hidden="true">Clipboard inspection</span>
+    </span>}
     {guests > 0 && Object.entries(queueStats).filter(([tile, queue]) => queue.guests > 0 && !closed.has(Number(tile))).slice(0, graphicsQuality === "balanced" ? 8 : 20).flatMap(([tileIndex, queue]) => Array.from({ length: Math.min(3, Math.max(1, Math.ceil(queue.guests / 5))) }, (_, i) => <span key={`q${tileIndex}-${i}`} className="park-pedestrian park-queue-guest" data-activity="waiting" title={`Queue: ${queue.guests} guests · ${queue.wait}m wait · rail capacity ${queue.queueCapacity ?? 8}${queue.overflow > 0 ? " · overflow " + queue.overflow : ""}`} style={position(Number(tileIndex) % 8 + .18 + i * .31, Math.floor(Number(tileIndex) / 8) + .76)}><PersonSprite activity="waiting" variant={(i + tick) % 8} /></span>))}
   </div>;
 }
