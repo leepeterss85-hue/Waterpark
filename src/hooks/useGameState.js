@@ -434,6 +434,52 @@ export function useGameState() {
     }
   }, []);
 
+  // Narrative events are driven by actual simulated park days. They remain
+  // pending until the player decides, without hijacking the game or menus.
+  useEffect(() => {
+    setParkLife(current => {
+      if (current.lastProcessedDay >= day) return current;
+      const hasRide = grid.some(id => getParkItem(id)?.category === "attraction");
+      const snapshot = stateRef.current;
+      const pendingEvent = current.pendingEvent || (hasRide && day >= 4 && day % 4 === 0 ? nextParkEvent(snapshot) : null);
+      const pendingInspection = current.pendingInspection || (hasRide && day >= 7 && day % 7 === 0 ? inspectPark(snapshot) : null);
+      return { ...current, lastProcessedDay: day, pendingEvent, pendingInspection };
+    });
+  }, [day]);
+
+  const resolveParkEvent = useCallback((eventId, choiceId) => {
+    const current = parkLifeRef.current;
+    if (current.pendingEvent?.id !== eventId || parkLifeActionGuard.current === eventId) return false;
+    const event = PARK_LIFE_EVENTS.find(e => e.id === current.pendingEvent.type);
+    const choice = event?.choices.find(c => c.id === choiceId);
+    if (!choice) return false;
+    parkLifeActionGuard.current = eventId;
+    const next = { ...current, pendingEvent: null, eventsResolved: [
+      {id:eventId, day:current.pendingEvent.day, title:event.title, choice:choice.label, result:choice.result,
+        money:choice.money, reputation:choice.reputation}, ...(current.eventsResolved || [])
+    ].slice(0, 12) };
+    parkLifeRef.current = next;
+    setParkLife(next);
+    if (choice.money) setMoney(m => Math.max(0, m + choice.money));
+    if (choice.reputation) setReputation(r => Math.max(0, Math.min(100, r + choice.reputation)));
+    setLog(l => [{day:stateRef.current.day, text:`🎭 ${event.title}: ${choice.result} (${choice.money >= 0 ? "+" : "−"}£${Math.abs(choice.money).toLocaleString("en-GB")}, ${choice.reputation >= 0 ? "+" : ""}${choice.reputation} reputation)`}, ...l].slice(0, 12));
+    return true;
+  }, []);
+
+  const acceptParkInspection = useCallback((inspectionId) => {
+    const current = parkLifeRef.current;
+    const report = current.pendingInspection;
+    if (!report || report.id !== inspectionId || parkLifeActionGuard.current === inspectionId) return false;
+    parkLifeActionGuard.current = inspectionId;
+    const next = { ...current, pendingInspection: null, inspections: [report, ...(current.inspections || [])].slice(0, 12) };
+    parkLifeRef.current = next;
+    setParkLife(next);
+    if (report.money) setMoney(m => Math.max(0, m + report.money));
+    if (report.reputation) setReputation(r => Math.max(0, Math.min(100, r + report.reputation)));
+    setLog(l => [{day:stateRef.current.day, text:`📋 Inspector report: ${report.grade}, ${report.score}/100. ${report.remark}`}, ...l].slice(0, 12));
+    return true;
+  }, []);
+
   // Game loop
   useEffect(() => {
     if (!playing) return;
