@@ -185,7 +185,7 @@ export function unlockedDistricts(expansionsDone) {
 }
 
 export function nextLockedDistrict(expansionsDone) {
-  return DISTRICTS.find((d) => d.minExpansions > expansionsDone) || null;
+  return DISTRICTS.filter((d) => d.minExpansions > expansionsDone).sort((a, b) => a.minExpansions - b.minExpansions)[0] || null;
 }
 
 // Check legendary objective completion using each district’s stated target count.
