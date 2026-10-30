@@ -1,14 +1,15 @@
 import React from "react";
-import { Hammer, Settings, Users, Grid3x3, ChevronUp, Gamepad2 } from "lucide-react";
+import { Hammer, Settings, Users, Grid3x3, ChevronUp, Gamepad2, ClipboardCheck } from "lucide-react";
 
 const PRIMARY = [
   { key: "build", icon: Hammer, label: "Build", tutorialTarget: "build" },
   { key: "manage", icon: Settings, label: "Manage", tutorialTarget: "manage" },
   { key: "staff", icon: Users, label: "Staff", tutorialTarget: "staff" },
   { key: "gameModes", icon: Gamepad2, label: "Modes", tutorialTarget: "gameModes" },
+  { key: "parkLife", icon: ClipboardCheck, label: "Park Life", tutorialTarget: "parkLife" },
 ];
 
-export default function MapMenuBar({ openSheet, onOpen, missionsBadge = 0, incidentBadge = 0 }) {
+export default function MapMenuBar({ openSheet, onOpen, missionsBadge = 0, incidentBadge = 0, parkLifeBadge = 0 }) {
   const isHubOpen = openSheet === "menu";
   const handleOpen = (key) => onOpen(openSheet === key ? null : key);
   return (
@@ -17,7 +18,7 @@ export default function MapMenuBar({ openSheet, onOpen, missionsBadge = 0, incid
         {PRIMARY.map((m) => {
           const Icon = m.icon;
           const active = openSheet === m.key;
-          const badge = m.key === "manage" ? incidentBadge : 0;
+          const badge = m.key === "manage" ? incidentBadge : m.key === "parkLife" ? parkLifeBadge : 0;
           return <button key={m.key} type="button" onClick={() => handleOpen(m.key)} title={m.label} aria-label={m.label}
             aria-expanded={active} className={"park-menu-button" + (active ? " is-active" : "")}
             data-tutorial-target={m.tutorialTarget || undefined}>
