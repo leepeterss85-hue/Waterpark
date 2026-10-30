@@ -113,8 +113,18 @@ export function inspectPark(game) {
     Poor:"Several improvements are required. The clipboard has requested overtime.",
     Catastrophic:"This inspection required a second pen and a strong cup of tea.",
   };
+  const targeted = {
+    "Ride safety": "Your mechanic is busy. The rides have been asked to make fewer expensive noises.",
+    "Water and cleanliness": "The pool water should sparkle. The inspector's eyebrows should not.",
+    "Queues": "The queue is long enough to apply for its own postcode.",
+    "Guest happiness": "Several guests are smiling. Several others have requested a refund on the concept of fun.",
+    "Facilities": "Your facilities need attention. Even the seagulls are filing formal complaints.",
+    "Hotel hospitality": "The hotel has possibilities. We suggest beginning with guests who can find their rooms.",
+    "Zoo care": "The zookeeper looks capable. The meerkats have requested a second opinion.",
+  };
+  const personalisedRemark = score >= 78 ? remarks[grade] : targeted[worst.name] + " " + remarks[grade];
   const money = ({Legendary:2000,Excellent:1100,Good:400,Acceptable:0,Poor:-450,Catastrophic:-950})[grade];
   const reputation = ({Legendary:3,Excellent:2,Good:1,Acceptable:0,Poor:-1,Catastrophic:-3})[grade];
   return {id:`inspection-${game.day}`, day:game.day, score, grade, sections, money, reputation,
-    remark: remarks[grade], advice: `Improve ${worst.name.toLowerCase()}: ${worst.hint}.`};
+    remark: personalisedRemark, advice: `Improve ${worst.name.toLowerCase()}: ${worst.hint}.`};
 }
