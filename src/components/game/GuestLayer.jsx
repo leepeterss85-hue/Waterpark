@@ -1,5 +1,5 @@
 import { guestJourney } from "@/data/guestJourney";
-import { walkerProfile } from "@/data/guestWayfinding";
+import { guestPersonalityRemark, walkerProfile } from "@/data/guestWayfinding";
 import { useReducedMotion } from "framer-motion";
 import React, { useEffect, useMemo, useState } from "react";
 import { getParkItem } from "@/data/gameData";
@@ -18,7 +18,7 @@ const STAFF_ROLES = [
   { id: "zookeeper", color: "bg-emerald-700", label: "Zookeeper" },
 ];
 
-export default function GuestLayer({ playing = true, graphicsQuality = "ultra", grid, parkZones = [], guests = 0, avgMood = 0, waterQualityAvg = 100, movements = {}, queueStats = {}, staff = {}, staffAssignments = {}, incidents = [], attractionCondition = [], hotelGuests = [] }) {
+export default function GuestLayer({ playing = true, graphicsQuality = "ultra", grid, parkZones = [], guests = 0, avgMood = 0, waterQualityAvg = 100, movements = {}, queueStats = {}, staff = {}, staffAssignments = {}, incidents = [], attractionCondition = [], hotelGuests = [], ticketPrice = 28 }) {
   const [tick, setTick] = useState(0);
   const reducedMotion = useReducedMotion();
   useEffect(() => { if(reducedMotion || !playing) return; const timer = setInterval(() => setTick(value => document.hidden ? value : value + 1), graphicsQuality === "balanced" ? 3200 : 1600); return () => clearInterval(timer); }, [reducedMotion, graphicsQuality, playing]);
@@ -42,11 +42,12 @@ export default function GuestLayer({ playing = true, graphicsQuality = "ultra", 
     if(!trip) return null;
     const {target,activity,x,y}=trip;
     if(activity==="waiting" && isWaterAttraction(target.id)) return null;
+    const remark = guestPersonalityRemark(profile, {queueWait:queueStats?.[target.index]?.wait || 0,mood:avgMood,waterQuality:waterQualityAvg,ticketPrice,incidents:incidents.length});
     return <span key={"g"+i} className="park-pedestrian park-guest" data-activity={activity} data-destination={target.id} data-guest-activity={activity}
       data-guest-type={profile.type.replaceAll(" ","-").toLowerCase()} style={position(x+(i%3-1)*.16,y+((i%3)-1)*.045)} title={profile.label+" · "+activity+" · "+target.attr.name}>
       <PersonSprite activity={activity} variant={i}/>
       {i>0 && i%9===0 && graphicsQuality!=="balanced" && <span className="park-guest-profile-tag" aria-hidden="true" title={profile.label}>{profile.badge}</span>}
-      {i===0 && guestReaction && <span className="guest-reaction-bubble" data-tone={guestReaction.tone} title={guestReaction.reason}>{guestReaction.text}</span>}
+      {(i===0 && guestReaction || i%11===0 && (tick+i)%9===0) && <span className="guest-reaction-bubble" data-tone={i===0 && guestReaction ? guestReaction.tone : remark.tone} title={profile.type}>{i===0 && guestReaction ? guestReaction.text : remark.text}</span>}
     </span>;
   });
   const personnel = STAFF_ROLES.flatMap((role, roleIndex) => {
