@@ -1,5 +1,5 @@
 import React from "react";
-import { CalendarDays, ClipboardCheck, Coins, MapPinned, Users, Sparkles, AlertCircle, CheckCircle2 } from "lucide-react";
+import { CalendarDays, ClipboardCheck, Coins, MapPinned, Users, Sparkles, CheckCircle2 } from "lucide-react";
 import { PARK_LIFE_EVENTS } from "@/data/parkLifeExpansion";
 import { WALKER_PROFILES } from "@/data/guestWayfinding";
 
