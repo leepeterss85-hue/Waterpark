@@ -240,7 +240,7 @@ export default function Home() {
         <UndoButton onUndo={game.lastBuildAction ? game.undoLastBuild : null} />
         <ParkGrid
           playing={game.playing}
-          parkRadio={<ParkRadio game={game} />}
+          parkRadio={<ParkRadio game={game} onOpenParkLife={() => handleOpenMenu("parkLife")} />}
           grid={game.grid}
           parkZones={game.parkZones}
           upgrades={game.upgrades}
