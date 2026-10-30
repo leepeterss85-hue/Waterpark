@@ -294,7 +294,7 @@ export default function Home() {
           }
           storyGuide={<StoryCoach game={game} setOpenSheet={handleOpenMenu} openSheet={openSheet} />}
           parkUpdates={<><ObjectiveShortcuts game={game} onOpen={handleOpenMenu} />{game.challenge && <ChallengeBanner challenge={game.challenge} />}{game.vipVisit && <VipBanner vipVisit={game.vipVisit} />}{game.disaster && <DisasterBanner disaster={game.disaster} />}</>}
-          bottomMenu={<MapMenuBar openSheet={openSheet} onOpen={handleOpenMenu} missionsBadge={claimableMissions} incidentBadge={incidentCount} />}
+          bottomMenu={<MapMenuBar openSheet={openSheet} onOpen={handleOpenMenu} missionsBadge={claimableMissions} incidentBadge={incidentCount} parkLifeBadge={Number(!!game.parkLife?.pendingEvent) + Number(!!game.parkLife?.pendingInspection)} />}
           statsBar={statsBar}
           themeClass={themeClass}
         />
