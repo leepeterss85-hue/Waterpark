@@ -52,3 +52,7 @@
 @media(prefers-reduced-motion:reduce) {
   .resort-finish .park-construction-workers i { animation:none; }
 }
+/* Visiting inspector is a lightweight non-interactive sprite. */
+.resort-finish .park-inspector { z-index:38; display:flex; align-items:center; flex-direction:column; pointer-events:none; filter:drop-shadow(0 3px 3px #0f172a66); }
+.resort-finish .park-inspector-avatar { font-size:clamp(14px,2vw,25px); line-height:1; }
+.resort-finish .park-inspector-label { padding:3px 5px; border:1px solid #fef3c7; border-radius:5px; background:#1e293bee; color:white; font-size:8px; font-weight:800; white-space:nowrap; }
