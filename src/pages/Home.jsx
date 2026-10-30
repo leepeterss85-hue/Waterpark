@@ -66,6 +66,7 @@ export default function Home() {
   const prevLevel = useRef(game.level);
   const [dailyReport, setDailyReport] = useState(null);
   const [openSheet, setOpenSheet] = useState(null);
+  const [spotlightTile, setSpotlightTile] = useState(null);
   const [graphicsQuality, setGraphicsQualityState] = useState(getGraphicsQuality);
   const changeGraphicsQuality = (value) => {
     setGraphicsQualityState(setGraphicsQuality(value));
@@ -253,6 +254,9 @@ export default function Home() {
           onOpenSettings={() => handleOpenMenu("settings")}
           money={game.money}
           sandbox={game.sandbox}
+          ticketPrice={game.ticketPrice}
+          spotlightTile={spotlightTile}
+          onExitSpotlight={() => setSpotlightTile(null)}
           onCancelBuild={() => game.setSelectedBuild(null)}
           onChangeBuild={() => handleOpenMenu("build")}
           selectedTile={game.selectedTile}
@@ -338,6 +342,7 @@ export default function Home() {
                   trendBoost={game.popularityTrend?.[game.selectedTile] ?? 0}
                   rideFocus={rideFocusFor(game.rideSpecialties, game.selectedTile, selectedAttrId)}
                   sandbox={game.sandbox}
+                  onWatchRide={() => { setSpotlightTile(game.selectedTile); game.setSelectedTile(null); game.setSelectedBuild(null); }}
                   onUpgrade={(focus) => game.upgradeAttraction(game.selectedTile, focus)}
                   onSell={() => game.sellAttraction(game.selectedTile)}
                   onClose={() => game.setSelectedTile(null)}
