@@ -44,7 +44,7 @@ export default function StoryCoach({ game, setOpenSheet, openSheet }) {
       : guide.kind === "ride"
         ? '[data-kind="attraction"]'
         : `[data-tutorial-target="${guide.target}"]`;
-    const targets = [...document.querySelectorAll(selector)];
+    const targets = Array.from(document.querySelectorAll(selector));
     targets.forEach((el) => el.classList.add("story-action-highlight"));
     return () => targets.forEach((el) => el.classList.remove("story-action-highlight"));
   }, [guide?.kind, guide?.target, openSheet, details, game.grid, active]);
@@ -68,7 +68,7 @@ export default function StoryCoach({ game, setOpenSheet, openSheet }) {
       const tile = document.querySelector(selector);
       if (tile) {
         tile.dispatchEvent(new CustomEvent("park-focus-tile", { bubbles: true }));
-        tile.focus({ preventScroll: true });
+        if (tile instanceof HTMLElement) tile.focus({ preventScroll: true });
       } else {
         setOpenSheet("build");
       }
